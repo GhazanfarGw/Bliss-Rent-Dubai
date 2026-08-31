@@ -24,11 +24,11 @@ describe('NavBar', () => {
     renderNavBar()
 
     expect(screen.getAllByRole('link', { name: 'Home' }).length).toBeGreaterThan(0)
+    expect(screen.getAllByRole('link', { name: 'About' }).length).toBeGreaterThan(0)
     expect(screen.getAllByRole('link', { name: 'Browse Fleet' }).length).toBeGreaterThan(0)
     expect(screen.getAllByRole('link', { name: 'Car Types' }).length).toBeGreaterThan(0)
-    expect(screen.getAllByRole('link', { name: 'About' }).length).toBeGreaterThan(0)
-    expect(screen.getAllByRole('link', { name: 'Contact' }).length).toBeGreaterThan(0)
     expect(screen.getAllByRole('link', { name: 'Services' }).length).toBeGreaterThan(0)
+    expect(screen.getAllByRole('link', { name: 'Contact' }).length).toBeGreaterThan(0)
     expect(screen.getAllByRole('link', { name: 'Search Cars' }).length).toBeGreaterThan(0)
   })
 
@@ -36,8 +36,8 @@ describe('NavBar', () => {
     renderNavBar()
     const aboutLinks = screen.getAllByRole('link', { name: 'About' })
     const carTypeLinks = screen.getAllByRole('link', { name: 'Car Types' })
-    const contactLinks = screen.getAllByRole('link', { name: 'Contact' })
     const servicesLinks = screen.getAllByRole('link', { name: 'Services' })
+    const contactLinks = screen.getAllByRole('link', { name: 'Contact' })
     expect(aboutLinks[0]).toHaveAttribute('href', '/about')
     expect(carTypeLinks[0]).toHaveAttribute('href', '/car-types')
     expect(contactLinks[0]).toHaveAttribute('href', '/contact')

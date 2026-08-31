@@ -43,9 +43,9 @@ export function NavBar() {
 
   const links = [
     { to: '/', label: t('nav.home'), end: true },
+    { to: '/about', label: t('nav.about'), end: false },
     { to: '/search', label: t('nav.browseFleet'), end: false },
     { to: '/car-types', label: t('nav.carTypes'), end: false },
-    { to: '/about', label: t('nav.about'), end: false },
     { to: '/contact', label: t('nav.contact'), end: false },
   ]
   const anchors = [{ to: { pathname: '/', hash: '#how-it-works' }, label: t('nav.services') }]
