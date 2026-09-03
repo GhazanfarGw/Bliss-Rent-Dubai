@@ -25,9 +25,9 @@ describe('FilterBar', () => {
     expect(openButton).toHaveAttribute('aria-expanded', 'false')
     await user.click(openButton)
 
-    const dialog = screen.getByRole('dialog', { name: 'Filter cars' })
+    const dialog = screen.getByRole('dialog', { name: 'Filter fleet' })
     expect(openButton).toHaveAttribute('aria-expanded', 'true')
-    await user.click(within(dialog).getByRole('checkbox', { name: 'Toyota' }))
+    await user.selectOptions(within(dialog).getByRole('combobox', { name: 'Brand' }), 'Toyota')
 
     expect(props.onFiltersChange).toHaveBeenCalledWith({ ...EMPTY_FILTERS, brand: 'Toyota' })
     expect(screen.getByRole('dialog')).toBeInTheDocument()

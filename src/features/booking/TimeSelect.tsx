@@ -22,8 +22,8 @@ interface TimeSelectProps {
 export function TimeSelect({ label, ariaLabel, value, onChange, row = false }: TimeSelectProps) {
   const { i18n } = useTranslation()
   return (
-    <div className={row ? 'flex w-28 shrink-0 flex-col gap-1' : 'flex w-full flex-col gap-1 sm:w-32'}>
-      <span className="block text-xs font-semibold uppercase tracking-wide text-slate-500">{label}</span>
+    <div className={row ? 'flex w-full flex-col gap-1 sm:w-28 sm:shrink-0' : 'flex w-full flex-col gap-1 sm:w-32'}>
+      <span className="block text-xs font-semibold uppercase tracking-wide text-text-muted">{label}</span>
       <select value={value} onChange={(e) => onChange(e.target.value)} aria-label={ariaLabel} className={inputClass() + ' ltr-nums'}>
         {TIME_OPTIONS.map((t) => (
           <option key={t} value={t}>

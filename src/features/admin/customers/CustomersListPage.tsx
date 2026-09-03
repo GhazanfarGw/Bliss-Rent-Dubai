@@ -68,14 +68,14 @@ export function CustomersListPage() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder={t('admin.customers.searchPlaceholder')}
-          className="w-full max-w-sm rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-brand-navy outline-none focus:border-brand-navy focus:ring-1 focus:ring-brand-navy"
+          className="w-full max-w-sm rounded-lg border border-border bg-white px-3 py-2 text-sm text-brand-navy outline-none focus:border-brand-navy focus:ring-1 focus:ring-brand-navy"
         />
       </div>
 
       {state.status === 'loading' && (
         <div className="flex flex-col items-center justify-center py-16">
           <Spinner className="h-8 w-8" />
-          <p className="mt-3 text-sm text-slate-500">{t('common.loading')}</p>
+          <p className="mt-3 text-sm text-text-muted">{t('common.loading')}</p>
         </div>
       )}
 
@@ -89,7 +89,7 @@ export function CustomersListPage() {
         <div className="overflow-x-auto rounded-xl border border-brand-navy/10 bg-white">
           <table className="w-full min-w-[640px] text-sm">
             <thead>
-              <tr className="border-b border-brand-navy/10 text-xs font-semibold uppercase tracking-wide text-slate-500">
+              <tr className="border-b border-brand-navy/10 text-xs font-semibold uppercase tracking-wide text-text-muted">
                 <th className="px-4 py-3 text-start">{t('admin.customers.columns.name')}</th>
                 <th className="px-4 py-3 text-start">{t('admin.customers.columns.email')}</th>
                 <th className="px-4 py-3 text-start">{t('admin.customers.columns.phone')}</th>

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { validateDateRange, rentalDays } from '@/lib/dateRange'
+import { validateDateRange, rentalDays, daysRemaining } from '@/lib/dateRange'
 
 const FIXED_TODAY = new Date('2026-09-10T12:00:00')
 
@@ -58,5 +58,19 @@ describe('rentalDays', () => {
 
   it('handles a month-long rental', () => {
     expect(rentalDays('2026-09-01', '2026-09-30')).toBe(30)
+  })
+})
+
+describe('daysRemaining', () => {
+  it('counts whole days between today and a future return date', () => {
+    expect(daysRemaining('2026-09-15', FIXED_TODAY)).toBe(5)
+  })
+
+  it('returns 0 when the return date is today', () => {
+    expect(daysRemaining('2026-09-10', FIXED_TODAY)).toBe(0)
+  })
+
+  it('clamps to 0 rather than going negative for a past return date', () => {
+    expect(daysRemaining('2026-09-01', FIXED_TODAY)).toBe(0)
   })
 })

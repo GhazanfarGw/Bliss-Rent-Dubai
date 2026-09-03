@@ -22,7 +22,7 @@ export function AdminTabs<T extends string>({ tabs, active, onChange }: AdminTab
             '-mb-px flex items-center gap-1.5 border-b-2 px-3 py-2 text-sm font-medium transition-colors ' +
             (active === tab.value
               ? 'border-brand-gold text-brand-navy'
-              : 'border-transparent text-slate-500 hover:text-brand-navy')
+              : 'border-transparent text-text-muted hover:text-brand-navy')
           }
         >
           {tab.label}
@@ -30,7 +30,7 @@ export function AdminTabs<T extends string>({ tabs, active, onChange }: AdminTab
             <span
               className={
                 'rounded-full px-1.5 py-0.5 text-[11px] font-semibold ' +
-                (active === tab.value ? 'bg-brand-lavender text-brand-navy' : 'bg-slate-100 text-slate-500')
+                (active === tab.value ? 'bg-brand-lavender text-brand-navy' : 'bg-surface-muted text-text-muted')
               }
             >
               {tab.count}

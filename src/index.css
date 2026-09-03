@@ -1,54 +1,66 @@
 @import "tailwindcss";
 
 /*
- * Bliss Rent brand theme.
+ * Bliss Rent official brand system (Phase 10 — Premium Frontend
+ * UI/UX & Responsive Overhaul). Every customer-facing color must trace
+ * back to exactly one of these six approved colors:
  *
- * Inspired by the muted navy / soft lavender / warm gold palette common
- * to Gulf-region government and travel sites (e.g. Saudi's eVisa portal)
- * — adapted into Bliss Rent's own tokens, not copied wholesale. Defined
- * once here as Tailwind v4 @theme tokens so `bg-brand-navy`,
- * `text-brand-gold`, etc. are available everywhere, and the palette can
- * be retuned from this single file.
+ *   Luxury Berry            #5C0931  -> --color-brand-gold (identifier kept
+ *                                       for backward compatibility — every
+ *                                       existing `bg-brand-gold`/`text-brand-gold`
+ *                                       class already renders the correct
+ *                                       Luxury Berry hex, unchanged)
+ *   Deep Space Blue         #0B132B  -> --color-brand-navy
+ *   Muted Champagne Gold    #D4AF37  -> --color-brand-champagne (new — the
+ *                                       one true "gold" accent; brand-gold
+ *                                       above is berry, not gold, despite
+ *                                       its name)
+ *   Sleek Platinum Gray     #F4F5F7  -> --color-brand-lavender (identifier
+ *                                       kept; value retuned from the old
+ *                                       warm beige to the official cool
+ *                                       platinum gray)
+ *   Crisp Clean White       #FFFFFF  -> --color-surface / literal white
+ *   Success Green           #10B981  -> --color-success
+ *
+ * No other hue is introduced. Tints/shades below (e.g. `-dark`/`-light`)
+ * are derived from these six, not new colors.
  */
 @theme {
-  --color-brand-navy: #2e2a54;
-  --color-brand-navy-dark: #201c3b;
-  --color-brand-navy-light: #46407c;
+  --color-brand-navy: #0b132b;
+  --color-brand-navy-dark: #070a1a;
+  --color-brand-navy-light: #1c2540;
 
-  --color-brand-lavender: #edebf4;
-  --color-brand-lavender-dark: #e0dcec;
+  --color-brand-lavender: #f4f5f7;
+  --color-brand-lavender-dark: #e2e4e9;
 
-  --color-brand-gold: #b49b6c;
-  --color-brand-gold-dark: #96794a;
-  --color-brand-gold-light: #d9c9a3;
+  --color-brand-gold: #5C0931;
+  --color-brand-gold-dark: #430720;
+  --color-brand-gold-light: #8c4a62;
+
+  --color-brand-champagne: #d4af37;
+  --color-brand-champagne-dark: #ad8a25;
+  --color-brand-champagne-light: #e6c968;
 
   --font-sans: 'Cairo', 'Noto Kufi Arabic', ui-sans-serif, system-ui, sans-serif;
 
   /*
-   * Phase 8 — semantic tokens, additive only.
+   * Phase 8 — semantic tokens, additive only (retuned in Phase 10 to the
+   * official palette above — identifiers unchanged, only hex values and
+   * the two documented mismatches fixed).
    *
-   * Everything above this comment is untouched from Phase 0–7 — no
-   * existing token was renamed, removed, or redefined, so every
-   * `bg-brand-navy`/`text-brand-gold`/etc. class already in the app
-   * keeps working exactly as before.
-   *
-   * These new tokens give every "state" color (success/warning/error/
-   * info) and every neutral surface/border/text color a name derived
-   * from (or deliberately matched to) the existing brand palette,
-   * instead of components reaching for Tailwind's stock red, emerald,
-   * and amber utilities ad hoc (see the Phase 8 audit, section 1.3).
-   * `warning`/`info` intentionally reuse brand-gold-dark/brand-navy
-   * rather than introducing unrelated hues, so the semantic layer still
-   * reads as "Bliss Rent", not a generic template palette.
+   * These give every "state" color (success/warning/error/info) and every
+   * neutral surface/border/text color a name derived from the brand
+   * palette, instead of components reaching for Tailwind's stock red,
+   * emerald, and amber utilities ad hoc.
    */
-  --color-success: #1e7a4d;
-  --color-success-bg: #e8f5ee;
+  --color-success: #10b981;
+  --color-success-bg: #e3faf1;
   --color-warning: #96794a; /* == brand-gold-dark */
   --color-warning-bg: #f7f0e2;
   --color-error: #b3261e;
   --color-error-bg: #fbeceb;
-  --color-info: #2e2a54; /* == brand-navy */
-  --color-info-bg: #edebf4; /* == brand-lavender */
+  --color-info: #0b132b; /* == brand-navy (was a mismatched literal before Phase 10) */
+  --color-info-bg: #eef0f4; /* tint of brand-lavender/platinum (was a mismatched literal before Phase 10) */
 
   --color-surface: #ffffff;
   --color-surface-muted: #faf9f6;
@@ -57,12 +69,62 @@
   --color-text-muted: #5c5a6b;
 }
 
+/*
+ * Single source of truth for the fixed header's height — NavBar's own
+ * `h-[var(--header-h)]` and every "clear the header" offset elsewhere
+ * (Layout's `<main>` top padding, HeroCarousel's full-bleed exception,
+ * StickySearchBar, FilterBar's mobile sticky bar) all read this one
+ * variable, so the header can never again get out of sync with the
+ * spacing that depends on it.
+ *
+ * `--ticker-h` is the same idea for the homepage TickerBar (Phase 11):
+ * a fixed strip pinned directly below the header. HeroCarousel's inner
+ * content clearance adds this on top of --header-h so heading text never
+ * sits under either bar; the ticker itself reads this for its own height.
+ */
+:root {
+  --header-h: 4rem;
+  --ticker-h: 2.25rem;
+}
+
 html[dir='rtl'] {
   font-family: 'Cairo', 'Noto Kufi Arabic', ui-sans-serif, system-ui, sans-serif;
 }
 
+html,
 body {
-  overflow-x: hidden;
+  max-width: 100%;
+  width: 100%;
+  overflow-x: hidden !important;
+  overscroll-behavior-x: none;
+  touch-action: pan-y;
+}
+
+html,
+body,
+#root {
+  min-width: 100%;
+}
+
+body {
+  position: relative;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.overflow-x-auto {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.overflow-x-auto::-webkit-scrollbar {
+  display: none;
 }
 
 .desktop-filter-options {
@@ -115,6 +177,27 @@ body {
   }
 }
 
+@keyframes slide-in-right {
+  from {
+    transform: translateX(110%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+/* Mirror of slide-in-right for the mobile nav drawer in RTL, where the
+   panel docks at the logical "end" (the left edge) and must slide in from
+   the left, not the right. */
+@keyframes slide-in-left {
+  from {
+    transform: translateX(-110%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
 @keyframes route-loader-drive {
   0% {
     transform: translateX(-10%) translateY(-50%);
@@ -151,7 +234,59 @@ body {
 
 .animate-marquee:hover,
 .animate-marquee:focus-within {
+  animation-play-state: running;
+}
+
+/* Homepage Featured Vehicles sliders — Economy and Luxury each auto-scroll
+   continuously in opposite directions (built the same way as
+   BrandsMarquee above: the vehicle list duplicated once so animating the
+   combined row by exactly -50% loops seamlessly), and — unlike
+   .animate-marquee above — genuinely pause while a shopper is looking at
+   one, on hover or keyboard focus, so they can read a card without it
+   sliding away. The duplicated copy is marked `inert`/`aria-hidden` in
+   the component, so this is purely decorative motion, never doubled
+   reading or tab order. */
+/* Named by the direction cards visually travel, not text direction —
+   this is decorative motion (same as BrandsMarquee), never RTL-flipped
+   for Arabic. */
+@keyframes featured-marquee-move-left {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes featured-marquee-move-right {
+  from {
+    transform: translateX(-50%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.animate-featured-marquee-left {
+  animation: featured-marquee-move-left 36s linear infinite;
+}
+
+.animate-featured-marquee-right {
+  animation: featured-marquee-move-right 36s linear infinite;
+}
+
+.animate-featured-marquee-left:hover,
+.animate-featured-marquee-left:focus-within,
+.animate-featured-marquee-right:hover,
+.animate-featured-marquee-right:focus-within {
   animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-featured-marquee-left,
+  .animate-featured-marquee-right {
+    animation: none;
+  }
 }
 
 .route-loader-overlay {

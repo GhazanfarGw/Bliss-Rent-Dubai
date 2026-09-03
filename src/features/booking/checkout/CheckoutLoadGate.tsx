@@ -21,7 +21,7 @@ export function CheckoutLoadGate({ loadState, vehicleId, errorMessage }: Checkou
     return (
       <div className="flex flex-col items-center justify-center py-24">
         <Spinner className="h-8 w-8" />
-        <p className="mt-3 text-sm text-slate-500">{t('common.loading')}</p>
+        <p className="mt-3 text-sm text-text-muted">{t('common.loading')}</p>
       </div>
     )
   }

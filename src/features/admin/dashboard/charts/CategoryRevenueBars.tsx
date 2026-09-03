@@ -13,7 +13,7 @@ interface CategoryRevenueBarsProps {
 /** Simple horizontal bar breakdown — deliberately plain divs/percent widths rather than SVG, since this is a ranked list, not a coordinate chart. */
 export function CategoryRevenueBars({ slices, currency, uncategorizedLabel, emptyLabel }: CategoryRevenueBarsProps) {
   if (slices.length === 0) {
-    return <p className="py-6 text-center text-sm text-slate-400">{emptyLabel}</p>
+    return <p className="py-6 text-center text-sm text-text-muted">{emptyLabel}</p>
   }
 
   return (
@@ -22,7 +22,7 @@ export function CategoryRevenueBars({ slices, currency, uncategorizedLabel, empt
         <div key={slice.name ?? '__uncategorized'}>
           <div className="mb-1 flex items-center justify-between gap-2 text-xs">
             <span className="font-medium text-brand-navy">{slice.name ?? uncategorizedLabel}</span>
-            <span className="shrink-0 text-slate-500">
+            <span className="shrink-0 text-text-muted">
               {formatCurrencyFull(slice.revenue, currency)} · {slice.percent.toFixed(0)}%
             </span>
           </div>

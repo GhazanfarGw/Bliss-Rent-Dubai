@@ -85,7 +85,7 @@ export function CustomerDetailsPage() {
           />
         </Field>
 
-        <p className="text-xs text-slate-500">{t('checkout.customer.note')}</p>
+        <p className="text-xs text-text-muted">{t('checkout.customer.note')}</p>
 
         <button
           type="submit"
@@ -101,12 +101,12 @@ export function CustomerDetailsPage() {
 function Field({ label, error, children }: { label: string; error?: string; children: ReactNode }) {
   return (
     <label className="block">
-      <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">{label}</span>
+      <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-text-muted">{label}</span>
       {children}
-      {error && <span className="mt-1 block text-xs font-medium text-red-600">{error}</span>}
+      {error && <span className="mt-1 block text-xs font-medium text-error">{error}</span>}
     </label>
   )
 }
 
 const inputClass =
-  'w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-brand-navy outline-none transition-colors focus:border-brand-navy focus:ring-1 focus:ring-brand-navy'
+  'w-full rounded-lg border border-border bg-white px-3 py-2.5 text-sm text-brand-navy outline-none transition-colors focus:border-brand-navy focus:ring-1 focus:ring-brand-navy'

@@ -1,6 +1,7 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { ArrowLeft } from 'lucide-react'
 import { criteriaToSearchParams } from '@/features/booking/searchParams'
 import {
   fetchLocations,
@@ -89,7 +90,7 @@ export function VehicleDetailPage() {
     return (
       <div className="flex flex-col items-center justify-center py-24">
         <Spinner className="h-8 w-8" />
-        <p className="mt-3 text-sm text-slate-500">{t('common.loading')}</p>
+        <p className="mt-3 text-sm text-text-muted">{t('common.loading')}</p>
       </div>
     )
   }
@@ -144,8 +145,9 @@ export function VehicleDetailPage() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-      <Link to="/search" className="text-sm font-medium text-slate-500 hover:text-brand-navy">
-        ← {t('vehicleDetail.backToResults')}
+      <Link to="/search" className="inline-flex items-center gap-1.5 text-sm font-medium text-text-muted hover:text-brand-navy">
+        <ArrowLeft className="h-4 w-4 rtl:rotate-180" aria-hidden="true" />
+        {t('vehicleDetail.backToResults')}
       </Link>
 
       <div className="mt-6 grid grid-cols-1 items-start gap-6 lg:grid-cols-[minmax(0,1fr)_360px] lg:gap-8">
@@ -181,7 +183,7 @@ export function VehicleDetailPage() {
                 <p className="text-2xl font-bold text-brand-navy">
                   {quote.currency} {quote.totalPrice.toLocaleString()}
                 </p>
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-text-muted">
                   {quote.currency} {quote.unitPrice.toLocaleString()} {TERM_LABELS[quote.term]} · {days}{' '}
                   {t(days === 1 ? 'common.day' : 'common.days')}
                 </p>
@@ -191,12 +193,12 @@ export function VehicleDetailPage() {
                 <p className="text-2xl font-bold text-brand-navy">
                   {headline.currency} {headline.client_price.toLocaleString()}
                 </p>
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-text-muted">
                   {TERM_LABELS[headline.term]} — {t('vehicleDetail.selectDatesForQuote')}
                 </p>
               </>
             ) : (
-              <p className="text-sm font-medium text-slate-500">{t('vehicleDetail.pricingSoon')}</p>
+              <p className="text-sm font-medium text-text-muted">{t('vehicleDetail.pricingSoon')}</p>
             )}
 
             <div className="mt-4 space-y-2 border-t border-brand-navy/10 pt-4 text-sm">
@@ -210,7 +212,7 @@ export function VehicleDetailPage() {
               <div className="mt-4 border-t border-brand-navy/10 pt-4">
                 <div className="flex items-center justify-between gap-3">
                   <p className="text-xs font-semibold text-brand-navy">{t('vehicleDetail.chooseTripDetails')}</p>
-                  <button type="button" onClick={() => setQuickEditor(null)} className="text-xs font-medium text-slate-500 underline-offset-2 hover:text-brand-navy hover:underline">{t('common.close')}</button>
+                  <button type="button" onClick={() => setQuickEditor(null)} className="text-xs font-medium text-text-muted underline-offset-2 hover:text-brand-navy hover:underline">{t('common.close')}</button>
                 </div>
                 <div className="mt-3">
                   {quickEditor === 'dates' && (
@@ -263,11 +265,11 @@ export function VehicleDetailPage() {
                 if (!id || !completeCriteria || !hasDates) return
                 navigate(`/checkout/${id}/customer?${criteriaToSearchParams(completeCriteria).toString()}`)
               }}
-              className="mt-5 w-full rounded-lg bg-brand-gold px-4 py-3 text-sm font-semibold text-brand-navy-dark transition-colors hover:bg-brand-gold-light disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-400"
+              className="mt-5 w-full rounded-lg bg-brand-gold px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-gold-light disabled:cursor-not-allowed disabled:bg-surface-muted disabled:text-text-muted"
             >
               {t('vehicleDetail.continueBooking')}
             </button>
-            <p className="mt-2 text-center text-xs text-slate-400">
+            <p className="mt-2 text-center text-xs text-text-muted">
               {t('vehicleDetail.paymentNote')}
             </p>
           </div>
@@ -281,7 +283,7 @@ export function VehicleDetailPage() {
 function Spec({ label, value, capitalize }: { label: string; value: string; capitalize?: boolean }) {
   return (
     <div>
-      <dt className="text-xs text-slate-500">{label}</dt>
+      <dt className="text-xs text-text-muted">{label}</dt>
       <dd className={'text-sm font-medium text-brand-navy ' + (capitalize ? 'capitalize' : '')}>{value}</dd>
     </div>
   )
@@ -290,7 +292,7 @@ function Spec({ label, value, capitalize }: { label: string; value: string; capi
 function Row({ label, value }: { label: string; value: ReactNode }) {
   return (
     <div className="flex items-center justify-between">
-      <span className="text-slate-500">{label}</span>
+      <span className="text-text-muted">{label}</span>
       <span className="font-medium text-brand-navy">{value}</span>
     </div>
   )
@@ -299,7 +301,7 @@ function Row({ label, value }: { label: string; value: ReactNode }) {
 function EditableRow({ label, value, onClick }: { label: string; value: ReactNode; onClick: () => void }) {
   return (
     <div className="flex items-center justify-between gap-3">
-      <span className="text-slate-500">{label}</span>
+      <span className="text-text-muted">{label}</span>
       <button type="button" onClick={onClick} className="max-w-[65%] truncate text-end font-medium text-brand-navy underline decoration-brand-gold/60 underline-offset-4 hover:text-brand-navy-light focus:outline-none focus:ring-2 focus:ring-brand-gold">
         {value}
       </button>
@@ -309,8 +311,8 @@ function EditableRow({ label, value, onClick }: { label: string; value: ReactNod
 
 function AvailabilityBadge({ state }: { state: 'checking' | 'available' | 'unavailable' | 'unknown' }) {
   const { t } = useTranslation()
-  if (state === 'checking') return <span className="text-slate-400">{t('vehicleDetail.checking')}</span>
-  if (state === 'available') return <span className="text-emerald-600">{t('vehicleDetail.available')}</span>
-  if (state === 'unavailable') return <span className="text-red-600">{t('vehicleDetail.unavailable')}</span>
-  return <span className="text-slate-400">{t('vehicleDetail.selectDates')}</span>
+  if (state === 'checking') return <span className="text-text-muted">{t('vehicleDetail.checking')}</span>
+  if (state === 'available') return <span className="text-success">{t('vehicleDetail.available')}</span>
+  if (state === 'unavailable') return <span className="text-error">{t('vehicleDetail.unavailable')}</span>
+  return <span className="text-text-muted">{t('vehicleDetail.selectDates')}</span>
 }

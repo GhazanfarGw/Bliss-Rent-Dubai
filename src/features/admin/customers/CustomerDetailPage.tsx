@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { ArrowLeft } from 'lucide-react'
 import { fetchCustomerById, fetchCustomerBookings } from '@/features/admin/customers/adminCustomersApi'
 import { AdminApiError } from '@/features/admin/adminApi'
 import { AdminPageHeader } from '@/features/admin/shared/AdminPageHeader'
@@ -77,8 +78,9 @@ export function CustomerDetailPage() {
 
   return (
     <div>
-      <button type="button" onClick={() => navigate('/admin/customers')} className="mb-4 text-sm font-medium text-slate-500 hover:text-brand-navy">
-        ← {t('admin.customers.backToList')}
+      <button type="button" onClick={() => navigate('/admin/customers')} className="mb-4 inline-flex items-center gap-1.5 text-sm font-medium text-text-muted hover:text-brand-navy">
+        <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+        {t('admin.customers.backToList')}
       </button>
 
       <AdminPageHeader title={customer.full_name} description={customer.email} />
@@ -88,11 +90,11 @@ export function CustomerDetailPage() {
           <h2 className="text-sm font-semibold text-brand-navy">{t('admin.customers.contactInfo')}</h2>
           <dl className="mt-3 space-y-2 text-sm">
             <div className="flex items-center justify-between gap-3">
-              <dt className="text-slate-500">Email</dt>
+              <dt className="text-text-muted">Email</dt>
               <dd className="font-medium text-brand-navy">{customer.email}</dd>
             </div>
             <div className="flex items-center justify-between gap-3">
-              <dt className="text-slate-500">{t('checkout.customer.phone')}</dt>
+              <dt className="text-text-muted">{t('checkout.customer.phone')}</dt>
               <dd className="font-medium text-brand-navy">{customer.phone ?? '—'}</dd>
             </div>
           </dl>
@@ -113,7 +115,7 @@ export function CustomerDetailPage() {
 }
 
 function BookingMiniList({ bookings, empty }: { bookings: AdminBookingWithDetails[]; empty: string }) {
-  if (bookings.length === 0) return <p className="mt-3 text-sm text-slate-400">{empty}</p>
+  if (bookings.length === 0) return <p className="mt-3 text-sm text-text-muted">{empty}</p>
   return (
     <ul className="mt-3 divide-y divide-brand-navy/5">
       {bookings.map((b) => (
@@ -122,7 +124,7 @@ function BookingMiniList({ bookings, empty }: { bookings: AdminBookingWithDetail
             <Link to={`/admin/bookings/${b.id}`} className="block truncate font-medium text-brand-navy hover:underline">
               {b.vehicles ? `${b.vehicles.make} ${b.vehicles.model}` : '—'}
             </Link>
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-text-muted">
               {b.start_date} → {b.end_date}
             </p>
           </div>

@@ -122,21 +122,21 @@ export function StaffAccountsPage() {
       <AdminPageHeader title={t('admin.nav.staff')} description={t('admin.staff.subtitle')} />
 
       {created && (
-        <div className="mb-5 rounded-2xl border border-emerald-200 bg-emerald-50 p-5">
-          <h2 className="text-sm font-semibold text-emerald-800">{t('admin.staff.created.title')}</h2>
-          <p className="mt-1 text-sm text-emerald-800/90">
+        <div className="mb-5 rounded-2xl border border-success/25 bg-success-bg p-5">
+          <h2 className="text-sm font-semibold text-success">{t('admin.staff.created.title')}</h2>
+          <p className="mt-1 text-sm text-success/90">
             {t('admin.staff.created.body', { name: created.fullName })}
           </p>
-          <dl className="mt-3 space-y-1 rounded-lg border border-emerald-200 bg-white p-3 font-mono text-sm">
+          <dl className="mt-3 space-y-1 rounded-lg border border-success/25 bg-white p-3 font-mono text-sm">
             <div className="flex items-center justify-between gap-3">
-              <dt className="text-slate-500">{t('admin.staff.form.email')}</dt>
+              <dt className="text-text-muted">{t('admin.staff.form.email')}</dt>
               <dd className="font-medium text-brand-navy">{created.email}</dd>
             </div>
           </dl>
           <button
             type="button"
             onClick={() => setCreated(null)}
-            className="mt-3 rounded-lg border border-emerald-300 bg-white px-4 py-2 text-sm font-semibold text-emerald-800 hover:bg-emerald-100"
+            className="mt-3 rounded-lg border border-success/25 bg-white px-4 py-2 text-sm font-semibold text-success hover:bg-success-bg"
           >
             {t('admin.staff.created.dismiss')}
           </button>
@@ -153,7 +153,7 @@ export function StaffAccountsPage() {
                 resetForm()
                 setShowAddForm(true)
               }}
-              className="rounded-lg bg-brand-gold px-4 py-2 text-sm font-semibold text-brand-navy-dark transition-colors hover:bg-brand-gold-light"
+              className="rounded-lg bg-brand-gold px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-brand-gold-light"
             >
               {t('admin.staff.addButton')}
             </button>
@@ -168,33 +168,33 @@ export function StaffAccountsPage() {
             <h3 className="text-sm font-semibold text-brand-navy">{t('admin.staff.form.title')}</h3>
 
             <label className="block">
-              <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
+              <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-text-muted">
                 {t('admin.staff.form.fullName')}
               </span>
               <input
                 type="text"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
-                className="w-full max-w-sm rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-brand-navy outline-none focus:border-brand-navy focus:ring-1 focus:ring-brand-navy"
+                className="w-full max-w-sm rounded-lg border border-border bg-white px-3 py-2 text-sm text-brand-navy outline-none focus:border-brand-navy focus:ring-1 focus:ring-brand-navy"
               />
-              {fieldErrors.fullName && <p className="mt-1 text-xs font-medium text-red-600">{fieldErrors.fullName}</p>}
+              {fieldErrors.fullName && <p className="mt-1 text-xs font-medium text-error">{fieldErrors.fullName}</p>}
             </label>
 
             <label className="block">
-              <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
+              <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-text-muted">
                 {t('admin.staff.form.email')}
               </span>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full max-w-sm rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-brand-navy outline-none focus:border-brand-navy focus:ring-1 focus:ring-brand-navy"
+                className="w-full max-w-sm rounded-lg border border-border bg-white px-3 py-2 text-sm text-brand-navy outline-none focus:border-brand-navy focus:ring-1 focus:ring-brand-navy"
               />
-              {fieldErrors.email && <p className="mt-1 text-xs font-medium text-red-600">{fieldErrors.email}</p>}
+              {fieldErrors.email && <p className="mt-1 text-xs font-medium text-error">{fieldErrors.email}</p>}
             </label>
 
             <label className="block">
-              <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
+              <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-text-muted">
                 {t('admin.staff.form.password')}
               </span>
               <div className="flex max-w-sm items-center gap-2">
@@ -202,30 +202,30 @@ export function StaffAccountsPage() {
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 font-mono text-sm text-brand-navy outline-none focus:border-brand-navy focus:ring-1 focus:ring-brand-navy"
+                  className="w-full rounded-lg border border-border bg-white px-3 py-2 font-mono text-sm text-brand-navy outline-none focus:border-brand-navy focus:ring-1 focus:ring-brand-navy"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword((v) => !v)}
-                  className="shrink-0 rounded-lg border border-slate-300 px-3 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50"
+                  className="shrink-0 rounded-lg border border-border px-3 py-2 text-xs font-semibold text-text-muted hover:bg-surface-muted"
                 >
                   {showPassword ? t('admin.staff.form.hide') : t('admin.staff.form.show')}
                 </button>
                 <button
                   type="button"
                   onClick={() => setPassword(generateTempPassword())}
-                  className="shrink-0 rounded-lg border border-slate-300 px-3 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50"
+                  className="shrink-0 rounded-lg border border-border px-3 py-2 text-xs font-semibold text-text-muted hover:bg-surface-muted"
                 >
                   {t('admin.staff.form.generate')}
                 </button>
               </div>
-              {fieldErrors.password && <p className="mt-1 text-xs font-medium text-red-600">{fieldErrors.password}</p>}
+              {fieldErrors.password && <p className="mt-1 text-xs font-medium text-error">{fieldErrors.password}</p>}
             </label>
 
-            <p className="text-xs text-slate-500">{t('admin.staff.form.note')}</p>
+            <p className="text-xs text-text-muted">{t('admin.staff.form.note')}</p>
 
             {submitError && !Object.keys(fieldErrors).length && (
-              <p className="text-sm font-medium text-red-600">{submitError}</p>
+              <p className="text-sm font-medium text-error">{submitError}</p>
             )}
 
             <div className="flex flex-wrap gap-2 pt-1">
@@ -239,7 +239,7 @@ export function StaffAccountsPage() {
               <button
                 type="button"
                 onClick={() => setShowAddForm(false)}
-                className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50"
+                className="rounded-lg border border-border px-4 py-2 text-sm font-semibold text-text-muted hover:bg-surface-muted"
               >
                 {t('admin.staff.cancel')}
               </button>
@@ -269,7 +269,7 @@ export function StaffAccountsPage() {
           <div className="mt-4 overflow-x-auto">
             <table className="w-full min-w-[560px] text-sm">
               <thead>
-                <tr className="border-b border-brand-navy/10 text-start text-xs font-semibold uppercase tracking-wide text-slate-400">
+                <tr className="border-b border-brand-navy/10 text-start text-xs font-semibold uppercase tracking-wide text-text-muted">
                   <th className="py-2 pe-3 text-start">{t('admin.staff.table.nameColumn')}</th>
                   <th className="py-2 pe-3 text-start">{t('admin.staff.table.role')}</th>
                   <th className="py-2 pe-3 text-start">{t('admin.staff.table.status')}</th>
@@ -292,21 +292,21 @@ export function StaffAccountsPage() {
                           </span>
                         )}
                       </td>
-                      <td className="py-3 pe-3 text-slate-600">{t(`admin.settings.roles.${a.role}`)}</td>
+                      <td className="py-3 pe-3 text-text-muted">{t(`admin.settings.roles.${a.role}`)}</td>
                       <td className="py-3 pe-3">
                         <span
                           className={
                             'rounded-full px-2 py-0.5 text-xs font-semibold ' +
-                            (a.is_active ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-600')
+                            (a.is_active ? 'bg-success-bg text-success' : 'bg-surface-muted text-text-muted')
                           }
                         >
                           {a.is_active ? t('admin.staff.status.active') : t('admin.staff.status.suspended')}
                         </span>
                       </td>
-                      <td className="py-3 pe-3 text-slate-500">{new Date(a.created_at).toLocaleDateString()}</td>
+                      <td className="py-3 pe-3 text-text-muted">{new Date(a.created_at).toLocaleDateString()}</td>
                       <td className="py-3 ps-3 text-end">
                         {isSelf ? (
-                          <span className="text-xs text-slate-400">—</span>
+                          <span className="text-xs text-text-muted">—</span>
                         ) : isConfirming ? (
                           <div className="flex flex-wrap items-center justify-end gap-2">
                             <span className="text-xs text-brand-navy">
@@ -324,7 +324,7 @@ export function StaffAccountsPage() {
                               type="button"
                               disabled={isRowBusy}
                               onClick={() => setPendingAction(null)}
-                              className="rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-50"
+                              className="rounded-lg border border-border px-3 py-1.5 text-xs font-semibold text-text-muted hover:bg-surface-muted"
                             >
                               {t('admin.staff.actions.cancel')}
                             </button>
@@ -340,7 +340,7 @@ export function StaffAccountsPage() {
                                   kind: a.is_active ? 'suspend' : 'reactivate',
                                 })
                               }
-                              className="rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-50"
+                              className="rounded-lg border border-border px-3 py-1.5 text-xs font-semibold text-text-muted hover:bg-surface-muted"
                             >
                               {a.is_active ? t('admin.staff.actions.suspend') : t('admin.staff.actions.reactivate')}
                             </button>
@@ -353,7 +353,7 @@ export function StaffAccountsPage() {
                                   kind: a.role === 'staff' ? 'promote' : 'demote',
                                 })
                               }
-                              className="rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-50"
+                              className="rounded-lg border border-border px-3 py-1.5 text-xs font-semibold text-text-muted hover:bg-surface-muted"
                             >
                               {a.role === 'staff' ? t('admin.staff.actions.promote') : t('admin.staff.actions.demote')}
                             </button>
@@ -365,7 +365,7 @@ export function StaffAccountsPage() {
                 })}
               </tbody>
             </table>
-            {actionError && <p className="mt-3 text-sm font-medium text-red-600">{actionError}</p>}
+            {actionError && <p className="mt-3 text-sm font-medium text-error">{actionError}</p>}
           </div>
         )}
       </div>

@@ -1,6 +1,7 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { ArrowLeft } from 'lucide-react'
 import { fetchComplaintById, updateComplaint } from '@/features/admin/complaints/adminComplaintsApi'
 import { AdminApiError } from '@/features/admin/adminApi'
 import { AdminPageHeader } from '@/features/admin/shared/AdminPageHeader'
@@ -74,7 +75,7 @@ export function ComplaintDetailPage() {
     return (
       <div className="flex flex-col items-center justify-center py-16">
         <Spinner className="h-8 w-8" />
-        <p className="mt-3 text-sm text-slate-500">{t('common.loading')}</p>
+        <p className="mt-3 text-sm text-text-muted">{t('common.loading')}</p>
       </div>
     )
   }
@@ -103,9 +104,10 @@ export function ComplaintDetailPage() {
       <button
         type="button"
         onClick={() => navigate('/admin/complaints')}
-        className="mb-4 text-sm font-medium text-slate-500 hover:text-brand-navy"
+        className="mb-4 inline-flex items-center gap-1.5 text-sm font-medium text-text-muted hover:text-brand-navy"
       >
-        ← {t('admin.complaints.backToList')}
+        <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+        {t('admin.complaints.backToList')}
       </button>
 
       <AdminPageHeader
@@ -131,20 +133,20 @@ export function ComplaintDetailPage() {
             }
           />
           <div className="pt-1">
-            <dt className="mb-1 text-sm text-slate-500">{t('admin.complaints.columns.complaint')}</dt>
+            <dt className="mb-1 text-sm text-text-muted">{t('admin.complaints.columns.complaint')}</dt>
             <dd className="whitespace-pre-wrap text-sm font-medium text-brand-navy">{complaint.description}</dd>
           </div>
         </Section>
 
         <Section title={t('admin.complaints.section.manage')}>
           <div>
-            <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
+            <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-text-muted">
               {t('admin.bookings.columns.status')}
             </label>
             <select
               value={statusDraft}
               onChange={(e) => setStatusDraft(e.target.value as ComplaintStatus)}
-              className="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-sm text-brand-navy outline-none focus:border-brand-navy"
+              className="w-full rounded-lg border border-border bg-white px-2.5 py-1.5 text-sm text-brand-navy outline-none focus:border-brand-navy"
             >
               {STATUS_OPTIONS.map((s) => (
                 <option key={s} value={s}>
@@ -155,7 +157,7 @@ export function ComplaintDetailPage() {
           </div>
 
           <div className="mt-4">
-            <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
+            <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-text-muted">
               {t('admin.complaints.internalNotes')}
             </label>
             <textarea
@@ -163,12 +165,12 @@ export function ComplaintDetailPage() {
               onChange={(e) => setNotesDraft(e.target.value)}
               rows={3}
               placeholder={t('admin.complaints.internalNotesPlaceholder')}
-              className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-brand-navy outline-none focus:border-brand-navy focus:ring-1 focus:ring-brand-navy"
+              className="w-full rounded-lg border border-border bg-white px-3 py-2 text-sm text-brand-navy outline-none focus:border-brand-navy focus:ring-1 focus:ring-brand-navy"
             />
           </div>
 
           <div className="mt-4">
-            <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
+            <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-text-muted">
               {t('admin.complaints.resolution')}
             </label>
             <textarea
@@ -176,15 +178,15 @@ export function ComplaintDetailPage() {
               onChange={(e) => setResolutionDraft(e.target.value)}
               rows={3}
               placeholder={t('admin.complaints.resolutionPlaceholder')}
-              className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-brand-navy outline-none focus:border-brand-navy focus:ring-1 focus:ring-brand-navy"
+              className="w-full rounded-lg border border-border bg-white px-3 py-2 text-sm text-brand-navy outline-none focus:border-brand-navy focus:ring-1 focus:ring-brand-navy"
             />
           </div>
 
           {saveError && (
-            <div className="mt-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{saveError}</div>
+            <div className="mt-4 rounded-lg border border-error/25 bg-error-bg px-4 py-3 text-sm text-error">{saveError}</div>
           )}
           {saved && !saveError && (
-            <div className="mt-4 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+            <div className="mt-4 rounded-lg border border-success/25 bg-success-bg px-4 py-3 text-sm text-success">
               {t('admin.complaints.saved')}
             </div>
           )}
@@ -215,7 +217,7 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
 function Row({ label, value }: { label: string; value: ReactNode }) {
   return (
     <div className="flex items-center justify-between gap-3">
-      <dt className="text-slate-500">{label}</dt>
+      <dt className="text-text-muted">{label}</dt>
       <dd className="text-right font-medium text-brand-navy">{value}</dd>
     </div>
   )

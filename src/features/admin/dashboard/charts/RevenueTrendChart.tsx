@@ -117,7 +117,7 @@ export function RevenueTrendChart({ data, currency, formatBookings }: RevenueTre
         >
           <p className="font-semibold text-brand-navy">{formatTooltipDate(hovered.date)}</p>
           <p className="mt-0.5 font-bold text-brand-navy">{formatCurrencyFull(hovered.revenue, currency)}</p>
-          <p className="text-slate-400">{formatBookings(hovered.bookings)}</p>
+          <p className="text-text-muted">{formatBookings(hovered.bookings)}</p>
         </div>
       )}
     </div>

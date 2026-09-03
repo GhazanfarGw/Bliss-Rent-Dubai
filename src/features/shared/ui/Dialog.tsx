@@ -1,5 +1,6 @@
 import { useEffect, useId, useRef, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
+import { X } from 'lucide-react'
 
 const FOCUSABLE_SELECTOR =
   'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
@@ -86,22 +87,14 @@ export function Dialog({ open, onClose, title, closeLabel, children, maxWidthCla
             type="button"
             onClick={onClose}
             aria-label={closeLabel}
-            className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-md p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-brand-navy focus:outline-none focus:ring-2 focus:ring-brand-gold"
+            className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-md p-1 text-text-muted transition-colors hover:bg-surface-muted hover:text-brand-navy focus:outline-none focus:ring-2 focus:ring-brand-gold"
           >
-            <CloseIcon />
+            <X className="h-5 w-5" aria-hidden="true" />
           </button>
         </div>
         {children}
       </div>
     </div>,
     document.body,
-  )
-}
-
-function CloseIcon() {
-  return (
-    <svg viewBox="0 0 20 20" fill="none" className="h-5 w-5" aria-hidden="true">
-      <path d="M5 5l10 10M15 5L5 15" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-    </svg>
   )
 }

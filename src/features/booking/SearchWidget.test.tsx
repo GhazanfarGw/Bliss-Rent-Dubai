@@ -104,6 +104,24 @@ describe('SearchWidget', () => {
     expect(within(dialog).getByRole('button', { name: /DXB Terminal 3/ })).toBeInTheDocument()
   })
 
+  it('uses a mobile-friendly stacked layout for compact booking rows', async () => {
+    const user = userEvent.setup()
+    render(<SearchWidget onSearch={vi.fn()} compact layout="row" />)
+    await screen.findByRole('button', { name: /select pickup point/i })
+
+    const form = screen.getByRole('button', { name: /search cars/i }).closest('form') as HTMLFormElement
+    const row = form.firstElementChild as HTMLElement
+    const searchButton = screen.getByRole('button', { name: /search cars/i })
+
+    expect(row).toHaveClass('flex-col')
+    expect(row).toHaveClass('sm:flex-row')
+    expect(searchButton).toHaveClass('w-full')
+    expect(searchButton).toHaveClass('sm:w-auto')
+
+    await user.click(screen.getByRole('button', { name: /search cars/i }))
+    expect(await screen.findByText('Please choose a pickup date.')).toBeInTheDocument()
+  })
+
   it('shows a validation message and does not call onSearch when submitted empty', async () => {
     const onSearch = vi.fn()
     const user = userEvent.setup()

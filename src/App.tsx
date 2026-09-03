@@ -36,6 +36,7 @@ import { ExtensionsListPage } from '@/features/admin/extensions/ExtensionsListPa
 import { ComplaintsListPage } from '@/features/admin/complaints/ComplaintsListPage'
 import { ComplaintDetailPage } from '@/features/admin/complaints/ComplaintDetailPage'
 import { PricingManagementPage } from '@/features/admin/pricing/PricingManagementPage'
+import { EmailManagementPage } from '@/features/admin/emails/EmailManagementPage'
 import { AuditLogPage } from '@/features/admin/auditlog/AuditLogPage'
 import { StaffAccountsPage } from '@/features/admin/staff/StaffAccountsPage'
 import { AdminSettingsPage } from '@/features/admin/settings/AdminSettingsPage'
@@ -139,6 +140,7 @@ function App() {
               <Route path="complaints" element={<ComplaintsListPage />} />
               <Route path="complaints/:id" element={<ComplaintDetailPage />} />
               <Route path="pricing" element={<PricingManagementPage />} />
+              <Route path="emails" element={<EmailManagementPage />} />
               <Route
                 path="audit-log"
                 element={

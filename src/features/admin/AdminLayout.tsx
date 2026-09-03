@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { Menu } from 'lucide-react'
 import { useAdminAuth } from '@/features/admin/AdminAuthContext'
 import { LanguageSwitcher } from '@/features/shared/LanguageSwitcher'
 import { fetchPendingBookingsCount } from '@/features/admin/bookings/adminBookingsApi'
@@ -18,6 +19,7 @@ const NAV_ITEMS = [
   { to: '/admin/extensions', key: 'extensions', end: false },
   { to: '/admin/complaints', key: 'complaints', end: false },
   { to: '/admin/pricing', key: 'pricing', end: false },
+  { to: '/admin/emails', key: 'emails', end: false },
   { to: '/admin/audit-log', key: 'auditLog', end: false, superAdminOnly: true },
   { to: '/admin/staff', key: 'staff', end: false, superAdminOnly: true },
   { to: '/admin/settings', key: 'settings', end: false },
@@ -77,7 +79,7 @@ export function AdminLayout() {
       {/* Sidebar — mobile drawer */}
       {mobileOpen && (
         <div className="fixed inset-0 z-40 lg:hidden">
-          <div className="absolute inset-0 bg-black/40" onClick={() => setMobileOpen(false)} />
+          <div className="absolute inset-0 bg-brand-navy-dark/50" onClick={() => setMobileOpen(false)} />
           <aside className="absolute inset-y-0 start-0 flex w-64 flex-col bg-white shadow-xl">
             <SidebarContent
               adminName={adminProfile?.full_name ?? ''}
@@ -99,9 +101,7 @@ export function AdminLayout() {
             aria-label={t('admin.nav.toggleMenu')}
             onClick={() => setMobileOpen(true)}
           >
-            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
+            <Menu className="h-6 w-6" aria-hidden="true" />
           </button>
           <span className="text-sm font-semibold text-brand-navy lg:hidden">{t('admin.nav.title')}</span>
           <div className="flex items-center gap-3">
@@ -109,7 +109,7 @@ export function AdminLayout() {
             <button
               type="button"
               onClick={() => void handleSignOut()}
-              className="rounded-lg bg-brand-gold px-3 py-1.5 text-sm font-semibold text-brand-navy-dark shadow-sm transition-colors hover:bg-brand-gold-light"
+              className="rounded-lg bg-brand-gold px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-brand-gold-light"
             >
               {t('admin.nav.signOut')}
             </button>
@@ -150,7 +150,7 @@ function SidebarContent({
         </span>
         <div>
           <p className="text-sm font-semibold leading-tight text-brand-navy">{t('nav.brand')}</p>
-          <p className="text-[11px] leading-tight text-slate-400">{t('admin.nav.title')}</p>
+          <p className="text-[11px] leading-tight text-text-muted">{t('admin.nav.title')}</p>
         </div>
       </div>
 
@@ -163,7 +163,7 @@ function SidebarContent({
             onClick={onNavigate}
             className={({ isActive }) =>
               'flex items-center justify-between gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors ' +
-              (isActive ? 'bg-brand-navy text-white' : 'text-slate-600 hover:bg-brand-lavender hover:text-brand-navy')
+              (isActive ? 'bg-brand-navy text-white' : 'text-text-muted hover:bg-brand-lavender hover:text-brand-navy')
             }
           >
             <span>{t(`admin.nav.${item.key}`)}</span>
@@ -174,13 +174,13 @@ function SidebarContent({
 
       <div className="border-t border-brand-navy/10 p-3">
         <div className="flex items-center justify-between gap-2 px-2">
-          <p className="truncate text-xs text-slate-400">{adminName}</p>
+          <p className="truncate text-xs text-text-muted">{adminName}</p>
           <RoleBadge isSuperAdmin={isSuperAdmin} />
         </div>
         <button
           type="button"
           onClick={onSignOut}
-          className="mt-2 w-full rounded-lg px-3 py-2 text-start text-sm font-medium text-slate-600 transition-colors hover:bg-brand-lavender hover:text-brand-navy"
+          className="mt-2 w-full rounded-lg px-3 py-2 text-start text-sm font-medium text-text-muted transition-colors hover:bg-brand-lavender hover:text-brand-navy"
         >
           {t('admin.nav.signOut')}
         </button>
@@ -222,7 +222,7 @@ function WorkloadBadge({ count }: { count: number | null }) {
     <span
       className={
         'flex h-5 min-w-[1.25rem] items-center justify-center rounded-full px-1.5 text-[11px] font-semibold ' +
-        (heavy ? 'bg-amber-400 text-amber-950' : 'bg-emerald-400 text-emerald-950')
+        (heavy ? 'bg-warning text-white' : 'bg-success text-white')
       }
       title={heavy ? 'Multiple bookings awaiting payment' : 'Bookings awaiting payment'}
     >

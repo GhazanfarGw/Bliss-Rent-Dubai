@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { ChevronRight } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useAdminAuth } from '@/features/admin/AdminAuthContext'
 import { resetAllTestData } from '@/features/admin/settings/adminSettingsApi'
@@ -162,15 +163,15 @@ export function AdminSettingsPage() {
           <h2 className="text-sm font-semibold text-brand-navy">{t('admin.settings.yourProfile')}</h2>
           <dl className="mt-3 space-y-2 text-sm">
             <div className="flex items-center justify-between gap-3">
-              <dt className="text-slate-500">{t('admin.settings.name')}</dt>
+              <dt className="text-text-muted">{t('admin.settings.name')}</dt>
               <dd className="font-medium text-brand-navy">{adminProfile?.full_name ?? '—'}</dd>
             </div>
             <div className="flex items-center justify-between gap-3">
-              <dt className="text-slate-500">Email</dt>
+              <dt className="text-text-muted">Email</dt>
               <dd className="font-medium text-brand-navy">{session?.user.email ?? '—'}</dd>
             </div>
             <div className="flex items-center justify-between gap-3">
-              <dt className="text-slate-500">{t('admin.settings.role')}</dt>
+              <dt className="text-text-muted">{t('admin.settings.role')}</dt>
               <dd className="font-medium text-brand-navy">{adminProfile ? t(`admin.settings.roles.${adminProfile.role}`) : '—'}</dd>
             </div>
           </dl>
@@ -187,15 +188,13 @@ export function AdminSettingsPage() {
         {isSuperAdmin && (
           <div className="rounded-2xl border border-brand-navy/10 bg-white p-5">
             <h2 className="text-sm font-semibold text-brand-navy">{t('admin.settings.staffDirectory')}</h2>
-            <p className="mt-1 text-xs text-slate-400">{t('admin.settings.staffDirectoryNote')}</p>
+            <p className="mt-1 text-xs text-text-muted">{t('admin.settings.staffDirectoryNote')}</p>
             <Link
               to="/admin/staff"
               className="mt-4 inline-flex items-center gap-1.5 rounded-lg bg-brand-navy px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-brand-navy-dark"
             >
               {t('admin.settings.manageStaff')}
-              <svg className="h-4 w-4 rtl:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
+              <ChevronRight className="h-4 w-4 rtl:rotate-180" aria-hidden="true" />
             </Link>
           </div>
         )}
@@ -204,7 +203,7 @@ export function AdminSettingsPage() {
       {isSuperAdmin && (
         <div className="mt-5 rounded-2xl border border-brand-navy/10 bg-white p-5">
           <h2 className="text-sm font-semibold text-brand-navy">{t('admin.settings.extensionPricing.title')}</h2>
-          <p className="mt-1 text-xs text-slate-400">{t('admin.settings.extensionPricing.subtitle')}</p>
+          <p className="mt-1 text-xs text-text-muted">{t('admin.settings.extensionPricing.subtitle')}</p>
 
           {extPricing.status === 'loading' && (
             <div className="mt-4 flex justify-center">
@@ -221,13 +220,13 @@ export function AdminSettingsPage() {
           {extPricing.status === 'loaded' && (
             <div className="mt-4 space-y-3">
               {!extPricing.policy && (
-                <p className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
+                <p className="rounded-lg border border-warning/30 bg-warning-bg px-3 py-2 text-xs text-warning">
                   {t('admin.settings.extensionPricing.notConfigured')}
                 </p>
               )}
 
               <label className="block max-w-xs">
-                <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
+                <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-text-muted">
                   {t('admin.settings.extensionPricing.policyLabel')}
                 </span>
                 <select
@@ -237,7 +236,7 @@ export function AdminSettingsPage() {
                     setExtPricing((s) => (s.status === 'loaded' ? { ...s, policy } : s))
                     setExtPricingSaved(false)
                   }}
-                  className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-brand-navy outline-none focus:border-brand-navy focus:ring-1 focus:ring-brand-navy"
+                  className="w-full rounded-lg border border-border bg-white px-3 py-2 text-sm text-brand-navy outline-none focus:border-brand-navy focus:ring-1 focus:ring-brand-navy"
                 >
                   <option value="" disabled>
                     {t('admin.settings.extensionPricing.policyOptions.unset')}
@@ -251,7 +250,7 @@ export function AdminSettingsPage() {
               {extPricing.policy === 'custom_rate' && (
                 <div className="flex max-w-xs gap-2">
                   <label className="block flex-1">
-                    <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
+                    <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-text-muted">
                       {t('admin.settings.extensionPricing.customDailyRateLabel')}
                     </span>
                     <input
@@ -264,11 +263,11 @@ export function AdminSettingsPage() {
                         setExtPricing((s) => (s.status === 'loaded' ? { ...s, customDailyRate } : s))
                         setExtPricingSaved(false)
                       }}
-                      className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-brand-navy outline-none focus:border-brand-navy focus:ring-1 focus:ring-brand-navy"
+                      className="w-full rounded-lg border border-border bg-white px-3 py-2 text-sm text-brand-navy outline-none focus:border-brand-navy focus:ring-1 focus:ring-brand-navy"
                     />
                   </label>
                   <label className="block w-24">
-                    <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
+                    <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-text-muted">
                       {t('admin.settings.extensionPricing.customCurrencyLabel')}
                     </span>
                     <input
@@ -279,14 +278,14 @@ export function AdminSettingsPage() {
                         setExtPricing((s) => (s.status === 'loaded' ? { ...s, customCurrency } : s))
                         setExtPricingSaved(false)
                       }}
-                      className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-brand-navy outline-none focus:border-brand-navy focus:ring-1 focus:ring-brand-navy"
+                      className="w-full rounded-lg border border-border bg-white px-3 py-2 text-sm text-brand-navy outline-none focus:border-brand-navy focus:ring-1 focus:ring-brand-navy"
                     />
                   </label>
                 </div>
               )}
 
-              {extPricingError && <p className="text-sm font-medium text-red-600">{extPricingError}</p>}
-              {extPricingSaved && !extPricingError && <p className="text-sm font-medium text-emerald-700">{t('admin.settings.extensionPricing.saved')}</p>}
+              {extPricingError && <p className="text-sm font-medium text-error">{extPricingError}</p>}
+              {extPricingSaved && !extPricingError && <p className="text-sm font-medium text-success">{t('admin.settings.extensionPricing.saved')}</p>}
 
               <button
                 type="button"
@@ -304,7 +303,7 @@ export function AdminSettingsPage() {
       {isSuperAdmin && (
         <div className="mt-5 rounded-2xl border border-brand-navy/10 bg-white p-5">
           <h2 className="text-sm font-semibold text-brand-navy">{t('admin.settings.extensionPenalty.title')}</h2>
-          <p className="mt-1 text-xs text-slate-400">{t('admin.settings.extensionPenalty.subtitle')}</p>
+          <p className="mt-1 text-xs text-text-muted">{t('admin.settings.extensionPenalty.subtitle')}</p>
 
           {extPenalty.status === 'loading' && (
             <div className="mt-4 flex justify-center">
@@ -321,13 +320,13 @@ export function AdminSettingsPage() {
           {extPenalty.status === 'loaded' && (
             <div className="mt-4 space-y-3">
               {!extPenalty.policy && (
-                <p className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
+                <p className="rounded-lg border border-warning/30 bg-warning-bg px-3 py-2 text-xs text-warning">
                   {t('admin.settings.extensionPenalty.notConfigured')}
                 </p>
               )}
 
               <label className="block max-w-xs">
-                <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
+                <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-text-muted">
                   {t('admin.settings.extensionPenalty.policyLabel')}
                 </span>
                 <select
@@ -337,7 +336,7 @@ export function AdminSettingsPage() {
                     setExtPenalty((s) => (s.status === 'loaded' ? { ...s, policy } : s))
                     setExtPenaltySaved(false)
                   }}
-                  className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-brand-navy outline-none focus:border-brand-navy focus:ring-1 focus:ring-brand-navy"
+                  className="w-full rounded-lg border border-border bg-white px-3 py-2 text-sm text-brand-navy outline-none focus:border-brand-navy focus:ring-1 focus:ring-brand-navy"
                 >
                   <option value="" disabled>
                     {t('admin.settings.extensionPenalty.policyOptions.unset')}
@@ -351,7 +350,7 @@ export function AdminSettingsPage() {
               {extPenalty.policy === 'fixed_fee' && (
                 <div className="flex max-w-xs gap-2">
                   <label className="block flex-1">
-                    <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
+                    <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-text-muted">
                       {t('admin.settings.extensionPenalty.fixedFeeLabel')}
                     </span>
                     <input
@@ -364,11 +363,11 @@ export function AdminSettingsPage() {
                         setExtPenalty((s) => (s.status === 'loaded' ? { ...s, fixedFeeAmount } : s))
                         setExtPenaltySaved(false)
                       }}
-                      className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-brand-navy outline-none focus:border-brand-navy focus:ring-1 focus:ring-brand-navy"
+                      className="w-full rounded-lg border border-border bg-white px-3 py-2 text-sm text-brand-navy outline-none focus:border-brand-navy focus:ring-1 focus:ring-brand-navy"
                     />
                   </label>
                   <label className="block w-24">
-                    <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
+                    <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-text-muted">
                       {t('admin.settings.extensionPenalty.currencyLabel')}
                     </span>
                     <input
@@ -379,7 +378,7 @@ export function AdminSettingsPage() {
                         setExtPenalty((s) => (s.status === 'loaded' ? { ...s, currency } : s))
                         setExtPenaltySaved(false)
                       }}
-                      className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-brand-navy outline-none focus:border-brand-navy focus:ring-1 focus:ring-brand-navy"
+                      className="w-full rounded-lg border border-border bg-white px-3 py-2 text-sm text-brand-navy outline-none focus:border-brand-navy focus:ring-1 focus:ring-brand-navy"
                     />
                   </label>
                 </div>
@@ -388,7 +387,7 @@ export function AdminSettingsPage() {
               {extPenalty.policy === 'per_day' && (
                 <div className="flex max-w-xs gap-2">
                   <label className="block flex-1">
-                    <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
+                    <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-text-muted">
                       {t('admin.settings.extensionPenalty.perDayLabel')}
                     </span>
                     <input
@@ -401,11 +400,11 @@ export function AdminSettingsPage() {
                         setExtPenalty((s) => (s.status === 'loaded' ? { ...s, perDayAmount } : s))
                         setExtPenaltySaved(false)
                       }}
-                      className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-brand-navy outline-none focus:border-brand-navy focus:ring-1 focus:ring-brand-navy"
+                      className="w-full rounded-lg border border-border bg-white px-3 py-2 text-sm text-brand-navy outline-none focus:border-brand-navy focus:ring-1 focus:ring-brand-navy"
                     />
                   </label>
                   <label className="block w-24">
-                    <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
+                    <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-text-muted">
                       {t('admin.settings.extensionPenalty.currencyLabel')}
                     </span>
                     <input
@@ -416,7 +415,7 @@ export function AdminSettingsPage() {
                         setExtPenalty((s) => (s.status === 'loaded' ? { ...s, currency } : s))
                         setExtPenaltySaved(false)
                       }}
-                      className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-brand-navy outline-none focus:border-brand-navy focus:ring-1 focus:ring-brand-navy"
+                      className="w-full rounded-lg border border-border bg-white px-3 py-2 text-sm text-brand-navy outline-none focus:border-brand-navy focus:ring-1 focus:ring-brand-navy"
                     />
                   </label>
                 </div>
@@ -424,7 +423,7 @@ export function AdminSettingsPage() {
 
               {extPenalty.policy === 'percentage' && (
                 <label className="block max-w-xs">
-                  <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
+                  <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-text-muted">
                     {t('admin.settings.extensionPenalty.percentageLabel')}
                   </span>
                   <input
@@ -438,13 +437,13 @@ export function AdminSettingsPage() {
                       setExtPenalty((s) => (s.status === 'loaded' ? { ...s, percentageRate } : s))
                       setExtPenaltySaved(false)
                     }}
-                    className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-brand-navy outline-none focus:border-brand-navy focus:ring-1 focus:ring-brand-navy"
+                    className="w-full rounded-lg border border-border bg-white px-3 py-2 text-sm text-brand-navy outline-none focus:border-brand-navy focus:ring-1 focus:ring-brand-navy"
                   />
                 </label>
               )}
 
-              {extPenaltyError && <p className="text-sm font-medium text-red-600">{extPenaltyError}</p>}
-              {extPenaltySaved && !extPenaltyError && <p className="text-sm font-medium text-emerald-700">{t('admin.settings.extensionPenalty.saved')}</p>}
+              {extPenaltyError && <p className="text-sm font-medium text-error">{extPenaltyError}</p>}
+              {extPenaltySaved && !extPenaltyError && <p className="text-sm font-medium text-success">{t('admin.settings.extensionPenalty.saved')}</p>}
 
               <button
                 type="button"
@@ -466,29 +465,29 @@ export function AdminSettingsPage() {
         testing is done and the team goes live with real data.
       */}
       {isSuperAdmin && (
-        <div className="mt-5 rounded-2xl border-2 border-red-200 bg-red-50/50 p-5">
-          <h2 className="text-sm font-semibold text-red-700">{t('admin.settings.dangerZone.title')}</h2>
-          <p className="mt-1 text-xs text-red-700/80">{t('admin.settings.dangerZone.subtitle')}</p>
+        <div className="mt-5 rounded-2xl border-2 border-error/25 bg-error-bg/50 p-5">
+          <h2 className="text-sm font-semibold text-error">{t('admin.settings.dangerZone.title')}</h2>
+          <p className="mt-1 text-xs text-error/80">{t('admin.settings.dangerZone.subtitle')}</p>
 
           {resetState.status !== 'confirming' && resetState.status !== 'done' && (
             <button
               type="button"
               onClick={() => setResetState({ status: 'confirming' })}
-              className="mt-4 rounded-lg border border-red-300 bg-white px-4 py-2 text-sm font-semibold text-red-700 hover:bg-red-100"
+              className="mt-4 rounded-lg border border-error/25 bg-white px-4 py-2 text-sm font-semibold text-error hover:bg-error-bg"
             >
               {t('admin.settings.dangerZone.button')}
             </button>
           )}
 
           {resetState.status === 'confirming' && (
-            <div className="mt-4 space-y-3 rounded-lg border border-red-200 bg-white p-4">
-              <p className="text-sm text-red-800">{t('admin.settings.dangerZone.confirmPrompt')}</p>
+            <div className="mt-4 space-y-3 rounded-lg border border-error/25 bg-white p-4">
+              <p className="text-sm text-error">{t('admin.settings.dangerZone.confirmPrompt')}</p>
               <input
                 type="text"
                 value={confirmText}
                 onChange={(e) => setConfirmText(e.target.value)}
                 placeholder="RESET"
-                className="w-full max-w-xs rounded-lg border border-red-300 bg-white px-3 py-2 text-sm font-mono uppercase tracking-wide text-red-800 outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500"
+                className="w-full max-w-xs rounded-lg border border-error/25 bg-white px-3 py-2 text-sm font-mono uppercase tracking-wide text-error outline-none focus:border-error focus:ring-1 focus:ring-error"
                 autoComplete="off"
               />
               <div className="flex flex-wrap gap-2">
@@ -496,7 +495,7 @@ export function AdminSettingsPage() {
                   type="button"
                   disabled={confirmText.trim().toUpperCase() !== 'RESET'}
                   onClick={() => void handleReset()}
-                  className="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-40"
+                  className="rounded-lg bg-error px-4 py-2 text-sm font-semibold text-white transition-colors hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   {t('admin.settings.dangerZone.confirmButton')}
                 </button>
@@ -506,7 +505,7 @@ export function AdminSettingsPage() {
                     setResetState({ status: 'idle' })
                     setConfirmText('')
                   }}
-                  className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50"
+                  className="rounded-lg border border-border px-4 py-2 text-sm font-semibold text-text-muted hover:bg-surface-muted"
                 >
                   {t('admin.settings.dangerZone.cancel')}
                 </button>
@@ -515,7 +514,7 @@ export function AdminSettingsPage() {
           )}
 
           {resetState.status === 'loading' && (
-            <div className="mt-4 flex items-center gap-2 text-sm text-red-700">
+            <div className="mt-4 flex items-center gap-2 text-sm text-error">
               <Spinner className="h-4 w-4" />
               {t('admin.settings.dangerZone.resetting')}
             </div>
@@ -528,7 +527,7 @@ export function AdminSettingsPage() {
           )}
 
           {resetState.status === 'done' && (
-            <p className="mt-4 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+            <p className="mt-4 rounded-lg border border-success/25 bg-success-bg px-4 py-3 text-sm text-success">
               {t('admin.settings.dangerZone.done', { count: resetState.totalRows })}
             </p>
           )}

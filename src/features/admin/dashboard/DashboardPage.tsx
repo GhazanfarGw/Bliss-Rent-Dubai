@@ -54,7 +54,7 @@ export function DashboardPage() {
       {state.status === 'loading' && (
         <div className="flex flex-col items-center justify-center py-16">
           <Spinner className="h-8 w-8" />
-          <p className="mt-3 text-sm text-slate-500">{t('common.loading')}</p>
+          <p className="mt-3 text-sm text-text-muted">{t('common.loading')}</p>
         </div>
       )}
 
@@ -98,7 +98,7 @@ export function DashboardPage() {
                     <Link to={`/admin/bookings/${b.id}`} className="block truncate font-medium text-brand-navy hover:underline">
                       {b.customer_name}
                     </Link>
-                    <p className="text-xs text-slate-400">
+                    <p className="text-xs text-text-muted">
                       {b.currency} {b.total_price.toLocaleString()}
                     </p>
                   </div>
@@ -112,7 +112,7 @@ export function DashboardPage() {
                 <li key={p.id} className="flex items-center justify-between gap-3 py-2 text-sm">
                   <div className="min-w-0">
                     <p className="truncate font-medium text-brand-navy">{p.customer_name}</p>
-                    <p className="text-xs text-slate-400">
+                    <p className="text-xs text-text-muted">
                       {p.currency} {p.amount.toLocaleString()}
                     </p>
                   </div>
@@ -126,7 +126,7 @@ export function DashboardPage() {
                 <li key={c.id} className="flex items-center justify-between gap-3 py-2 text-sm">
                   <div className="min-w-0">
                     <p className="truncate font-medium text-brand-navy">{c.subject}</p>
-                    <p className="truncate text-xs text-slate-400">{c.customer_name}</p>
+                    <p className="truncate text-xs text-text-muted">{c.customer_name}</p>
                   </div>
                   <AdminStatusBadge status={c.status} />
                 </li>
@@ -142,8 +142,8 @@ export function DashboardPage() {
 function KpiTile({ label, value, warn, isText }: { label: string; value: number | string; warn?: boolean; isText?: boolean }) {
   return (
     <div className="rounded-xl border border-brand-navy/10 bg-white p-4">
-      <p className="text-xs font-medium text-slate-500">{label}</p>
-      <p className={'mt-1 font-bold text-brand-navy ' + (isText ? 'text-lg' : 'text-2xl') + (warn ? ' text-amber-600' : '')}>
+      <p className="text-xs font-medium text-text-muted">{label}</p>
+      <p className={'mt-1 font-bold text-brand-navy ' + (isText ? 'text-lg' : 'text-2xl') + (warn ? ' text-warning' : '')}>
         {value}
       </p>
     </div>
@@ -158,7 +158,7 @@ function ActivityCard({ title, emptyLabel, children }: { title: string; emptyLab
       {hasChildren ? (
         <ul className="mt-2 divide-y divide-brand-navy/5">{children}</ul>
       ) : (
-        <p className="mt-3 text-sm text-slate-400">{emptyLabel}</p>
+        <p className="mt-3 text-sm text-text-muted">{emptyLabel}</p>
       )}
     </div>
   )

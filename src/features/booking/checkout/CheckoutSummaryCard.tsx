@@ -39,7 +39,7 @@ export function CheckoutSummaryCard({ vehicle, startDate, endDate, pickup, dropo
           <p className="text-sm font-semibold text-brand-navy">
             {vehicle.make} {vehicle.model}
           </p>
-          <p className="text-xs text-slate-500">{vehicle.model_year} · {vehicle.transmission}</p>
+          <p className="text-xs text-text-muted">{vehicle.model_year} · {vehicle.transmission}</p>
         </div>
       </div>
 
@@ -57,12 +57,12 @@ export function CheckoutSummaryCard({ vehicle, startDate, endDate, pickup, dropo
             <p className="text-xl font-bold text-brand-navy">
               {quote.currency} {quote.totalPrice.toLocaleString()}
             </p>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-text-muted">
               {quote.currency} {quote.unitPrice.toLocaleString()} {TERM_LABELS[quote.term]} — {t('checkout.summaryCard.estimated')}
             </p>
           </>
         ) : (
-          <p className="text-sm font-medium text-slate-500">{t('checkout.summaryCard.pricingUnavailable')}</p>
+          <p className="text-sm font-medium text-text-muted">{t('checkout.summaryCard.pricingUnavailable')}</p>
         )}
       </div>
     </aside>
@@ -72,7 +72,7 @@ export function CheckoutSummaryCard({ vehicle, startDate, endDate, pickup, dropo
 function Row({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center justify-between gap-3">
-      <dt className="text-slate-500">{label}</dt>
+      <dt className="text-text-muted">{label}</dt>
       <dd className="text-right font-medium text-brand-navy">{value}</dd>
     </div>
   )

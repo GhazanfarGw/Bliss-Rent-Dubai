@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { Check, ChevronRight } from 'lucide-react'
 import { Dialog } from '@/features/shared/ui/Dialog'
 import { inputClass } from '@/features/shared/ui/inputClasses'
 import { TYPE_ICON, typeOrderIndex } from '@/features/booking/locationDisplay'
@@ -39,8 +40,8 @@ interface CitySelectProps {
 
 export function CitySelect({ label, ariaLabel, value, onChange, cities, disabled = false, row = false }: CitySelectProps) {
   return (
-    <div className={row ? 'flex w-32 shrink-0 flex-col gap-1' : 'flex w-full flex-col gap-1 sm:w-64'}>
-      <span className="block text-xs font-semibold uppercase tracking-wide text-slate-500">{label}</span>
+    <div className={row ? 'flex w-full flex-col gap-1 sm:w-32 sm:shrink-0' : 'flex w-full flex-col gap-1 sm:w-64'}>
+      <span className="block text-xs font-semibold uppercase tracking-wide text-text-muted">{label}</span>
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
@@ -92,19 +93,19 @@ export function LocationPickerButton({
   const selected = sorted.find((l) => l.id === locationId) ?? null
 
   return (
-    <div className={row ? 'flex min-w-0 flex-1 flex-col gap-1 sm:min-w-[190px]' : 'flex w-full flex-col gap-1 sm:w-64'}>
-      <span className="block text-xs font-semibold uppercase tracking-wide text-slate-500">{label}</span>
+    <div className={row ? 'flex w-full min-w-0 flex-col gap-1 sm:flex-1 sm:min-w-[190px]' : 'flex w-full flex-col gap-1 sm:w-64'}>
+      <span className="block text-xs font-semibold uppercase tracking-wide text-text-muted">{label}</span>
       <button
         type="button"
         onClick={() => setSheetOpen(true)}
         disabled={disabled}
         aria-expanded={sheetOpen}
-        className="flex w-full items-center justify-between gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-start text-sm text-brand-navy outline-none transition-colors focus:border-brand-navy focus:ring-1 focus:ring-brand-navy disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-400"
+        className="flex w-full items-center justify-between gap-2 rounded-lg border border-border bg-white px-3 py-2.5 text-start text-sm text-brand-navy outline-none transition-colors focus:border-brand-navy focus:ring-1 focus:ring-brand-navy disabled:cursor-not-allowed disabled:bg-surface-muted disabled:text-text-muted"
       >
         <span className="min-w-0 truncate font-medium">
           {loading ? t('searchWidget.loadingLocations') : selected ? `${TYPE_ICON[selected.type]} ${selected.name}` : placeholder}
         </span>
-        <ChevronIcon className="h-4 w-4 shrink-0 text-slate-400 rtl:rotate-180" />
+        <ChevronRight className="h-4 w-4 shrink-0 text-text-muted rtl:rotate-180" aria-hidden="true" />
       </button>
 
       <Dialog open={sheetOpen} onClose={() => setSheetOpen(false)} title={sheetTitle} closeLabel={t('common.close')} mobileSheet maxWidthClassName="max-w-xl">
@@ -180,7 +181,7 @@ function LocationOptionList({
                 'flex min-h-14 w-full items-center gap-3 rounded-xl px-3 py-3 text-left transition-colors focus:outline-none focus:ring-2 focus:ring-inset focus:ring-brand-gold ' +
                 (opt.id === selectedId
                   ? 'bg-brand-lavender/60 text-brand-navy'
-                  : 'text-slate-700 hover:bg-slate-50')
+                  : 'text-brand-navy hover:bg-surface-muted')
               }
             >
               {opt.icon && (
@@ -190,32 +191,17 @@ function LocationOptionList({
               )}
               <span className="min-w-0 flex-1">
                 <span className="block truncate text-sm font-medium">{opt.label}</span>
-                {opt.sublabel && <span className="block truncate text-xs text-slate-500">{opt.sublabel}</span>}
+                {opt.sublabel && <span className="block truncate text-xs text-text-muted">{opt.sublabel}</span>}
               </span>
-              {opt.id === selectedId && <CheckIcon className="h-4 w-4 shrink-0 text-brand-gold-dark" />}
+              {opt.id === selectedId && <Check className="h-4 w-4 shrink-0 text-brand-gold-dark" aria-hidden="true" />}
             </button>
           </li>
         ))}
         {filtered.length === 0 && (
-          <li className="px-3 py-6 text-center text-sm text-slate-500">{noMatchesLabel}</li>
+          <li className="px-3 py-6 text-center text-sm text-text-muted">{noMatchesLabel}</li>
         )}
       </ul>
     </div>
   )
 }
 
-function ChevronIcon({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth={1.8} className={className} aria-hidden="true">
-      <path d="M7.5 5l5 5-5 5" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  )
-}
-
-function CheckIcon({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth={2} className={className} aria-hidden="true">
-      <path d="M4 10.5l3.5 3.5L16 5.5" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  )
-}

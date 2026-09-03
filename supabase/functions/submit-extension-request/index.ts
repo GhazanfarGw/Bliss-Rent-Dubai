@@ -12,6 +12,9 @@ import { createClient } from 'jsr:@supabase/supabase-js@2'
 import { corsHeaders, jsonResponse } from '../_shared/cors.ts'
 import { handleSubmitExtensionRequest, type SubmitExtensionRequestBody } from './logic.ts'
 import { ApiError } from '../_shared/errors.ts'
+import { fetchExtensionBookingIds } from '../_shared/email/extensionNotificationData.ts'
+import { triggerAdminOperationalEmail } from '../_shared/email/triggerAdminOperationalEmail.ts'
+import { createSupabaseAdminEmailLogStore } from '../_shared/email/supabaseAdminEmailLogStore.ts'
 
 Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') {
@@ -35,6 +38,41 @@ Deno.serve(async (req: Request) => {
 
   try {
     const result = await handleSubmitExtensionRequest(body, supabaseAdmin)
+
+    // Phase 9F: admin_extension_requested — the one admin operational
+    // event with no customer-facing equivalent (see
+    // adminOperationalEmailContent.ts's file header). The result here
+    // doesn't include the booking id (submit_extension_request_public()
+    // only returns extension_id/status/is_late), so it's resolved
+    // server-side from the just-inserted booking_extensions row via 9E's
+    // own fetchExtensionBookingIds — pure reuse, that file is untouched.
+    // Best-effort: triggerAdminOperationalEmail never throws, so this
+    // can never affect the already-successful submission response.
+    try {
+      const { bookingId } = await fetchExtensionBookingIds(supabaseAdmin, result.extensionId)
+      await triggerAdminOperationalEmail({
+        dataSource: supabaseAdmin,
+        async getAdminEmail(id: string) {
+          const { data, error } = await supabaseAdmin.auth.admin.getUserById(id)
+          if (error || !data.user) return null
+          return data.user.email ?? null
+        },
+        emailLog: createSupabaseAdminEmailLogStore(supabaseAdmin),
+        resendConfig: {
+          apiKey: Deno.env.get('RESEND_API_KEY') ?? '',
+          fromAddress: Deno.env.get('RESEND_FROM_ADDRESS') ?? 'Bliss Rent <noreply@bliss.rent>',
+        },
+        siteBaseUrl: Deno.env.get('SITE_BASE_URL') ?? 'https://bliss.rent',
+        bookingId,
+        eventType: 'admin_extension_requested',
+        language: 'en',
+        dashboardPath: '/admin/extensions',
+        triggeringRowId: result.extensionId,
+      })
+    } catch (err) {
+      console.error('admin_extension_requested notification failed', err)
+    }
+
     return jsonResponse(result, 200)
   } catch (err) {
     if (err instanceof ApiError) {

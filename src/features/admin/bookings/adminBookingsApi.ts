@@ -49,13 +49,82 @@ export async function fetchBookingStatusHistory(bookingId: string): Promise<Admi
 }
 
 /**
- * A plain RLS-governed UPDATE — no Edge Function needed. The Phase 0
- * `bookings_status_change` trigger (extended in Phase 3) automatically
- * writes both booking_status_history and audit_logs rows, so this single
- * call is already fully auditable with no extra code here.
+ * Phase 11: replaces the old unrestricted `updateBookingStatus(bookingId,
+ * status)` — a bare RLS UPDATE that let any admin set a booking to any
+ * status with no payment-consistency check (see
+ * claude/phase-11-premium-booking-admin-audit-and-plan-2026-09-02.md §0).
+ * Admins no longer have direct UPDATE on `bookings` at all (see the RLS
+ * policy comment in 20260917000000_phase11_controlled_booking_status_actions.sql)
+ * — every status transition now goes through one of these three
+ * Super-Admin-only, idempotent RPCs. The DB trigger
+ * (`handle_booking_status_change`) still validates the transition graph
+ * and writes booking_status_history + a generic audit_logs row; each RPC
+ * additionally writes its own named audit_logs row.
+ *
+ * The customer/admin cancellation emails below are unchanged from the
+ * old updateBookingStatus — same Edge Functions, same best-effort
+ * (logged, never thrown) semantics — just moved onto the new RPC path.
  */
-export async function updateBookingStatus(bookingId: string, status: BookingStatus): Promise<void> {
-  const { error } = await supabase.from('bookings').update({ status }).eq('id', bookingId)
+export async function adminCancelBooking(bookingId: string, note?: string): Promise<void> {
+  const { error } = await supabase.rpc('admin_cancel_booking', {
+    p_booking_id: bookingId,
+    p_note: note?.trim() ? note.trim() : null,
+  })
+  if (error) throw new AdminApiError(error.message)
+
+  try {
+    const { error: emailError } = await supabase.functions.invoke('send-customer-email', {
+      body: { bookingId, eventType: 'booking_cancelled' },
+    })
+    if (emailError) {
+      console.error('send-customer-email (booking_cancelled) failed', emailError)
+    }
+  } catch (err) {
+    console.error('send-customer-email (booking_cancelled) failed', err)
+  }
+
+  try {
+    const { error: adminEmailError } = await supabase.functions.invoke('notify-admin-booking-cancelled', {
+      body: { bookingId },
+    })
+    if (adminEmailError) {
+      console.error('notify-admin-booking-cancelled failed', adminEmailError)
+    }
+  } catch (err) {
+    console.error('notify-admin-booking-cancelled failed', err)
+  }
+}
+
+/** Super-Admin-only controlled confirmed->active transition ("Start Rental"). See admin_start_rental RPC. */
+export async function adminStartRental(bookingId: string, note?: string): Promise<void> {
+  const { error } = await supabase.rpc('admin_start_rental', {
+    p_booking_id: bookingId,
+    p_note: note?.trim() ? note.trim() : null,
+  })
+  if (error) throw new AdminApiError(error.message)
+}
+
+/** Super-Admin-only controlled active->completed transition ("Mark Returned"). See admin_mark_returned RPC. */
+export async function adminMarkReturned(bookingId: string, note?: string): Promise<void> {
+  const { error } = await supabase.rpc('admin_mark_returned', {
+    p_booking_id: bookingId,
+    p_note: note?.trim() ? note.trim() : null,
+  })
+  if (error) throw new AdminApiError(error.message)
+}
+
+/**
+ * Super-Admin-only manual "mark paid" for an ORIGINAL booking stuck in
+ * pending_payment — the checkout-recovery counterpart to
+ * confirmExtensionPayment (adminExtensionsApi.ts), same is_super_admin()
+ * gate enforced inside the RPC itself (a stale role in memory can never
+ * bypass it). See supabase/migrations/20260915000000_checkout_resume_payment.sql.
+ */
+export async function adminConfirmBookingPayment(bookingId: string, note?: string): Promise<void> {
+  const { error } = await supabase.rpc('admin_confirm_booking_payment', {
+    p_booking_id: bookingId,
+    p_note: note?.trim() ? note.trim() : null,
+  })
   if (error) throw new AdminApiError(error.message)
 }
 

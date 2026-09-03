@@ -14,6 +14,14 @@ interface CheckoutStepLayoutProps {
   children: ReactNode
 }
 
+/**
+ * Checkout progress stepper (brief item 11): a compact "Step X of Y"
+ * progress bar on mobile so it never eats vertical space above the fold,
+ * and a full icon stepper (done / active / upcoming, connected by a
+ * fill-as-you-go line) from `sm` up. Icons are the same hand-authored
+ * inline-SVG style used everywhere else in the app (NavBar, AdminLayout)
+ * — no icon library.
+ */
 export function CheckoutStepLayout({
   stepIndex,
   title,
@@ -29,26 +37,7 @@ export function CheckoutStepLayout({
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
-      <ol className="mb-8 flex flex-wrap items-center gap-x-2 gap-y-2 text-xs font-medium">
-        {steps.map((step, i) => (
-          <li key={step} className="flex items-center gap-2">
-            <span
-              className={
-                'flex h-6 w-6 items-center justify-center rounded-full text-[11px] ' +
-                (i < stepIndex
-                  ? 'bg-brand-navy text-white'
-                  : i === stepIndex
-                    ? 'bg-brand-gold text-brand-navy-dark'
-                    : 'bg-slate-100 text-slate-400')
-              }
-            >
-              {i + 1}
-            </span>
-            <span className={i === stepIndex ? 'text-brand-navy' : 'text-slate-400'}>{step}</span>
-            {i < steps.length - 1 && <span className="mx-1 text-slate-300">→</span>}
-          </li>
-        ))}
-      </ol>
+      <CheckoutStepper steps={steps} stepIndex={stepIndex} />
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
         <div className="lg:col-span-2">
@@ -62,5 +51,77 @@ export function CheckoutStepLayout({
         </div>
       </div>
     </div>
+  )
+}
+
+function CheckoutStepper({ steps, stepIndex }: { steps: string[]; stepIndex: number }) {
+  const { t } = useTranslation()
+  const progressPercent = steps.length > 1 ? Math.round((stepIndex / (steps.length - 1)) * 100) : 0
+
+  return (
+    <nav className="mb-8" aria-label={t('checkout.stepperLabel')}>
+      {/* Mobile: a compact fill bar + "Step X of Y" text — never more than one line. */}
+      <div className="sm:hidden">
+        <div className="flex items-center justify-between text-xs font-semibold text-brand-navy">
+          <span>{t('checkout.stepOfTotal', { current: stepIndex + 1, total: steps.length })}</span>
+          <span className="text-text-muted">{steps[stepIndex]}</span>
+        </div>
+        <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-surface-muted" role="progressbar" aria-valuenow={progressPercent} aria-valuemin={0} aria-valuemax={100}>
+          <div className="h-full rounded-full bg-brand-gold transition-all duration-300" style={{ width: `${progressPercent}%` }} />
+        </div>
+      </div>
+
+      {/* sm and up: full icon stepper with a fill-as-you-go connecting line. */}
+      <ol className="hidden items-center sm:flex">
+        {steps.map((step, i) => {
+          const state = i < stepIndex ? 'done' : i === stepIndex ? 'active' : 'upcoming'
+          return (
+            <li key={step} className="flex flex-1 items-center last:flex-none">
+              <div className="flex flex-col items-center gap-1.5">
+                <StepIcon state={state} number={i + 1} />
+                <span
+                  className={
+                    'whitespace-nowrap text-[11px] font-semibold ' +
+                    (state === 'upcoming' ? 'text-text-muted' : 'text-brand-navy')
+                  }
+                >
+                  {step}
+                </span>
+              </div>
+              {i < steps.length - 1 && (
+                <div className="mx-2 h-0.5 flex-1 rounded-full bg-surface-muted" aria-hidden="true">
+                  <div
+                    className="h-full rounded-full bg-brand-gold transition-all duration-300"
+                    style={{ width: i < stepIndex ? '100%' : '0%' }}
+                  />
+                </div>
+              )}
+            </li>
+          )
+        })}
+      </ol>
+    </nav>
+  )
+}
+
+function StepIcon({ state, number }: { state: 'done' | 'active' | 'upcoming'; number: number }) {
+  if (state === 'done') {
+    return (
+      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-gold text-white">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} className="h-3.5 w-3.5" aria-hidden="true">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+        </svg>
+      </span>
+    )
+  }
+  return (
+    <span
+      className={
+        'flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[11px] font-bold ' +
+        (state === 'active' ? 'bg-brand-gold text-white ring-4 ring-brand-gold/15' : 'bg-surface-muted text-text-muted')
+      }
+    >
+      {number}
+    </span>
   )
 }

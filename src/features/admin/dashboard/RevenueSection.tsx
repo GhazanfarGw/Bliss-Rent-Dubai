@@ -71,7 +71,7 @@ export function RevenueSection() {
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="text-lg font-bold text-brand-navy">{t('admin.dashboard.revenue.title')}</h2>
-          <p className="text-xs text-slate-500">{t('admin.dashboard.revenue.subtitle')}</p>
+          <p className="text-xs text-text-muted">{t('admin.dashboard.revenue.subtitle')}</p>
         </div>
         {state.status === 'loaded' && (
           <div className="flex gap-1 rounded-lg bg-brand-lavender/60 p-1">
@@ -82,7 +82,7 @@ export function RevenueSection() {
                 onClick={() => setRange(opt)}
                 className={
                   'rounded-md px-3 py-1.5 text-xs font-semibold transition-colors ' +
-                  (range === opt ? 'bg-white text-brand-navy shadow-sm' : 'text-slate-500 hover:text-brand-navy')
+                  (range === opt ? 'bg-white text-brand-navy shadow-sm' : 'text-text-muted hover:text-brand-navy')
                 }
               >
                 {opt}D
@@ -95,7 +95,7 @@ export function RevenueSection() {
       {state.status === 'loading' && (
         <div className="flex flex-col items-center justify-center py-16">
           <Spinner className="h-8 w-8" />
-          <p className="mt-3 text-sm text-slate-500">{t('common.loading')}</p>
+          <p className="mt-3 text-sm text-text-muted">{t('common.loading')}</p>
         </div>
       )}
 
@@ -164,7 +164,7 @@ export function RevenueSection() {
 
               <ChartCard title={t('admin.dashboard.revenue.topVehiclesTitle')} subtitle={t('admin.dashboard.revenue.topVehiclesSubtitle')}>
                 {topVehicles.length === 0 ? (
-                  <p className="py-6 text-center text-sm text-slate-400">{t('admin.dashboard.revenue.topVehiclesEmpty')}</p>
+                  <p className="py-6 text-center text-sm text-text-muted">{t('admin.dashboard.revenue.topVehiclesEmpty')}</p>
                 ) : (
                   <ol className="space-y-3">
                     {topVehicles.map((v, i) => (
@@ -210,15 +210,15 @@ function RevenueKpiCard({
 }) {
   return (
     <div className="rounded-xl border border-brand-navy/10 bg-white p-4">
-      <p className="text-xs font-medium text-slate-500">{label}</p>
+      <p className="text-xs font-medium text-text-muted">{label}</p>
       <p className="mt-1 text-2xl font-bold text-brand-navy">{value}</p>
       {typeof trendPct === 'number' && (
-        <p className={'mt-1 inline-flex items-center gap-1 text-xs font-semibold ' + (trendPct >= 0 ? 'text-emerald-600' : 'text-rose-600')}>
+        <p className={'mt-1 inline-flex items-center gap-1 text-xs font-semibold ' + (trendPct >= 0 ? 'text-success' : 'text-error')}>
           <span aria-hidden="true">{trendPct >= 0 ? '▲' : '▼'}</span>
-          {Math.abs(trendPct).toFixed(0)}%<span className="font-normal text-slate-400">{trendCaption}</span>
+          {Math.abs(trendPct).toFixed(0)}%<span className="font-normal text-text-muted">{trendCaption}</span>
         </p>
       )}
-      {subCaption && <p className="mt-1 text-xs text-slate-400">{subCaption}</p>}
+      {subCaption && <p className="mt-1 text-xs text-text-muted">{subCaption}</p>}
     </div>
   )
 }
@@ -227,7 +227,7 @@ function ChartCard({ title, subtitle, children }: { title: string; subtitle: str
   return (
     <div className="rounded-xl border border-brand-navy/10 bg-white p-4">
       <h3 className="text-sm font-semibold text-brand-navy">{title}</h3>
-      <p className="mb-3 text-xs text-slate-400">{subtitle}</p>
+      <p className="mb-3 text-xs text-text-muted">{subtitle}</p>
       {children}
     </div>
   )

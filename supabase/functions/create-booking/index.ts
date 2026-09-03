@@ -11,6 +11,11 @@ import { createClient } from 'jsr:@supabase/supabase-js@2'
 import { corsHeaders, jsonResponse } from '../_shared/cors.ts'
 import { handleCreateBooking, type CreateBookingRequestBody } from './logic.ts'
 import { ApiError } from '../_shared/errors.ts'
+import { triggerCustomerBookingEmail } from '../_shared/email/triggerCustomerBookingEmail.ts'
+import { createSupabaseEmailLogStore } from '../_shared/email/supabaseEmailLogStore.ts'
+import { triggerAdminOperationalEmail } from '../_shared/email/triggerAdminOperationalEmail.ts'
+import { createSupabaseAdminEmailLogStore } from '../_shared/email/supabaseAdminEmailLogStore.ts'
+import type { EmailLanguage } from '../_shared/email/strings.ts'
 
 Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') {
@@ -20,12 +25,17 @@ Deno.serve(async (req: Request) => {
     return jsonResponse({ code: 'METHOD_NOT_ALLOWED', message: 'Use POST.' }, 405)
   }
 
-  let body: CreateBookingRequestBody
+  let rawBody: unknown
   try {
-    body = await req.json()
+    rawBody = await req.json()
   } catch {
     return jsonResponse({ code: 'VALIDATION_ERROR', message: 'Request body must be JSON.' }, 400)
   }
+  const body = rawBody as CreateBookingRequestBody
+  // Phase 9D: loosely read here, purely to pick the customer email's
+  // language — CreateBookingRequestBody/logic.ts stay untouched, so this
+  // can never affect booking validation or business rules.
+  const language: EmailLanguage = isPlainObject(rawBody) && rawBody.language === 'ar' ? 'ar' : 'en'
 
   // Server-side only client, using the service-role key. This is what
   // lets create_booking()/confirm_payment() be reachable at all — they
@@ -37,6 +47,46 @@ Deno.serve(async (req: Request) => {
 
   try {
     const result = await handleCreateBooking(body, supabaseAdmin)
+
+    // Phase 9D: fire the booking_received customer email after the
+    // booking itself is fully committed. triggerCustomerBookingEmail
+    // never throws, so an email/Resend problem can never turn this
+    // already-successful booking into an error response.
+    await triggerCustomerBookingEmail({
+      dataSource: supabaseAdmin,
+      emailLog: createSupabaseEmailLogStore(supabaseAdmin),
+      resendConfig: {
+        apiKey: Deno.env.get('RESEND_API_KEY') ?? '',
+        fromAddress: Deno.env.get('RESEND_FROM_ADDRESS') ?? 'Bliss Rent <noreply@bliss.rent>',
+      },
+      siteBaseUrl: Deno.env.get('SITE_BASE_URL') ?? 'https://bliss.rent',
+      bookingId: result.bookingId,
+      eventType: 'booking_received',
+      language,
+    })
+
+    // Phase 9F: admin-side mirror of the same event, to every currently
+    // active admin (see adminRecipients.ts). Same best-effort guarantee —
+    // triggerAdminOperationalEmail never throws.
+    await triggerAdminOperationalEmail({
+      dataSource: supabaseAdmin,
+      async getAdminEmail(id: string) {
+        const { data, error } = await supabaseAdmin.auth.admin.getUserById(id)
+        if (error || !data.user) return null
+        return data.user.email ?? null
+      },
+      emailLog: createSupabaseAdminEmailLogStore(supabaseAdmin),
+      resendConfig: {
+        apiKey: Deno.env.get('RESEND_API_KEY') ?? '',
+        fromAddress: Deno.env.get('RESEND_FROM_ADDRESS') ?? 'Bliss Rent <noreply@bliss.rent>',
+      },
+      siteBaseUrl: Deno.env.get('SITE_BASE_URL') ?? 'https://bliss.rent',
+      bookingId: result.bookingId,
+      eventType: 'admin_booking_received',
+      language,
+      dashboardPath: `/admin/bookings/${result.bookingId}`,
+    })
+
     return jsonResponse(result, 200)
   } catch (err) {
     if (err instanceof ApiError) {
@@ -52,3 +102,7 @@ Deno.serve(async (req: Request) => {
     )
   }
 })
+
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null
+}

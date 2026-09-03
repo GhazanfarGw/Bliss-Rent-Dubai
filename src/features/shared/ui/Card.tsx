@@ -19,7 +19,7 @@ interface CardSlotProps extends HTMLAttributes<HTMLDivElement> {
  */
 export function Card({ children, className = '', ...rest }: CardSlotProps) {
   return (
-    <div className={'rounded-2xl border border-border bg-surface p-6 shadow-sm ' + className} {...rest}>
+    <div className={'border border-border bg-surface p-6 shadow-sm ' + className} {...rest}>
       {children}
     </div>
   )

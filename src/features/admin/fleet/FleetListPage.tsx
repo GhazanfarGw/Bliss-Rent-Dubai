@@ -69,7 +69,7 @@ export function FleetListPage() {
         action={
           <Link
             to="/admin/fleet/new"
-            className="inline-flex items-center rounded-lg bg-brand-gold px-4 py-2 text-sm font-semibold text-brand-navy-dark hover:bg-brand-gold-light"
+            className="inline-flex items-center rounded-lg bg-brand-gold px-4 py-2 text-sm font-semibold text-white hover:bg-brand-gold-light"
           >
             {t('admin.fleet.addVehicle')}
           </Link>
@@ -81,7 +81,7 @@ export function FleetListPage() {
       {state.status === 'loading' && (
         <div className="flex flex-col items-center justify-center py-16">
           <Spinner className="h-8 w-8" />
-          <p className="mt-3 text-sm text-slate-500">{t('common.loading')}</p>
+          <p className="mt-3 text-sm text-text-muted">{t('common.loading')}</p>
         </div>
       )}
 
@@ -106,13 +106,13 @@ export function FleetListPage() {
                     <p className="text-sm font-semibold text-brand-navy">
                       {v.make} {v.model}
                     </p>
-                    <p className="text-xs text-slate-500">
+                    <p className="text-xs text-text-muted">
                       {v.model_year} · {v.plate_number}
                     </p>
                   </div>
                   <AdminStatusBadge status={v.operational_status} />
                 </div>
-                <p className="mt-2 text-xs text-slate-400">{v.vehicle_categories?.name ?? '—'}</p>
+                <p className="mt-2 text-xs text-text-muted">{v.vehicle_categories?.name ?? '—'}</p>
               </div>
             </Link>
           ))}

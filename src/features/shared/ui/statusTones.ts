@@ -1,17 +1,16 @@
 /**
- * Extracted verbatim from the pre-Phase-8 `AdminStatusBadge` tone map —
- * no value or class changed — so the shared `StatusBadge` component
- * behaves identically to the admin-only version it replaces underneath
- * `AdminStatusBadge` (kept as a thin alias for existing call sites).
+ * Phase 11: migrated off stock Tailwind colors onto the semantic Bliss Rent
+ * design tokens (no tone-to-status mapping changed, only the underlying
+ * classes) so every status badge in the app draws from the same palette.
  */
 export type StatusTone = 'neutral' | 'info' | 'warning' | 'success' | 'danger'
 
 export const STATUS_TONE_CLASSES: Record<StatusTone, string> = {
-  neutral: 'bg-slate-100 text-slate-700',
+  neutral: 'bg-surface-muted text-text-muted',
   info: 'bg-brand-lavender text-brand-navy',
-  warning: 'bg-amber-100 text-amber-800',
-  success: 'bg-emerald-100 text-emerald-700',
-  danger: 'bg-red-100 text-red-700',
+  warning: 'bg-warning-bg text-warning',
+  success: 'bg-success-bg text-success',
+  danger: 'bg-error-bg text-error',
 }
 
 export const STATUS_VALUE_TONE: Record<string, StatusTone> = {
@@ -43,4 +42,10 @@ export const STATUS_VALUE_TONE: Record<string, StatusTone> = {
   maintenance: 'danger',
   unavailable: 'neutral',
   retired: 'neutral',
+  // email_log delivery status (Phase 9J) — 'failed' above is already the
+  // right tone (danger) and is shared as-is; 'queued' deliberately falls
+  // through to the 'neutral' default rather than being listed here.
+  sent: 'info',
+  delivered: 'success',
+  bounced: 'danger',
 }

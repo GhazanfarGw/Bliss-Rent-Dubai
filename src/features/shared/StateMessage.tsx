@@ -16,7 +16,7 @@ interface StateMessageProps {
 }
 
 const TONE_CLASSES: Record<NonNullable<StateMessageProps['tone']>, { box: string; title: string; body: string }> = {
-  neutral: { box: 'border-brand-navy/10 bg-brand-lavender/40', title: 'text-brand-navy', body: 'text-slate-600' },
+  neutral: { box: 'border-brand-gold/10 bg-[#f1eee9]/40', title: 'text-brand-gold', body: 'text-text-muted' },
   error: { box: 'border-error/30 bg-error-bg', title: 'text-error', body: 'text-error' },
   success: { box: 'border-success/30 bg-success-bg', title: 'text-success', body: 'text-success' },
 }
@@ -36,7 +36,7 @@ export function StateMessage({ title, body, action, tone = 'neutral' }: StateMes
 export function Spinner({ className = '' }: { className?: string }) {
   return (
     <svg
-      className={'animate-spin text-brand-navy/40 ' + className}
+      className={'animate-spin text-brand-gold/40 ' + className}
       viewBox="0 0 24 24"
       fill="none"
       aria-hidden="true"

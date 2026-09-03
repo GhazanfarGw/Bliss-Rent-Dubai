@@ -1,5 +1,4 @@
-import { useTranslation } from 'react-i18next'
-import { SearchWidget } from '@/features/booking/SearchWidget'
+import { BookingNavigator } from '@/features/booking/BookingNavigator'
 import type { SearchCriteria } from '@/types/domain'
 
 interface BookingSearchSectionProps {
@@ -9,27 +8,27 @@ interface BookingSearchSectionProps {
 /**
  * The large, premium booking/search section directly below the hero. This
  * is a visual wrapper only — all search logic (date validation, location
- * loading, submit handling) stays in SearchWidget, reused unchanged. The
- * `id` here is what the hero CTA scrolls to and what StickySearchBar's
- * IntersectionObserver watches to know when it's scrolled out of view.
+ * loading, submit handling) stays in SearchWidget inside BookingNavigator,
+ * reused unchanged. The `id` here is what the hero CTA scrolls to and what
+ * StickySearchBar's IntersectionObserver watches to know when it's
+ * scrolled out of view.
+ *
+ * Phase 11 correction: the card's heading/subtitle and SearchWidget used
+ * to render unconditionally here, below a small always-visible tab row.
+ * Both now live inside BookingNavigator itself, which swaps in the
+ * Manage Booking / Booking Status / Contact panels in their place — this
+ * section is left as the plain premium card frame (rounded corners,
+ * border, shadow) around whichever panel is active.
  */
 export function BookingSearchSection({ onSearch }: BookingSearchSectionProps) {
-  const { t } = useTranslation()
-
   return (
     <section
       id="booking-section"
-      className="relative z-10 -mt-10 scroll-mt-20 sm:-mt-14"
+      className="relative z-10 -mt-10 scroll-mt-20 bg-[#f7f4ef] pb-16 pt-8 sm:-mt-14 sm:pb-20"
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="rounded-2xl bg-white p-4 shadow-md sm:p-6">
-          <div className="max-w-xl">
-            <h2 className="text-xl font-bold text-brand-navy sm:text-2xl">{t('home.booking.title')}</h2>
-            <p className="mt-1.5 text-sm text-slate-600">{t('home.booking.subtitle')}</p>
-          </div>
-          <div className="mt-4">
-            <SearchWidget compact layout="row" onSearch={onSearch} />
-          </div>
+        <div className="rounded-[2rem] border border-[#ece7df] bg-white shadow-[0_30px_70px_rgba(17,20,29,0.08)]">
+          <BookingNavigator onSearch={onSearch} />
         </div>
       </div>
     </section>

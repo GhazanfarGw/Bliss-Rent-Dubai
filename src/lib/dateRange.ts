@@ -49,3 +49,18 @@ export function rentalDays(startDate: string, endDate: string): number {
   const ms = end.getTime() - start.getTime()
   return Math.max(1, Math.round(ms / 86_400_000) + 1)
 }
+
+/**
+ * Whole days remaining between today and a booking's return date — the
+ * "Days Left" figure on the homepage Booking Status panel (Phase 11
+ * correction). Never negative: a return date already in the past (a
+ * completed or overdue rental) reads as 0 rather than a confusing negative
+ * count. `today` is injectable so callers (and tests) don't depend on the
+ * real clock, matching `validateDateRange` above.
+ */
+export function daysRemaining(endDate: string, today: Date = new Date()): number {
+  const end = new Date(endDate + 'T00:00:00')
+  const todayMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate())
+  const ms = end.getTime() - todayMidnight.getTime()
+  return Math.max(0, Math.round(ms / 86_400_000))
+}

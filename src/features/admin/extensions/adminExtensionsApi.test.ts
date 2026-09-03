@@ -5,12 +5,14 @@ import { AdminApiError } from '@/features/admin/adminApi'
 const fromMock = vi.fn()
 const rpcMock = vi.fn()
 const getUserMock = vi.fn()
+const functionsInvokeMock = vi.fn()
 
 vi.mock('@/lib/supabaseClient', () => ({
   supabase: {
     from: (...args: unknown[]) => fromMock(...args),
     rpc: (...args: unknown[]) => rpcMock(...args),
     auth: { getUser: (...args: unknown[]) => getUserMock(...args) },
+    functions: { invoke: (...args: unknown[]) => functionsInvokeMock(...args) },
   },
 }))
 
@@ -53,6 +55,8 @@ describe('adminExtensionsApi', () => {
     rpcMock.mockReset()
     getUserMock.mockReset()
     getUserMock.mockResolvedValue({ data: { user: { id: 'admin-1' } } })
+    functionsInvokeMock.mockReset()
+    functionsInvokeMock.mockResolvedValue({ data: null, error: null })
   })
 
   it('fetches extensions for one booking, newest first', async () => {
@@ -436,6 +440,124 @@ describe('adminExtensionsApi', () => {
       p_extension_id: 'ext-3',
       p_outcome: 'paid',
       p_reference: 'stripe_ref_123',
+    })
+  })
+
+  /**
+   * Phase 9E — best-effort trigger of the deliver-extension-notifications
+   * Edge Function. These lock in: which of the three RPC call sites fire
+   * it, with which extensionId, that it never throws (an email problem
+   * must never surface as a failure of the extension action the admin
+   * just successfully completed), and that it never fires when the
+   * underlying RPC itself failed.
+   */
+  describe('triggerExtensionNotificationEmails wiring', () => {
+    it('fires after requestBookingExtension succeeds, with that request\'s own extension_id', async () => {
+      rpcMock.mockResolvedValue({
+        data: [{ extension_id: 'ext-1', status: 'approved', payment_status: 'paid', rejection_reason: null, is_late: false, penalty_amount: null, conflict_booking_id: null, replacement_vehicle_id: null }],
+        error: null,
+      })
+      await requestBookingExtension({
+        bookingId: 'booking-1',
+        requestedReturnDate: '2026-09-05',
+        supportConfirmedBy: 'Aisha (support)',
+        supportConfirmationNote: null,
+        paymentMethod: 'cash',
+        amount: 300,
+        currency: 'AED',
+        pricingPolicyUsed: 'original_rate',
+      })
+      expect(functionsInvokeMock).toHaveBeenCalledWith('deliver-extension-notifications', { body: { extensionId: 'ext-1' } })
+    })
+
+    it('fires after processExtensionRequest (customer-review path) succeeds, with the reviewed extension\'s id', async () => {
+      rpcMock.mockResolvedValue({
+        data: [{ extension_id: 'ext-7', status: 'approved', payment_status: 'paid', rejection_reason: null, is_late: false, penalty_amount: null, conflict_booking_id: null, replacement_vehicle_id: null }],
+        error: null,
+      })
+      await processExtensionRequest('ext-7', {
+        bookingId: 'booking-1',
+        requestedReturnDate: '2026-09-05',
+        supportConfirmedBy: null,
+        supportConfirmationNote: null,
+        paymentMethod: 'cash',
+        amount: 300,
+        currency: 'AED',
+        pricingPolicyUsed: 'original_rate',
+      })
+      expect(functionsInvokeMock).toHaveBeenCalledWith('deliver-extension-notifications', { body: { extensionId: 'ext-7' } })
+    })
+
+    it('does not fire when the request_booking_extension RPC itself errors', async () => {
+      rpcMock.mockResolvedValue({ data: null, error: { message: 'permission denied for table booking_extensions' } })
+      await expect(
+        requestBookingExtension({
+          bookingId: 'booking-1',
+          requestedReturnDate: '2026-09-05',
+          supportConfirmedBy: 'Aisha (support)',
+          supportConfirmationNote: null,
+          paymentMethod: 'cash',
+          amount: 300,
+          currency: 'AED',
+          pricingPolicyUsed: 'original_rate',
+        }),
+      ).rejects.toThrow(AdminApiError)
+      expect(functionsInvokeMock).not.toHaveBeenCalled()
+    })
+
+    it('fires after rejectExtensionRequest succeeds, with that extension\'s id', async () => {
+      rpcMock.mockResolvedValue({ data: [{ extension_id: 'ext-8', status: 'rejected' }], error: null })
+      await rejectExtensionRequest('ext-8', 'Duplicate request — already handled on WhatsApp.')
+      expect(functionsInvokeMock).toHaveBeenCalledWith('deliver-extension-notifications', { body: { extensionId: 'ext-8' } })
+    })
+
+    it('does not fire when reject_extension_request itself errors', async () => {
+      rpcMock.mockResolvedValue({ data: null, error: { message: 'permission denied' } })
+      await expect(rejectExtensionRequest('ext-8', 'reason')).rejects.toThrow(AdminApiError)
+      expect(functionsInvokeMock).not.toHaveBeenCalled()
+    })
+
+    it('fires after confirmExtensionPayment(..., "paid", ...) succeeds', async () => {
+      rpcMock.mockResolvedValue({ data: [{ extension_id: 'ext-3', status: 'approved', payment_status: 'paid' }], error: null })
+      await confirmExtensionPayment('ext-3', 'paid', 'stripe_ref_123')
+      expect(functionsInvokeMock).toHaveBeenCalledWith('deliver-extension-notifications', { body: { extensionId: 'ext-3' } })
+    })
+
+    it('does NOT fire after confirmExtensionPayment(..., "failed", ...) — confirm_booking_extension_payment() never writes a booking_notifications row for a failure', async () => {
+      rpcMock.mockResolvedValue({ data: [{ extension_id: 'ext-3', status: 'approved', payment_status: 'failed' }], error: null })
+      await confirmExtensionPayment('ext-3', 'failed', null)
+      expect(functionsInvokeMock).not.toHaveBeenCalled()
+    })
+
+    it('does not fire when confirm_booking_extension_payment itself errors', async () => {
+      rpcMock.mockResolvedValue({ data: null, error: { message: 'permission denied' } })
+      await expect(confirmExtensionPayment('ext-3', 'paid', null)).rejects.toThrow(AdminApiError)
+      expect(functionsInvokeMock).not.toHaveBeenCalled()
+    })
+
+    it('never throws/rejects the caller\'s action when the invoke call itself returns an error', async () => {
+      functionsInvokeMock.mockResolvedValue({ data: null, error: { message: 'Edge Function returned a non-2xx status code' } })
+      rpcMock.mockResolvedValue({
+        data: [{ extension_id: 'ext-1', status: 'approved', payment_status: 'paid', rejection_reason: null, is_late: false, penalty_amount: null, conflict_booking_id: null, replacement_vehicle_id: null }],
+        error: null,
+      })
+      const result = await requestBookingExtension({
+        bookingId: 'booking-1',
+        requestedReturnDate: '2026-09-05',
+        supportConfirmedBy: 'Aisha (support)',
+        supportConfirmationNote: null,
+        paymentMethod: 'cash',
+        amount: 300,
+        currency: 'AED',
+        pricingPolicyUsed: 'original_rate',
+      })
+      expect(result.extensionId).toBe('ext-1')
+    })
+
+    it('never throws/rejects the caller\'s action when the invoke call itself rejects (network failure)', async () => {
+      functionsInvokeMock.mockRejectedValue(new Error('network error'))
+      rpcMock.mockResolvedValue({ data: [{ extension_id: 'ext-8', status: 'rejected' }], error: null })
+      await expect(rejectExtensionRequest('ext-8', 'Duplicate request.')).resolves.toBeUndefined()
     })
   })
 })

@@ -16,23 +16,24 @@ export function WhyChooseSection() {
   const items = t('home.whyChoose.items', { returnObjects: true }) as WhyChooseItem[]
 
   return (
-    <section id="why-choose" className="scroll-mt-20 bg-brand-lavender/30">
-      <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
-        <div className="max-w-2xl">
-          <h2 className="text-2xl font-bold text-brand-navy sm:text-3xl">{t('home.whyChoose.title')}</h2>
-          <p className="mt-2 text-sm text-slate-600">{t('home.whyChoose.subtitle')}</p>
+    <section id="why-choose" className="scroll-mt-20 bg-[#f8f5f0]">
+      <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-3xl text-center">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.36em] text-brand-gold-dark">Why travelers choose us</p>
+          <h2 className="mt-4 text-3xl font-black tracking-[-0.06em] text-brand-navy sm:text-5xl">{t('home.whyChoose.title')}</h2>
+          <p className="mt-3 text-sm leading-7 text-text-muted sm:text-base">{t('home.whyChoose.subtitle')}</p>
         </div>
 
-        <div className="mt-8 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {items.map((item, i) => (
-            <div key={item.title} className="flex gap-4">
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-navy text-sm font-bold text-brand-gold-light">
-                {i + 1}
-              </span>
-              <div>
+            <div key={item.title} className="border border-[#ece7df] bg-white p-5 shadow-none backdrop-blur-sm">
+              <div className="flex items-center gap-4">
+                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-none bg-brand-gold text-sm font-semibold text-white shadow-none">
+                  {i + 1}
+                </span>
                 <h3 className="text-base font-semibold text-brand-navy">{item.title}</h3>
-                <p className="mt-1.5 text-sm text-slate-600">{item.body}</p>
               </div>
+              <p className="mt-4 text-sm leading-7 text-text-muted">{item.body}</p>
             </div>
           ))}
         </div>

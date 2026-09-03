@@ -24,7 +24,7 @@ export function AdminRoute({ children }: { children: ReactNode }) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-brand-lavender/30">
         <Spinner className="h-8 w-8" />
-        <p className="mt-3 text-sm text-slate-500">{t('common.loading')}</p>
+        <p className="mt-3 text-sm text-text-muted">{t('common.loading')}</p>
       </div>
     )
   }

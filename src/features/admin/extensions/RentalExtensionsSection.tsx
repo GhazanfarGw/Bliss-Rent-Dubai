@@ -1,5 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
+import { BadgeCheck, Calendar, CalendarPlus, Eye, XCircle } from 'lucide-react'
 import {
   fetchExtensionsForBooking,
   fetchBookingForExtension,
@@ -352,17 +353,17 @@ export function RentalExtensionsSection({
 
   return (
     <Section title={t('admin.extensions.section.title')} full>
-      <p className="text-sm text-slate-500">{t('admin.extensions.section.intro')}</p>
+      <p className="text-sm text-text-muted">{t('admin.extensions.section.intro')}</p>
 
       {lastResult && (
         <div
           className={
             'mt-4 rounded-xl border p-4 text-sm ' +
             (lastResult.status === 'rejected'
-              ? 'border-red-200 bg-red-50 text-red-800'
+              ? 'border-error/25 bg-error-bg text-error'
               : lastResult.status === 'conflict_unresolved'
-                ? 'border-amber-200 bg-amber-50 text-amber-800'
-                : 'border-emerald-200 bg-emerald-50 text-emerald-800')
+                ? 'border-warning/25 bg-warning-bg text-warning'
+                : 'border-success/25 bg-success-bg text-success')
           }
         >
           <p className="font-semibold">
@@ -400,22 +401,23 @@ export function RentalExtensionsSection({
       {bookingCtx && reviewQueue.length > 0 && (
         <div className="mt-4 rounded-xl border border-brand-navy/10 bg-brand-lavender/10 p-4">
           <h3 className="text-sm font-semibold text-brand-navy">{t('admin.extensions.section.reviewTitle')}</h3>
-          <p className="mt-1 text-xs text-slate-500">{t('admin.extensions.section.reviewIntro')}</p>
+          <p className="mt-1 text-xs text-text-muted">{t('admin.extensions.section.reviewIntro')}</p>
           <div className="mt-3 space-y-2">
             {reviewQueue.map((ext) => (
               <div key={ext.id} className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-brand-navy/10 bg-white px-3 py-2">
                 <div className="flex items-center gap-2 text-xs">
                   <AdminStatusBadge status={ext.status} />
-                  <span className="text-slate-600">
+                  <span className="inline-flex items-center gap-1 text-brand-navy/80">
+                    <Calendar className="h-3 w-3 shrink-0 text-brand-gold" aria-hidden="true" />
                     {ext.previous_return_date} → {ext.requested_return_date} ({ext.extension_days}d)
                   </span>
                   {ext.is_late && (
-                    <span className="rounded-full bg-amber-100 px-1.5 py-0.5 text-[10px] font-semibold text-amber-800">
+                    <span className="rounded-full bg-warning-bg px-1.5 py-0.5 text-[10px] font-semibold text-warning">
                       {t('admin.extensions.table.late')}
                     </span>
                   )}
                   {ext.status === 'conflict_unresolved' && (
-                    <span className="max-w-xs text-amber-700">{t('admin.extensions.conflict.unresolvedNotice')}</span>
+                    <span className="max-w-xs text-warning">{t('admin.extensions.conflict.unresolvedNotice')}</span>
                   )}
                 </div>
                 <div className="flex gap-2">
@@ -426,14 +428,14 @@ export function RentalExtensionsSection({
                         value={rejectReason}
                         onChange={(e) => setRejectReason(e.target.value)}
                         placeholder={t('admin.extensions.section.rejectPrompt')}
-                        className="w-64 rounded-lg border border-slate-300 px-2 py-1 text-xs outline-none focus:border-brand-navy"
+                        className="w-64 rounded-lg border border-border px-2 py-1 text-xs outline-none focus:border-brand-navy"
                       />
                       <div className="flex gap-2">
                         <button
                           type="button"
                           disabled={rejectBusy || !rejectReason.trim()}
                           onClick={() => void confirmReject()}
-                          className="rounded-lg bg-red-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
+                          className="rounded-lg bg-error px-3 py-1.5 text-xs font-semibold text-white hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
                         >
                           {rejectBusy ? '…' : t('admin.extensions.payment.yes')}
                         </button>
@@ -443,7 +445,7 @@ export function RentalExtensionsSection({
                             setRejectingExtensionId(null)
                             setRejectReason('')
                           }}
-                          className="rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-50"
+                          className="rounded-lg border border-border px-3 py-1.5 text-xs font-semibold text-text-muted hover:bg-surface-muted"
                         >
                           {t('admin.extensions.payment.cancel')}
                         </button>
@@ -454,15 +456,17 @@ export function RentalExtensionsSection({
                       <button
                         type="button"
                         onClick={() => openReview(ext)}
-                        className="rounded-lg bg-brand-gold px-3 py-1.5 text-xs font-semibold text-brand-navy-dark hover:bg-brand-gold-light"
+                        className="inline-flex items-center gap-1.5 rounded-lg bg-brand-gold px-3 py-1.5 text-xs font-semibold text-white hover:bg-brand-gold-light"
                       >
+                        <Eye className="h-3.5 w-3.5" aria-hidden="true" />
                         {t('admin.extensions.section.reviewButton')}
                       </button>
                       <button
                         type="button"
                         onClick={() => setRejectingExtensionId(ext.id)}
-                        className="rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-50"
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs font-semibold text-text-muted hover:bg-surface-muted"
                       >
+                        <XCircle className="h-3.5 w-3.5" aria-hidden="true" />
                         {t('admin.extensions.section.rejectButton')}
                       </button>
                     </>
@@ -471,12 +475,12 @@ export function RentalExtensionsSection({
               </div>
             ))}
           </div>
-          {rejectError && <p className="mt-2 text-xs font-medium text-red-600">{rejectError}</p>}
+          {rejectError && <p className="mt-2 text-xs font-medium text-error">{rejectError}</p>}
         </div>
       )}
 
       {bookingCtx && !isEligibleStatus && (
-        <p className="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+        <p className="mt-4 rounded-lg border border-warning/25 bg-warning-bg px-4 py-3 text-sm text-warning">
           {t('admin.extensions.section.notEligible')}
         </p>
       )}
@@ -487,8 +491,9 @@ export function RentalExtensionsSection({
             <button
               type="button"
               onClick={() => setShowForm(true)}
-              className="rounded-lg bg-brand-gold px-4 py-2 text-sm font-semibold text-brand-navy-dark transition-colors hover:bg-brand-gold-light"
+              className="inline-flex items-center gap-1.5 rounded-lg bg-brand-gold px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-brand-gold-light"
             >
+              <CalendarPlus className="h-4 w-4" aria-hidden="true" />
               {t('admin.extensions.section.recordButton')}
             </button>
           )}
@@ -500,7 +505,7 @@ export function RentalExtensionsSection({
               </h3>
 
               <label className="block">
-                <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
+                <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-text-muted">
                   {t('admin.extensions.form.requestedReturnDate')}
                 </span>
                 {reviewingExtensionId ? (
@@ -515,12 +520,12 @@ export function RentalExtensionsSection({
                   />
                 )}
                 {validation?.errors.requestedReturnDate && (
-                  <p className="mt-1 text-xs font-medium text-red-600">{validation.errors.requestedReturnDate}</p>
+                  <p className="mt-1 text-xs font-medium text-error">{validation.errors.requestedReturnDate}</p>
                 )}
               </label>
 
               <label className="block">
-                <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
+                <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-text-muted">
                   {t('admin.extensions.form.supportConfirmedBy')}
                 </span>
                 <input
@@ -531,16 +536,16 @@ export function RentalExtensionsSection({
                   className={inputClass}
                 />
                 {reviewingExtensionId ? (
-                  <p className="mt-1 text-xs text-slate-400">{t('admin.extensions.form.supportConfirmedByOptionalNote')}</p>
+                  <p className="mt-1 text-xs text-text-muted">{t('admin.extensions.form.supportConfirmedByOptionalNote')}</p>
                 ) : (
                   validation?.errors.supportConfirmedBy && (
-                    <p className="mt-1 text-xs font-medium text-red-600">{validation.errors.supportConfirmedBy}</p>
+                    <p className="mt-1 text-xs font-medium text-error">{validation.errors.supportConfirmedBy}</p>
                   )
                 )}
               </label>
 
               <label className="block">
-                <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
+                <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-text-muted">
                   {t('admin.extensions.form.supportConfirmationNote')}
                 </span>
                 <textarea
@@ -553,7 +558,7 @@ export function RentalExtensionsSection({
               </label>
 
               <label className="block max-w-xs">
-                <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
+                <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-text-muted">
                   {t('admin.extensions.form.paymentMethod')}
                 </span>
                 <select
@@ -565,25 +570,25 @@ export function RentalExtensionsSection({
                   {isSuperAdmin && <option value="cash">{t('admin.extensions.form.paymentMethodCash')}</option>}
                   <option value="online">{t('admin.extensions.form.paymentMethodOnline')}</option>
                 </select>
-                {!isSuperAdmin && <p className="mt-1 text-xs text-slate-400">{t('admin.extensions.form.cashSuperAdminOnlyHint')}</p>}
+                {!isSuperAdmin && <p className="mt-1 text-xs text-text-muted">{t('admin.extensions.form.cashSuperAdminOnlyHint')}</p>}
                 {validation?.errors.paymentMethod && (
-                  <p className="mt-1 text-xs font-medium text-red-600">{validation.errors.paymentMethod}</p>
+                  <p className="mt-1 text-xs font-medium text-error">{validation.errors.paymentMethod}</p>
                 )}
               </label>
 
               {availability.status === 'checking' && (
-                <p className="text-xs text-slate-500">
+                <p className="text-xs text-text-muted">
                   {t('admin.extensions.form.checkingAvailability', { plate: bookingCtx.vehicle.plate_number })}
                 </p>
               )}
               {availability.status === 'done' && (
-                <p className={'text-xs font-medium ' + (availability.available ? 'text-emerald-700' : 'text-amber-700')}>
+                <p className={'text-xs font-medium ' + (availability.available ? 'text-success' : 'text-warning')}>
                   {t(availability.available ? 'admin.extensions.form.availableMessage' : 'admin.extensions.form.unavailableMessage', {
                     plate: bookingCtx.vehicle.plate_number,
                   })}
                 </p>
               )}
-              {availability.status === 'error' && <p className="text-xs text-amber-700">{t('admin.extensions.form.availabilityError')}</p>}
+              {availability.status === 'error' && <p className="text-xs text-warning">{t('admin.extensions.form.availabilityError')}</p>}
 
               {validation?.extensionDays ? (
                 pricingPreview?.ok ? (
@@ -591,20 +596,20 @@ export function RentalExtensionsSection({
                     {t('admin.extensions.form.amountLabel')}: {pricingPreview.currency} {pricingPreview.amount.toLocaleString()}
                   </p>
                 ) : (
-                  <p className="text-xs font-medium text-red-600">{pricingPreview?.message}</p>
+                  <p className="text-xs font-medium text-error">{pricingPreview?.message}</p>
                 )
               ) : null}
 
               {isLate && (
-                <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2">
-                  <p className="text-xs font-medium text-amber-800">{t('admin.extensions.form.lateNotice')}</p>
+                <div className="rounded-lg border border-warning/25 bg-warning-bg px-3 py-2">
+                  <p className="text-xs font-medium text-warning">{t('admin.extensions.form.lateNotice')}</p>
                   {penaltyPreview?.ok ? (
                     <p className="mt-1 text-sm font-semibold text-brand-navy">
                       {t('admin.extensions.form.penaltyLabel')}: {penaltyPreview.result?.currency} {penaltyPreview.result?.amount.toLocaleString()}
                       {penaltyPreview.result?.policy === 'percentage' && ` (${penaltyPreview.result.rateUsed}%)`}
                     </p>
                   ) : (
-                    <p className="mt-1 text-xs font-medium text-red-600">{penaltyPreview?.message}</p>
+                    <p className="mt-1 text-xs font-medium text-error">{penaltyPreview?.message}</p>
                   )}
                 </div>
               )}
@@ -616,7 +621,7 @@ export function RentalExtensionsSection({
                 </p>
               )}
 
-              {submitError && <p className="text-sm font-medium text-red-600">{submitError}</p>}
+              {submitError && <p className="text-sm font-medium text-error">{submitError}</p>}
 
               <div className="flex flex-wrap gap-2 pt-1">
                 <button
@@ -632,7 +637,7 @@ export function RentalExtensionsSection({
                     setShowForm(false)
                     resetForm()
                   }}
-                  className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50"
+                  className="rounded-lg border border-border px-4 py-2 text-sm font-semibold text-text-muted hover:bg-surface-muted"
                 >
                   {t('admin.extensions.section.cancel')}
                 </button>
@@ -645,12 +650,12 @@ export function RentalExtensionsSection({
       <div className="mt-5">
         <h3 className="text-sm font-semibold text-brand-navy">{t('admin.extensions.section.historyTitle')}</h3>
         {history.length === 0 ? (
-          <p className="mt-2 text-sm text-slate-400">{t('admin.extensions.section.historyEmpty')}</p>
+          <p className="mt-2 text-sm text-text-muted">{t('admin.extensions.section.historyEmpty')}</p>
         ) : (
           <div className="mt-2 overflow-x-auto">
             <table className="w-full min-w-[820px] text-sm">
               <thead>
-                <tr className="border-b border-brand-navy/10 text-start text-xs font-semibold uppercase tracking-wide text-slate-400">
+                <tr className="border-b border-brand-navy/10 text-start text-xs font-semibold uppercase tracking-wide text-text-muted">
                   <th className="py-2 pe-3 text-start">{t('admin.extensions.table.source')}</th>
                   <th className="py-2 pe-3 text-start">{t('admin.extensions.table.dates')}</th>
                   <th className="py-2 pe-3 text-start">{t('admin.extensions.table.days')}</th>
@@ -673,7 +678,7 @@ export function RentalExtensionsSection({
                       <td className="py-3 pe-3 text-xs">
                         {ext.previous_return_date} → {ext.requested_return_date}
                         {ext.is_late && (
-                          <span className="ms-1.5 inline-flex items-center rounded-full bg-amber-100 px-1.5 py-0.5 text-[10px] font-semibold text-amber-800">
+                          <span className="ms-1.5 inline-flex items-center rounded-full bg-warning-bg px-1.5 py-0.5 text-[10px] font-semibold text-warning">
                             {t('admin.extensions.table.late')}
                           </span>
                         )}
@@ -692,7 +697,7 @@ export function RentalExtensionsSection({
                       <td className="py-3 pe-3">
                         {ext.payment_method ? (
                           <div className="flex flex-col gap-1">
-                            <span className="text-xs capitalize text-slate-500">
+                            <span className="text-xs capitalize text-text-muted">
                               {t(`admin.extensions.form.paymentMethod${ext.payment_method === 'cash' ? 'Cash' : 'Online'}`)}
                             </span>
                             {ext.payment_status && <AdminStatusBadge status={ext.payment_status} />}
@@ -704,18 +709,18 @@ export function RentalExtensionsSection({
                       <td className="py-3 pe-3">
                         <AdminStatusBadge status={ext.status} />
                         {ext.status === 'rejected' && ext.rejection_reason && (
-                          <p className="mt-1 max-w-[16rem] text-xs text-slate-500">{ext.rejection_reason}</p>
+                          <p className="mt-1 max-w-[16rem] text-xs text-text-muted">{ext.rejection_reason}</p>
                         )}
                         {ext.conflict_booking_id && ext.replacement_vehicle && (
-                          <p className="mt-1 max-w-[16rem] text-xs text-slate-500">
+                          <p className="mt-1 max-w-[16rem] text-xs text-text-muted">
                             {t('admin.extensions.conflict.resolvedNotice', { plate: ext.replacement_vehicle.plate_number })}
                           </p>
                         )}
                         {ext.status === 'conflict_unresolved' && (
-                          <p className="mt-1 max-w-[16rem] text-xs text-amber-700">{t('admin.extensions.conflict.unresolvedNotice')}</p>
+                          <p className="mt-1 max-w-[16rem] text-xs text-warning">{t('admin.extensions.conflict.unresolvedNotice')}</p>
                         )}
                       </td>
-                      <td className="py-3 pe-3 text-xs text-slate-500">{ext.support_confirmed_by ?? '—'}</td>
+                      <td className="py-3 pe-3 text-xs text-text-muted">{ext.support_confirmed_by ?? '—'}</td>
                       <td className="py-3 ps-3 text-end">
                         {canConfirmPayment ? (
                           isConfirmingPayment ? (
@@ -725,7 +730,7 @@ export function RentalExtensionsSection({
                                 value={paymentReference}
                                 onChange={(e) => setPaymentReference(e.target.value)}
                                 placeholder={t('admin.extensions.payment.referenceLabel')}
-                                className="w-44 rounded-lg border border-slate-300 px-2 py-1 text-xs outline-none focus:border-brand-navy"
+                                className="w-44 rounded-lg border border-border px-2 py-1 text-xs outline-none focus:border-brand-navy"
                               />
                               <span className="text-xs text-brand-navy">
                                 {t(
@@ -751,7 +756,7 @@ export function RentalExtensionsSection({
                                     setPendingPayment(null)
                                     setPaymentReference('')
                                   }}
-                                  className="rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-50"
+                                  className="rounded-lg border border-border px-3 py-1.5 text-xs font-semibold text-text-muted hover:bg-surface-muted"
                                 >
                                   {t('admin.extensions.payment.cancel')}
                                 </button>
@@ -762,21 +767,23 @@ export function RentalExtensionsSection({
                               <button
                                 type="button"
                                 onClick={() => setPendingPayment({ extensionId: ext.id, outcome: 'paid' })}
-                                className="rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-50"
+                                className="inline-flex items-center gap-1 rounded-lg border border-border px-3 py-1.5 text-xs font-semibold text-text-muted hover:bg-surface-muted"
                               >
+                                <BadgeCheck className="h-3.5 w-3.5 text-success" aria-hidden="true" />
                                 {t('admin.extensions.payment.markReceived')}
                               </button>
                               <button
                                 type="button"
                                 onClick={() => setPendingPayment({ extensionId: ext.id, outcome: 'failed' })}
-                                className="rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-50"
+                                className="inline-flex items-center gap-1 rounded-lg border border-border px-3 py-1.5 text-xs font-semibold text-text-muted hover:bg-surface-muted"
                               >
+                                <XCircle className="h-3.5 w-3.5 text-error" aria-hidden="true" />
                                 {t('admin.extensions.payment.markFailed')}
                               </button>
                             </div>
                           )
                         ) : (
-                          <span className="text-xs text-slate-400">—</span>
+                          <span className="text-xs text-text-muted">—</span>
                         )}
                       </td>
                     </tr>
@@ -784,7 +791,7 @@ export function RentalExtensionsSection({
                 })}
               </tbody>
             </table>
-            {paymentError && <p className="mt-3 text-sm font-medium text-red-600">{paymentError}</p>}
+            {paymentError && <p className="mt-3 text-sm font-medium text-error">{paymentError}</p>}
           </div>
         )}
       </div>
@@ -802,4 +809,4 @@ function Section({ title, children, full }: { title: string; children: React.Rea
 }
 
 const inputClass =
-  'w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-brand-navy outline-none focus:border-brand-navy focus:ring-1 focus:ring-brand-navy'
+  'w-full rounded-lg border border-border bg-white px-3 py-2 text-sm text-brand-navy outline-none focus:border-brand-navy focus:ring-1 focus:ring-brand-navy'

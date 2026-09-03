@@ -30,7 +30,7 @@ export function AboutPage() {
           <h2 className="text-xl font-bold text-brand-navy">{t('pages.about.story.heading')}</h2>
           <div className="mt-3 space-y-3">
             {storyParagraphs.map((p, i) => (
-              <p key={i} className="text-sm leading-relaxed text-slate-700">
+              <p key={i} className="text-sm leading-relaxed text-brand-navy/80">
                 {p}
               </p>
             ))}
@@ -40,11 +40,11 @@ export function AboutPage() {
         <div className="mt-10 grid gap-6 sm:grid-cols-2">
           <div className="rounded-2xl border border-brand-navy/10 bg-brand-lavender/30 p-6">
             <h2 className="text-base font-semibold text-brand-navy">{t('pages.about.vision.heading')}</h2>
-            <p className="mt-2 text-sm leading-relaxed text-slate-700">{t('pages.about.vision.body')}</p>
+            <p className="mt-2 text-sm leading-relaxed text-brand-navy/80">{t('pages.about.vision.body')}</p>
           </div>
           <div className="rounded-2xl border border-brand-navy/10 bg-brand-lavender/30 p-6">
             <h2 className="text-base font-semibold text-brand-navy">{t('pages.about.mission.heading')}</h2>
-            <p className="mt-2 text-sm leading-relaxed text-slate-700">{t('pages.about.mission.body')}</p>
+            <p className="mt-2 text-sm leading-relaxed text-brand-navy/80">{t('pages.about.mission.body')}</p>
           </div>
         </div>
 
@@ -53,12 +53,12 @@ export function AboutPage() {
           <div className="mt-5 grid gap-6 sm:grid-cols-2">
             {values.map((item, i) => (
               <div key={item.title} className="flex gap-4">
-                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-navy text-sm font-bold text-brand-gold-light">
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-navy text-sm font-bold text-white">
                   {i + 1}
                 </span>
                 <div>
                   <h3 className="text-sm font-semibold text-brand-navy">{item.title}</h3>
-                  <p className="mt-1 text-sm text-slate-600">{item.body}</p>
+                  <p className="mt-1 text-sm text-text-muted">{item.body}</p>
                 </div>
               </div>
             ))}
@@ -68,7 +68,7 @@ export function AboutPage() {
         <div className="mt-10 flex justify-center">
           <Link
             to="/search"
-            className="rounded-lg bg-brand-gold px-6 py-3 text-sm font-semibold text-brand-navy-dark shadow-sm transition-colors hover:bg-brand-gold-light"
+            className="rounded-lg bg-brand-gold px-6 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-brand-gold-light"
           >
             {t('nav.searchCars')}
           </Link>

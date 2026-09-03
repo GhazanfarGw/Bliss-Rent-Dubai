@@ -9,6 +9,11 @@ import { createClient } from 'jsr:@supabase/supabase-js@2'
 import { corsHeaders, jsonResponse } from '../_shared/cors.ts'
 import { handleConfirmPayment, type ConfirmPaymentRequestBody } from './logic.ts'
 import { ApiError } from '../_shared/errors.ts'
+import { triggerCustomerBookingEmail } from '../_shared/email/triggerCustomerBookingEmail.ts'
+import { createSupabaseEmailLogStore } from '../_shared/email/supabaseEmailLogStore.ts'
+import { triggerAdminOperationalEmail } from '../_shared/email/triggerAdminOperationalEmail.ts'
+import { createSupabaseAdminEmailLogStore } from '../_shared/email/supabaseAdminEmailLogStore.ts'
+import type { EmailLanguage } from '../_shared/email/strings.ts'
 
 Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') {
@@ -18,12 +23,16 @@ Deno.serve(async (req: Request) => {
     return jsonResponse({ code: 'METHOD_NOT_ALLOWED', message: 'Use POST.' }, 405)
   }
 
-  let body: ConfirmPaymentRequestBody
+  let rawBody: unknown
   try {
-    body = await req.json()
+    rawBody = await req.json()
   } catch {
     return jsonResponse({ code: 'VALIDATION_ERROR', message: 'Request body must be JSON.' }, 400)
   }
+  const body = rawBody as ConfirmPaymentRequestBody
+  // Phase 9D: loosely read here, purely to pick the customer email's
+  // language — ConfirmPaymentRequestBody/logic.ts stay untouched.
+  const language: EmailLanguage = isPlainObject(rawBody) && rawBody.language === 'ar' ? 'ar' : 'en'
 
   const supabaseAdmin = createClient(
     Deno.env.get('SUPABASE_URL') ?? '',
@@ -32,6 +41,48 @@ Deno.serve(async (req: Request) => {
 
   try {
     const result = await handleConfirmPayment(body, supabaseAdmin)
+
+    // Phase 9D: booking_confirmed on a successful payment, payment_failed
+    // otherwise — the TEST payment provider's outcome, already decided
+    // server-side inside handleConfirmPayment, is what picks the event;
+    // nothing here re-derives or second-guesses that decision.
+    // triggerCustomerBookingEmail never throws, so this can never affect
+    // the already-successful confirm-payment response.
+    await triggerCustomerBookingEmail({
+      dataSource: supabaseAdmin,
+      emailLog: createSupabaseEmailLogStore(supabaseAdmin),
+      resendConfig: {
+        apiKey: Deno.env.get('RESEND_API_KEY') ?? '',
+        fromAddress: Deno.env.get('RESEND_FROM_ADDRESS') ?? 'Bliss Rent <noreply@bliss.rent>',
+      },
+      siteBaseUrl: Deno.env.get('SITE_BASE_URL') ?? 'https://bliss.rent',
+      bookingId: result.bookingId,
+      eventType: result.paymentStatus === 'paid' ? 'booking_confirmed' : 'payment_failed',
+      language,
+    })
+
+    // Phase 9F: admin-side mirror of the same event, to every currently
+    // active admin (see adminRecipients.ts). Same paid/failed branch the
+    // customer email above already used — nothing here re-derives it.
+    await triggerAdminOperationalEmail({
+      dataSource: supabaseAdmin,
+      async getAdminEmail(id: string) {
+        const { data, error } = await supabaseAdmin.auth.admin.getUserById(id)
+        if (error || !data.user) return null
+        return data.user.email ?? null
+      },
+      emailLog: createSupabaseAdminEmailLogStore(supabaseAdmin),
+      resendConfig: {
+        apiKey: Deno.env.get('RESEND_API_KEY') ?? '',
+        fromAddress: Deno.env.get('RESEND_FROM_ADDRESS') ?? 'Bliss Rent <noreply@bliss.rent>',
+      },
+      siteBaseUrl: Deno.env.get('SITE_BASE_URL') ?? 'https://bliss.rent',
+      bookingId: result.bookingId,
+      eventType: result.paymentStatus === 'paid' ? 'admin_booking_confirmed' : 'admin_payment_failed',
+      language,
+      dashboardPath: `/admin/bookings/${result.bookingId}`,
+    })
+
     return jsonResponse(result, 200)
   } catch (err) {
     if (err instanceof ApiError) {
@@ -47,3 +98,7 @@ Deno.serve(async (req: Request) => {
     )
   }
 })
+
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null
+}

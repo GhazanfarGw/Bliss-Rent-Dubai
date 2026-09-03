@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type ChangeEvent, type FormEvent, type ReactNode } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { ArrowLeft } from 'lucide-react'
 import {
   fetchCategories,
   fetchVehicleById,
@@ -153,7 +154,7 @@ export function VehicleFormPage() {
     return (
       <div className="flex flex-col items-center justify-center py-16">
         <Spinner className="h-8 w-8" />
-        <p className="mt-3 text-sm text-slate-500">{t('common.loading')}</p>
+        <p className="mt-3 text-sm text-text-muted">{t('common.loading')}</p>
       </div>
     )
   }
@@ -175,8 +176,9 @@ export function VehicleFormPage() {
 
   return (
     <div>
-      <button type="button" onClick={() => navigate('/admin/fleet')} className="mb-4 text-sm font-medium text-slate-500 hover:text-brand-navy">
-        ← {t('admin.fleet.backToList')}
+      <button type="button" onClick={() => navigate('/admin/fleet')} className="mb-4 inline-flex items-center gap-1.5 text-sm font-medium text-text-muted hover:text-brand-navy">
+        <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+        {t('admin.fleet.backToList')}
       </button>
 
       <AdminPageHeader title={isEdit ? t('admin.fleet.editTitle') : t('admin.fleet.addTitle')} />
@@ -239,7 +241,7 @@ export function VehicleFormPage() {
             </Field>
           </div>
 
-          {saveError && <p className="text-sm font-medium text-red-600">{saveError}</p>}
+          {saveError && <p className="text-sm font-medium text-error">{saveError}</p>}
 
           <button
             type="submit"
@@ -253,7 +255,7 @@ export function VehicleFormPage() {
         <div className="rounded-2xl border border-brand-navy/10 bg-white p-5">
           <h2 className="text-sm font-semibold text-brand-navy">{t('admin.fleet.images')}</h2>
           {!isEdit ? (
-            <p className="mt-2 text-xs text-slate-400">{t('admin.fleet.imagesAfterCreate')}</p>
+            <p className="mt-2 text-xs text-text-muted">{t('admin.fleet.imagesAfterCreate')}</p>
           ) : (
             <>
               <div className="mt-3 grid grid-cols-2 gap-2">
@@ -261,7 +263,7 @@ export function VehicleFormPage() {
                   <div key={img.id} className="relative overflow-hidden rounded-lg border border-brand-navy/10">
                     <VehiclePhoto storagePath={img.storage_path} alt="" className="h-20 w-full" />
                     {img.is_primary && (
-                      <span className="absolute start-1 top-1 rounded bg-brand-gold px-1.5 py-0.5 text-[10px] font-semibold text-brand-navy-dark">
+                      <span className="absolute start-1 top-1 rounded bg-brand-gold px-1.5 py-0.5 text-[10px] font-semibold text-white">
                         {t('admin.fleet.primary')}
                       </span>
                     )}
@@ -274,7 +276,7 @@ export function VehicleFormPage() {
                       <button
                         type="button"
                         onClick={() => void handleDeleteImage(img.id, img.storage_path)}
-                        className="font-semibold text-red-600 underline"
+                        className="font-semibold text-error underline"
                       >
                         {t('admin.fleet.remove')}
                       </button>
@@ -298,7 +300,7 @@ export function VehicleFormPage() {
               >
                 {imageBusy ? t('admin.fleet.uploading') : t('admin.fleet.addPhoto')}
               </button>
-              {imageError && <p className="mt-2 text-xs font-medium text-red-600">{imageError}</p>}
+              {imageError && <p className="mt-2 text-xs font-medium text-error">{imageError}</p>}
             </>
           )}
         </div>
@@ -310,12 +312,12 @@ export function VehicleFormPage() {
 function Field({ label, error, children }: { label: string; error?: string; children: ReactNode }) {
   return (
     <label className="block">
-      <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">{label}</span>
+      <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-text-muted">{label}</span>
       {children}
-      {error && <span className="mt-1 block text-xs font-medium text-red-600">{error}</span>}
+      {error && <span className="mt-1 block text-xs font-medium text-error">{error}</span>}
     </label>
   )
 }
 
 const inputClass =
-  'w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-brand-navy outline-none transition-colors focus:border-brand-navy focus:ring-1 focus:ring-brand-navy'
+  'w-full rounded-lg border border-border bg-white px-3 py-2.5 text-sm text-brand-navy outline-none transition-colors focus:border-brand-navy focus:ring-1 focus:ring-brand-navy'

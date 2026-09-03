@@ -19,26 +19,33 @@ export function RequirementsSection() {
   const items = t('home.requirements.items', { returnObjects: true }) as RequirementItem[]
 
   return (
-    <section className="bg-brand-navy-dark">
-      <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
-        <div className="max-w-2xl">
-          <p className="text-xs font-semibold uppercase tracking-wide text-brand-gold-light">
+    <section className="bg-[#f1eee9]">
+      <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+        <div className="max-w-5xl">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.32em] text-brand-gold">
             {t('home.requirements.eyebrow')}
           </p>
-          <h2 className="mt-2 text-2xl font-bold text-white sm:text-3xl">{t('home.requirements.title')}</h2>
-          <p className="mt-2 text-sm text-slate-400">{t('home.requirements.subtitle')}</p>
+          <h2 className="mt-4 text-[clamp(2.8rem,5vw,6rem)] font-black leading-[0.92] tracking-[-0.065em] text-[#000] drop-shadow-[0_8px_24px_rgba(17,22,29,0.08)]">
+            {t('home.requirements.title')}
+          </h2>
+          <p className="mt-4 max-w-2xl text-base leading-7 text-[#58616d]">
+            {t('home.requirements.subtitle')}
+          </p>
         </div>
 
-        <div className="mt-10 grid gap-6 sm:grid-cols-3">
+        <div className="mt-10 grid gap-6 xl:grid-cols-3">
           {items.map((item, i) => (
-            <div key={item.title} className="rounded-2xl border border-white/10 bg-white/5 p-6">
+            <div
+              key={item.title}
+              className="rounded-[1.75rem] border border-[#e7decf] bg-white/80 p-6 shadow-[0_18px_38px_rgba(17,22,29,0.06)] backdrop-blur-[2px]"
+            >
               <div className="flex items-center justify-between">
                 <RequirementIcon index={i} />
-                <span className="font-mono text-xs text-brand-gold-light">{`0${i + 1}`}</span>
+                <span className="font-mono text-xs font-semibold tracking-[0.18em] text-brand-gold">{`0${i + 1}`}</span>
               </div>
-              <h3 className="mt-4 text-base font-semibold text-white">{item.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-slate-400">{item.body}</p>
-              <div className="mt-5 h-px w-full bg-gradient-to-r from-brand-gold to-transparent" />
+              <h3 className="mt-6 text-[1.6rem] font-semibold leading-tight tracking-[-0.04em] text-[#1b2430]">{item.title}</h3>
+              <p className="mt-3 text-[1.02rem] leading-8 text-[#5e6874]">{item.body}</p>
+              <div className="mt-6 h-px w-full bg-brand-gold" />
             </div>
           ))}
         </div>

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { CalendarClock } from 'lucide-react'
 import {
   fetchCurrentRentedCars,
   fetchExtensionPricingSettings,
@@ -285,10 +286,10 @@ export function CurrentRentedCarsSection({ onExtended }: { onExtended: () => voi
   return (
     <div className="rounded-2xl border border-brand-navy/10 bg-white p-5">
       <h2 className="text-sm font-semibold text-brand-navy">{t('admin.extensions.currentRentedCars.title')}</h2>
-      <p className="mt-1 text-xs text-slate-500">{t('admin.extensions.currentRentedCars.subtitle')}</p>
+      <p className="mt-1 text-xs text-text-muted">{t('admin.extensions.currentRentedCars.subtitle')}</p>
 
       {successMessage && (
-        <div className="mt-4 rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-800">
+        <div className="mt-4 rounded-xl border border-success/25 bg-success-bg p-3 text-sm text-success">
           <p className="font-semibold">{t('admin.extensions.currentRentedCars.panel.successTitle')}</p>
           <p className="mt-1">{successMessage}</p>
           <button type="button" onClick={() => setSuccessMessage(null)} className="mt-2 text-xs font-semibold underline">
@@ -319,7 +320,7 @@ export function CurrentRentedCarsSection({ onExtended }: { onExtended: () => voi
         <div className="mt-4 overflow-x-auto">
           <table className="w-full min-w-[820px] text-sm">
             <thead>
-              <tr className="border-b border-brand-navy/10 text-xs font-semibold uppercase tracking-wide text-slate-400">
+              <tr className="border-b border-brand-navy/10 text-xs font-semibold uppercase tracking-wide text-text-muted">
                 <th className="py-2 pe-3 text-start">{t('admin.extensions.currentRentedCars.columns.customer')}</th>
                 <th className="py-2 pe-3 text-start">{t('admin.extensions.currentRentedCars.columns.booking')}</th>
                 <th className="py-2 pe-3 text-start">{t('admin.extensions.currentRentedCars.columns.vehicle')}</th>
@@ -353,8 +354,9 @@ export function CurrentRentedCarsSection({ onExtended }: { onExtended: () => voi
                         type="button"
                         disabled={!car.vehicles}
                         onClick={() => openPanel(car)}
-                        className="rounded-lg bg-brand-gold px-3 py-1.5 text-xs font-semibold text-brand-navy-dark hover:bg-brand-gold-light disabled:cursor-not-allowed disabled:opacity-60"
+                        className="inline-flex items-center gap-1.5 rounded-lg bg-brand-gold px-3 py-1.5 text-xs font-semibold text-white hover:bg-brand-gold-light disabled:cursor-not-allowed disabled:opacity-60"
                       >
+                        <CalendarClock className="h-3.5 w-3.5" aria-hidden="true" />
                         {t('admin.extensions.currentRentedCars.extendButton')}
                       </button>
                     </td>
@@ -368,7 +370,7 @@ export function CurrentRentedCarsSection({ onExtended }: { onExtended: () => voi
 
       {selected && (
         <div className="fixed inset-0 z-40 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/40" onClick={submitting ? undefined : closePanel} />
+          <div className="absolute inset-0 bg-brand-navy-dark/50" onClick={submitting ? undefined : closePanel} />
           <div className="relative max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-5 shadow-xl">
             {step === 'form' && (
               <>
@@ -376,16 +378,16 @@ export function CurrentRentedCarsSection({ onExtended }: { onExtended: () => voi
 
                 <div className="mt-3 rounded-xl border border-brand-navy/10 bg-brand-lavender/10 p-3 text-sm">
                   <p className="font-semibold text-brand-navy">{selected.customers?.full_name ?? '—'}</p>
-                  <p className="mt-1 text-xs text-slate-600">
+                  <p className="mt-1 text-xs text-brand-navy/80">
                     {formatBookingReference(selected.id)} · {selected.vehicles?.make} {selected.vehicles?.model} · {selected.vehicles?.plate_number}
                   </p>
-                  <p className="mt-1 text-xs text-slate-500">
+                  <p className="mt-1 text-xs text-text-muted">
                     {t('admin.extensions.currentRentedCars.panel.currentReturnLabel')}: {selected.end_date}
                   </p>
                 </div>
 
                 <label className="mt-4 block max-w-[10rem]">
-                  <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
+                  <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-text-muted">
                     {t('admin.extensions.currentRentedCars.panel.extensionDaysLabel')}
                   </span>
                   <input
@@ -398,7 +400,7 @@ export function CurrentRentedCarsSection({ onExtended }: { onExtended: () => voi
                     className={inputClass}
                   />
                   {extensionDaysInput && !daysValid && (
-                    <p className="mt-1 text-xs font-medium text-red-600">{t('admin.extensions.currentRentedCars.panel.extensionDaysHint')}</p>
+                    <p className="mt-1 text-xs font-medium text-error">{t('admin.extensions.currentRentedCars.panel.extensionDaysHint')}</p>
                   )}
                 </label>
 
@@ -409,12 +411,12 @@ export function CurrentRentedCarsSection({ onExtended }: { onExtended: () => voi
                 )}
 
                 {availability.status === 'checking' && (
-                  <p className="mt-2 text-xs text-slate-500">
+                  <p className="mt-2 text-xs text-text-muted">
                     {t('admin.extensions.form.checkingAvailability', { plate: selected.vehicles?.plate_number ?? '' })}
                   </p>
                 )}
                 {availability.status === 'done' && (
-                  <p className={'mt-2 text-xs font-medium ' + (availability.available ? 'text-emerald-700' : 'text-amber-700')}>
+                  <p className={'mt-2 text-xs font-medium ' + (availability.available ? 'text-success' : 'text-warning')}>
                     {t(availability.available ? 'admin.extensions.form.availableMessage' : 'admin.extensions.form.unavailableMessage', {
                       plate: selected.vehicles?.plate_number ?? '',
                     })}
@@ -422,7 +424,7 @@ export function CurrentRentedCarsSection({ onExtended }: { onExtended: () => voi
                 )}
 
                 <label className="mt-4 block">
-                  <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
+                  <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-text-muted">
                     {t('admin.extensions.currentRentedCars.panel.confirmedByLabel')}
                   </span>
                   <input
@@ -434,7 +436,7 @@ export function CurrentRentedCarsSection({ onExtended }: { onExtended: () => voi
                 </label>
 
                 <label className="mt-4 block max-w-xs">
-                  <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
+                  <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-text-muted">
                     {t('admin.extensions.form.paymentMethod')}
                   </span>
                   <select value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value as 'cash' | 'online' | '')} className={inputClass}>
@@ -442,14 +444,14 @@ export function CurrentRentedCarsSection({ onExtended }: { onExtended: () => voi
                     {isSuperAdmin && <option value="cash">{t('admin.extensions.form.paymentMethodCash')}</option>}
                     <option value="online">{t('admin.extensions.form.paymentMethodOnline')}</option>
                   </select>
-                  {!isSuperAdmin && <p className="mt-1 text-xs text-slate-400">{t('admin.extensions.form.cashSuperAdminOnlyHint')}</p>}
+                  {!isSuperAdmin && <p className="mt-1 text-xs text-text-muted">{t('admin.extensions.form.cashSuperAdminOnlyHint')}</p>}
                 </label>
 
                 {daysValid && (
                   <div className="mt-4 space-y-1 rounded-xl border border-brand-navy/10 bg-white p-3 text-sm">
                     {pricingPreview?.ok ? (
                       <>
-                        <p className="text-xs text-slate-500">
+                        <p className="text-xs text-text-muted">
                           {t('admin.extensions.currentRentedCars.panel.dailyRateLabel')}: {pricingPreview.currency}{' '}
                           {extensionDays ? (pricingPreview.amount / extensionDays).toLocaleString() : ''}
                         </p>
@@ -457,7 +459,7 @@ export function CurrentRentedCarsSection({ onExtended }: { onExtended: () => voi
                           {t('admin.extensions.form.amountLabel')}: {pricingPreview.currency} {pricingPreview.amount.toLocaleString()}
                         </p>
                         {isLate && (
-                          <p className="text-amber-700">
+                          <p className="text-warning">
                             {penaltyPreview?.ok
                               ? `${t('admin.extensions.form.penaltyLabel')}: ${penaltyPreview.result?.currency} ${penaltyPreview.result?.amount.toLocaleString()}${
                                   penaltyPreview.result?.policy === 'percentage' ? ` (${penaltyPreview.result.rateUsed}%)` : ''
@@ -472,12 +474,12 @@ export function CurrentRentedCarsSection({ onExtended }: { onExtended: () => voi
                         )}
                       </>
                     ) : (
-                      <p className="text-xs font-medium text-red-600">{pricingPreview?.message}</p>
+                      <p className="text-xs font-medium text-error">{pricingPreview?.message}</p>
                     )}
                   </div>
                 )}
 
-                {submitError && <p className="mt-3 text-sm font-medium text-red-600">{submitError}</p>}
+                {submitError && <p className="mt-3 text-sm font-medium text-error">{submitError}</p>}
 
                 <div className="mt-5 flex flex-wrap gap-2">
                   <button
@@ -491,7 +493,7 @@ export function CurrentRentedCarsSection({ onExtended }: { onExtended: () => voi
                   <button
                     type="button"
                     onClick={closePanel}
-                    className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50"
+                    className="rounded-lg border border-border px-4 py-2 text-sm font-semibold text-brand-navy/80 hover:bg-surface-muted"
                   >
                     {t('admin.extensions.currentRentedCars.panel.cancelButton')}
                   </button>
@@ -505,13 +507,13 @@ export function CurrentRentedCarsSection({ onExtended }: { onExtended: () => voi
 
                 <div className="mt-3 space-y-1.5 rounded-xl border border-brand-navy/10 bg-brand-lavender/10 p-4 text-sm">
                   <p className="font-semibold text-brand-navy">{selected.customers?.full_name ?? '—'}</p>
-                  <p className="text-xs text-slate-600">
+                  <p className="text-xs text-brand-navy/80">
                     {selected.vehicles?.make} {selected.vehicles?.model} · {selected.vehicles?.plate_number}
                   </p>
-                  <p className="pt-2 text-xs text-slate-500">
+                  <p className="pt-2 text-xs text-text-muted">
                     {t('admin.extensions.currentRentedCars.panel.currentReturnLabel')}: {selected.end_date}
                   </p>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-text-muted">
                     {t('admin.extensions.currentRentedCars.panel.extensionDaysLabel')}: {extensionDays}
                   </p>
                   <p className="font-medium text-brand-navy">
@@ -522,7 +524,7 @@ export function CurrentRentedCarsSection({ onExtended }: { onExtended: () => voi
                       {t('admin.extensions.form.amountLabel')}: {pricingPreview.currency} {pricingPreview.amount.toLocaleString()}
                     </p>
                     {isLate && penaltyPreview?.ok && (
-                      <p className="text-amber-700">
+                      <p className="text-warning">
                         {t('admin.extensions.form.penaltyLabel')}: {penaltyPreview.result?.currency} {penaltyPreview.result?.amount.toLocaleString()}
                       </p>
                     )}
@@ -531,14 +533,14 @@ export function CurrentRentedCarsSection({ onExtended }: { onExtended: () => voi
                         {t('admin.extensions.form.totalLabel')}: {pricingPreview.currency} {totalAmount.toLocaleString()}
                       </p>
                     )}
-                    <p className="mt-1 text-xs uppercase tracking-wide text-slate-500">
+                    <p className="mt-1 text-xs uppercase tracking-wide text-text-muted">
                       {t('admin.extensions.form.paymentMethod')}:{' '}
                       {t(paymentMethod === 'cash' ? 'admin.extensions.form.paymentMethodCash' : 'admin.extensions.form.paymentMethodOnline')}
                     </p>
                   </div>
                 </div>
 
-                {submitError && <p className="mt-3 text-sm font-medium text-red-600">{submitError}</p>}
+                {submitError && <p className="mt-3 text-sm font-medium text-error">{submitError}</p>}
 
                 <div className="mt-5 flex flex-wrap gap-2">
                   <button
@@ -553,7 +555,7 @@ export function CurrentRentedCarsSection({ onExtended }: { onExtended: () => voi
                     type="button"
                     disabled={submitting}
                     onClick={() => setStep('form')}
-                    className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50"
+                    className="rounded-lg border border-border px-4 py-2 text-sm font-semibold text-brand-navy/80 hover:bg-surface-muted"
                   >
                     {t('admin.extensions.currentRentedCars.panel.backButton')}
                   </button>
@@ -568,4 +570,4 @@ export function CurrentRentedCarsSection({ onExtended }: { onExtended: () => voi
 }
 
 const inputClass =
-  'w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-brand-navy outline-none focus:border-brand-navy focus:ring-1 focus:ring-brand-navy'
+  'w-full rounded-lg border border-border bg-white px-3 py-2 text-sm text-brand-navy outline-none focus:border-brand-navy focus:ring-1 focus:ring-brand-navy'

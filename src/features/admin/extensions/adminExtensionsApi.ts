@@ -216,6 +216,29 @@ export interface RequestExtensionResult {
   replacementVehicleId: string | null
 }
 
+/**
+ * Phase 9E: best-effort trigger for the deliver-extension-notifications
+ * Edge Function, called right after any of this file's three
+ * extension-processing RPCs succeeds. Never throws — an email problem
+ * must never surface as a failure of the extension action the admin just
+ * successfully completed. See deliver-extension-notifications/logic.ts
+ * for why extensionId alone is enough: every other fact (which booking(s)
+ * got a notification, who to email) is resolved server-side from the
+ * unmodified booking_extensions/booking_notifications rows.
+ */
+async function triggerExtensionNotificationEmails(extensionId: string): Promise<void> {
+  try {
+    const { error } = await supabase.functions.invoke('deliver-extension-notifications', {
+      body: { extensionId },
+    })
+    if (error) {
+      console.error('deliver-extension-notifications failed', error)
+    }
+  } catch (err) {
+    console.error('deliver-extension-notifications failed', err)
+  }
+}
+
 async function callRequestBookingExtension(input: RequestExtensionInput): Promise<RequestExtensionResult> {
   const { data, error } = await supabase.rpc('request_booking_extension', {
     p_booking_id: input.bookingId,
@@ -245,6 +268,13 @@ async function callRequestBookingExtension(input: RequestExtensionInput): Promis
       }
     | undefined
   if (!row) throw new AdminApiError('The extension could not be processed. Please try again.')
+
+  // Fire-and-forget: a conflict/reassignment or a customer-review
+  // approval can both produce a booking_notifications row here (see
+  // deliverExtensionNotifications.ts) — awaited so the trigger reliably
+  // fires before this function returns, but its own errors never surface.
+  await triggerExtensionNotificationEmails(row.extension_id)
+
   return {
     extensionId: row.extension_id,
     status: row.status,
@@ -283,6 +313,8 @@ export async function rejectExtensionRequest(extensionId: string, reason: string
     p_rejection_reason: reason,
   })
   if (error) throw friendlyExtensionError(error)
+
+  await triggerExtensionNotificationEmails(extensionId)
 }
 
 export async function confirmExtensionPayment(
@@ -296,4 +328,13 @@ export async function confirmExtensionPayment(
     p_reference: reference,
   })
   if (error) throw friendlyExtensionError(error)
+
+  // A 'failed' outcome only updates payment_status — confirm_booking_extension_payment()
+  // never writes a booking_notifications row for it (see the migration),
+  // so there is nothing to deliver; only 'paid' can produce one (an
+  // extension_approved row, and possibly a vehicle_reassigned row for a
+  // different booking via resolve_extension_conflict()).
+  if (outcome === 'paid') {
+    await triggerExtensionNotificationEmails(extensionId)
+  }
 }

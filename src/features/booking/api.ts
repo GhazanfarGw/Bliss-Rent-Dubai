@@ -90,6 +90,32 @@ export async function fetchFeaturedVehicles(limit = 6): Promise<VehicleWithDetai
 }
 
 /**
+ * Same as `fetchFeaturedVehicles`, scoped to one `vehicle_categories.name`
+ * (e.g. 'Economy', 'Luxury') — backs the homepage's two independent
+ * Featured sliders so a newly-added luxury vehicle never crowds out or
+ * gets mixed into the economy row, and vice versa. `!inner` turns the
+ * joined `vehicle_categories` into a filterable inner join so `.eq` on the
+ * related table's column works.
+ */
+export async function fetchFeaturedVehiclesByCategory(
+  categoryName: string,
+  limit = 6,
+): Promise<VehicleWithDetails[]> {
+  const { data, error } = await supabase
+    .from('vehicles')
+    .select(
+      '*, vehicle_categories!inner(id, name, description), vehicle_images(id, storage_path, is_primary, sort_order), pricing(id, term, list_price, client_price, currency)',
+    )
+    .eq('status', 'available')
+    .eq('vehicle_categories.name', categoryName)
+    .order('created_at', { ascending: false })
+    .limit(limit)
+
+  if (error) throw new BookingApiError(error.message)
+  return (data ?? []) as unknown as VehicleWithDetails[]
+}
+
+/**
  * All currently-available vehicles with no date-range filtering — the
  * Search page's default view before the customer has chosen pickup/
  * drop-off dates, so they can browse the fleet first instead of hitting a

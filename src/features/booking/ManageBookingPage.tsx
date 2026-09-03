@@ -1,8 +1,11 @@
-import { useState, type FormEvent } from 'react'
-import { Link } from 'react-router-dom'
+import { useEffect, useState, type FormEvent, type ReactNode } from 'react'
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { lookupBooking, BookingLookupError } from '@/features/booking/lookupApi'
 import { ExtendRentalSection } from '@/features/booking/ExtendRentalSection'
+import { resumePendingBookingFromLookup, clearActiveBooking } from '@/features/booking/checkout/checkoutStorage'
+import { criteriaToSearchParams } from '@/features/booking/searchParams'
+import { Button, StatusBadge } from '@/features/shared/ui'
 import type { BookingLookupResult } from '@/types/domain'
 
 type ViewState =
@@ -26,11 +29,42 @@ const EXTENDABLE_STATUSES = new Set(['confirmed', 'active'])
  * result instead of sending the customer to a second page. See
  * lookupApi.ts and the lookup_booking_for_customer() migration for the
  * deliberate single-field trade-off this relies on.
+ *
+ * Phase 9D: every booking/payment email's "Manage your booking" button
+ * links here as `/manage-booking?ref=BLS-XXXXXXXX` (buildManageBookingUrl,
+ * _shared/email/manageBookingLink.ts). The `ref` query parameter only
+ * pre-fills the lookup field below — it does not auto-submit — so the
+ * existing lookup behavior (the customer reviews the reference, then
+ * presses the button) is unchanged either way.
+ *
+ * Phase 11 correction: the homepage navigator's Manage Booking panel
+ * (ManageBookingVerifyPanel.tsx) now verifies the reference + last name
+ * up front, then hands off here via `navigate('/manage-booking', { state:
+ * { prefetchedResult } })` so the customer isn't asked to look their
+ * booking up a second time. When present, `location.state.prefetchedResult`
+ * seeds the result straight into the "found" state below — reusing the
+ * exact same ResultCard/ExtendRentalSection/Continue-to-Payment code, no
+ * new booking logic. Navigating here normally (no state, e.g. the `ref`
+ * query param above, or a direct visit) behaves exactly as before.
  */
 export function ManageBookingPage() {
   const { t } = useTranslation()
-  const [query, setQuery] = useState('')
-  const [state, setState] = useState<ViewState>({ status: 'idle' })
+  const [searchParams] = useSearchParams()
+  const location = useLocation()
+  const prefetchedResult = (location.state as { prefetchedResult?: BookingLookupResult } | null)?.prefetchedResult
+  const [query, setQuery] = useState(() => prefetchedResult?.bookingReference ?? searchParams.get('ref') ?? '')
+  const [state, setState] = useState<ViewState>(() =>
+    prefetchedResult ? { status: 'found', result: prefetchedResult } : { status: 'idle' },
+  )
+
+  useEffect(() => {
+    // Mirrors the same defensive cleanup handleSubmit does below, for the
+    // pre-verified arrival path.
+    if (prefetchedResult && prefetchedResult.bookingStatus !== 'pending_payment') {
+      clearActiveBooking(prefetchedResult.vehicleId)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- only ever meant to run once, for the initial prefetched result
+  }, [])
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
@@ -38,7 +72,17 @@ export function ManageBookingPage() {
     setState({ status: 'loading' })
     try {
       const result = await lookupBooking(query)
-      setState(result ? { status: 'found', result } : { status: 'not_found' })
+      if (result) {
+        setState({ status: 'found', result })
+        // Defensive cleanup: if this browser still has an active-booking
+        // pointer for this vehicle (e.g. a stale tab) but the booking is
+        // no longer pending_payment (paid, cancelled, reassigned…), drop
+        // the pointer so the header reminder and BookingSummaryPage's
+        // resume panel never show something that's already resolved.
+        if (result.bookingStatus !== 'pending_payment') clearActiveBooking(result.vehicleId)
+      } else {
+        setState({ status: 'not_found' })
+      }
     } catch (err) {
       setState({
         status: 'error',
@@ -48,47 +92,52 @@ export function ManageBookingPage() {
   }
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-12 sm:px-6">
-      <h1 className="text-xl font-bold text-brand-navy">{t('manageBooking.title')}</h1>
-      <p className="mt-1 text-sm text-slate-600">{t('manageBooking.subtitle')}</p>
+    <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">
+      <div className="overflow-hidden rounded-[30px] border border-brand-gold/25 bg-[radial-gradient(circle_at_top,#1a2028_0%,#11161d_48%,#0b0e12_100%)] text-white shadow-[0_30px_80px_rgba(13,16,19,0.4)]">
+        <div className="px-5 py-7 sm:px-8 sm:py-8">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.35em] text-brand-gold-light">{t('manageBooking.eyebrow')}</p>
+          <h1 className="mt-3 text-3xl font-black tracking-[-0.07em] text-white sm:text-4xl">{t('manageBooking.title')}</h1>
+          <p className="mt-3 max-w-xl text-sm leading-6 text-white/70 sm:text-base">{t('manageBooking.subtitle')}</p>
+        </div>
 
-      <form onSubmit={(e) => void handleSubmit(e)} noValidate className="mt-6 space-y-4 rounded-2xl border border-brand-navy/10 bg-white p-5">
-        <label className="block">
-          <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">
-            {t('manageBooking.queryLabel')}
-          </span>
-          <input
-            type="text"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="BLS-XXXXXXXX or ABC-123"
-            className={inputClass}
-            autoComplete="off"
-          />
-        </label>
+        <form onSubmit={(e) => void handleSubmit(e)} noValidate className="space-y-4 border-t border-white/10 bg-white/4 px-5 py-6 sm:px-8">
+          <label className="block">
+            <span className="mb-2 block text-[11px] font-semibold uppercase tracking-[0.18em] text-[#f5dfb0]">
+              {t('manageBooking.queryLabel')}
+            </span>
+            <input
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="BLS-XXXXXXXX or ABC-123"
+              className={inputClass}
+              autoComplete="off"
+            />
+          </label>
 
-        <button
-          type="submit"
-          disabled={state.status === 'loading'}
-          className="w-full rounded-lg bg-brand-navy px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-navy-light disabled:opacity-60 sm:w-auto"
-        >
-          {state.status === 'loading' ? t('manageBooking.checking') : t('manageBooking.submit')}
-        </button>
+          <button
+            type="submit"
+            disabled={state.status === 'loading'}
+            className="inline-flex min-h-12 items-center justify-center rounded-none bg-brand-gold px-6 py-3 text-sm font-bold text-white shadow-[0_18px_36px_rgba(92,9,49,0.3)] transition-all hover:brightness-105 disabled:opacity-60 sm:w-auto"
+          >
+            {state.status === 'loading' ? t('manageBooking.checking') : t('manageBooking.submit')}
+          </button>
 
-        {state.status === 'not_found' && (
-          <p className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-            {t('manageBooking.notFound')}
-          </p>
-        )}
-        {state.status === 'error' && (
-          <p className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{state.message}</p>
-        )}
-      </form>
+          {state.status === 'not_found' && (
+            <p className="rounded-2xl border border-warning/30 bg-warning-bg px-4 py-3 text-sm text-warning">
+              {t('manageBooking.notFound')}
+            </p>
+          )}
+          {state.status === 'error' && (
+            <p className="rounded-2xl border border-error/25 bg-error-bg px-4 py-3 text-sm text-error">{state.message}</p>
+          )}
+        </form>
+      </div>
 
       {state.status === 'found' && <ResultCard result={state.result} />}
 
       <div className="mt-6 text-center">
-        <Link to="/" className="text-sm font-semibold text-brand-navy underline">
+        <Link to="/" className="text-sm font-semibold text-brand-navy underline decoration-brand-gold decoration-2 underline-offset-4">
           {t('checkout.confirmation.backToHome')}
         </Link>
       </div>
@@ -98,21 +147,32 @@ export function ManageBookingPage() {
 
 function ResultCard({ result }: { result: BookingLookupResult }) {
   const { t } = useTranslation()
-  const isConfirmed = result.bookingStatus === 'confirmed'
+  const navigate = useNavigate()
   const canExtend = EXTENDABLE_STATUSES.has(result.bookingStatus)
+  const canResumePayment = result.bookingStatus === 'pending_payment'
+
+  function handleContinueToPayment() {
+    // Resume the EXISTING booking found above — never re-run
+    // create-booking, never re-check availability. See
+    // resumePendingBookingFromLookup for exactly what state this seeds.
+    resumePendingBookingFromLookup(result)
+    const qs = criteriaToSearchParams({
+      startDate: result.startDate,
+      endDate: result.endDate,
+      pickupLocationId: result.pickupLocationId,
+      dropoffLocationId: result.dropoffLocationId,
+    }).toString()
+    navigate(`/checkout/${result.vehicleId}/payment/${result.bookingId}?${qs}`)
+  }
 
   return (
-    <div className="mt-6 space-y-4 rounded-2xl border border-brand-navy/10 bg-white p-6">
-      <div className="flex items-center justify-between">
-        <span className="font-mono text-sm font-semibold text-brand-navy">{result.bookingReference}</span>
-        <span
-          className={
-            'rounded-full px-3 py-1 text-xs font-semibold capitalize ' +
-            (isConfirmed ? 'bg-emerald-50 text-emerald-700' : 'bg-slate-100 text-slate-600')
-          }
-        >
-          {result.bookingStatus.replace(/_/g, ' ')}
-        </span>
+    <div className="mt-6 space-y-4 rounded-[28px] border border-brand-gold/20 bg-[linear-gradient(180deg,#ffffff_0%,#f9f5f1_100%)] p-6 shadow-[0_20px_38px_rgba(18,20,23,0.08)]">
+      <div className="flex items-center justify-between gap-3 border-b border-brand-navy/8 pb-4">
+        <div>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-brand-gold-dark">{t('manageBooking.resultLabel')}</p>
+          <span className="mt-2 block font-mono text-base font-semibold text-brand-navy">{result.bookingReference}</span>
+        </div>
+        <StatusBadge status={result.bookingStatus} translationPrefix="admin.status" />
       </div>
       <Row label={t('checkout.confirmation.vehicle')} value={`${result.vehicleMake} ${result.vehicleModel}`} />
       <Row label={t('extendRental.vehicleNumberLabel')} value={result.vehiclePlate} />
@@ -121,7 +181,15 @@ function ResultCard({ result }: { result: BookingLookupResult }) {
       <Row label={t('checkout.confirmation.dropoff')} value={result.dropoffLocationName} />
       <Row label={t('checkout.confirmation.customer')} value={result.customerName} />
       <Row label={t('checkout.confirmation.amount')} value={`${result.currency} ${result.totalPrice.toLocaleString()}`} />
-      <Row label={t('checkout.confirmation.paymentStatus')} value={result.paymentStatus} />
+      <Row label={t('checkout.confirmation.paymentStatus')} value={<StatusBadge status={result.paymentStatus} translationPrefix="admin.status" />} />
+
+      {canResumePayment && (
+        <div className="border-t border-brand-navy/8 pt-4">
+          <Button onClick={handleContinueToPayment} fullWidthOnMobile>
+            {t('manageBooking.continueToPayment')}
+          </Button>
+        </div>
+      )}
 
       {canExtend && (
         <ExtendRentalSection
@@ -134,14 +202,16 @@ function ResultCard({ result }: { result: BookingLookupResult }) {
   )
 }
 
-function Row({ label, value }: { label: string; value: string }) {
+function Row({ label, value }: { label: string; value: ReactNode }) {
   return (
     <div className="flex items-center justify-between gap-3 text-sm">
-      <span className="text-slate-500">{label}</span>
-      <span className="text-right font-medium capitalize text-brand-navy">{value.replace(/_/g, ' ')}</span>
+      <span className="text-text-muted">{label}</span>
+      <span className="text-right font-medium capitalize text-brand-navy">
+        {typeof value === 'string' ? value.replace(/_/g, ' ') : value}
+      </span>
     </div>
   )
 }
 
 const inputClass =
-  'w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-brand-navy outline-none transition-colors focus:border-brand-navy focus:ring-1 focus:ring-brand-navy'
+  'w-full rounded-2xl border border-brand-gold/25 bg-white px-3 py-3 text-sm text-brand-navy outline-none transition-colors focus:border-brand-gold focus:ring-2 focus:ring-brand-gold/25'

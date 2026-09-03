@@ -15,21 +15,21 @@ export function HowItWorksSection() {
   const steps = t('home.howItWorks.steps', { returnObjects: true }) as Step[]
 
   return (
-    <section id="how-it-works" className="scroll-mt-20">
-      <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
+    <section id="how-it-works" className="scroll-mt-20 bg-[#f6f3ee]">
+      <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="max-w-2xl">
-          <h2 className="text-2xl font-bold text-brand-navy sm:text-3xl">{t('home.howItWorks.title')}</h2>
-          <p className="mt-2 text-sm text-slate-600">{t('home.howItWorks.subtitle')}</p>
+          <h2 className="text-3xl font-black tracking-[-0.06em] text-brand-navy sm:text-4xl">{t('home.howItWorks.title')}</h2>
+          <p className="mt-3 text-sm leading-6 text-text-muted">{t('home.howItWorks.subtitle')}</p>
         </div>
 
-        <ol className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+        <ol className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {steps.map((step, i) => (
-            <li key={step.title} className="relative rounded-2xl border border-brand-navy/10 bg-white p-5 shadow-sm">
-              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-gold text-sm font-bold text-brand-navy-dark">
+            <li key={step.title} className="relative rounded-[1.5rem] border border-[#e8dcc6] bg-white p-5 shadow-[0_18px_36px_rgba(16,20,29,0.04)]">
+              <span className="flex h-11 w-11 items-center justify-center bg-brand-gold text-sm font-bold text-[#fff] shadow-[0_12px_24px_rgba(92,9,49,0.18)]">
                 {i + 1}
               </span>
               <h3 className="mt-4 text-sm font-semibold text-brand-navy">{step.title}</h3>
-              <p className="mt-1.5 text-sm text-slate-600">{step.body}</p>
+              <p className="mt-1.5 text-sm leading-6 text-text-muted">{step.body}</p>
             </li>
           ))}
         </ol>

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { fetchVehicles } from '@/features/admin/fleet/adminFleetApi'
 import { fetchVehicleBookingsInRange, type CalendarBooking } from '@/features/admin/availability/adminAvailabilityApi'
 import { buildMonthGrid } from '@/features/admin/availability/calendarGrid'
@@ -77,7 +78,7 @@ export function AvailabilityCalendarPage() {
             <select
               value={selectedVehicleId}
               onChange={(e) => setSelectedVehicleId(e.target.value)}
-              className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-brand-navy outline-none focus:border-brand-navy"
+              className="rounded-lg border border-border bg-white px-3 py-2 text-sm text-brand-navy outline-none focus:border-brand-navy"
             >
               {vehicles.map((v) => (
                 <option key={v.id} value={v.id}>
@@ -89,35 +90,37 @@ export function AvailabilityCalendarPage() {
             <div className="ms-auto flex items-center gap-2">
               <button
                 type="button"
+                aria-label={t('common.previousMonth')}
                 onClick={() => setCursor((c) => (c.month0 === 0 ? { year: c.year - 1, month0: 11 } : { year: c.year, month0: c.month0 - 1 }))}
-                className="rounded-lg border border-slate-300 px-2.5 py-1.5 text-sm text-brand-navy hover:bg-brand-lavender"
+                className="rounded-lg border border-border px-2.5 py-1.5 text-brand-navy hover:bg-brand-lavender"
               >
-                ←
+                <ChevronLeft className="h-4 w-4 rtl:rotate-180" aria-hidden="true" />
               </button>
               <span className="min-w-[9rem] text-center text-sm font-semibold text-brand-navy">{monthLabel}</span>
               <button
                 type="button"
+                aria-label={t('common.nextMonth')}
                 onClick={() => setCursor((c) => (c.month0 === 11 ? { year: c.year + 1, month0: 0 } : { year: c.year, month0: c.month0 + 1 }))}
-                className="rounded-lg border border-slate-300 px-2.5 py-1.5 text-sm text-brand-navy hover:bg-brand-lavender"
+                className="rounded-lg border border-border px-2.5 py-1.5 text-brand-navy hover:bg-brand-lavender"
               >
-                →
+                <ChevronRight className="h-4 w-4 rtl:rotate-180" aria-hidden="true" />
               </button>
             </div>
           </div>
 
           {selectedVehicle?.status === 'maintenance' && (
-            <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+            <div className="mb-4 rounded-lg border border-error/25 bg-error-bg px-3 py-2 text-sm text-error">
               {t('admin.availability.underMaintenance')}
             </div>
           )}
           {selectedVehicle?.status === 'retired' && (
-            <div className="mb-4 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-600">
+            <div className="mb-4 rounded-lg border border-border bg-surface-muted px-3 py-2 text-sm text-text-muted">
               {t('admin.availability.retired')}
             </div>
           )}
 
           <div className="rounded-2xl border border-brand-navy/10 bg-white p-3 sm:p-4">
-            <div className="grid grid-cols-7 gap-1 text-center text-xs font-semibold text-slate-500">
+            <div className="grid grid-cols-7 gap-1 text-center text-xs font-semibold text-text-muted">
               {WEEKDAY_KEYS.map((wd) => (
                 <div key={wd} className="py-1">
                   {t(`admin.availability.weekday.${wd}`)}
@@ -129,7 +132,7 @@ export function AvailabilityCalendarPage() {
                 <Spinner className="h-6 w-6" />
               </div>
             ) : error ? (
-              <p className="py-6 text-center text-sm text-red-600">{error}</p>
+              <p className="py-6 text-center text-sm text-error">{error}</p>
             ) : (
               <div className="mt-1 grid grid-cols-7 gap-1">
                 {grid.map((cell) => {
@@ -139,7 +142,7 @@ export function AvailabilityCalendarPage() {
                       key={cell.date}
                       className={
                         'min-h-[64px] rounded-lg border p-1.5 text-xs ' +
-                        (cell.inMonth ? 'border-brand-navy/10 bg-white' : 'border-transparent bg-slate-50 text-slate-300') +
+                        (cell.inMonth ? 'border-brand-navy/10 bg-white' : 'border-transparent bg-surface-muted text-text-muted/60') +
                         (booking ? ' ' + dayCellClass(booking.status) : '')
                       }
                     >
@@ -156,10 +159,10 @@ export function AvailabilityCalendarPage() {
             )}
           </div>
 
-          <div className="mt-3 flex flex-wrap gap-3 text-xs text-slate-500">
+          <div className="mt-3 flex flex-wrap gap-3 text-xs text-text-muted">
             <LegendDot className="bg-brand-lavender" label={t('admin.status.confirmed')} />
-            <LegendDot className="bg-amber-200" label={t('admin.status.active')} />
-            <LegendDot className="bg-slate-200" label={t('admin.status.pending_payment')} />
+            <LegendDot className="bg-warning" label={t('admin.status.active')} />
+            <LegendDot className="bg-border" label={t('admin.status.pending_payment')} />
           </div>
         </>
       )}
@@ -168,9 +171,9 @@ export function AvailabilityCalendarPage() {
 }
 
 function dayCellClass(status: string): string {
-  if (status === 'active') return 'bg-amber-100 border-amber-200'
+  if (status === 'active') return 'bg-warning-bg border-warning/30'
   if (status === 'confirmed') return 'bg-brand-lavender border-brand-navy/10'
-  if (status === 'pending_payment') return 'bg-slate-100 border-slate-200'
+  if (status === 'pending_payment') return 'bg-surface-muted border-border'
   return ''
 }
 

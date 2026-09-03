@@ -3,20 +3,30 @@ import { chainable } from '@/test/supabaseMock'
 
 const fromMock = vi.fn()
 const storageFromMock = vi.fn()
+const functionsInvokeMock = vi.fn()
+const rpcMock = vi.fn()
 
 vi.mock('@/lib/supabaseClient', () => ({
   supabase: {
     from: (...args: unknown[]) => fromMock(...args),
     storage: { from: (...args: unknown[]) => storageFromMock(...args) },
+    functions: { invoke: (...args: unknown[]) => functionsInvokeMock(...args) },
+    rpc: (...args: unknown[]) => rpcMock(...args),
   },
 }))
 
-const { fetchBookings, fetchBookingById, updateBookingStatus, fetchDriverDocumentUrl } = await import('./adminBookingsApi')
+const { fetchBookings, fetchBookingById, adminCancelBooking, adminStartRental, adminMarkReturned, fetchDriverDocumentUrl } = await import(
+  './adminBookingsApi'
+)
 
 describe('adminBookingsApi', () => {
   beforeEach(() => {
     fromMock.mockReset()
     storageFromMock.mockReset()
+    functionsInvokeMock.mockReset()
+    rpcMock.mockReset()
+    functionsInvokeMock.mockResolvedValue({ data: null, error: null })
+    rpcMock.mockResolvedValue({ data: null, error: null })
   })
 
   it('lists bookings for the requested status (Booking Management)', async () => {
@@ -47,10 +57,76 @@ describe('adminBookingsApi', () => {
     await expect(fetchBookings('all')).rejects.toThrow('permission denied')
   })
 
-  it('updates booking status via a plain RLS-governed UPDATE — no parallel status-mutation path', async () => {
-    fromMock.mockReturnValue(chainable({ data: null, error: null }))
-    await expect(updateBookingStatus('b1', 'completed')).resolves.toBeUndefined()
-    expect(fromMock).toHaveBeenCalledWith('bookings')
+  // -------------------------------------------------------------------
+  // Phase 11 — every manual status transition now goes through a
+  // Super-Admin-only SECURITY DEFINER RPC (never a direct `bookings`
+  // UPDATE — admins lost that RLS grant in this phase), so these tests
+  // assert the RPC call itself, not a `.from('bookings').update(...)`.
+  // -------------------------------------------------------------------
+
+  describe('adminCancelBooking', () => {
+    it('calls the admin_cancel_booking RPC — no parallel status-mutation path', async () => {
+      await expect(adminCancelBooking('b1')).resolves.toBeUndefined()
+      expect(rpcMock).toHaveBeenCalledWith('admin_cancel_booking', { p_booking_id: 'b1', p_note: null })
+    })
+
+    it('passes a trimmed note through when given', async () => {
+      await adminCancelBooking('b1', '  guest requested refund  ')
+      expect(rpcMock).toHaveBeenCalledWith('admin_cancel_booking', { p_booking_id: 'b1', p_note: 'guest requested refund' })
+    })
+
+    it('raises AdminApiError and never calls the notification emails when the RPC itself fails', async () => {
+      rpcMock.mockResolvedValue({ data: null, error: { message: 'Only a Super Admin can cancel a booking.' } })
+      await expect(adminCancelBooking('b1')).rejects.toThrow('Only a Super Admin can cancel a booking.')
+      expect(functionsInvokeMock).not.toHaveBeenCalled()
+    })
+
+    it('triggers the customer cancellation email after a successful cancel (Phase 9D, preserved)', async () => {
+      await adminCancelBooking('b1')
+      expect(functionsInvokeMock).toHaveBeenCalledWith('send-customer-email', {
+        body: { bookingId: 'b1', eventType: 'booking_cancelled' },
+      })
+    })
+
+    it('also triggers the admin notification email after a successful cancel (Phase 9F, preserved)', async () => {
+      await adminCancelBooking('b1')
+      expect(functionsInvokeMock).toHaveBeenCalledWith('notify-admin-booking-cancelled', { body: { bookingId: 'b1' } })
+    })
+
+    it('does not throw when either notification email call fails or rejects', async () => {
+      functionsInvokeMock.mockImplementation(async (fn: string) => {
+        if (fn === 'send-customer-email') return { data: null, error: { message: 'function unavailable' } }
+        if (fn === 'notify-admin-booking-cancelled') throw new Error('network error')
+        return { data: null, error: null }
+      })
+      await expect(adminCancelBooking('b1')).resolves.toBeUndefined()
+    })
+  })
+
+  describe('adminStartRental', () => {
+    it('calls the admin_start_rental RPC and never touches the email functions', async () => {
+      await expect(adminStartRental('b1')).resolves.toBeUndefined()
+      expect(rpcMock).toHaveBeenCalledWith('admin_start_rental', { p_booking_id: 'b1', p_note: null })
+      expect(functionsInvokeMock).not.toHaveBeenCalled()
+    })
+
+    it('raises AdminApiError for an illegal transition', async () => {
+      rpcMock.mockResolvedValue({ data: null, error: { message: 'Only a confirmed booking can start its rental (current status: pending_payment).' } })
+      await expect(adminStartRental('b1')).rejects.toThrow(/only a confirmed booking/i)
+    })
+  })
+
+  describe('adminMarkReturned', () => {
+    it('calls the admin_mark_returned RPC and never touches the email functions', async () => {
+      await expect(adminMarkReturned('b1')).resolves.toBeUndefined()
+      expect(rpcMock).toHaveBeenCalledWith('admin_mark_returned', { p_booking_id: 'b1', p_note: null })
+      expect(functionsInvokeMock).not.toHaveBeenCalled()
+    })
+
+    it('raises AdminApiError for an illegal transition', async () => {
+      rpcMock.mockResolvedValue({ data: null, error: { message: 'Only an active rental can be marked as returned (current status: completed).' } })
+      await expect(adminMarkReturned('b1')).rejects.toThrow(/only an active rental/i)
+    })
   })
 
   it('fetches a signed, short-lived URL for a private driver document — never a public URL', async () => {

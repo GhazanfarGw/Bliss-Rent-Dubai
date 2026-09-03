@@ -39,20 +39,20 @@ export function LocationsPreviewSection() {
   const cityNames = Array.from(new Set((locations ?? []).map((l) => l.city)))
 
   return (
-    <section className="bg-brand-navy-dark">
-      <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
-        <p className="text-xs font-semibold uppercase tracking-wide text-brand-gold-light">
+    <section className="bg-[#f7f4ef]">
+      <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.32em] text-brand-gold-dark">
           {t('home.locationsPreview.eyebrow')}
         </p>
-        <h2 className="mt-2 max-w-2xl text-2xl font-bold text-white sm:text-3xl">
+        <h2 className="mt-3 max-w-2xl text-3xl font-black tracking-[-0.06em] text-brand-navy sm:text-4xl">
           <HighlightCities text={t('home.locationsPreview.title')} cityNames={cityNames} />
         </h2>
-        <p className="mt-2 max-w-2xl text-sm text-slate-400">{t('home.locationsPreview.subtitle')}</p>
+        <p className="mt-3 max-w-2xl text-sm leading-6 text-text-muted">{t('home.locationsPreview.subtitle')}</p>
 
-        {locations === null && <p className="mt-8 text-sm text-slate-400">{t('home.locationsPreview.loading')}</p>}
+        {locations === null && <p className="mt-8 text-sm text-text-muted">{t('home.locationsPreview.loading')}</p>}
 
         {locations !== null && preview.length === 0 && (
-          <p className="mt-8 max-w-xl text-sm text-slate-400">{t('home.locationsPreview.emptyBody')}</p>
+          <p className="mt-8 max-w-xl text-sm text-text-muted">{t('home.locationsPreview.emptyBody')}</p>
         )}
 
         {preview.length > 0 && (
@@ -60,10 +60,10 @@ export function LocationsPreviewSection() {
             {preview.map((loc) => (
               <div
                 key={loc.id}
-                className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-medium text-slate-200"
+                className="flex min-w-0 items-center gap-2 rounded-2xl border border-[#ece7df] bg-white px-4 py-3 text-sm font-medium text-[#1f2430] shadow-[0_16px_30px_rgba(17,20,29,0.04)]"
               >
-                <PinIcon className="h-4 w-4 shrink-0 text-brand-gold-light" />
-                <span className="truncate">{loc.name}</span>
+                <PinIcon className="h-4 w-4 shrink-0 text-brand-gold-dark" />
+                <span className="min-w-0 truncate">{loc.name}</span>
               </div>
             ))}
           </div>
@@ -71,7 +71,7 @@ export function LocationsPreviewSection() {
 
         <Link
           to="/locations"
-          className="mt-10 inline-flex items-center gap-2 rounded-lg border border-brand-gold px-5 py-2.5 text-sm font-semibold text-brand-gold-light transition-colors hover:bg-brand-gold hover:text-brand-navy-dark"
+          className="mt-10 inline-flex items-center gap-2 border border-brand-gold/60 bg-brand-gold px-5 py-2.5 text-sm font-semibold text-white shadow-[0_8px_16px_rgba(186,142,92,0.18)] transition-transform hover:-translate-y-0.5"
         >
           {t('home.locationsPreview.viewAll')}
           <ArrowIcon className="h-4 w-4 rtl:rotate-180" />

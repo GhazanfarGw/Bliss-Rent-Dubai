@@ -21,7 +21,14 @@ export function Layout() {
   return (
     <div className="flex min-h-screen flex-col bg-white text-brand-navy">
       <NavBar />
-      <main className="flex-1">
+      {/* NavBar is `fixed`, so it's out of document flow — every page's
+          content must clear its height itself. `pt-[var(--header-h)]` here
+          is the one place that happens, instead of each page guessing its
+          own top padding (see index.css for the shared --header-h token).
+          HomePage's Hero is the single deliberate exception: it
+          negates this padding to sit full-bleed under the translucent
+          header, and documents why at its own definition. */}
+      <main className="flex-1 pt-[var(--header-h)]">
         <Outlet />
       </main>
       <Footer />

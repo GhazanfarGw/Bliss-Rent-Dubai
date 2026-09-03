@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
+import { BadgeCheck } from 'lucide-react'
 import { submitExtendRentalRequest, ExtendRentalError } from '@/features/booking/extendRentalApi'
 import { extensionDaysBetween } from '@/lib/extensionPricing'
 
@@ -10,7 +11,7 @@ type Step =
   | { step: 'submitted'; isLate: boolean }
 
 const inputClass =
-  'w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-brand-navy outline-none transition-colors focus:border-brand-navy focus:ring-1 focus:ring-brand-navy'
+  'w-full rounded-lg border border-border bg-white px-3 py-2.5 text-sm text-brand-navy outline-none transition-colors focus:border-brand-navy focus:ring-1 focus:ring-brand-navy'
 
 export interface ExtendRentalSectionProps {
   bookingReference: string
@@ -57,11 +58,11 @@ export function ExtendRentalSection({ bookingReference, vehicleNumber, currentRe
 
   if (state.step === 'submitted') {
     return (
-      <div className="mt-4 space-y-2 rounded-xl border border-emerald-200 bg-emerald-50 p-5 text-center">
-        <p className="text-2xl">✓</p>
+      <div className="mt-4 space-y-2 rounded-xl border border-success/25 bg-success-bg p-5 text-center">
+        <BadgeCheck className="mx-auto h-6 w-6 text-success" aria-hidden="true" />
         <h3 className="text-sm font-bold text-brand-navy">{t('extendRental.result.submittedTitle')}</h3>
-        <p className="text-xs text-slate-600">{t('extendRental.result.submittedBody')}</p>
-        {state.isLate && <p className="text-xs text-amber-700">{t('extendRental.result.lateNote')}</p>}
+        <p className="text-xs text-text-muted">{t('extendRental.result.submittedBody')}</p>
+        {state.isLate && <p className="text-xs text-warning">{t('extendRental.result.lateNote')}</p>}
       </div>
     )
   }
@@ -69,11 +70,11 @@ export function ExtendRentalSection({ bookingReference, vehicleNumber, currentRe
   return (
     <div className="mt-4 border-t border-brand-navy/10 pt-4">
       <h3 className="text-sm font-bold text-brand-navy">{t('extendRental.sectionTitle')}</h3>
-      <p className="mt-1 text-xs text-slate-500">{t('extendRental.sectionIntro')}</p>
+      <p className="mt-1 text-xs text-text-muted">{t('extendRental.sectionIntro')}</p>
 
       <form onSubmit={(e) => void handleSubmit(e)} noValidate className="mt-3 space-y-3">
         <label className="block">
-          <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">
+          <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-text-muted">
             {t('extendRental.newReturnDateLabel')}
           </span>
           <input
@@ -85,12 +86,12 @@ export function ExtendRentalSection({ bookingReference, vehicleNumber, currentRe
           />
         </label>
         {requestedReturnDate && (
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-text-muted">
             {t('extendRental.daysPreview', { count: extensionDaysBetween(currentReturnDate, requestedReturnDate) })}
           </p>
         )}
 
-        <p className="rounded-lg border border-brand-lavender bg-brand-lavender/30 px-4 py-3 text-xs text-slate-600">
+        <p className="rounded-lg border border-brand-lavender bg-brand-lavender/30 px-4 py-3 text-xs text-text-muted">
           {t('extendRental.notInstantNotice')}
         </p>
 
@@ -103,7 +104,7 @@ export function ExtendRentalSection({ bookingReference, vehicleNumber, currentRe
         </button>
 
         {state.step === 'submit_failed' && (
-          <p className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{state.message}</p>
+          <p className="rounded-lg border border-error/25 bg-error-bg px-4 py-3 text-sm text-error">{state.message}</p>
         )}
       </form>
     </div>

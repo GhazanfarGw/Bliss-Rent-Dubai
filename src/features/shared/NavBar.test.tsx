@@ -20,22 +20,30 @@ describe('NavBar', () => {
     })
   })
 
-  it('shows the primary desktop links and the Search Cars CTA', () => {
+  it('keeps the primary desktop navigation inside the viewport without forced horizontal overflow', () => {
     renderNavBar()
+
+    const primaryNav = screen.getByRole('navigation', { name: /primary navigation/i })
+    const innerNav = primaryNav.firstElementChild as HTMLElement
+    expect(primaryNav).not.toHaveClass('overflow-x-auto')
+    expect(primaryNav).not.toHaveClass('whitespace-nowrap')
+    expect(innerNav).toHaveClass('flex')
+    expect(innerNav).toHaveClass('max-w-full')
+    expect(innerNav).toHaveClass('items-center')
 
     expect(screen.getAllByRole('link', { name: 'Home' }).length).toBeGreaterThan(0)
     expect(screen.getAllByRole('link', { name: 'About' }).length).toBeGreaterThan(0)
-    expect(screen.getAllByRole('link', { name: 'Browse Fleet' }).length).toBeGreaterThan(0)
-    expect(screen.getAllByRole('link', { name: 'Car Types' }).length).toBeGreaterThan(0)
+    expect(screen.getAllByRole('link', { name: 'Fleet' }).length).toBeGreaterThan(0)
+    expect(screen.getAllByRole('link', { name: 'Vehicle Collection' }).length).toBeGreaterThan(0)
     expect(screen.getAllByRole('link', { name: 'Services' }).length).toBeGreaterThan(0)
     expect(screen.getAllByRole('link', { name: 'Contact' }).length).toBeGreaterThan(0)
-    expect(screen.getAllByRole('link', { name: 'Search Cars' }).length).toBeGreaterThan(0)
+    expect(screen.getAllByRole('link', { name: 'Book Now' }).length).toBeGreaterThan(0)
   })
 
   it('About/Car Types/Contact are real pages; Services is still an in-page anchor', () => {
     renderNavBar()
     const aboutLinks = screen.getAllByRole('link', { name: 'About' })
-    const carTypeLinks = screen.getAllByRole('link', { name: 'Car Types' })
+    const carTypeLinks = screen.getAllByRole('link', { name: 'Vehicle Collection' })
     const servicesLinks = screen.getAllByRole('link', { name: 'Services' })
     const contactLinks = screen.getAllByRole('link', { name: 'Contact' })
     expect(aboutLinks[0]).toHaveAttribute('href', '/about')

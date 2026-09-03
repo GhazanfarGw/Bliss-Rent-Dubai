@@ -88,7 +88,7 @@ export function PricingManagementPage() {
     return (
       <div className="flex flex-col items-center justify-center py-16">
         <Spinner className="h-8 w-8" />
-        <p className="mt-3 text-sm text-slate-500">{t('common.loading')}</p>
+        <p className="mt-3 text-sm text-text-muted">{t('common.loading')}</p>
       </div>
     )
   }
@@ -106,13 +106,13 @@ export function PricingManagementPage() {
       ) : (
         <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
           <div className="rounded-2xl border border-brand-navy/10 bg-white p-5 lg:col-span-1">
-            <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
+            <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-text-muted">
               {t('admin.pricing.selectVehicle')}
             </label>
             <select
               value={vehicleId}
               onChange={(e) => handleSelectVehicle(e.target.value)}
-              className="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-sm text-brand-navy outline-none focus:border-brand-navy"
+              className="w-full rounded-lg border border-border bg-white px-2.5 py-1.5 text-sm text-brand-navy outline-none focus:border-brand-navy"
             >
               {vehicles.map((v) => (
                 <option key={v.id} value={v.id}>
@@ -121,7 +121,7 @@ export function PricingManagementPage() {
               ))}
             </select>
             {selectedVehicle && (
-              <p className="mt-3 text-xs text-slate-400">{selectedVehicle.vehicle_categories?.name ?? '—'}</p>
+              <p className="mt-3 text-xs text-text-muted">{selectedVehicle.vehicle_categories?.name ?? '—'}</p>
             )}
           </div>
 
@@ -133,38 +133,38 @@ export function PricingManagementPage() {
                 <div key={d.term} className="grid grid-cols-1 items-end gap-3 border-b border-brand-navy/5 pb-4 last:border-0 last:pb-0 sm:grid-cols-3">
                   <div className="text-sm font-medium text-brand-navy">{TERM_LABELS[d.term]}</div>
                   <div>
-                    <label className="mb-1 block text-xs text-slate-500">{t('admin.pricing.listPrice')}</label>
+                    <label className="mb-1 block text-xs text-text-muted">{t('admin.pricing.listPrice')}</label>
                     <input
                       type="number"
                       min="0"
                       step="0.01"
                       value={d.listPrice}
                       onChange={(e) => handleDraftChange(d.term, 'listPrice', e.target.value)}
-                      className="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-sm text-brand-navy outline-none focus:border-brand-navy"
+                      className="w-full rounded-lg border border-border bg-white px-2.5 py-1.5 text-sm text-brand-navy outline-none focus:border-brand-navy"
                     />
-                    {errors[`${d.term}.listPrice`] && <p className="mt-1 text-xs text-red-600">{errors[`${d.term}.listPrice`]}</p>}
+                    {errors[`${d.term}.listPrice`] && <p className="mt-1 text-xs text-error">{errors[`${d.term}.listPrice`]}</p>}
                   </div>
                   <div>
-                    <label className="mb-1 block text-xs text-slate-500">{t('admin.pricing.clientPrice')}</label>
+                    <label className="mb-1 block text-xs text-text-muted">{t('admin.pricing.clientPrice')}</label>
                     <input
                       type="number"
                       min="0"
                       step="0.01"
                       value={d.clientPrice}
                       onChange={(e) => handleDraftChange(d.term, 'clientPrice', e.target.value)}
-                      className="w-full rounded-lg border border-slate-300 bg-white px-2.5 py-1.5 text-sm text-brand-navy outline-none focus:border-brand-navy"
+                      className="w-full rounded-lg border border-border bg-white px-2.5 py-1.5 text-sm text-brand-navy outline-none focus:border-brand-navy"
                     />
-                    {errors[`${d.term}.clientPrice`] && <p className="mt-1 text-xs text-red-600">{errors[`${d.term}.clientPrice`]}</p>}
+                    {errors[`${d.term}.clientPrice`] && <p className="mt-1 text-xs text-error">{errors[`${d.term}.clientPrice`]}</p>}
                   </div>
                 </div>
               ))}
             </div>
 
             {saveError && (
-              <div className="mt-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{saveError}</div>
+              <div className="mt-4 rounded-lg border border-error/25 bg-error-bg px-4 py-3 text-sm text-error">{saveError}</div>
             )}
             {saved && !saveError && (
-              <div className="mt-4 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+              <div className="mt-4 rounded-lg border border-success/25 bg-success-bg px-4 py-3 text-sm text-success">
                 {t('admin.pricing.saved')}
               </div>
             )}

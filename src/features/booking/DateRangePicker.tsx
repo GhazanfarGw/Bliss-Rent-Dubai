@@ -128,7 +128,7 @@ export function DateRangePicker({ startDate, endDate, onChange, todayIso, row = 
     }
 
     let circleClass = 'text-brand-navy hover:bg-brand-lavender/70'
-    if (disabled) circleClass = 'text-slate-300 cursor-not-allowed'
+    if (disabled) circleClass = 'text-text-muted cursor-not-allowed'
     else if (isStart || isEnd || isSingle) circleClass = 'bg-brand-navy text-white hover:bg-brand-navy'
 
     return { wrapperClass: wrapperClasses.join(' '), circleClass }
@@ -162,7 +162,7 @@ export function DateRangePicker({ startDate, endDate, onChange, todayIso, row = 
         <p className="mb-3 text-center text-sm font-semibold text-brand-navy">
           {formatMonthLabel(year, month0, i18n.language)}
         </p>
-        <div className="grid grid-cols-7 text-center text-[11px] font-semibold uppercase tracking-wide text-slate-400">
+        <div className="grid grid-cols-7 text-center text-[11px] font-semibold uppercase tracking-wide text-text-muted">
           {weekdays.map((w, i) => (
             <span key={i}>{w}</span>
           ))}
@@ -227,8 +227,8 @@ export function DateRangePicker({ startDate, endDate, onChange, todayIso, row = 
         aria-expanded={open}
         onClick={() => setOpen(true)}
         className={
-          'flex w-full items-center justify-between gap-2 rounded-lg border border-slate-300 bg-white text-start text-sm text-brand-navy outline-none transition-colors focus:border-brand-navy focus:ring-1 focus:ring-brand-navy ' +
-          (row ? 'divide-x divide-brand-navy/10 whitespace-nowrap px-3 py-2.5' : 'divide-x divide-brand-navy/10')
+          'flex w-full items-center justify-between gap-2 rounded-lg border border-border bg-white text-start text-sm text-brand-navy outline-none transition-colors focus:border-brand-navy focus:ring-1 focus:ring-brand-navy ' +
+          (row ? 'max-w-full divide-x divide-brand-navy/10 px-3 py-2.5 sm:whitespace-nowrap' : 'divide-x divide-brand-navy/10')
         }
       >
         {row ? (
@@ -236,7 +236,7 @@ export function DateRangePicker({ startDate, endDate, onChange, todayIso, row = 
             <span className="ltr-nums font-medium">
               {startDate ? formatShortDate(startDate, i18n.language) : t('searchWidget.calendar.pickup')}
             </span>
-            <ArrowIcon className="h-3.5 w-3.5 shrink-0 text-slate-400 rtl:rotate-180" />
+            <ArrowIcon className="h-3.5 w-3.5 shrink-0 text-text-muted rtl:rotate-180" />
             <span className="ltr-nums font-medium">
               {endDate ? formatShortDate(endDate, i18n.language) : t('searchWidget.calendar.return')}
             </span>
@@ -245,7 +245,7 @@ export function DateRangePicker({ startDate, endDate, onChange, todayIso, row = 
         ) : (
           <>
             <span className="min-w-0 flex-1 px-3 py-2.5">
-              <span className="block text-xs font-semibold uppercase tracking-wide text-slate-500">
+              <span className="block text-xs font-semibold uppercase tracking-wide text-text-muted">
                 {t('searchWidget.calendar.pickup')}
               </span>
               <span className="ltr-nums mt-0.5 block truncate font-medium">
@@ -253,7 +253,7 @@ export function DateRangePicker({ startDate, endDate, onChange, todayIso, row = 
               </span>
             </span>
             <span className="min-w-0 flex-1 px-3 py-2.5">
-              <span className="block text-xs font-semibold uppercase tracking-wide text-slate-500">
+              <span className="block text-xs font-semibold uppercase tracking-wide text-text-muted">
                 {t('searchWidget.calendar.return')}
               </span>
               <span className="ltr-nums mt-0.5 block truncate font-medium">
@@ -281,7 +281,7 @@ export function DateRangePicker({ startDate, endDate, onChange, todayIso, row = 
         <div>
           <div className="mb-4 flex items-stretch justify-between gap-3 rounded-xl border border-brand-navy/10 bg-brand-lavender/20 p-3">
             <div className={'flex-1 ' + (phase === 'start' ? 'opacity-100' : 'opacity-70')}>
-              <span className="block text-xs font-semibold uppercase tracking-wide text-slate-500">
+              <span className="block text-xs font-semibold uppercase tracking-wide text-text-muted">
                 {t('searchWidget.calendar.pickup')}
               </span>
               <span className="ltr-nums block text-sm font-semibold text-brand-navy">
@@ -290,7 +290,7 @@ export function DateRangePicker({ startDate, endDate, onChange, todayIso, row = 
             </div>
             <div className="w-px shrink-0 bg-brand-navy/10" aria-hidden="true" />
             <div className={'flex-1 ' + (phase === 'end' ? 'opacity-100' : 'opacity-70')}>
-              <span className="block text-xs font-semibold uppercase tracking-wide text-slate-500">
+              <span className="block text-xs font-semibold uppercase tracking-wide text-text-muted">
                 {t('searchWidget.calendar.return')}
               </span>
               <span className="ltr-nums block text-sm font-semibold text-brand-navy">
@@ -312,7 +312,7 @@ export function DateRangePicker({ startDate, endDate, onChange, todayIso, row = 
               aria-label={t('searchWidget.calendar.previousMonth')}
               disabled={atFloorMonth}
               onClick={() => goToMonth(-1)}
-              className="absolute start-0 top-1 rounded-md p-1.5 text-slate-500 hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-30"
+              className="absolute start-0 top-1 rounded-md p-1.5 text-text-muted hover:bg-surface-muted disabled:cursor-not-allowed disabled:opacity-30"
             >
               <ChevronIcon className="h-4 w-4 rtl:rotate-180" />
             </button>
@@ -320,7 +320,7 @@ export function DateRangePicker({ startDate, endDate, onChange, todayIso, row = 
               type="button"
               aria-label={t('searchWidget.calendar.nextMonth')}
               onClick={() => goToMonth(1)}
-              className="absolute end-0 top-1 rounded-md p-1.5 text-slate-500 hover:bg-slate-100"
+              className="absolute end-0 top-1 rounded-md p-1.5 text-text-muted hover:bg-surface-muted"
             >
               <ChevronIcon className="h-4 w-4 rotate-180 rtl:rotate-0" />
             </button>

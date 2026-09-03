@@ -75,7 +75,7 @@ export function ExtensionsListPage() {
       {state.status === 'loading' && (
         <div className="flex flex-col items-center justify-center py-16">
           <Spinner className="h-8 w-8" />
-          <p className="mt-3 text-sm text-slate-500">{t('common.loading')}</p>
+          <p className="mt-3 text-sm text-text-muted">{t('common.loading')}</p>
         </div>
       )}
 
@@ -89,7 +89,7 @@ export function ExtensionsListPage() {
         <div className="overflow-x-auto rounded-xl border border-brand-navy/10 bg-white">
           <table className="w-full min-w-[960px] text-sm">
             <thead>
-              <tr className="border-b border-brand-navy/10 text-xs font-semibold uppercase tracking-wide text-slate-500">
+              <tr className="border-b border-brand-navy/10 text-xs font-semibold uppercase tracking-wide text-text-muted">
                 <th className="px-4 py-3 text-start">{t('admin.extensions.columns.customer')}</th>
                 <th className="px-4 py-3 text-start">{t('admin.extensions.columns.booking')}</th>
                 <th className="px-4 py-3 text-start">{t('admin.extensions.columns.vehicle')}</th>
@@ -125,7 +125,7 @@ export function ExtensionsListPage() {
                     <td className="px-4 py-3 text-xs">
                       {ext.previous_return_date} → {ext.requested_return_date}
                       {ext.is_late && (
-                        <span className="ms-1.5 inline-flex items-center rounded-full bg-amber-100 px-1.5 py-0.5 text-[10px] font-semibold text-amber-800">
+                        <span className="ms-1.5 inline-flex items-center rounded-full bg-warning-bg px-1.5 py-0.5 text-[10px] font-semibold text-warning">
                           {t('admin.extensions.table.late')}
                         </span>
                       )}
@@ -135,7 +135,7 @@ export function ExtensionsListPage() {
                     <td className="px-4 py-3">
                       {ext.payment_method ? (
                         <div className="flex flex-col gap-1">
-                          <span className="text-xs capitalize text-slate-500">
+                          <span className="text-xs capitalize text-text-muted">
                             {t(`admin.extensions.form.paymentMethod${ext.payment_method === 'cash' ? 'Cash' : 'Online'}`)}
                           </span>
                           {ext.payment_status && <AdminStatusBadge status={ext.payment_status} />}

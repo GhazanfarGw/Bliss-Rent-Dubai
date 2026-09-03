@@ -1,5 +1,6 @@
 import { Link, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { BadgeCheck } from 'lucide-react'
 import { readConfirmationSnapshot } from '@/features/booking/checkout/checkoutStorage'
 import { StateMessage } from '@/features/shared/StateMessage'
 
@@ -40,12 +41,12 @@ export function ConfirmationPage() {
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-12 sm:px-6">
-      <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-6 text-center">
-        <p className="text-3xl">✓</p>
+      <div className="rounded-2xl border border-success/25 bg-success-bg p-6 text-center">
+        <BadgeCheck className="mx-auto h-8 w-8 text-success" aria-hidden="true" />
         <h1 className="mt-2 text-xl font-bold text-brand-navy">
           {isConfirmed ? t('checkout.confirmation.confirmed') : t('checkout.confirmation.received')}
         </h1>
-        <p className="mt-1 text-sm text-slate-600">
+        <p className="mt-1 text-sm text-text-muted">
           {t('checkout.confirmation.reference')}{' '}
           <span className="font-mono font-semibold text-brand-navy">{snapshot.bookingReference}</span>
         </p>
@@ -65,7 +66,7 @@ export function ConfirmationPage() {
 
       <div className="mt-6 rounded-2xl border border-brand-navy/10 bg-brand-lavender/30 p-6">
         <h2 className="text-sm font-semibold text-brand-navy">{t('checkout.confirmation.whatNext')}</h2>
-        <ul className="mt-3 space-y-2 text-sm text-slate-600">
+        <ul className="mt-3 space-y-2 text-sm text-text-muted">
           <li>• {t('checkout.confirmation.next1')}</li>
           <li>• {t('checkout.confirmation.next2')}</li>
           <li>• {t('checkout.confirmation.next3')}</li>
@@ -79,7 +80,7 @@ export function ConfirmationPage() {
         </ul>
       </div>
 
-      <p className="mt-6 text-center text-sm text-slate-500">
+      <p className="mt-6 text-center text-sm text-text-muted">
         {t('checkout.confirmation.checkStatusLaterPrefix')}{' '}
         <Link to="/manage-booking" className="font-semibold text-brand-navy underline">
           {t('checkout.confirmation.checkStatusLaterLink')}
@@ -98,8 +99,8 @@ export function ConfirmationPage() {
 function Row({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) {
   return (
     <div className="flex items-center justify-between gap-3 text-sm">
-      <span className="text-slate-500">{label}</span>
-      <span className={'text-right font-medium capitalize ' + (highlight ? 'text-emerald-600' : 'text-brand-navy')}>
+      <span className="text-text-muted">{label}</span>
+      <span className={'text-right font-medium capitalize ' + (highlight ? 'text-success' : 'text-brand-navy')}>
         {value.replace(/_/g, ' ')}
       </span>
     </div>

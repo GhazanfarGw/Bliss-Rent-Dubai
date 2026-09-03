@@ -1,11 +1,13 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { Calendar, Eye } from 'lucide-react'
 import { fetchBookings } from '@/features/admin/bookings/adminBookingsApi'
 import { AdminApiError } from '@/features/admin/adminApi'
 import { AdminPageHeader } from '@/features/admin/shared/AdminPageHeader'
 import { AdminTabs, type AdminTab } from '@/features/admin/shared/AdminTabs'
 import { AdminStatusBadge } from '@/features/admin/shared/AdminStatusBadge'
+import { SearchField } from '@/features/shared/ui'
 import { StateMessage, Spinner } from '@/features/shared/StateMessage'
 import type { AdminBookingWithDetails } from '@/types/domain'
 import type { Database } from '@/types/database'
@@ -84,20 +86,20 @@ export function BookingsListPage() {
 
       <AdminTabs tabs={tabs} active={tab} onChange={setTab} />
 
-      <div className="mb-4">
-        <input
-          type="search"
+      <div className="mb-4 max-w-sm">
+        <SearchField
+          label={t('admin.bookings.searchPlaceholder')}
+          hideLabel
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder={t('admin.bookings.searchPlaceholder')}
-          className="w-full max-w-sm rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-brand-navy outline-none focus:border-brand-navy focus:ring-1 focus:ring-brand-navy"
         />
       </div>
 
       {state.status === 'loading' && (
         <div className="flex flex-col items-center justify-center py-16">
           <Spinner className="h-8 w-8" />
-          <p className="mt-3 text-sm text-slate-500">{t('common.loading')}</p>
+          <p className="mt-3 text-sm text-text-muted">{t('common.loading')}</p>
         </div>
       )}
 
@@ -111,7 +113,7 @@ export function BookingsListPage() {
         <div className="overflow-x-auto rounded-xl border border-brand-navy/10 bg-white">
           <table className="w-full min-w-[820px] text-sm">
             <thead>
-              <tr className="border-b border-brand-navy/10 text-start text-xs font-semibold uppercase tracking-wide text-slate-500">
+              <tr className="border-b border-brand-navy/10 text-start text-xs font-semibold uppercase tracking-wide text-text-muted">
                 <th className="px-4 py-3 text-start">{t('admin.bookings.columns.customer')}</th>
                 <th className="px-4 py-3 text-start">{t('admin.bookings.columns.vehicle')}</th>
                 <th className="px-4 py-3 text-start">{t('admin.bookings.columns.dates')}</th>
@@ -126,13 +128,16 @@ export function BookingsListPage() {
                 <tr key={b.id} className="hover:bg-brand-lavender/20">
                   <td className="px-4 py-3">
                     <p className="font-medium text-brand-navy">{b.customers?.full_name ?? '—'}</p>
-                    <p className="text-xs text-slate-400">{b.customers?.email ?? '—'}</p>
+                    <p className="text-xs text-text-muted">{b.customers?.email ?? '—'}</p>
                   </td>
                   <td className="px-4 py-3">
                     {b.vehicles ? `${b.vehicles.make} ${b.vehicles.model}` : '—'}
                   </td>
                   <td className="px-4 py-3 text-xs">
-                    {b.start_date} → {b.end_date}
+                    <span className="inline-flex items-center gap-1.5">
+                      <Calendar className="h-3 w-3 shrink-0 text-brand-gold" aria-hidden="true" />
+                      {b.start_date} → {b.end_date}
+                    </span>
                   </td>
                   <td className="px-4 py-3">
                     {b.currency} {b.total_price.toLocaleString()}
@@ -144,7 +149,11 @@ export function BookingsListPage() {
                     <AdminStatusBadge status={b.status} />
                   </td>
                   <td className="px-4 py-3 text-end">
-                    <Link to={`/admin/bookings/${b.id}`} className="text-xs font-semibold text-brand-navy underline">
+                    <Link
+                      to={`/admin/bookings/${b.id}`}
+                      className="inline-flex items-center gap-1 text-xs font-semibold text-brand-navy underline"
+                    >
+                      <Eye className="h-3.5 w-3.5" aria-hidden="true" />
                       {t('admin.bookings.view')}
                     </Link>
                   </td>

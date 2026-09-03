@@ -6,9 +6,10 @@
  *
  *   supabase gen types typescript --linked > src/types/database.ts
  *
- * Until then, this is kept in sync BY HAND with
- * supabase/migrations/20260824000000_phase0_foundation.sql — if you add a
- * column there, add it here too.
+ * Until then, this is kept in sync BY HAND with the migrations in
+ * supabase/migrations/ — if you add a table or column there, add it
+ * here too (most recently: email_log, in
+ * 20260911000000_phase9_email_log_table.sql).
  */
 
 export type AdminRole = 'super_admin' | 'staff'
@@ -24,6 +25,9 @@ export type ExtensionPenaltyPolicy = 'fixed_fee' | 'per_day' | 'percentage'
 export type ExtensionSource = 'admin' | 'customer'
 export type NotificationType = 'vehicle_reassigned' | 'extension_approved' | 'extension_rejected' | 'extension_conflict_pending_review'
 export type NotificationDeliveryStatus = 'pending_delivery' | 'sent' | 'failed'
+export type EmailRecipientType = 'customer' | 'admin'
+export type EmailLanguageCode = 'en' | 'ar'
+export type EmailDeliveryStatus = 'queued' | 'sent' | 'delivered' | 'bounced' | 'failed'
 
 export interface Database {
   public: {
@@ -495,6 +499,46 @@ export interface Database {
         Update: Partial<Database['public']['Tables']['booking_notifications']['Insert']>
         Relationships: []
       }
+      email_log: {
+        Row: {
+          id: string
+          idempotency_key: string
+          booking_id: string | null
+          event_type: string
+          recipient_type: EmailRecipientType
+          recipient_email: string
+          language: EmailLanguageCode
+          template: string
+          subject: string
+          status: EmailDeliveryStatus
+          provider_message_id: string | null
+          failure_reason: string | null
+          retry_count: number
+          created_at: string
+          sent_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          idempotency_key: string
+          booking_id?: string | null
+          event_type: string
+          recipient_type: EmailRecipientType
+          recipient_email: string
+          language: EmailLanguageCode
+          template: string
+          subject: string
+          status?: EmailDeliveryStatus
+          provider_message_id?: string | null
+          failure_reason?: string | null
+          retry_count?: number
+          created_at?: string
+          sent_at?: string | null
+          updated_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['email_log']['Insert']>
+        Relationships: []
+      }
     }
     Views: {
       /**
@@ -554,6 +598,10 @@ export interface Database {
        * either one alone is sufficient. See the migration's own header for
        * the deliberate, owner-approved trade-off versus every other guest
        * lookup in this project (which pairs two values together).
+       * Extended 2026-09-15 (checkout resume-payment fix) with
+       * payment_id/vehicle_id/pickup_location_id/dropoff_location_id so a
+       * pending_payment booking found here can be routed straight back
+       * into the Payment step without a second lookup.
        */
       lookup_booking_for_customer: {
         Args: { p_query: string }
@@ -565,14 +613,71 @@ export interface Database {
           end_date: string
           total_price: number
           currency: string
+          vehicle_id: string
           vehicle_make: string
           vehicle_model: string
           vehicle_plate: string
+          pickup_location_id: string
+          dropoff_location_id: string
           pickup_location_name: string
           dropoff_location_name: string
           customer_name: string
+          payment_id: string
           payment_status: Database['public']['Tables']['payments']['Row']['status']
           created_at: string
+        }[]
+      }
+      /**
+       * Super-Admin-only manual "mark paid" for an ORIGINAL booking stuck
+       * in pending_payment — the original-booking counterpart to Phase 7's
+       * cash-extension confirmation (same is_super_admin() gate).
+       * Idempotent. See
+       * supabase/migrations/20260915000000_checkout_resume_payment.sql.
+       */
+      admin_confirm_booking_payment: {
+        Args: { p_booking_id: string; p_note: string | null }
+        Returns: {
+          booking_id: string
+          payment_id: string
+          booking_status: Database['public']['Tables']['bookings']['Row']['status']
+          payment_status: Database['public']['Tables']['payments']['Row']['status']
+        }[]
+      }
+      /**
+       * Phase 11 — Super-Admin-only controlled cancel action, replacing the
+       * old unrestricted status dropdown. Allowed from pending_payment,
+       * confirmed, or active only. See
+       * supabase/migrations/20260917000000_phase11_controlled_booking_status_actions.sql.
+       */
+      admin_cancel_booking: {
+        Args: { p_booking_id: string; p_note: string | null }
+        Returns: {
+          booking_id: string
+          booking_status: Database['public']['Tables']['bookings']['Row']['status']
+        }[]
+      }
+      /**
+       * Phase 11 — Super-Admin-only controlled confirmed->active transition
+       * ("Start Rental"). See
+       * supabase/migrations/20260917000000_phase11_controlled_booking_status_actions.sql.
+       */
+      admin_start_rental: {
+        Args: { p_booking_id: string; p_note: string | null }
+        Returns: {
+          booking_id: string
+          booking_status: Database['public']['Tables']['bookings']['Row']['status']
+        }[]
+      }
+      /**
+       * Phase 11 — Super-Admin-only controlled active->completed transition
+       * ("Mark Returned"). See
+       * supabase/migrations/20260917000000_phase11_controlled_booking_status_actions.sql.
+       */
+      admin_mark_returned: {
+        Args: { p_booking_id: string; p_note: string | null }
+        Returns: {
+          booking_id: string
+          booking_status: Database['public']['Tables']['bookings']['Row']['status']
         }[]
       }
       /**

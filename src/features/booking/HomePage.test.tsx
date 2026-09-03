@@ -6,6 +6,7 @@ import { HomePage } from '@/features/booking/HomePage'
 vi.mock('@/features/booking/api', () => ({
   fetchLocations: vi.fn().mockResolvedValue([]),
   fetchFeaturedVehicles: vi.fn().mockResolvedValue([]),
+  fetchFeaturedVehiclesByCategory: vi.fn().mockResolvedValue([]),
   fetchAllAvailableVehicles: vi.fn().mockResolvedValue([]),
 }))
 
@@ -14,16 +15,16 @@ describe('HomePage', () => {
     vi.clearAllMocks()
   })
 
-  it('renders the hero, booking search, why-choose, featured vehicles, and how-it-works sections in order', async () => {
+  it('renders the hero, booking search, featured vehicles, why-choose, and how-it-works sections in order', async () => {
     render(
       <MemoryRouter>
         <HomePage />
       </MemoryRouter>,
     )
 
-    const hero = await screen.findByRole('heading', { name: 'A fleet for every budget' })
+    const hero = await screen.findByRole('heading', { name: 'Drive Dubai your way' })
     const booking = screen.getByRole('heading', { name: 'Find your car' })
-    const whyChoose = screen.getByRole('heading', { name: 'Why choose Bliss Rent' })
+    const whyChoose = screen.getByRole('heading', { name: 'Why Dubai chooses Bliss Rent' })
     const featured = screen.getByRole('heading', { name: 'Featured vehicles' })
     const howItWorks = await screen.findByRole('heading', { name: 'How it works' })
 
@@ -46,12 +47,26 @@ describe('HomePage', () => {
     expect(container.querySelector('#how-it-works')).not.toBeNull()
   })
 
-  it("renders the Featured Vehicles empty state rather than fake vehicle data when none exist", async () => {
+  it('renders separate Economy and Luxury empty states rather than fake vehicle data when none exist', async () => {
     render(
       <MemoryRouter>
         <HomePage />
       </MemoryRouter>,
     )
-    expect(await screen.findByText('No vehicles listed yet')).toBeInTheDocument()
+    expect(await screen.findByText('No economy vehicles listed yet')).toBeInTheDocument()
+    expect(await screen.findByText('No luxury vehicles listed yet')).toBeInTheDocument()
+  })
+
+  it('renders one shared Featured Vehicles heading above the separate Economy and Luxury rows, not a heading per row', async () => {
+    render(
+      <MemoryRouter>
+        <HomePage />
+      </MemoryRouter>,
+    )
+    expect(await screen.findByRole('heading', { name: 'Featured vehicles' })).toBeInTheDocument()
+    expect(screen.getByText('Economy Fleet')).toBeInTheDocument()
+    expect(screen.getByText('Luxury Fleet')).toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: 'Featured Economy Vehicles' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: 'Featured Luxury Fleet' })).not.toBeInTheDocument()
   })
 })

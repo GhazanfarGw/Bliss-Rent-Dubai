@@ -14,7 +14,7 @@ export function VehicleGallery({ images, alt }: { images: ImageRow[]; alt: strin
       <VehiclePhoto
         storagePath={active?.storage_path ?? null}
         alt={alt}
-        className="h-72 w-full rounded-2xl sm:h-[28rem] lg:h-[34rem]"
+        className="h-72 w-full sm:h-[28rem] lg:h-[34rem]"
       />
       {sorted.length > 1 && (
         <div className="mt-3 flex gap-2 overflow-x-auto">
@@ -24,8 +24,8 @@ export function VehicleGallery({ images, alt }: { images: ImageRow[]; alt: strin
               type="button"
               onClick={() => setActiveIndex(i)}
               className={
-                'h-16 w-20 shrink-0 overflow-hidden rounded-lg border-2 transition-colors ' +
-                (i === activeIndex ? 'border-slate-900' : 'border-transparent')
+                'h-16 w-20 shrink-0 overflow-hidden transition-colors ' +
+                (i === activeIndex ? 'border-brand-navy' : 'border-transparent')
               }
             >
               <VehiclePhoto storagePath={img.storage_path} alt="" className="h-full w-full" />

@@ -1,15 +1,20 @@
 import { useState, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
+import { supabase } from '@/lib/supabaseClient'
+import { SectionHeader } from '@/features/shared/ui/SectionHeader'
 
 type FormState = { status: 'idle' | 'sending' | 'sent' }
 
 /**
  * Contact Us — contact methods (placeholders until real numbers/inboxes
- * exist) plus a message form. The form validates and shows a success
- * state client-side only: there is no email backend to actually deliver
- * it to yet (that's the Phase 7 email/WhatsApp build). Wiring this
- * `handleSubmit` to a real send is a one-function change once Resend is
- * connected — nothing about this UI needs to change then.
+ * exist) plus a message form.
+ *
+ * Phase 9H: `handleSubmit` now calls the real submit-complaint Edge
+ * Function (previously a client-side-only `setTimeout` stub with no
+ * backend at all). Validation is unchanged — the server re-checks the
+ * same three fields, so nothing here can regress; a submission failure
+ * (network, or a server-side validation mismatch) surfaces as a plain
+ * inline error rather than a false "sent" state.
  */
 export function ContactPage() {
   const { t } = useTranslation()
@@ -20,7 +25,7 @@ export function ContactPage() {
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [state, setState] = useState<FormState>({ status: 'idle' })
 
-  function handleSubmit(e: FormEvent) {
+  async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     const nextErrors: Record<string, string> = {}
     if (!name.trim()) nextErrors.name = t('pages.contact.form.errorName')
@@ -30,13 +35,21 @@ export function ContactPage() {
     if (Object.keys(nextErrors).length > 0) return
 
     setState({ status: 'sending' })
-    window.setTimeout(() => {
+    try {
+      const { error } = await supabase.functions.invoke('submit-complaint', {
+        body: { fullName: name.trim(), email: email.trim(), subject: subject.trim(), message: message.trim() },
+      })
+      if (error) throw error
+
       setState({ status: 'sent' })
       setName('')
       setEmail('')
       setSubject('')
       setMessage('')
-    }, 500)
+    } catch {
+      setState({ status: 'idle' })
+      setErrors({ submit: t('pages.contact.form.errorSubmit') })
+    }
   }
 
   type Method = { label: string; value: string; note: string }
@@ -49,21 +62,18 @@ export function ContactPage() {
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6">
-      <div className="max-w-2xl">
-        <h1 className="text-2xl font-bold text-brand-navy sm:text-3xl">{t('pages.contact.title')}</h1>
-        <p className="mt-2 text-sm text-slate-600">{t('pages.contact.subtitle')}</p>
-      </div>
+      <SectionHeader title={t('pages.contact.title')} description={t('pages.contact.subtitle')} />
 
       <div className="mt-10 grid gap-10 lg:grid-cols-2">
         <div className="space-y-5">
           {methods.map((m) => (
             <div key={m.label} className="rounded-xl border border-brand-navy/10 bg-white p-5">
-              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{m.label}</p>
+              <p className="text-xs font-semibold uppercase tracking-wide text-text-muted">{m.label}</p>
               <p className="mt-1 font-mono text-sm font-semibold text-brand-navy">{m.value}</p>
-              {m.note && <p className="mt-1 text-xs text-slate-500">{m.note}</p>}
+              {m.note && <p className="mt-1 text-xs text-text-muted">{m.note}</p>}
             </div>
           ))}
-          <p className="rounded-xl border border-brand-lavender bg-brand-lavender/30 px-4 py-3 text-xs text-slate-600">
+          <p className="rounded-xl border border-brand-lavender bg-brand-lavender/30 px-4 py-3 text-xs text-text-muted">
             {t('pages.contact.supportNote')}
           </p>
         </div>
@@ -73,15 +83,15 @@ export function ContactPage() {
 
           <div className="mt-4 space-y-4">
             <label className="block">
-              <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">
+              <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-text-muted">
                 {t('pages.contact.form.name')}
               </span>
               <input value={name} onChange={(e) => setName(e.target.value)} className={inputClass} autoComplete="name" />
-              {errors.name && <p className="mt-1 text-xs text-red-600">{errors.name}</p>}
+              {errors.name && <p className="mt-1 text-xs text-error">{errors.name}</p>}
             </label>
 
             <label className="block">
-              <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">
+              <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-text-muted">
                 {t('pages.contact.form.email')}
               </span>
               <input
@@ -91,18 +101,18 @@ export function ContactPage() {
                 className={inputClass}
                 autoComplete="email"
               />
-              {errors.email && <p className="mt-1 text-xs text-red-600">{errors.email}</p>}
+              {errors.email && <p className="mt-1 text-xs text-error">{errors.email}</p>}
             </label>
 
             <label className="block">
-              <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">
+              <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-text-muted">
                 {t('pages.contact.form.subject')}
               </span>
               <input value={subject} onChange={(e) => setSubject(e.target.value)} className={inputClass} />
             </label>
 
             <label className="block">
-              <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500">
+              <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-text-muted">
                 {t('pages.contact.form.message')}
               </span>
               <textarea
@@ -111,23 +121,26 @@ export function ContactPage() {
                 rows={5}
                 className={inputClass}
               />
-              {errors.message && <p className="mt-1 text-xs text-red-600">{errors.message}</p>}
+              {errors.message && <p className="mt-1 text-xs text-error">{errors.message}</p>}
             </label>
 
             <button
               type="submit"
               disabled={state.status === 'sending'}
-              className="w-full rounded-lg bg-brand-gold px-6 py-3 text-sm font-semibold text-brand-navy-dark shadow-sm transition-colors hover:bg-brand-gold-light disabled:opacity-60"
+              className="w-full rounded-lg bg-brand-gold px-6 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-brand-gold-light disabled:opacity-60"
             >
               {state.status === 'sending' ? t('pages.contact.form.sending') : t('pages.contact.form.submit')}
             </button>
 
             {state.status === 'sent' && (
-              <p className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+              <p className="rounded-lg border border-success/25 bg-success-bg px-4 py-3 text-sm text-success">
                 {t('pages.contact.form.success')}
               </p>
             )}
-            <p className="text-xs text-slate-500">{t('pages.contact.form.note')}</p>
+            {errors.submit && (
+              <p className="rounded-lg border border-error/25 bg-error-bg px-4 py-3 text-sm text-error">{errors.submit}</p>
+            )}
+            <p className="text-xs text-text-muted">{t('pages.contact.form.note')}</p>
           </div>
         </form>
       </div>
@@ -136,4 +149,4 @@ export function ContactPage() {
 }
 
 const inputClass =
-  'w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-brand-navy outline-none transition-colors focus:border-brand-navy focus:ring-1 focus:ring-brand-navy'
+  'w-full rounded-lg border border-border bg-white px-3 py-2.5 text-sm text-brand-navy outline-none transition-colors focus:border-brand-navy focus:ring-1 focus:ring-brand-navy'

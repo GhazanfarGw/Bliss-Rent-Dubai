@@ -30,7 +30,7 @@ export function VehiclePhoto({ storagePath, alt, className = '' }: VehiclePhotoP
 
 function PhotoPlaceholder({ className }: { className: string }) {
   return (
-    <div className={'flex items-center justify-center bg-brand-lavender/60 text-brand-navy/30 ' + className}>
+    <div className={'flex items-center justify-center bg-brand-lavender/60 text-[#fff]/30 ' + className}>
       <svg className="h-10 w-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
         <path
           strokeLinecap="round"

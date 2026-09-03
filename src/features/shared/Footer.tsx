@@ -21,27 +21,28 @@ export function Footer() {
   const { t } = useTranslation()
 
   return (
-    <footer className="border-t border-brand-navy/20 bg-brand-navy-dark text-slate-300">
+    <footer className="border-t border-[#ece7df] bg-[#f7f4ef] text-[#1f2430]">
+      <img className='w-full mx-auto justify-center' src='./footerbaner.jpg' alt="Footer Logo" />
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
           <div>
             <div className="flex items-center gap-2">
-              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-white text-xs font-bold text-brand-navy">
+              <span className="flex h-8 w-8 items-center justify-center rounded-none bg-brand-gold text-[10px] font-black tracking-[0.18em] text-[#fff] shadow-none">
                 BR
               </span>
-              <span className="text-sm font-semibold text-white">{t('nav.brand')}</span>
+              <span className="text-sm font-semibold text-brand-navy">{t('nav.brand')}</span>
             </div>
-            <p className="mt-3 max-w-xs text-sm text-slate-400">{t('footer.tagline')}</p>
+            <p className="mt-3 max-w-xs text-sm leading-6 text-text-muted">{t('footer.tagline')}</p>
 
             <div className="mt-4">
-              <h3 className="text-xs font-semibold uppercase tracking-wide text-brand-gold-light">{t('footer.followUs')}</h3>
+              <h3 className="text-[10px] font-semibold uppercase tracking-[0.3em] text-brand-gold-dark">{t('footer.followUs')}</h3>
               <div className="mt-2 flex gap-3">
                 {SOCIAL_LINKS.map(({ name, href, icon: Icon }) => (
                   <a
                     key={name}
                     href={href}
                     aria-label={name}
-                    className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-slate-300 transition-colors hover:bg-white/20 hover:text-white"
+                    className="flex h-8 w-8 items-center justify-center rounded-none border border-[#e5dfd6] bg-white text-[#1f2430] transition-colors hover:border-brand-gold/40 hover:bg-brand-gold/10 hover:text-brand-navy"
                   >
                     <Icon className="h-4 w-4" />
                   </a>
@@ -51,40 +52,40 @@ export function Footer() {
           </div>
 
           <div>
-            <h3 className="text-sm font-semibold text-brand-gold-light">{t('footer.company')}</h3>
+            <h3 className="text-sm font-semibold text-brand-gold-dark">{t('footer.company')}</h3>
             <ul className="mt-3 space-y-2 text-sm">
               <li>
-                <Link to="/about" className="text-slate-400 transition-colors hover:text-white">
+                <Link to="/about" className="text-text-muted transition-colors hover:text-brand-navy">
                   {t('footer.aboutUs')}
                 </Link>
               </li>
               <li>
-                <Link to="/car-types" className="text-slate-400 transition-colors hover:text-white">
+                <Link to="/car-types" className="text-text-muted transition-colors hover:text-brand-navy">
                   {t('footer.carTypes')}
                 </Link>
               </li>
               <li>
-                <Link to="/locations" className="text-slate-400 transition-colors hover:text-white">
+                <Link to="/locations" className="text-text-muted transition-colors hover:text-brand-navy">
                   {t('footer.locations')}
                 </Link>
               </li>
               <li>
-                <Link to="/search" className="text-slate-400 transition-colors hover:text-white">
+                <Link to="/search" className="text-text-muted transition-colors hover:text-brand-navy">
                   {t('nav.browseFleet')}
                 </Link>
               </li>
               <li>
-                <Link to="/contact" className="text-slate-400 transition-colors hover:text-white">
+                <Link to="/contact" className="text-text-muted transition-colors hover:text-brand-navy">
                   {t('footer.contactUs')}
                 </Link>
               </li>
               <li>
-                <Link to="/faqs" className="text-slate-400 transition-colors hover:text-white">
+                <Link to="/faqs" className="text-text-muted transition-colors hover:text-brand-navy">
                   {t('footer.faqs')}
                 </Link>
               </li>
               <li>
-                <Link to="/manage-booking" className="text-slate-400 transition-colors hover:text-white">
+                <Link to="/manage-booking" className="text-text-muted transition-colors hover:text-brand-navy">
                   {t('footer.manageBooking')}
                 </Link>
               </li>
@@ -92,20 +93,20 @@ export function Footer() {
           </div>
 
           <div>
-            <h3 className="text-sm font-semibold text-brand-gold-light">{t('footer.legal')}</h3>
+            <h3 className="text-sm font-semibold text-brand-gold-dark">{t('footer.legal')}</h3>
             <ul className="mt-3 space-y-2 text-sm">
               <li>
-                <Link to="/privacy-policy" className="text-slate-400 transition-colors hover:text-white">
+                <Link to="/privacy-policy" className="text-text-muted transition-colors hover:text-brand-navy">
                   {t('footer.privacyPolicy')}
                 </Link>
               </li>
               <li>
-                <Link to="/cookie-policy" className="text-slate-400 transition-colors hover:text-white">
+                <Link to="/cookie-policy" className="text-text-muted transition-colors hover:text-brand-navy">
                   {t('footer.cookiePolicy')}
                 </Link>
               </li>
               <li>
-                <Link to="/booking-terms" className="text-slate-400 transition-colors hover:text-white">
+                <Link to="/booking-terms" className="text-text-muted transition-colors hover:text-brand-navy">
                   {t('footer.bookingTerms')}
                 </Link>
               </li>
@@ -113,8 +114,8 @@ export function Footer() {
           </div>
 
           <div>
-            <h3 className="text-sm font-semibold text-brand-gold-light">{t('footer.goodToKnow')}</h3>
-            <ul className="mt-3 space-y-2 text-sm text-slate-400">
+            <h3 className="text-sm font-semibold text-brand-gold-dark">{t('footer.goodToKnow')}</h3>
+            <ul className="mt-3 space-y-2 text-sm text-text-muted">
               <li>{t('footer.knowDubaiOnly')}</li>
               <li>{t('footer.knowWebsiteOnly')}</li>
               <li>{t('footer.knowOwnDriver')}</li>
@@ -122,17 +123,17 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-10 flex flex-col gap-4 border-t border-white/10 pt-6 sm:flex-row sm:items-center sm:justify-between">
-          <div className="text-xs text-slate-500">
+        <div className="mt-10 flex flex-col gap-4 border-t border-[#e5dfd6] pt-6 sm:flex-row sm:items-center sm:justify-between">
+          <div className="text-xs text-text-muted">
             © {new Date().getFullYear()} {t('footer.copyright')}
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">{t('footer.weAccept')}</span>
+            <span className="text-[10px] font-semibold uppercase tracking-[0.22em] text-text-muted">{t('footer.weAccept')}</span>
             <div className="flex gap-1.5">
               {PAYMENT_BADGES.map((label) => (
                 <span
                   key={label}
-                  className="rounded border border-white/15 bg-white/5 px-2 py-1 text-[10px] font-semibold tracking-wide text-slate-300"
+                  className="rounded border border-[#e5dfd6] bg-white px-2 py-1 text-[10px] font-semibold tracking-wide text-[#1f2430]"
                 >
                   {label}
                 </span>

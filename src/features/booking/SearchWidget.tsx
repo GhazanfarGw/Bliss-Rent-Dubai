@@ -132,11 +132,11 @@ export function SearchWidget({ initialValues, onSearch, compact = false, layout 
       onSubmit={handleSubmit}
       noValidate
       className={
-        'w-full rounded-2xl border border-brand-navy/10 bg-white shadow-lg shadow-brand-navy/5 ' +
+        'w-full rounded-[1.8rem] border border-[#dfe2de] bg-[#f7f7f5] shadow-[0_12px_30px_rgba(15,18,22,0.05)] ' +
         (compact ? 'p-3 sm:p-4' : 'p-5 sm:p-6')
       }
     >
-      <div className={fieldRow ? 'flex w-full flex-wrap items-end gap-2 lg:flex-nowrap' : 'flex flex-wrap items-end gap-3'}>
+      <div className={fieldRow ? 'flex w-full flex-col items-stretch gap-3 sm:flex-row sm:flex-wrap sm:items-end lg:flex-nowrap' : 'flex flex-wrap items-end gap-3'}>
         <CitySelect
           label={t('searchWidget.pickupCity')}
           ariaLabel={t('searchWidget.pickupCity')}
@@ -194,17 +194,17 @@ export function SearchWidget({ initialValues, onSearch, compact = false, layout 
           row={fieldRow}
         />
 
-        <Button type="submit" fullWidthOnMobile={!fieldRow} className={fieldRow ? 'mb-px shrink-0' : undefined}>
+        <Button type="submit" fullWidthOnMobile={fieldRow} className={fieldRow ? 'mb-px shrink-0' : undefined}>
           {t('searchWidget.searchCars')}
         </Button>
       </div>
 
-      <label className={(fieldRow ? 'mt-2' : 'mt-3') + ' flex w-fit cursor-pointer items-center gap-2 text-sm text-slate-600'}>
+      <label className={(fieldRow ? 'mt-2' : 'mt-3') + ' flex w-fit cursor-pointer items-center gap-3 text-[0.95rem] font-medium text-[#2d3948]'}>
         <input
           type="checkbox"
           checked={sameReturnLocation}
           onChange={(e) => setSameReturnLocation(e.target.checked)}
-          className="h-4 w-4 rounded border-slate-300 text-brand-navy focus:ring-brand-navy"
+          className="h-4 w-4 rounded border-border text-brand-navy focus:ring-brand-navy"
         />
         {t('searchWidget.sameReturnLocation')}
       </label>

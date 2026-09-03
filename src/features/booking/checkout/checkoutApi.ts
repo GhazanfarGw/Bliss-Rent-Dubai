@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabaseClient'
+import i18n from '@/i18n'
 import type { BookingCreationResult, CustomerDraft, DriverDraft } from '@/types/domain'
 
 /**
@@ -22,7 +23,13 @@ export class CheckoutApiError extends Error {
 }
 
 async function invoke<T>(fn: 'create-booking' | 'confirm-payment', body: object): Promise<T> {
-  const { data, error } = await supabase.functions.invoke(fn, { body: body as Record<string, unknown> })
+  // Phase 9D: every create-booking/confirm-payment call carries the
+  // customer's current UI language, so the booking/payment emails those
+  // functions trigger render in the same language the customer is
+  // actually using — a single injection point rather than every caller
+  // having to remember to pass it.
+  const requestBody: Record<string, unknown> = { ...body, language: i18n.language === 'ar' ? 'ar' : 'en' }
+  const { data, error } = await supabase.functions.invoke(fn, { body: requestBody })
 
   if (error) {
     // supabase-js exposes the raw Response for an HTTP-level function

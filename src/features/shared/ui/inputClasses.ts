@@ -6,9 +6,9 @@
 export function inputClass({ invalid = false }: { invalid?: boolean } = {}): string {
   return [
     'w-full rounded-lg border bg-white px-3 py-2.5 text-sm text-brand-navy outline-none transition-colors',
-    'disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-400',
+    'disabled:cursor-not-allowed disabled:bg-surface-muted disabled:text-text-muted',
     invalid
       ? 'border-error focus:border-error focus:ring-1 focus:ring-error'
-      : 'border-slate-300 focus:border-brand-navy focus:ring-1 focus:ring-brand-navy',
+      : 'border-border focus:border-brand-navy focus:ring-1 focus:ring-brand-navy',
   ].join(' ')
 }

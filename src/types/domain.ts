@@ -12,6 +12,7 @@ type BookingStatusHistoryRow = Database['public']['Tables']['booking_status_hist
 type PaymentRow = Database['public']['Tables']['payments']['Row']
 type ComplaintRow = Database['public']['Tables']['complaints']['Row']
 type AuditLogRow = Database['public']['Tables']['audit_logs']['Row']
+type EmailLogRow = Database['public']['Tables']['email_log']['Row']
 type AdminProfileRow = Database['public']['Tables']['admin_profiles']['Row']
 type OperationalStatusRow = Database['public']['Views']['vehicle_operational_status']['Row']
 
@@ -193,6 +194,27 @@ export type AdminComplaintWithDetails = ComplaintRow & {
 export type AdminAuditLogEntry = AuditLogRow
 
 // ---------------------------------------------------------------------------
+// Phase 9J — Admin Email Management dashboard
+// ---------------------------------------------------------------------------
+
+/** Read-only view onto email_log — the Email Log tab reads this table exactly as it was created in 9C, no new columns. */
+export type AdminEmailLogEntry = EmailLogRow
+
+/**
+ * One (category, eventType) pair the preview/test-send tool
+ * (supabase/functions/preview-send-email) can render — mirrors
+ * previewRenderer.ts's PreviewCatalogEntry exactly. Fetched from that
+ * Edge Function's 'catalog' mode rather than hand-maintained here, so
+ * this dashboard can never drift out of sync with what the tool actually
+ * supports.
+ */
+export interface AdminEmailPreviewCatalogEntry {
+  category: 'customer' | 'admin' | 'complaint'
+  eventType: string
+  label: string
+}
+
+// ---------------------------------------------------------------------------
 // Phase 6 — Booking Engine & Reservation System (booking retrieval)
 // ---------------------------------------------------------------------------
 
@@ -213,12 +235,17 @@ export interface BookingLookupResult {
   endDate: string
   totalPrice: number
   currency: string
+  vehicleId: string
   vehicleMake: string
   vehicleModel: string
   vehiclePlate: string
+  pickupLocationId: string
+  dropoffLocationId: string
   pickupLocationName: string
   dropoffLocationName: string
   customerName: string
+  /** Added for the checkout resume-payment fix — lets Manage Booking route a pending_payment booking straight back into the Payment step. */
+  paymentId: string
   paymentStatus: string
   createdAt: string
 }

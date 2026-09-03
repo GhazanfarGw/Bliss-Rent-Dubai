@@ -126,7 +126,7 @@ export function RevenueCandlestickChart({ data, currency, labels }: RevenueCandl
         >
           <p className="font-semibold text-brand-navy">{formatTooltipDate(hovered.date)}</p>
           {hovered.candle ? (
-            <div className="mt-1 space-y-0.5 text-slate-500">
+            <div className="mt-1 space-y-0.5 text-text-muted">
               <p>
                 {labels.open}: <span className="font-medium text-brand-navy">{formatCurrencyFull(hovered.candle.open, currency)}</span>
               </p>
@@ -142,7 +142,7 @@ export function RevenueCandlestickChart({ data, currency, labels }: RevenueCandl
               <p>{labels.formatBookings(hovered.candle.volume)}</p>
             </div>
           ) : (
-            <p className="mt-0.5 text-slate-400">{labels.noData}</p>
+            <p className="mt-0.5 text-text-muted">{labels.noData}</p>
           )}
         </div>
       )}
