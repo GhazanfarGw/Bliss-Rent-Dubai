@@ -29,7 +29,7 @@ export function DocumentsRequiredSection() {
   const groups = t('home.documents.groups', { returnObjects: true }) as DocumentsGroup[]
 
   return (
-    <section className="bg-white">
+    <section className="bg-[#f8f5f0]">
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <SectionHeader as="h2" title={t('home.documents.title')} description={t('home.documents.subtitle')} />
 
@@ -37,15 +37,15 @@ export function DocumentsRequiredSection() {
           {groups.map((group) => (
             <div
               key={group.title}
-              className="overflow-hidden rounded-2xl border border-[#e7dcc7] bg-white shadow-[0_16px_38px_rgba(16,20,29,0.04)]"
+              className="overflow-hidden border border-[#e7dcc7] bg-white shadow-[0_16px_38px_rgba(16,20,29,0.04)]"
             >
-              <div className="bg-brand-navy px-6 py-4">
+              <div className="bg-brand-gold px-6 py-4">
                 <h3 className="text-base font-bold tracking-tight text-white">{group.title}</h3>
               </div>
               <ul className="space-y-3.5 p-6">
                 {group.items.map((item) => (
                   <li key={item} className="flex items-start gap-3">
-                    <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-brand-gold" aria-hidden="true" />
+                    <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-brand-navy" aria-hidden="true" />
                     <span className="text-sm leading-6 text-brand-navy sm:text-base">{item}</span>
                   </li>
                 ))}

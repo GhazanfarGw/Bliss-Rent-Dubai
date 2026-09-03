@@ -23,7 +23,7 @@ export function SectionHeader({ title, description, action, as = 'h1' }: Section
   return (
     <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
       <div className="max-w-2xl">
-        <Heading className="text-2xl font-black tracking-[-0.06em] text-brand-navy sm:text-3xl lg:text-[2.5rem]">
+        <Heading className="text-2xl font-black tracking-[-0.06em] text-brand-navy sm:text-3xl lg:text-[3.0rem]">
           <span className="bg-gradient-to-r from-brand-navy via-brand-navy-light to-brand-gold-dark bg-clip-text text-transparent">
             {title}
           </span>

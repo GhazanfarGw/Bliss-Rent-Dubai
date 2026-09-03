@@ -229,7 +229,7 @@ body {
 }
 
 .animate-marquee {
-  animation: marquee-scroll 28s linear infinite;
+  animation: marquee-scroll 55s linear infinite;
 }
 
 .animate-marquee:hover,

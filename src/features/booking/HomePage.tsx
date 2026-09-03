@@ -10,7 +10,6 @@ import { DocumentsRequiredSection } from '@/features/booking/DocumentsRequiredSe
 import { LocationsPreviewSection } from '@/features/booking/LocationsPreviewSection'
 import { FeaturedVehicles } from '@/features/booking/FeaturedVehicles'
 import { HowItWorksSection } from '@/features/booking/HowItWorksSection'
-import { VehicleCategoriesSection } from '@/features/booking/VehicleCategoriesSection'
 import { HomeFaqSection } from '@/features/booking/HomeFaqSection'
 import { criteriaToSearchParams } from '@/features/booking/searchParams'
 import type { SearchCriteria } from '@/types/domain'
@@ -67,7 +66,6 @@ export function HomePage() {
       <BrandsMarquee />
 
       <div className="bg-[#f6f3ee]">
-        <VehicleCategoriesSection />
         <FeaturedVehicles />
         <WhyChooseSection />
         <RequirementsSection />
