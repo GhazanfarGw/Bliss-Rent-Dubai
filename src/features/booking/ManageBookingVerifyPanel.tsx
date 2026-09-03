@@ -99,7 +99,7 @@ export function ManageBookingVerifyPanel() {
         </div>
 
         {error && (
-          <p className="rounded-2xl border border-error/25 bg-error-bg px-4 py-3 text-sm text-error sm:col-span-2">{error}</p>
+          <p className="border border-error/25 bg-error-bg px-4 py-3 text-sm text-error sm:col-span-2">{error}</p>
         )}
       </form>
     </div>

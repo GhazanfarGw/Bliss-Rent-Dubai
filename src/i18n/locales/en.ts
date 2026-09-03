@@ -106,7 +106,15 @@ const en = {
     },
   },
   home: {
-    categories: { title: 'Choose your ideal ride', subtitle: 'Explore our fleet mix: 65% luxury cars and 35% economy cars across Dubai.', emptyTitle: 'Fleet categories will appear here', emptyBody: 'Our vehicle categories update from the live fleet mix.' },
+    categories: {
+      title: 'Choose your ideal ride',
+      subtitle: 'Explore our fleet mix: 65% luxury cars and 35% economy cars across Dubai.',
+      emptyTitle: 'Fleet categories will appear here',
+      emptyBody: 'Our vehicle categories update from the live fleet mix.',
+      carsCount: '{{count}} car available',
+      carsCount_other: '{{count}} cars available',
+      seeMore: 'See more',
+    },
     faq: { eyebrow: 'Need to know', title: 'Your questions, answered', subtitle: 'Everything you need to know before booking your Dubai drive.', viewAll: 'View all FAQs' },
     finalCta: { title: 'Ready for your next Dubai arrival?', subtitle: 'Choose your dates and city to explore our fleet mix: 65% luxury cars and 35% economy cars.', button: 'Reserve Your Drive' },
     brands: {
@@ -154,6 +162,27 @@ const en = {
           body: 'Collect your car at the airport and return it anywhere across the city — no counters, no delays.',
         },
       ],
+    },
+    documents: {
+      title: 'Documents required to rent a car in the UAE',
+      subtitle: "Whether you live here or you're visiting, have these ready before pickup so check-in only takes a minute.",
+      groups: [
+        {
+          title: 'For UAE Residents',
+          items: ['Valid UAE driving license', 'Emirates ID (a residence visa copy may also be requested)'],
+        },
+        {
+          title: 'For Visitors to the UAE',
+          items: [
+            'Valid passport',
+            'UAE entry visa or visit visa',
+            'Valid driving license from your home country',
+            "International Driving Permit (IDP), if your home license isn't already UAE-recognized",
+          ],
+        },
+      ],
+      note: 'Visitors from the GCC and a number of other countries can drive on their home license alone, without an IDP.',
+      contactLink: 'Not sure which documents you need? Contact us',
     },
     booking: {
       title: 'Find your car',

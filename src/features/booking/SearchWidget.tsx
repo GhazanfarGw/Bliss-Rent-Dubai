@@ -132,7 +132,7 @@ export function SearchWidget({ initialValues, onSearch, compact = false, layout 
       onSubmit={handleSubmit}
       noValidate
       className={
-        'w-full rounded-[1.8rem] border border-[#dfe2de] bg-[#f7f7f5] shadow-[0_12px_30px_rgba(15,18,22,0.05)] ' +
+        'w-full border border-[#dfe2de] bg-[#f7f7f5] shadow-[0_12px_30px_rgba(15,18,22,0.05)] ' +
         (compact ? 'p-3 sm:p-4' : 'p-5 sm:p-6')
       }
     >

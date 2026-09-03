@@ -83,7 +83,7 @@ export function BookingNavigator({ onSearch }: BookingNavigatorProps) {
           Phase 11 header/hero redesign (was Deep Space Blue) — active state
           still reads via the Champagne Gold underline + Berry icon/label,
           so the accent language is unchanged, only the bar's own bg is. */}
-      <nav aria-label={t('home.navigator.ariaLabel')} className="hidden rounded-t-[2rem] border border-b-0 border-border bg-white md:flex">
+      <nav aria-label={t('home.navigator.ariaLabel')} className="hidden border border-b-0 border-border bg-white md:flex">
         {TAB_ORDER.map((tab) => {
           const Icon = TAB_ICONS[tab]
           const active = tab === activeTab
@@ -95,13 +95,13 @@ export function BookingNavigator({ onSearch }: BookingNavigatorProps) {
               aria-current={active ? 'page' : undefined}
               aria-label={`${t(`home.navigator.tabs.${tab}.label`)} — ${t(`home.navigator.tabs.${tab}.description`)}`}
               className={
-                'flex flex-1 items-center justify-center gap-2.5 border-b-[3px] px-4 py-5 text-start transition-colors ' +
-                (active ? 'border-brand-champagne bg-brand-lavender/50' : 'border-transparent hover:bg-surface-muted')
+                'flex flex-1 items-center justify-center gap-2.5 border-b-[3px] px-4 py-4 text-start transition-colors bg-surface-muted ' +
+                (active ? 'border-brand-gold bg-brand-lavender/50' : 'border-transparent hover:bg-white')
               }
             >
-              <Icon className={'h-5 w-5 shrink-0 ' + (active ? 'text-brand-gold-dark' : 'text-text-muted')} aria-hidden={true} />
+              <Icon className={'h-5 w-5 shrink-0 ' + (active ? 'text-[#5C0931]' : 'text-text-muted')} aria-hidden={true} />
               <span className="min-w-0">
-                <span className={'block text-sm font-bold tracking-tight ' + (active ? 'text-brand-navy' : 'text-text-muted')}>
+                <span className={'block text-base font-bold tracking-tight ' + (active ? 'text-brand-navy' : 'text-text-muted')}>
                   {t(`home.navigator.tabs.${tab}.label`)}
                 </span>
                 <span className="hidden truncate text-[11px] font-medium text-text-muted lg:block">
@@ -114,7 +114,7 @@ export function BookingNavigator({ onSearch }: BookingNavigatorProps) {
       </nav>
 
       {/* Mobile: a single dropdown trigger, never four stacked tabs (below md). */}
-      <div ref={menuRef} className="relative rounded-t-[2rem] border border-b-0 border-border bg-white p-3 md:hidden">
+      <div ref={menuRef} className="relative border border-b-0 border-border bg-white p-3 md:hidden">
         <button
           type="button"
           onClick={() => setMenuOpen((open) => !open)}

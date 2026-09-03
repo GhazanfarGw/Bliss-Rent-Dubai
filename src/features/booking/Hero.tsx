@@ -67,8 +67,8 @@ export function Hero() {
           hero, so it isn't affected by this padding. Height increased
           (owner's request, referencing airline-style full hero sections)
           so the hero image reads as a real full-bleed visual, not a strip. */}
-      <div className="relative z-10 mx-auto flex min-h-[680px] max-w-7xl items-end px-4 pb-12 pt-[calc(var(--header-h)+var(--ticker-h))] sm:px-6 lg:min-h-[82vh] lg:pb-16 lg:px-8">
-        <div className="max-w-xl lg:pb-10">
+      <div className="relative  z-10 mx-auto flex min-h-[680px] max-w-7xl items-end px-4 pb-12 pt-[calc(var(--header-h)+var(--ticker-h))] sm:px-6 lg:min-h-[100vh] lg:pb-16 lg:px-8">
+        <div className="max-w-xl lg:pb-28 pb-40 md:pb-28">
           <div className="mb-5 inline-flex items-center gap-2 border border-[#fff]/35 bg-[#120f0a]/55 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.33em] text-[#fff] backdrop-blur-md shadow-[0_12px_28px_rgba(17,13,8,0.32)]">
             <span className="h-2 w-2 bg-brand-gold" />
             {t('hero.badge')}

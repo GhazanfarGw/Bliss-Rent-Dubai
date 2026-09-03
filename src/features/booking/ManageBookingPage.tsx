@@ -124,12 +124,12 @@ export function ManageBookingPage() {
           </button>
 
           {state.status === 'not_found' && (
-            <p className="rounded-2xl border border-warning/30 bg-warning-bg px-4 py-3 text-sm text-warning">
+            <p className="border border-warning/30 bg-warning-bg px-4 py-3 text-sm text-warning">
               {t('manageBooking.notFound')}
             </p>
           )}
           {state.status === 'error' && (
-            <p className="rounded-2xl border border-error/25 bg-error-bg px-4 py-3 text-sm text-error">{state.message}</p>
+            <p className="border border-error/25 bg-error-bg px-4 py-3 text-sm text-error">{state.message}</p>
           )}
         </form>
       </div>
@@ -214,4 +214,4 @@ function Row({ label, value }: { label: string; value: ReactNode }) {
 }
 
 const inputClass =
-  'w-full rounded-2xl border border-brand-gold/25 bg-white px-3 py-3 text-sm text-brand-navy outline-none transition-colors focus:border-brand-gold focus:ring-2 focus:ring-brand-gold/25'
+  'w-full border border-brand-gold/25 bg-white px-3 py-3 text-sm text-brand-navy outline-none transition-colors focus:border-brand-gold focus:ring-2 focus:ring-brand-gold/25'

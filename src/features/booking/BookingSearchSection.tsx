@@ -26,8 +26,8 @@ export function BookingSearchSection({ onSearch }: BookingSearchSectionProps) {
       id="booking-section"
       className="relative z-10 -mt-10 scroll-mt-20 bg-[#f7f4ef] pb-16 pt-8 sm:-mt-14 sm:pb-20"
     >
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="rounded-[2rem] border border-[#ece7df] bg-white shadow-[0_30px_70px_rgba(17,20,29,0.08)]">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 md:-mt-20 lg:-mt-24 xl:-mt-20 -mt-32">
+        <div className="border border-[#ece7df] bg-white shadow-[0_30px_70px_rgba(17,20,29,0.08)]">
           <BookingNavigator onSearch={onSearch} />
         </div>
       </div>

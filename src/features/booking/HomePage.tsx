@@ -6,6 +6,7 @@ import { BrandsMarquee } from '@/features/booking/BrandsMarquee'
 import { BookingSearchSection } from '@/features/booking/BookingSearchSection'
 import { WhyChooseSection } from '@/features/booking/WhyChooseSection'
 import { RequirementsSection } from '@/features/booking/RequirementsSection'
+import { DocumentsRequiredSection } from '@/features/booking/DocumentsRequiredSection'
 import { LocationsPreviewSection } from '@/features/booking/LocationsPreviewSection'
 import { FeaturedVehicles } from '@/features/booking/FeaturedVehicles'
 import { HowItWorksSection } from '@/features/booking/HowItWorksSection'
@@ -17,11 +18,14 @@ import type { SearchCriteria } from '@/types/domain'
 /**
  * Section order per the Phase 4 spec: Header (Layout) -> full-width Hero ->
  * Booking Search -> Brands marquee -> live categories -> featured vehicles ->
- * Why Choose Bliss Rent -> Requirements -> locations -> How It Works -> FAQ ->
- * final booking CTA -> Footer. The old value-props grid is now
- * WhyChooseSection. The multi-slide HeroCarousel (Phase 4.1) was replaced
- * per the Phase 11 header/hero redesign with Hero, a single static image
- * with the header transparently overlaid on top of it.
+ * Why Choose Bliss Rent -> Requirements -> Documents required -> locations ->
+ * How It Works -> FAQ -> final booking CTA -> Footer. The old value-props
+ * grid is now WhyChooseSection. The multi-slide HeroCarousel (Phase 4.1)
+ * was replaced per the Phase 11 header/hero redesign with Hero, a single
+ * static image with the header transparently overlaid on top of it.
+ * DocumentsRequiredSection (also Phase 11) breaks the existing
+ * Requirements checklist's driving-license line out into the full
+ * resident/visitor document list.
  */
 export function HomePage() {
   const { t } = useTranslation()
@@ -67,6 +71,7 @@ export function HomePage() {
         <FeaturedVehicles />
         <WhyChooseSection />
         <RequirementsSection />
+        <DocumentsRequiredSection />
         <LocationsPreviewSection />
         <HowItWorksSection />
         <HomeFaqSection />
