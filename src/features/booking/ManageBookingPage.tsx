@@ -5,6 +5,8 @@ import { lookupBooking, BookingLookupError } from '@/features/booking/lookupApi'
 import { ExtendRentalSection } from '@/features/booking/ExtendRentalSection'
 import { resumePendingBookingFromLookup, clearActiveBooking } from '@/features/booking/checkout/checkoutStorage'
 import { criteriaToSearchParams } from '@/features/booking/searchParams'
+import { ManageBookingHero } from '@/features/booking/ManageBookingHero'
+import { ManageBookingLookupCard } from '@/features/booking/ManageBookingLookupCard'
 import { Button, StatusBadge } from '@/features/shared/ui'
 import type { BookingLookupResult } from '@/types/domain'
 
@@ -46,6 +48,18 @@ const EXTENDABLE_STATUSES = new Set(['confirmed', 'active'])
  * exact same ResultCard/ExtendRentalSection/Continue-to-Payment code, no
  * new booking logic. Navigating here normally (no state, e.g. the `ref`
  * query param above, or a direct visit) behaves exactly as before.
+ *
+ * Frontend redesign (full page + header link): the page now opens with
+ * its own hero (ManageBookingHero) and a purpose-built lookup UI
+ * (ManageBookingLookupCard) instead of the earlier compact dark card —
+ * a deliberately different look from SearchWidget/BookingNavigator's
+ * tab-and-pill treatment, per the "same car find navigator everywhere"
+ * feedback. All state, the `lookupBooking()` call, and every view-state
+ * branch below are byte-for-byte the same as before; only the JSX these
+ * two components render has changed. NavBar now links here directly
+ * (`nav.manageBooking`), so this is reachable from every page's header,
+ * not only from an email link or the homepage navigator's Manage
+ * Booking tab.
  */
 export function ManageBookingPage() {
   const { t } = useTranslation()
@@ -92,54 +106,26 @@ export function ManageBookingPage() {
   }
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">
-      <div className="overflow-hidden rounded-[30px] border border-brand-gold/25 bg-[radial-gradient(circle_at_top,#1a2028_0%,#11161d_48%,#0b0e12_100%)] text-white shadow-[0_30px_80px_rgba(13,16,19,0.4)]">
-        <div className="px-5 py-7 sm:px-8 sm:py-8">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.35em] text-brand-gold-light">{t('manageBooking.eyebrow')}</p>
-          <h1 className="mt-3 text-3xl font-black tracking-[-0.07em] text-white sm:text-4xl">{t('manageBooking.title')}</h1>
-          <p className="mt-3 max-w-xl text-sm leading-6 text-white/70 sm:text-base">{t('manageBooking.subtitle')}</p>
+    <div className="bg-[#f6f3ee]">
+      <ManageBookingHero />
+
+      <div className="mx-auto max-w-4xl px-4 pb-14 sm:px-6 lg:px-8">
+        <ManageBookingLookupCard
+          query={query}
+          onQueryChange={setQuery}
+          onSubmit={(e) => void handleSubmit(e)}
+          loading={state.status === 'loading'}
+          notFound={state.status === 'not_found'}
+          errorMessage={state.status === 'error' ? state.message : null}
+        />
+
+        {state.status === 'found' && <ResultCard result={state.result} />}
+
+        <div className="mt-8 text-center">
+          <Link to="/" className="text-sm font-semibold text-brand-navy underline decoration-brand-gold decoration-2 underline-offset-4">
+            {t('checkout.confirmation.backToHome')}
+          </Link>
         </div>
-
-        <form onSubmit={(e) => void handleSubmit(e)} noValidate className="space-y-4 border-t border-white/10 bg-white/4 px-5 py-6 sm:px-8">
-          <label className="block">
-            <span className="mb-2 block text-[11px] font-semibold uppercase tracking-[0.18em] text-[#f5dfb0]">
-              {t('manageBooking.queryLabel')}
-            </span>
-            <input
-              type="text"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="BLS-XXXXXXXX or ABC-123"
-              className={inputClass}
-              autoComplete="off"
-            />
-          </label>
-
-          <button
-            type="submit"
-            disabled={state.status === 'loading'}
-            className="inline-flex min-h-12 items-center justify-center rounded-none bg-brand-gold px-6 py-3 text-sm font-bold text-white shadow-[0_18px_36px_rgba(92,9,49,0.3)] transition-all hover:brightness-105 disabled:opacity-60 sm:w-auto"
-          >
-            {state.status === 'loading' ? t('manageBooking.checking') : t('manageBooking.submit')}
-          </button>
-
-          {state.status === 'not_found' && (
-            <p className="border border-warning/30 bg-warning-bg px-4 py-3 text-sm text-warning">
-              {t('manageBooking.notFound')}
-            </p>
-          )}
-          {state.status === 'error' && (
-            <p className="border border-error/25 bg-error-bg px-4 py-3 text-sm text-error">{state.message}</p>
-          )}
-        </form>
-      </div>
-
-      {state.status === 'found' && <ResultCard result={state.result} />}
-
-      <div className="mt-6 text-center">
-        <Link to="/" className="text-sm font-semibold text-brand-navy underline decoration-brand-gold decoration-2 underline-offset-4">
-          {t('checkout.confirmation.backToHome')}
-        </Link>
       </div>
     </div>
   )
@@ -166,7 +152,7 @@ function ResultCard({ result }: { result: BookingLookupResult }) {
   }
 
   return (
-    <div className="mt-6 space-y-4 rounded-[28px] border border-brand-gold/20 bg-[linear-gradient(180deg,#ffffff_0%,#f9f5f1_100%)] p-6 shadow-[0_20px_38px_rgba(18,20,23,0.08)]">
+    <div className="mt-6 space-y-4 border border-[#ece7df] bg-white p-6 shadow-[0_20px_38px_rgba(18,20,23,0.06)] sm:p-8">
       <div className="flex items-center justify-between gap-3 border-b border-brand-navy/8 pb-4">
         <div>
           <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-brand-gold-dark">{t('manageBooking.resultLabel')}</p>
@@ -212,6 +198,3 @@ function Row({ label, value }: { label: string; value: ReactNode }) {
     </div>
   )
 }
-
-const inputClass =
-  'w-full border border-brand-gold/25 bg-white px-3 py-3 text-sm text-brand-navy outline-none transition-colors focus:border-brand-gold focus:ring-2 focus:ring-brand-gold/25'

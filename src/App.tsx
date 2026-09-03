@@ -3,6 +3,7 @@ import { Layout } from '@/features/shared/Layout'
 import { RouteNavigationShell } from '@/features/shared/RouteNavigationShell'
 import { HomePage } from '@/features/booking/HomePage'
 import { SearchResultsPage } from '@/features/booking/SearchResultsPage'
+import { BookCarPage } from '@/features/booking/BookCarPage'
 import { VehicleDetailPage } from '@/features/booking/VehicleDetailPage'
 import { CustomerDetailsPage } from '@/features/booking/checkout/CustomerDetailsPage'
 import { DriverDetailsPage } from '@/features/booking/checkout/DriverDetailsPage'
@@ -88,6 +89,13 @@ import { AdminSettingsPage } from '@/features/admin/settings/AdminSettingsPage'
  * booking is in a state that can still be extended. /extend-rental keeps
  * working as a redirect to /manage-booking for anyone with the old link.
  * See lookupApi.ts and the lookup_booking_for_customer() migration.
+ *
+ * Frontend redesign follow-up (same requests as the header/hero/Manage
+ * Booking page rework): /book (BookCarPage) adds a standalone "start a
+ * booking" destination, separate from the homepage's embedded search and
+ * from /search's own compact edit bar — reusing SearchWidget's exact
+ * state, validation, and `onSearch` → /search flow via a new `card`
+ * layout variant, no new booking logic anywhere.
  */
 function App() {
   return (
@@ -97,6 +105,7 @@ function App() {
           <Routes>
             <Route element={<Layout />}>
               <Route path="/" element={<HomePage />} />
+              <Route path="/book" element={<BookCarPage />} />
               <Route path="/search" element={<SearchResultsPage />} />
               <Route path="/vehicles/:id" element={<VehicleDetailPage />} />
               <Route path="/checkout/:id/customer" element={<CustomerDetailsPage />} />

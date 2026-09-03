@@ -194,4 +194,47 @@ describe('SearchWidget', () => {
       }),
     )
   })
+
+  describe('layout="card" (BookCarPage)', () => {
+    it('renders the same fields, sectioned, and still finds a real location', async () => {
+      const user = userEvent.setup()
+      render(<SearchWidget onSearch={vi.fn()} layout="card" />)
+      await screen.findByRole('button', { name: /select pickup point/i })
+
+      expect(screen.getByText('Pickup & return')).toBeInTheDocument()
+      expect(screen.getByText('Dates & time')).toBeInTheDocument()
+
+      await user.click(screen.getByRole('button', { name: /select pickup point/i }))
+      const dialog = screen.getByRole('dialog')
+      expect(within(dialog).getByRole('button', { name: /DXB Terminal 3/ })).toBeInTheDocument()
+    })
+
+    it('calls onSearch with the same criteria shape as the other layouts', async () => {
+      const onSearch = vi.fn()
+      const user = userEvent.setup()
+      render(<SearchWidget onSearch={onSearch} layout="card" />)
+      await screen.findByRole('button', { name: /select pickup point/i })
+
+      const startIso = futureIso(2)
+      const endIso = futureIso(5)
+      await user.click(document.querySelector('button[aria-haspopup="dialog"]') as HTMLElement)
+      const dateDialog = screen.getByRole('dialog')
+      await user.click(within(dateDialog).getByRole('button', { name: fullDateLabel(startIso) }))
+      await user.click(within(dateDialog).getByRole('button', { name: fullDateLabel(endIso) }))
+      await user.click(within(dateDialog).getByRole('button', { name: 'Done' }))
+
+      await pickLocation(user, /select pickup point/i, /DXB Terminal 3/)
+      await user.click(screen.getByRole('button', { name: /search cars/i }))
+
+      await waitFor(() =>
+        expect(onSearch).toHaveBeenCalledWith({
+          startDate: startIso,
+          endDate: endIso,
+          pickupLocationId: 'loc-airport',
+          dropoffLocationId: 'loc-airport',
+          pickupTime: '10:00',
+        }),
+      )
+    })
+  })
 })

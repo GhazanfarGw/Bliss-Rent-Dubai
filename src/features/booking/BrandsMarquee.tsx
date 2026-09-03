@@ -81,6 +81,7 @@ function BrandCard({ name }: { name: string }) {
       <div className="flex h-24 w-full items-center justify-center sm:h-24">
         {renderBrandMark(name)}
       </div>
+      <p className="mt-2 text-center text-xs font-semibold tracking-[0.12em] text-brand-navy">{name}</p>
 
     </div>
   )
@@ -102,6 +103,7 @@ function renderBrandMark(name: string) {
   return (
     <div className="flex h-16 w-32 items-center justify-center rounded-none border border-brand-lavender-dark text-lg font-semibold tracking-[0.12em] text-brand-navy">
       {name.slice(0, 2).toUpperCase()}
+
     </div>
   )
 }

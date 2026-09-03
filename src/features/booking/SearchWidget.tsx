@@ -49,10 +49,15 @@ interface SearchWidgetProps {
    * 'row': the same flat-row field set at more compact widths (see the
    * `row` prop each field takes) — used by StickySearchBar so the sticky
    * bar stays visually tighter. Both wrap (flex-wrap) onto further lines
-   * on narrow screens; neither ever scrolls horizontally. Same form,
-   * state, and validation either way.
+   * on narrow screens; neither ever scrolls horizontally.
+   * 'card': a sectioned, vertical layout (Pickup & Return grouped, then
+   * Dates & Time, then a full-width submit) for BookCarPage — a
+   * standalone page deserves a more editorial presentation than either
+   * flat-row variant, without being a second implementation of anything.
+   * All three variants share the exact same state, validation, and
+   * `fetchLocations`/`onSearch` calls below — only the JSX layout differs.
    */
-  layout?: 'grid' | 'row'
+  layout?: 'grid' | 'row' | 'card'
 }
 
 export function SearchWidget({ initialValues, onSearch, compact = false, layout = 'grid' }: SearchWidgetProps) {
@@ -127,12 +132,104 @@ export function SearchWidget({ initialValues, onSearch, compact = false, layout 
   const todayIso = new Date().toISOString().slice(0, 10)
   const fieldRow = layout === 'row'
 
+  if (layout === 'card') {
+    return (
+      <form onSubmit={handleSubmit} noValidate className="w-full space-y-8 border border-[#ece7df] bg-white p-6 shadow-[0_20px_45px_rgba(15,18,22,0.08)] sm:p-8">
+        <div>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-brand-gold-dark">{t('searchWidget.sectionPickupReturn')}</p>
+          <div className="mt-4 grid gap-4 sm:grid-cols-2">
+            <CitySelect
+              label={t('searchWidget.pickupCity')}
+              ariaLabel={t('searchWidget.pickupCity')}
+              value={pickupCity}
+              onChange={handlePickupCityChange}
+              cities={cities}
+              disabled={locationsLoading || !!locationsError}
+            />
+            <LocationPickerButton
+              label={t('searchWidget.pickupLocation')}
+              locationId={pickupLocationId}
+              onLocationChange={setPickupLocationId}
+              options={pickupCityLocations}
+              loading={locationsLoading}
+              error={locationsError}
+              placeholder={t('searchWidget.selectPickup')}
+              sheetTitle={t('searchWidget.choosePickupLocation')}
+            />
+          </div>
+
+          <label className="mt-4 flex w-fit cursor-pointer items-center gap-3 text-sm font-medium text-brand-navy">
+            <input
+              type="checkbox"
+              checked={sameReturnLocation}
+              onChange={(e) => setSameReturnLocation(e.target.checked)}
+              className="h-4 w-4 rounded border-border text-brand-navy focus:ring-brand-navy"
+            />
+            {t('searchWidget.sameReturnLocation')}
+          </label>
+
+          {!sameReturnLocation && (
+            <div className="mt-4 sm:w-1/2 sm:pe-2">
+              <LocationPickerButton
+                label={t('searchWidget.returnLocation')}
+                locationId={returnLocationId}
+                onLocationChange={setReturnLocationId}
+                options={uaeLocations}
+                loading={locationsLoading}
+                error={locationsError}
+                placeholder={t('searchWidget.selectReturnLocation')}
+                sheetTitle={t('searchWidget.chooseReturnLocation')}
+              />
+            </div>
+          )}
+        </div>
+
+        <div className="border-t border-[#ece7df] pt-8">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-brand-gold-dark">{t('searchWidget.sectionDatesTime')}</p>
+          <div className="mt-4 grid gap-4 sm:grid-cols-2">
+            <DateRangePicker
+              startDate={startDate}
+              endDate={endDate}
+              onChange={(next) => {
+                setStartDate(next.startDate)
+                setEndDate(next.endDate)
+              }}
+              todayIso={todayIso}
+            />
+            <TimeSelect
+              label={t('searchWidget.pickupTime')}
+              ariaLabel={t('searchWidget.pickupTime')}
+              value={pickupTime}
+              onChange={setPickupTime}
+            />
+          </div>
+        </div>
+
+        {touched && dateValidation.error && (
+          <p className="text-sm font-medium text-error">{t('errors.dateRange.' + dateValidation.error)}</p>
+        )}
+        {touched && !dateValidation.error && missingLocation && (
+          <p className="text-sm font-medium text-error">{t('searchWidget.bothLocationsRequired')}</p>
+        )}
+        {locationsError && (
+          <p className="text-sm font-medium text-error">
+            {t('searchWidget.couldNotLoadLocations')} {locationsError}
+          </p>
+        )}
+
+        <Button type="submit" fullWidthOnMobile className="w-full sm:w-auto sm:px-10">
+          {t('searchWidget.searchCars')}
+        </Button>
+      </form>
+    )
+  }
+
   return (
     <form
       onSubmit={handleSubmit}
       noValidate
       className={
-        'w-full border border-[#dfe2de] bg-[#f7f7f5] shadow-[0_12px_30px_rgba(15,18,22,0.05)] ' +
+        'w-full rounded-[1.8rem] border border-[#dfe2de] bg-[#f7f7f5] shadow-[0_12px_30px_rgba(15,18,22,0.05)] ' +
         (compact ? 'p-3 sm:p-4' : 'p-5 sm:p-6')
       }
     >

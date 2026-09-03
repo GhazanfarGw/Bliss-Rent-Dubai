@@ -67,7 +67,7 @@ export function AboutPage() {
 
         <div className="mt-10 flex justify-center">
           <Link
-            to="/search"
+            to="/book"
             className="rounded-lg bg-brand-gold px-6 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-brand-gold-light"
           >
             {t('nav.searchCars')}

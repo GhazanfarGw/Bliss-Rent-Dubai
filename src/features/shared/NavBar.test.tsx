@@ -36,18 +36,21 @@ describe('NavBar', () => {
     expect(screen.getAllByRole('link', { name: 'Fleet' }).length).toBeGreaterThan(0)
     expect(screen.getAllByRole('link', { name: 'Vehicle Collection' }).length).toBeGreaterThan(0)
     expect(screen.getAllByRole('link', { name: 'Services' }).length).toBeGreaterThan(0)
+    expect(screen.getAllByRole('link', { name: 'Manage Booking' }).length).toBeGreaterThan(0)
     expect(screen.getAllByRole('link', { name: 'Contact' }).length).toBeGreaterThan(0)
     expect(screen.getAllByRole('link', { name: 'Book Now' }).length).toBeGreaterThan(0)
   })
 
-  it('About/Car Types/Contact are real pages; Services is still an in-page anchor', () => {
+  it('About/Car Types/Manage Booking/Contact are real pages; Services is still an in-page anchor', () => {
     renderNavBar()
     const aboutLinks = screen.getAllByRole('link', { name: 'About' })
     const carTypeLinks = screen.getAllByRole('link', { name: 'Vehicle Collection' })
+    const manageBookingLinks = screen.getAllByRole('link', { name: 'Manage Booking' })
     const servicesLinks = screen.getAllByRole('link', { name: 'Services' })
     const contactLinks = screen.getAllByRole('link', { name: 'Contact' })
     expect(aboutLinks[0]).toHaveAttribute('href', '/about')
     expect(carTypeLinks[0]).toHaveAttribute('href', '/car-types')
+    expect(manageBookingLinks[0]).toHaveAttribute('href', '/manage-booking')
     expect(contactLinks[0]).toHaveAttribute('href', '/contact')
     expect(servicesLinks[0]).toHaveAttribute('href', '/#how-it-works')
   })

@@ -24,11 +24,22 @@ function BrandMark({ compact = false }: { compact?: boolean }) {
 }
 
 /**
- * Premium header. Desktop: logo, Home, Browse Fleet, Car Types, About,
- * Contact (all real pages — see src/features/content/), Services (still an
- * in-page anchor to the homepage's "How It Works" section, since it isn't
- * its own page), language switcher, and the primary "Search Cars" CTA.
+ * Premium header. Desktop: logo, Home, About, Browse Fleet, Car Types,
+ * Manage Booking, Contact (all real pages — see src/features/content/ and
+ * ManageBookingPage.tsx), Services (still an in-page anchor to the
+ * homepage's "How It Works" section, since it isn't its own page),
+ * language switcher, and the primary "Search Cars"/"Book Now" CTA.
  * Mobile: hamburger drawer with the same links plus the CTA.
+ *
+ * Manage Booking was previously reachable only from an email link, the
+ * homepage navigator's own tab, or the footer — never the header itself —
+ * so a guest browsing from any other page had no direct way there.
+ *
+ * The CTA points at /book (BookCarPage) rather than straight at /search:
+ * its whole job is "start a booking", and BookCarPage is the dedicated
+ * page built for exactly that — the same SearchWidget fields and
+ * `onSearch` → /search flow, just presented as its own destination
+ * instead of only living inside the homepage hero.
  */
 const TRANSPARENT_SCROLL_THRESHOLD_PX = 24
 
@@ -125,6 +136,7 @@ export function NavBar() {
     { to: '/about', label: t('nav.about'), end: false },
     { to: '/search', label: t('nav.browseFleet'), end: false },
     { to: '/car-types', label: t('nav.carTypes'), end: false },
+    { to: '/manage-booking', label: t('nav.manageBooking'), end: false },
     { to: '/contact', label: t('nav.contact'), end: false },
   ]
   const anchors = [{ to: { pathname: '/', hash: '#how-it-works' }, label: t('nav.services') }]
@@ -189,7 +201,7 @@ export function NavBar() {
           <PendingBookingIndicator />
           <LanguageSwitcher tone={transparent ? 'light' : 'dark'} />
           <LinkButton
-            to="/search"
+            to="/book"
             variant="primary"
             size="compact"
             className="border border-brand-gold text-white shadow-none"
@@ -269,7 +281,7 @@ export function NavBar() {
           ))}
           <div className="mt-auto space-y-3 pt-3">
             <LinkButton
-              to="/search"
+              to="/book"
               variant="secondary"
               onClick={() => setOpen(false)}
               className="w-full text-center shadow-[0_10px_24px_rgba(180,155,108,0.2)]"
