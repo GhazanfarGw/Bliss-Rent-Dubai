@@ -1314,6 +1314,13 @@ const en = {
       bounced: 'Bounced',
     },
   },
+  cookieConsent: {
+    ariaLabel: 'Cookie notice',
+    message: 'We use essential cookies to keep the site working — remembering your language and your booking session. We don’t use tracking or advertising cookies.',
+    learnMore: 'Cookie Policy',
+    decline: 'Decline',
+    accept: 'Accept',
+  },
   pages: {
     draftBannerTitle: 'Draft — pending legal review',
     about: {
