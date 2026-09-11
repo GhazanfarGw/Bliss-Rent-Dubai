@@ -6,10 +6,12 @@ import { CheckoutLoadGate } from '@/features/booking/checkout/CheckoutLoadGate'
 import { CheckoutStepLayout } from '@/features/booking/checkout/CheckoutStepLayout'
 import { createBooking, CheckoutApiError } from '@/features/booking/checkout/checkoutApi'
 import { saveBookingResult, saveActiveBooking, readActiveBooking, type ActiveBookingPointer } from '@/features/booking/checkout/checkoutStorage'
+import { validateCustomerDraft, validateDriverDraft } from '@/features/booking/checkout/validation'
 import { criteriaToSearchParams } from '@/features/booking/searchParams'
 import { rentalDays } from '@/lib/dateRange'
 import { quoteForDays, TERM_LABELS } from '@/lib/pricing'
 import { Button, StatusBadge } from '@/features/shared/ui'
+import { effectiveDriverIdentity } from '@/types/domain'
 
 export function BookingSummaryPage() {
   const { t } = useTranslation()
@@ -30,6 +32,23 @@ export function BookingSummaryPage() {
   const qs = criteriaToSearchParams(criteria).toString()
   const days = rentalDays(criteria.startDate, criteria.endDate)
   const estimatedQuote = quoteForDays(vehicle.pricing, days)
+  const driverIdentity = effectiveDriverIdentity(draft.customer, draft.driver)
+
+  // Defensive re-check (2026-09-20): the Customer/Driver steps already
+  // validate their own fields before letting the customer navigate
+  // forward, but this Review page has no editable fields of its own to
+  // show a per-field error on — so if it's ever reached with incomplete
+  // data (e.g. an old bookmark, a stale sessionStorage draft from before
+  // a schema change, or manual back/forward navigation), calling
+  // create-booking would just come back with a generic, confusing
+  // "check the highlighted fields" error and nothing to actually
+  // highlight. Catching it here instead sends the customer straight back
+  // to whichever step is actually incomplete, with a clear reason, and
+  // never even attempts the doomed API call.
+  const customerErrors = validateCustomerDraft(draft.customer)
+  const driverErrors = validateDriverDraft(draft.customer, draft.driver, criteria.endDate)
+  const incompleteStep: 'customer' | 'driver' | null =
+    Object.keys(customerErrors).length > 0 ? 'customer' : Object.keys(driverErrors).length > 0 ? 'driver' : null
 
   // THE FIX: before ever calling create-booking, check whether this exact
   // vehicle + these exact dates/locations already produced a pending
@@ -54,7 +73,7 @@ export function BookingSummaryPage() {
   }
 
   async function handleConfirm() {
-    if (submitting) return // guards against a double-click / duplicate submit
+    if (submitting || incompleteStep) return // guards against a double-click / duplicate submit, and against submitting known-incomplete data
     setSubmitting(true)
     setSubmitError(null)
     try {
@@ -64,8 +83,20 @@ export function BookingSummaryPage() {
         endDate: criteria!.endDate,
         pickupLocationId: criteria!.pickupLocationId,
         dropoffLocationId: criteria!.dropoffLocationId,
-        customer: draft.customer,
-        driver: draft.driver,
+        customer: {
+          firstName: draft.customer.firstName,
+          lastName: draft.customer.lastName,
+          email: draft.customer.email,
+          phone: draft.customer.phone,
+        },
+        driver: {
+          firstName: driverIdentity.firstName,
+          lastName: driverIdentity.lastName,
+          phone: driverIdentity.phone,
+          licenseNumber: draft.driver.licenseNumber,
+          licenseCountry: draft.driver.licenseCountry,
+          licenseExpiry: draft.driver.licenseExpiry,
+        },
       })
       saveBookingResult(result)
       saveActiveBooking({
@@ -154,17 +185,17 @@ export function BookingSummaryPage() {
         </Section>
 
         <Section title={t('checkout.summary.customerSection')}>
-          <Row label={t('checkout.summary.name')} value={draft.customer.fullName} />
-          <Row label={t('checkout.summary.email')} value={draft.customer.email} />
+          <Row label={t('checkout.summary.name')} value={`${draft.customer.firstName} ${draft.customer.lastName}`.trim() || '—'} />
+          <Row label={t('checkout.summary.email')} value={draft.customer.email || '—'} />
           <Row label={t('checkout.summary.phone')} value={draft.customer.phone || '—'} />
         </Section>
 
         <Section title={t('checkout.summary.driverSection')}>
-          <Row label={t('checkout.summary.name')} value={draft.driver.fullName} />
-          <Row label={t('checkout.summary.dateOfBirth')} value={draft.driver.dateOfBirth} />
-          <Row label={t('checkout.summary.licenseNumber')} value={draft.driver.licenseNumber} />
-          <Row label={t('checkout.summary.licenseCountry')} value={draft.driver.licenseCountry} />
-          <Row label={t('checkout.summary.licenseExpiry')} value={draft.driver.licenseExpiry} />
+          <Row label={t('checkout.summary.name')} value={`${driverIdentity.firstName} ${driverIdentity.lastName}`.trim() || '—'} />
+          <Row label={t('checkout.summary.phone')} value={driverIdentity.phone || '—'} />
+          <Row label={t('checkout.summary.licenseNumber')} value={draft.driver.licenseNumber || '—'} />
+          <Row label={t('checkout.summary.licenseCountry')} value={draft.driver.licenseCountry || '—'} />
+          <Row label={t('checkout.summary.licenseExpiry')} value={draft.driver.licenseExpiry || '—'} />
         </Section>
 
         <Section title={t('checkout.summary.pricingSection')}>
@@ -183,6 +214,20 @@ export function BookingSummaryPage() {
           <Row label={t('checkout.summary.paymentStatus')} value={t('checkout.summary.notYetPaid')} />
         </Section>
 
+        {incompleteStep && (
+          <div className="rounded-lg border border-error/25 bg-error-bg px-4 py-3 text-sm text-error">
+            <p className="font-medium">
+              {incompleteStep === 'customer' ? t('checkout.summary.incompleteCustomer') : t('checkout.summary.incompleteDriver')}
+            </p>
+            <Link
+              to={`/checkout/${vehicleId}/${incompleteStep}?${qs}`}
+              className="mt-2 inline-block font-semibold underline"
+            >
+              {incompleteStep === 'customer' ? t('checkout.customer.title') : t('checkout.driver.title')}
+            </Link>
+          </div>
+        )}
+
         {submitError && (
           <div className="rounded-lg border border-error/25 bg-error-bg px-4 py-3 text-sm text-error">
             <p className="font-medium">{submitError.message}</p>
@@ -195,14 +240,14 @@ export function BookingSummaryPage() {
         )}
 
         <div className="flex flex-wrap items-center gap-4">
-          <button
+          <Button
             type="button"
-            onClick={handleConfirm}
-            disabled={submitting || !estimatedQuote}
-            className="rounded-lg bg-brand-gold px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-gold-light disabled:cursor-not-allowed disabled:bg-surface-muted disabled:text-text-muted"
+            onClick={() => void handleConfirm()}
+            loading={submitting}
+            disabled={!estimatedQuote || !!incompleteStep}
           >
             {submitting ? t('checkout.summary.confirming') : t('checkout.summary.confirm')}
-          </button>
+          </Button>
           <Link
             to={`/checkout/${vehicleId}/driver?${qs}`}
             className="text-sm font-semibold text-text-muted underline hover:text-brand-navy"

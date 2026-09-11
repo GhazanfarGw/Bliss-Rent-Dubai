@@ -80,7 +80,7 @@ export function Dialog({ open, onClose, title, closeLabel, children, maxWidthCla
         className={`relative z-10 max-h-[90vh] w-full overflow-y-auto rounded-2xl bg-surface p-6 shadow-md outline-none ${mobileSheet ? 'rounded-b-none sm:rounded-2xl' : ''} ${maxWidthClassName}`}
       >
         <div className="mb-4 flex items-start justify-between gap-3">
-          <h2 id={titleId} className="text-base font-semibold text-brand-navy">
+          <h2 id={titleId} className="min-w-0 break-words text-base font-semibold text-brand-navy">
             {title}
           </h2>
           <button

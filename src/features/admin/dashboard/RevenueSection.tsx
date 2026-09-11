@@ -17,7 +17,7 @@ import {
 } from '@/lib/revenueAnalytics'
 
 const CURRENCY = 'AED'
-const RANGE_OPTIONS = [7, 14, 30] as const
+const RANGE_OPTIONS = [7, 30, 90] as const
 type RangeDays = (typeof RANGE_OPTIONS)[number]
 
 type LoadState =

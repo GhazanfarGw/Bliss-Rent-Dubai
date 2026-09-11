@@ -14,6 +14,7 @@ import { createSupabaseEmailLogStore } from '../_shared/email/supabaseEmailLogSt
 import { triggerAdminOperationalEmail } from '../_shared/email/triggerAdminOperationalEmail.ts'
 import { createSupabaseAdminEmailLogStore } from '../_shared/email/supabaseAdminEmailLogStore.ts'
 import type { EmailLanguage } from '../_shared/email/strings.ts'
+import { getResendSenderConfig } from '../_shared/email/emailSenderConfig.ts'
 
 Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') {
@@ -53,7 +54,8 @@ Deno.serve(async (req: Request) => {
       emailLog: createSupabaseEmailLogStore(supabaseAdmin),
       resendConfig: {
         apiKey: Deno.env.get('RESEND_API_KEY') ?? '',
-        fromAddress: Deno.env.get('RESEND_FROM_ADDRESS') ?? 'Bliss Rent <noreply@bliss.rent>',
+        fromAddress: getResendSenderConfig('customer', Deno.env).fromAddress,
+        replyTo: getResendSenderConfig('customer', Deno.env).replyTo,
       },
       siteBaseUrl: Deno.env.get('SITE_BASE_URL') ?? 'https://bliss.rent',
       bookingId: result.bookingId,
@@ -74,7 +76,8 @@ Deno.serve(async (req: Request) => {
       emailLog: createSupabaseAdminEmailLogStore(supabaseAdmin),
       resendConfig: {
         apiKey: Deno.env.get('RESEND_API_KEY') ?? '',
-        fromAddress: Deno.env.get('RESEND_FROM_ADDRESS') ?? 'Bliss Rent <noreply@bliss.rent>',
+        fromAddress: getResendSenderConfig('admin', Deno.env).fromAddress,
+        replyTo: getResendSenderConfig('admin', Deno.env).replyTo,
       },
       siteBaseUrl: Deno.env.get('SITE_BASE_URL') ?? 'https://bliss.rent',
       bookingId: result.bookingId,

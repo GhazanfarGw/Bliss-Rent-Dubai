@@ -16,6 +16,7 @@ import { StateMessage, Spinner } from '@/features/shared/StateMessage'
 import { quoteForDays, cheapestHeadlineRate, TERM_LABELS } from '@/lib/pricing'
 import { rentalDays, validateDateRange } from '@/lib/dateRange'
 import { isCompleteCriteria, searchParamsToCriteria } from '@/features/booking/searchParams'
+import { useDocumentTitle } from '@/lib/useDocumentTitle'
 import type { Location, SearchCriteria, VehicleWithDetails } from '@/types/domain'
 
 type LoadState =
@@ -85,6 +86,8 @@ export function VehicleDetailPage() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, hasDates, criteria.startDate, criteria.endDate])
+
+  useDocumentTitle(state.status === 'loaded' ? `${state.vehicle.make} ${state.vehicle.model}` : null)
 
   if (state.status === 'loading') {
     return (

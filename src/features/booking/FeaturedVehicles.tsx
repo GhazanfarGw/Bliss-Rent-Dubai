@@ -5,6 +5,7 @@ import { fetchFeaturedVehiclesByCategory } from '@/features/booking/api'
 import { VehicleCard } from '@/features/booking/VehicleCard'
 import { SectionHeader } from '@/features/shared/ui/SectionHeader'
 import { StateMessage } from '@/features/shared/StateMessage'
+import { groupPublicVehicles } from '@/lib/vehicleGrouping'
 import type { VehicleWithDetails } from '@/types/domain'
 
 interface FeaturedVehicleSliderProps {
@@ -54,6 +55,10 @@ function FeaturedVehicleSlider({ categoryName, label, viewAllLabel, emptyTitle, 
   }, [categoryName])
 
   const loading = vehicles === null && !error
+  // Task 1 — same Make + Model + Year master listings collapse into one
+  // featured card with a combined quantity; see SearchResultsPage for
+  // the identical rule applied to search results.
+  const grouped = vehicles ? groupPublicVehicles(vehicles) : []
 
   return (
     <div className="mt-10 first:mt-0">
@@ -78,28 +83,28 @@ function FeaturedVehicleSlider({ categoryName, label, viewAllLabel, emptyTitle, 
           </div>
         )}
 
-        {!loading && (error || !vehicles || vehicles.length === 0) && <StateMessage title={emptyTitle} body={emptyBody} />}
+        {!loading && (error || !vehicles || grouped.length === 0) && <StateMessage title={emptyTitle} body={emptyBody} />}
 
-        {!loading && !error && vehicles && vehicles.length > 0 && (
+        {!loading && !error && vehicles && grouped.length > 0 && (
           <div className="overflow-hidden pb-2">
             <div
               className={`flex min-w-max gap-4 sm:gap-6 ${
                 direction === 'left' ? 'animate-featured-marquee-left' : 'animate-featured-marquee-right'
               }`}
             >
-              {[...vehicles, ...vehicles].map((vehicle, index) => {
+              {[...grouped, ...grouped].map((group, index) => {
                 // The second copy exists only to make the loop seamless —
                 // hidden from screen readers and keyboard tabbing so it
                 // never doubles up reading order or focus stops.
-                const isDuplicate = index >= vehicles.length
+                const isDuplicate = index >= grouped.length
                 return (
                   <div
-                    key={`${vehicle.id}-${index}`}
+                    key={`${group.vehicle.id}-${index}`}
                     aria-hidden={isDuplicate || undefined}
                     inert={isDuplicate}
                     className="w-[82vw] max-w-[320px] shrink-0 rounded-[1.5rem] border border-[#e6dcc7] bg-white p-1 shadow-[0_18px_40px_rgba(16,20,29,0.04)] sm:w-[280px]"
                   >
-                    <VehicleCard vehicle={vehicle} detailHref={`/vehicles/${vehicle.id}`} />
+                    <VehicleCard vehicle={group.vehicle} detailHref={`/vehicles/${group.vehicle.id}`} featured quantity={group.quantity} />
                   </div>
                 )
               })}

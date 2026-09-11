@@ -30,6 +30,18 @@ export type ExtensionNotificationType =
   | 'extension_approved'
   | 'extension_rejected'
   | 'extension_conflict_pending_review'
+  /**
+   * Phase 14 — Admin confirmed the real plate for a booking's Reserved
+   * copy. Deliberately NOT added to EXTENSION_NOTIFICATION_TYPES below:
+   * that array is the gate deliverExtensionNotificationEmails() uses for
+   * the UNRELATED extension/reassignment pipeline (triggered by
+   * extensionId, reading booking_extensions), and plate_confirmed has no
+   * extension row at all. It is delivered by its own, separate
+   * deliverPlateConfirmedNotificationEmail.ts (bookingId-scoped) so this
+   * existing, already-tested pipeline's behavior stays byte-for-byte
+   * unchanged.
+   */
+  | 'plate_confirmed'
 
 export const EXTENSION_NOTIFICATION_TYPES: ExtensionNotificationType[] = [
   'vehicle_reassigned',
@@ -56,13 +68,14 @@ export interface VehicleReassignedPayload {
   reason?: string
 }
 
-/** jsonb_build_object(...) in request_booking_extension() / confirm_booking_extension_payment(), e.g. 20260903000000_phase7_booking_reassignment.sql:713-715 */
+/** jsonb_build_object(...) in request_booking_extension() / confirm_booking_extension_payment(), e.g. 20260903000000_phase7_booking_reassignment.sql:713-715. `previous_total_price` added 2026-09-05 (see 20260918000000_extension_price_preview_and_email_breakdown.sql) — the booking's total_price as it stood BEFORE this extension (never mutated by an extension), so the email can show a paid/added/new-total breakdown rather than just the amount charged. Optional so an older/malformed payload still renders the pre-breakdown wording instead of failing (see textOr/numberOr's own file-header philosophy). */
 export interface ExtensionApprovedPayload {
   requested_return_date?: string
   extension_days?: number
   amount?: number
   currency?: string
   penalty_amount?: number | null
+  previous_total_price?: number | null
 }
 
 /** jsonb_build_object('reason', ...) in reject_extension_request(), 20260903000000_phase7_booking_reassignment.sql:891 */
@@ -73,6 +86,22 @@ export interface ExtensionRejectedPayload {
 /** jsonb_build_object('note', ...) in resolve_extension_conflict(), 20260903000000_phase7_booking_reassignment.sql:437-438 — always this exact static sentence today. */
 export interface ExtensionConflictPendingReviewPayload {
   note?: string
+}
+
+/**
+ * jsonb_build_object(...) in admin_confirm_booking_vehicle(),
+ * supabase/migrations/20261001000000_phase14_reserved_vehicle_copies.sql.
+ * `plate_number` here is deliberately the ONLY place a real plate is ever
+ * put into a customer-facing email payload — it exists only after Admin
+ * has confirmed it, never before (Decision 5 of the Phase 14 business
+ * rules: "The real plate is NOT sent to the customer at booking/payment
+ * time").
+ */
+export interface PlateConfirmedPayload {
+  booking_reference?: string
+  plate_number?: string
+  make?: string
+  model?: string
 }
 
 /** A payload field is technically `unknown` coming back from a jsonb column — this never throws on a missing/malformed field, it just renders a safe placeholder, since a notification already recorded in the database must never block delivery of the ones that follow it. */
@@ -102,6 +131,8 @@ export function getExtensionNotificationContent(
       return extensionRejectedContent(language, payload as ExtensionRejectedPayload)
     case 'extension_conflict_pending_review':
       return extensionConflictPendingReviewContent(language)
+    case 'plate_confirmed':
+      return plateConfirmedContent(language, payload as PlateConfirmedPayload)
   }
 }
 
@@ -133,24 +164,38 @@ function extensionApprovedContent(language: EmailLanguage, payload: ExtensionApp
   const currency = textOr(payload.currency, '')
   const amount = numberOr(payload.amount, 0)
   const penaltyAmount = typeof payload.penalty_amount === 'number' && payload.penalty_amount > 0 ? payload.penalty_amount : null
+  // Only present on payloads built from 2026-09-05 onward (see the
+  // interface's own citation) — an older/malformed notification without
+  // it falls back to the original "amount charged" wording rather than
+  // showing a wrong or partial breakdown.
+  const previousTotal = typeof payload.previous_total_price === 'number' ? payload.previous_total_price : null
+  const newTotal = previousTotal != null ? previousTotal + amount + (penaltyAmount ?? 0) : null
 
   if (language === 'ar') {
     const dayWord = days === 1 ? 'يوم واحد' : `${days} أيام`
     const penaltyNote = penaltyAmount ? ` يشمل ذلك رسوم تمديد متأخر بقيمة ${formatMoney(currency, penaltyAmount)}.` : ''
+    const message =
+      previousTotal != null && newTotal != null
+        ? `تم تمديد فترة إيجارك حتى ${returnDate} (${dayWord} إضافي). لقد دفعت سابقاً ${formatMoney(currency, previousTotal)}. تكلفة التمديد: ${formatMoney(currency, amount)}.${penaltyNote} إجمالي المبلغ الجديد لحجزك: ${formatMoney(currency, newTotal)}.`
+        : `تم تمديد فترة إيجارك حتى ${returnDate} (${dayWord} إضافي). المبلغ المستحق: ${formatMoney(currency, amount)}.${penaltyNote}`
     return {
       subject: 'تم تأكيد تمديد الإيجار — بليس رنت',
       title: 'تم تأكيد التمديد',
-      message: `تم تمديد فترة إيجارك حتى ${returnDate} (${dayWord} إضافي). المبلغ المستحق: ${formatMoney(currency, amount)}.${penaltyNote}`,
+      message,
       statusTone: 'success',
       statusMessage: 'تم تأكيد التمديد',
     }
   }
   const dayWord = days === 1 ? '1 extra day' : `${days} extra days`
   const penaltyNote = penaltyAmount ? ` This includes a ${formatMoney(currency, penaltyAmount)} late-extension fee.` : ''
+  const message =
+    previousTotal != null && newTotal != null
+      ? `Your rental has been extended through ${returnDate} (${dayWord}). You already paid ${formatMoney(currency, previousTotal)} for this booking. This extension adds ${formatMoney(currency, amount)}.${penaltyNote} Your new total for this booking is ${formatMoney(currency, newTotal)}.`
+      : `Your rental has been extended through ${returnDate} (${dayWord}). Amount charged: ${formatMoney(currency, amount)}.${penaltyNote}`
   return {
     subject: 'Your rental extension is confirmed — Bliss Rent',
     title: 'Extension confirmed',
-    message: `Your rental has been extended through ${returnDate} (${dayWord}). Amount charged: ${formatMoney(currency, amount)}.${penaltyNote}`,
+    message,
     statusTone: 'success',
     statusMessage: 'Extension confirmed',
   }
@@ -199,5 +244,29 @@ function extensionConflictPendingReviewContent(language: EmailLanguage): Extensi
     message: 'Your rental extension request needs manual review by our team before it can be completed. We will follow up with you shortly.',
     statusTone: 'warning',
     statusMessage: 'Needs review',
+  }
+}
+
+function plateConfirmedContent(language: EmailLanguage, payload: PlateConfirmedPayload): ExtensionEmailContent {
+  const plate = textOr(payload.plate_number, '—')
+  const vehicleName = payload.make && payload.model ? `${payload.make} ${payload.model}` : null
+
+  if (language === 'ar') {
+    const vehicleNote = vehicleName ? ` (${vehicleName})` : ''
+    return {
+      subject: 'تم تأكيد رقم لوحة مركبتك — بليس رنت',
+      title: 'تم تأكيد المركبة',
+      message: `قام فريقنا بتجهيز مركبتك${vehicleNote} لحجزك. رقم اللوحة المؤكد هو ${plate}. سيتواصل معك فريقنا لترتيب التسليم.`,
+      statusTone: 'success',
+      statusMessage: 'تم تأكيد المركبة',
+    }
+  }
+  const vehicleNote = vehicleName ? ` (${vehicleName})` : ''
+  return {
+    subject: 'Your vehicle plate is confirmed — Bliss Rent',
+    title: 'Vehicle confirmed',
+    message: `Your vehicle${vehicleNote} has been prepared for your booking. The confirmed plate number is ${plate}. Our team will follow up to arrange delivery.`,
+    statusTone: 'success',
+    statusMessage: 'Vehicle confirmed',
   }
 }

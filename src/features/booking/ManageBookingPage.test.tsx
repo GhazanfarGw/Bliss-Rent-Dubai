@@ -24,6 +24,21 @@ vi.mock('./extendRentalApi', async () => {
   }
 })
 
+// The live price-preview hook (2026-09-05) does its own Supabase reads —
+// irrelevant to what this file's own tests cover, and not something a
+// jsdom test should hit the network for. Its own math is covered by
+// extensionPricing.test.ts / extensionPenalty.test.ts.
+vi.mock('@/features/booking/useExtensionPriceEstimate', () => ({
+  useExtensionPriceEstimate: () => ({
+    status: 'unavailable',
+    isLate: false,
+    addedAmount: null,
+    penaltyAmount: null,
+    newTotal: null,
+    currency: null,
+  }),
+}))
+
 const confirmedResult = {
   bookingId: 'bk-1',
   bookingReference: 'BLS-ABCDEF12',
@@ -32,6 +47,7 @@ const confirmedResult = {
   endDate: '2026-09-15',
   totalPrice: 900,
   currency: 'AED',
+  vehicleId: 'veh-1',
   vehicleMake: 'Toyota',
   vehicleModel: 'Camry',
   vehiclePlate: 'ABC-123',

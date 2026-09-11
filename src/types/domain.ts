@@ -79,29 +79,52 @@ export const EMPTY_FILTERS: VehicleFilters = {
 // Phase 2 — Booking & Checkout
 // ---------------------------------------------------------------------------
 
-/** What the Customer Details step collects. Matches the create_booking Edge Function's `customer` shape exactly. */
+/** What the Customer Details step (Step 4) collects. Matches the create-booking Edge Function's `customer` shape exactly — see _shared/validation.ts's CustomerInput. */
 export interface CustomerDraft {
-  fullName: string
+  firstName: string
+  lastName: string
   email: string
   phone: string
 }
 
-/** What the Driver Details step collects. The customer supplies their own driver — see docs/ARCHITECTURE.md. */
+/**
+ * What the Driver Details step (Step 5) collects. The customer supplies
+ * their own driver — see docs/ARCHITECTURE.md. `isSameAsCustomer` backs
+ * the "Who will drive the car?" toggle: when true, the driver's
+ * firstName/lastName/phone here are ignored in favor of the CURRENT
+ * customer draft (computed on demand — see effectiveDriverIdentity below
+ * — never copied in, so editing Step 4 afterwards can never leave a
+ * stale driver name behind).
+ */
 export interface DriverDraft {
-  fullName: string
-  dateOfBirth: string
+  isSameAsCustomer: boolean
+  firstName: string
+  lastName: string
+  phone: string
   licenseNumber: string
   licenseCountry: string
   licenseExpiry: string
 }
 
-export const EMPTY_CUSTOMER_DRAFT: CustomerDraft = { fullName: '', email: '', phone: '' }
+export const EMPTY_CUSTOMER_DRAFT: CustomerDraft = { firstName: '', lastName: '', email: '', phone: '' }
 export const EMPTY_DRIVER_DRAFT: DriverDraft = {
-  fullName: '',
-  dateOfBirth: '',
+  isSameAsCustomer: true,
+  firstName: '',
+  lastName: '',
+  phone: '',
   licenseNumber: '',
   licenseCountry: '',
   licenseExpiry: '',
+}
+
+/** The driver identity actually used for validation/submission/display — the customer's own info when "I am the driver" is selected (always freshly computed, never a stale copy), or the driver's own typed fields otherwise. */
+export function effectiveDriverIdentity(
+  customer: CustomerDraft,
+  driver: DriverDraft,
+): { firstName: string; lastName: string; phone: string } {
+  return driver.isSameAsCustomer
+    ? { firstName: customer.firstName, lastName: customer.lastName, phone: customer.phone }
+    : { firstName: driver.firstName, lastName: driver.lastName, phone: driver.phone }
 }
 
 /**

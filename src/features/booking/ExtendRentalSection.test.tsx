@@ -4,6 +4,7 @@ import { ExtendRentalSection } from './ExtendRentalSection'
 import { ExtendRentalError } from './extendRentalApi'
 
 const submitMock = vi.fn()
+const estimateMock = vi.fn()
 
 vi.mock('./extendRentalApi', async () => {
   const actual = await vi.importActual<typeof import('./extendRentalApi')>('./extendRentalApi')
@@ -13,10 +14,22 @@ vi.mock('./extendRentalApi', async () => {
   }
 })
 
+// The live price-preview hook (2026-09-05) does its own Supabase reads —
+// irrelevant to what this file's own tests cover, and not something a
+// jsdom test should hit the network for. Its own math is covered by
+// extensionPricing.test.ts / extensionPenalty.test.ts.
+vi.mock('@/features/booking/useExtensionPriceEstimate', () => ({
+  useExtensionPriceEstimate: (...args: unknown[]) => estimateMock(...args),
+}))
+
 const props = {
   bookingReference: 'BLS-ABCDEF12',
   vehicleNumber: 'ABC-123',
   currentReturnDate: '2026-09-15',
+  vehicleId: 'veh-1',
+  originalStartDate: '2026-09-10',
+  currentTotalPrice: 900,
+  currency: 'AED',
 }
 
 function fillAndSubmit(newDate: string) {
@@ -27,6 +40,15 @@ function fillAndSubmit(newDate: string) {
 describe('ExtendRentalSection', () => {
   beforeEach(() => {
     submitMock.mockReset()
+    estimateMock.mockReset()
+    estimateMock.mockReturnValue({
+      status: 'unavailable',
+      isLate: false,
+      addedAmount: null,
+      penaltyAmount: null,
+      newTotal: null,
+      currency: null,
+    })
   })
 
   it('submits the request with the booking reference and vehicle number passed in as props', async () => {

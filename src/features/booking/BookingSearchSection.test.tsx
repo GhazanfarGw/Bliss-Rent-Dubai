@@ -157,11 +157,9 @@ describe('BookingSearchSection', () => {
     await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: /DXB Terminal 3/ }))
 
     // "Same Return Location" is checked by default — drop-off mirrors pickup.
-    // Exact, anchored match: the navigator's own "Search Cars" tab and the
-    // mobile dropdown trigger both also expose "Search Cars" as part of a
-    // longer accessible name (label + description) — only the actual
-    // SearchWidget submit button's name is exactly "Search Cars".
-    await user.click(screen.getByRole('button', { name: /^search cars$/i }))
+    // Scope the submit action to the SearchWidget form because the mobile
+    // navigator row intentionally has the same visible label.
+    await user.click(within(document.querySelector('form') as HTMLElement).getByRole('button', { name: /^search cars$/i }))
 
     await waitFor(() =>
       expect(onSearch).toHaveBeenCalledWith({

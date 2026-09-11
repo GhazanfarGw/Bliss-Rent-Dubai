@@ -23,8 +23,22 @@ export type ExtensionStatus = 'requested' | 'pending' | 'approved' | 'rejected' 
 export type ExtensionPricingPolicy = 'original_rate' | 'current_rate' | 'custom_rate'
 export type ExtensionPenaltyPolicy = 'fixed_fee' | 'per_day' | 'percentage'
 export type ExtensionSource = 'admin' | 'customer'
-export type NotificationType = 'vehicle_reassigned' | 'extension_approved' | 'extension_rejected' | 'extension_conflict_pending_review'
+export type NotificationType =
+  | 'vehicle_reassigned'
+  | 'extension_approved'
+  | 'extension_rejected'
+  | 'extension_conflict_pending_review'
+  /** Phase 14 — Admin confirmed the real plate for a booking's Reserved copy (new or reused). */
+  | 'plate_confirmed'
 export type NotificationDeliveryStatus = 'pending_delivery' | 'sent' | 'failed'
+/**
+ * Phase 14 — WhatsApp delivery tracking on booking_notifications, separate
+ * from the email-only status/sent_at columns above. 'not_applicable' for
+ * every notification_type except plate_confirmed; 'not_configured' means no
+ * WhatsApp provider is wired up yet (see dispatchPlateConfirmedWhatsapp.ts —
+ * no vendor is invented here, per the owner's explicit instruction).
+ */
+export type WhatsappDeliveryStatus = 'not_applicable' | 'pending_delivery' | 'sent' | 'failed' | 'not_configured'
 export type EmailRecipientType = 'customer' | 'admin'
 export type EmailLanguageCode = 'en' | 'ar'
 export type EmailDeliveryStatus = 'queued' | 'sent' | 'delivered' | 'bounced' | 'failed'
@@ -55,6 +69,9 @@ export interface Database {
           id: string
           auth_user_id: string | null
           full_name: string
+          /** Added by the checkout-v2 migration (2026-09-20) — nullable, additive alongside full_name. */
+          first_name: string | null
+          last_name: string | null
           email: string
           phone: string | null
           created_at: string
@@ -63,6 +80,8 @@ export interface Database {
           id?: string
           auth_user_id?: string | null
           full_name: string
+          first_name?: string | null
+          last_name?: string | null
           email: string
           phone?: string | null
           created_at?: string
@@ -75,7 +94,13 @@ export interface Database {
           id: string
           booking_id: string
           full_name: string
-          date_of_birth: string
+          /** Added by the checkout-v2 migration (2026-09-20) — nullable, additive alongside full_name. */
+          first_name: string | null
+          last_name: string | null
+          /** Added by the checkout-v2 migration (2026-09-20). */
+          phone: string | null
+          /** Made nullable by the checkout-v2 migration (2026-09-20) — the redesigned Driver Details step no longer collects this. */
+          date_of_birth: string | null
           license_number: string
           license_country: string
           license_expiry: string
@@ -87,7 +112,10 @@ export interface Database {
           id?: string
           booking_id: string
           full_name: string
-          date_of_birth: string
+          first_name?: string | null
+          last_name?: string | null
+          phone?: string | null
+          date_of_birth?: string | null
           license_number: string
           license_country: string
           license_expiry: string
@@ -126,6 +154,16 @@ export interface Database {
           plate_number: string
           status: VehicleStatus
           created_at: string
+          /**
+           * Phase 14 (20261001000000_phase14_reserved_vehicle_copies.sql).
+           * true = the public, always-searchable master listing (every
+           * pre-existing row defaults to true). false = a booking-specific
+           * "Reserved copy" cloned from a master listing at booking time —
+           * never returned by available_vehicles().
+           */
+          is_master_listing: boolean
+          /** Set only when is_master_listing = false: the master listing this Reserved copy was cloned from. */
+          master_vehicle_id: string | null
         }
         Insert: {
           id?: string
@@ -138,6 +176,8 @@ export interface Database {
           plate_number: string
           status?: VehicleStatus
           created_at?: string
+          is_master_listing?: boolean
+          master_vehicle_id?: string | null
         }
         Update: Partial<Database['public']['Tables']['vehicles']['Insert']>
         Relationships: []
@@ -305,6 +345,13 @@ export interface Database {
           resolved_at: string | null
           internal_notes: string | null
           resolution: string | null
+          // Task 3 (2026-09-11 scoped update) — see
+          // supabase/migrations/20261005000000_complaint_admin_reply.sql.
+          // Distinct from `resolution` (an internal summary) and
+          // `internal_notes` (staff-only, never shown to the customer):
+          // this text IS emailed to the customer verbatim once saved.
+          admin_reply_message: string | null
+          admin_reply_sent_at: string | null
         }
         Insert: {
           id?: string
@@ -317,6 +364,8 @@ export interface Database {
           resolved_at?: string | null
           internal_notes?: string | null
           resolution?: string | null
+          admin_reply_message?: string | null
+          admin_reply_sent_at?: string | null
         }
         Update: Partial<Database['public']['Tables']['complaints']['Insert']>
         Relationships: []
@@ -486,6 +535,10 @@ export interface Database {
           payload: Record<string, unknown>
           created_at: string
           sent_at: string | null
+          /** Phase 14 — WhatsApp delivery tracking, separate from the email-only status/sent_at above. */
+          whatsapp_status: WhatsappDeliveryStatus
+          whatsapp_dispatched_at: string | null
+          whatsapp_sent_at: string | null
         }
         Insert: {
           id?: string
@@ -495,6 +548,9 @@ export interface Database {
           payload: Record<string, unknown>
           created_at?: string
           sent_at?: string | null
+          whatsapp_status?: WhatsappDeliveryStatus
+          whatsapp_dispatched_at?: string | null
+          whatsapp_sent_at?: string | null
         }
         Update: Partial<Database['public']['Tables']['booking_notifications']['Insert']>
         Relationships: []
@@ -681,6 +737,28 @@ export interface Database {
         }[]
       }
       /**
+       * Phase 14 — Super-Admin-only "Confirm Vehicle" action. See
+       * supabase/migrations/20261001000000_phase14_reserved_vehicle_copies.sql.
+       * A NEW plate renames the booking's Reserved copy in place
+       * (is_new_physical_vehicle = true); an EXISTING plate atomically
+       * repoints bookings.vehicle_id at that vehicle and retires the
+       * now-unused Reserved copy (is_new_physical_vehicle = false).
+       * Idempotent when called again with the plate already confirmed
+       * (changed = false). Rejected for a booking whose vehicle is itself a
+       * master listing (a legacy, pre-Phase-14 booking — no Reserved copy
+       * to confirm).
+       */
+      admin_confirm_booking_vehicle: {
+        Args: { p_booking_id: string; p_plate_number: string; p_note: string | null }
+        Returns: {
+          booking_id: string
+          vehicle_id: string
+          plate_number: string
+          is_new_physical_vehicle: boolean
+          changed: boolean
+        }[]
+      }
+      /**
        * TEMPORARY testing-phase helper. SECURITY DEFINER — see
        * supabase/migrations/20260830000000_admin_reset_test_data.sql.
        * super_admin only (checked inside the function). Wipes all
@@ -786,6 +864,27 @@ export interface Database {
           vehicle_plate: string
           current_return_date: string
           booking_status: Database['public']['Tables']['bookings']['Row']['status']
+        }[]
+      }
+      /**
+       * 2026-09-05 — extension price-preview feature. Public, read-only.
+       * Exposes ONLY the fields needed to run computeExtensionAmount()/
+       * computeExtensionPenalty() (src/lib/extensionPricing.ts,
+       * src/lib/extensionPenalty.ts) client-side for a pre-submission
+       * "estimated new total" preview — never the full admin settings rows.
+       * See supabase/migrations/20260918000000_extension_price_preview_and_email_breakdown.sql.
+       */
+      get_extension_estimate_config: {
+        Args: Record<string, never>
+        Returns: {
+          pricing_policy: ExtensionPricingPolicy | null
+          custom_daily_rate: number | null
+          custom_currency: string
+          penalty_policy: ExtensionPenaltyPolicy | null
+          penalty_fixed_fee: number | null
+          penalty_per_day: number | null
+          penalty_percentage_rate: number | null
+          penalty_currency: string
         }[]
       }
     }

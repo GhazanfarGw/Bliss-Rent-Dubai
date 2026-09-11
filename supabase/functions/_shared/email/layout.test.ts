@@ -18,7 +18,7 @@ describe('renderCustomerLayout', () => {
   it('includes the booking reference, CTA link, and footer in every render', () => {
     const props = qaCustomerProps('en')
     const html = renderCustomerLayout(props)
-    expect(html).toContain(props.summary.reference)
+    expect(html).toContain(props.summary!.reference)
     expect(html).toContain(props.ctaUrl)
     expect(html.toLowerCase()).toContain('automated')
   })
@@ -36,9 +36,24 @@ describe('renderCustomerLayout', () => {
 
   it('omits paymentStatus/bookingStatus rows when the summary does not include them', () => {
     const props = qaCustomerProps('en')
-    const { paymentStatusLabel: _p, bookingStatusLabel: _b, ...summaryWithoutStatus } = props.summary
+    const { paymentStatusLabel: _p, bookingStatusLabel: _b, ...summaryWithoutStatus } = props.summary!
     const html = renderCustomerLayout({ ...props, summary: summaryWithoutStatus })
     expect(html).not.toContain('Payment status')
+  })
+
+  it('renders without a booking summary card when summary is omitted (Task 3 admin_complaint_reply, 2026-09-11)', () => {
+    const { summary: _summary, ...propsWithoutSummary } = qaCustomerProps('en')
+    const html = renderCustomerLayout(propsWithoutSummary)
+    expect(html).not.toContain('Reference')
+    expect(() => renderCustomerLayout(propsWithoutSummary)).not.toThrow()
+  })
+
+  it('renders extraContentHtml in place of the booking summary card correctly in Arabic/RTL when summary is omitted', () => {
+    const { summary: _summary, ...propsWithoutSummary } = qaCustomerProps('ar')
+    const html = renderCustomerLayout({ ...propsWithoutSummary, extraContentHtml: '<tr><td dir="rtl">ردنا هنا</td></tr>' })
+    expect(html).toContain('<html lang="ar" dir="rtl">')
+    expect(html).toContain('ردنا هنا')
+    expect(html).not.toContain('Reference')
   })
 })
 

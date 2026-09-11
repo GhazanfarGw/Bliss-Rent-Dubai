@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ChevronDown } from 'lucide-react'
 import { SectionHeader } from '@/features/shared/ui/SectionHeader'
+import { useDocumentTitle } from '@/lib/useDocumentTitle'
 
 interface FaqItem {
   question: string
@@ -23,6 +24,7 @@ interface FaqCategory {
  */
 export function FaqPage() {
   const { t } = useTranslation()
+  useDocumentTitle(t('pages.faqs.title'))
   const categories = t('pages.faqs.categories', { returnObjects: true }) as FaqCategory[]
   const [openKey, setOpenKey] = useState<string | null>(null)
 

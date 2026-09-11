@@ -10,6 +10,7 @@ import {
   FileText,
   History as HistoryIcon,
   IdCard,
+  KeyRound,
   MapPin,
   PlayCircle,
   ShieldCheck,
@@ -23,7 +24,9 @@ import {
   adminCancelBooking,
   adminStartRental,
   adminMarkReturned,
+  adminConfirmBookingVehicle,
   fetchDriverDocumentUrl,
+  type AdminConfirmBookingVehicleResult,
 } from '@/features/admin/bookings/adminBookingsApi'
 import { AdminApiError } from '@/features/admin/adminApi'
 import { useAdminAuth } from '@/features/admin/AdminAuthContext'
@@ -46,6 +49,10 @@ export function BookingDetailPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const [state, setState] = useState<LoadState>({ status: 'loading' })
+  // Kept outside LoadState (not reset by load()'s 'loading' status) so the
+  // Confirm Vehicle result banner survives the reload that action itself
+  // triggers — the banner shows once, until the admin navigates away.
+  const [vehicleConfirmResult, setVehicleConfirmResult] = useState<AdminConfirmBookingVehicleResult | null>(null)
 
   async function load() {
     if (!id) return
@@ -115,8 +122,26 @@ export function BookingDetailPage() {
         action={<AdminStatusBadge status={booking.status} />}
       />
 
+      {vehicleConfirmResult && (
+        <div className="mb-5 rounded-2xl border border-success/25 bg-success-bg p-4 text-sm text-success">
+          {t(
+            vehicleConfirmResult.isNewPhysicalVehicle
+              ? 'admin.bookings.confirmVehicle.resultNew'
+              : 'admin.bookings.confirmVehicle.resultExisting',
+            { plate: vehicleConfirmResult.plateNumber },
+          )}
+        </div>
+      )}
+
       <div className="mb-5">
-        <BookingActionsPanel booking={booking} onChanged={() => void load()} />
+        <BookingActionsPanel
+          booking={booking}
+          onChanged={() => void load()}
+          onVehicleConfirmed={(result) => {
+            setVehicleConfirmResult(result)
+            void load()
+          }}
+        />
       </div>
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
@@ -135,8 +160,9 @@ export function BookingDetailPage() {
         <Section title={t('admin.bookings.section.driver')} icon={<IdCard className="h-4 w-4" aria-hidden="true" />}>
           {driver ? (
             <>
-              <Row label={t('checkout.driver.fullName')} value={driver.full_name} />
-              <Row label={t('checkout.driver.dateOfBirth')} value={driver.date_of_birth} />
+              <Row label={t('admin.bookings.driverFullName')} value={driver.full_name} />
+              <Row label={t('admin.bookings.driverPhone')} value={driver.phone ?? '—'} />
+              {driver.date_of_birth && <Row label={t('admin.bookings.driverDateOfBirth')} value={driver.date_of_birth} />}
               <Row label={t('checkout.driver.licenseNumber')} value={driver.license_number} />
               <Row label={t('checkout.driver.licenseCountry')} value={driver.license_country} />
               <Row label={t('checkout.driver.licenseExpiry')} value={driver.license_expiry} />
@@ -150,6 +176,20 @@ export function BookingDetailPage() {
 
         <Section title={t('admin.bookings.section.rental')} icon={<Car className="h-4 w-4" aria-hidden="true" />}>
           <Row label={t('checkout.summary.vehicle')} value={booking.vehicles ? `${booking.vehicles.make} ${booking.vehicles.model} (${booking.vehicles.model_year})` : '—'} />
+          <Row
+            label={t('admin.fleet.fields.plateNumber')}
+            value={
+              // Phase 14 — Decision 5: the real plate is never shown to the
+              // customer before Admin confirms it, and the internal
+              // RSV-prefixed placeholder plate on a still-unconfirmed
+              // Reserved copy is not a real plate either — so this admin
+              // view shows the "pending" wording, not the placeholder
+              // string, until is_master_listing flips to true.
+              booking.vehicles && booking.vehicles.is_master_listing === false
+                ? t('admin.bookings.confirmVehicle.pending')
+                : (booking.vehicles?.plate_number ?? '—')
+            }
+          />
           <Row label={t('vehicleDetail.dates')} value={`${booking.start_date} → ${booking.end_date}`} />
           <Row
             label={t('admin.bookings.pickup')}
@@ -215,7 +255,15 @@ export function BookingDetailPage() {
  * active          -> Mark Returned
  * completed / cancelled -> terminal, no actions
  */
-function BookingActionsPanel({ booking, onChanged }: { booking: AdminBookingWithDetails; onChanged: () => void }) {
+function BookingActionsPanel({
+  booking,
+  onChanged,
+  onVehicleConfirmed,
+}: {
+  booking: AdminBookingWithDetails
+  onChanged: () => void
+  onVehicleConfirmed: (result: AdminConfirmBookingVehicleResult) => void
+}) {
   const { t } = useTranslation()
   const payment = booking.payments[0] ?? null
 
@@ -223,7 +271,16 @@ function BookingActionsPanel({ booking, onChanged }: { booking: AdminBookingWith
   const canCancel = booking.status === 'pending_payment' || booking.status === 'confirmed'
   const canStartRental = booking.status === 'confirmed'
   const canMarkReturned = booking.status === 'active'
-  const hasAnyAction = canConfirmPayment || canCancel || canStartRental || canMarkReturned
+  // Phase 14 — the booking's linked vehicle is still the temporary
+  // Reserved copy (is_master_listing: false) until Admin confirms the
+  // real plate; once confirmed, vehicle_id points at a real physical
+  // vehicle (is_master_listing: true for a reused existing vehicle, or
+  // the same row renamed in place for a brand-new one — either way
+  // is_master_listing becomes true), so this action naturally stops
+  // showing after a successful confirmation.
+  const canConfirmVehicle =
+    !!booking.vehicles && booking.vehicles.is_master_listing === false && (booking.status === 'confirmed' || booking.status === 'active')
+  const hasAnyAction = canConfirmPayment || canCancel || canStartRental || canMarkReturned || canConfirmVehicle
 
   return (
     <div className="rounded-2xl border border-brand-navy/10 bg-white p-5">
@@ -269,6 +326,7 @@ function BookingActionsPanel({ booking, onChanged }: { booking: AdminBookingWith
             onDone={onChanged}
           />
         )}
+        {canConfirmVehicle && <ConfirmVehicleAction bookingId={booking.id} onDone={onVehicleConfirmed} />}
         {!hasAnyAction && (
           <p className="text-xs text-text-muted">
             {t('admin.bookings.actions.noneAvailable', { status: t(`admin.status.${booking.status}`) })}
@@ -350,6 +408,93 @@ function StatusAction({
           {t(`${base}.confirm`)}
         </Button>
         <Button size="compact" variant="ghost" disabled={confirming} onClick={() => setShowNote(false)}>
+          {t(`${base}.cancel`)}
+        </Button>
+      </div>
+    </div>
+  )
+}
+
+/**
+ * Phase 14 — Super-Admin-only "Confirm Vehicle" action: Admin has
+ * arranged a physical car and enters its real plate. Unlike StatusAction
+ * (a bare note), this needs a required plate-number field and returns
+ * structured data (new vs. existing vehicle) the caller displays as a
+ * result banner rather than a simple boolean "done".
+ */
+function ConfirmVehicleAction({
+  bookingId,
+  onDone,
+}: {
+  bookingId: string
+  onDone: (result: AdminConfirmBookingVehicleResult) => void
+}) {
+  const { t } = useTranslation()
+  const { adminProfile } = useAdminAuth()
+  const isSuperAdmin = adminProfile?.role === 'super_admin'
+  const [confirming, setConfirming] = useState(false)
+  const [showForm, setShowForm] = useState(false)
+  const [plate, setPlate] = useState('')
+  const [note, setNote] = useState('')
+  const [error, setError] = useState<string | null>(null)
+  const base = 'admin.bookings.confirmVehicle'
+
+  if (!isSuperAdmin) {
+    return <p className="text-xs text-text-muted">{t(`${base}.staffHint`)}</p>
+  }
+
+  async function handleConfirm() {
+    if (!plate.trim()) {
+      setError(t(`${base}.plateRequired`))
+      return
+    }
+    setConfirming(true)
+    setError(null)
+    try {
+      const result = await adminConfirmBookingVehicle(bookingId, plate, note)
+      onDone(result)
+    } catch (err) {
+      setError(err instanceof AdminApiError || err instanceof Error ? err.message : t('admin.errorGeneric'))
+    } finally {
+      setConfirming(false)
+    }
+  }
+
+  if (!showForm) {
+    return (
+      <Button size="compact" variant="secondary" onClick={() => setShowForm(true)}>
+        <KeyRound className="h-4 w-4" aria-hidden="true" />
+        {t(`${base}.action`)}
+      </Button>
+    )
+  }
+
+  return (
+    <div className="w-full max-w-sm space-y-2 rounded-lg border border-border bg-surface-muted p-3">
+      <p className="text-xs text-text-muted">{t(`${base}.prompt`)}</p>
+      <label className="block text-xs font-medium text-brand-navy">
+        {t(`${base}.plateLabel`)}
+        <input
+          type="text"
+          value={plate}
+          onChange={(e) => setPlate(e.target.value)}
+          placeholder={t(`${base}.platePlaceholder`)}
+          className="mt-1 w-full rounded-lg border border-brand-navy/20 bg-white px-2.5 py-1.5 text-xs text-brand-navy outline-none focus:border-brand-navy"
+        />
+      </label>
+      <input
+        type="text"
+        value={note}
+        onChange={(e) => setNote(e.target.value)}
+        placeholder={t(`${base}.notePlaceholder`)}
+        className="w-full rounded-lg border border-brand-navy/20 bg-white px-2.5 py-1.5 text-xs text-brand-navy outline-none focus:border-brand-navy"
+      />
+      {error && <p className="text-xs text-error">{error}</p>}
+      <div className="flex items-center gap-2">
+        <Button size="compact" variant="secondary" loading={confirming} onClick={() => void handleConfirm()}>
+          {t(`${base}.confirm`)}
+        </Button>
+        <Button size="compact" variant="ghost" disabled={confirming} onClick={() => setShowForm(false)}>
           {t(`${base}.cancel`)}
         </Button>
       </div>

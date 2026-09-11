@@ -52,4 +52,20 @@ describe('sendViaResend', () => {
     expect(result.ok).toBe(false)
     expect(fetchImpl).not.toHaveBeenCalled()
   })
+
+  it('includes reply_to when replyTo is set on the config', async () => {
+    const fetchImpl = fakeFetch({ ok: true, status: 200, json: async () => ({ id: 'msg-123' }) })
+    await sendViaResend({ ...config, replyTo: 'support@bliss.rent' }, params, fetchImpl)
+    const call = (fetchImpl as ReturnType<typeof vi.fn>).mock.calls[0]
+    const body = JSON.parse(call[1].body as string)
+    expect(body.reply_to).toEqual(['support@bliss.rent'])
+  })
+
+  it('omits reply_to entirely when replyTo is not set (unchanged wire format)', async () => {
+    const fetchImpl = fakeFetch({ ok: true, status: 200, json: async () => ({ id: 'msg-123' }) })
+    await sendViaResend(config, params, fetchImpl)
+    const call = (fetchImpl as ReturnType<typeof vi.fn>).mock.calls[0]
+    const body = JSON.parse(call[1].body as string)
+    expect(body).not.toHaveProperty('reply_to')
+  })
 })

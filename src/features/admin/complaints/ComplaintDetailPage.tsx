@@ -2,7 +2,7 @@ import { useEffect, useState, type ReactNode } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { ArrowLeft } from 'lucide-react'
-import { fetchComplaintById, updateComplaint } from '@/features/admin/complaints/adminComplaintsApi'
+import { fetchComplaintById, updateComplaint, sendComplaintReply } from '@/features/admin/complaints/adminComplaintsApi'
 import { AdminApiError } from '@/features/admin/adminApi'
 import { AdminPageHeader } from '@/features/admin/shared/AdminPageHeader'
 import { AdminStatusBadge } from '@/features/admin/shared/AdminStatusBadge'
@@ -31,6 +31,10 @@ export function ComplaintDetailPage() {
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)
   const [saved, setSaved] = useState(false)
+  const [replyDraft, setReplyDraft] = useState('')
+  const [sendingReply, setSendingReply] = useState(false)
+  const [replyError, setReplyError] = useState<string | null>(null)
+  const [replyResult, setReplyResult] = useState<'sent' | 'email_failed' | null>(null)
 
   async function load() {
     if (!id) return
@@ -45,6 +49,7 @@ export function ComplaintDetailPage() {
       setStatusDraft(complaint.status)
       setNotesDraft(complaint.internal_notes ?? '')
       setResolutionDraft(complaint.resolution ?? '')
+      setReplyDraft(complaint.admin_reply_message ?? '')
     } catch (err) {
       setState({ status: 'error', message: err instanceof AdminApiError || err instanceof Error ? err.message : t('admin.errorGeneric') })
     }
@@ -68,6 +73,26 @@ export function ComplaintDetailPage() {
       setSaveError(err instanceof AdminApiError || err instanceof Error ? err.message : t('admin.errorGeneric'))
     } finally {
       setSaving(false)
+    }
+  }
+
+  async function handleSendReply() {
+    if (!id || sendingReply) return
+    if (!replyDraft.trim()) {
+      setReplyError(t('admin.complaints.reply.emptyError'))
+      return
+    }
+    setSendingReply(true)
+    setReplyError(null)
+    setReplyResult(null)
+    try {
+      const result = await sendComplaintReply(id, replyDraft)
+      await load()
+      setReplyResult(result.emailTriggered ? 'sent' : 'email_failed')
+    } catch (err) {
+      setReplyError(err instanceof AdminApiError || err instanceof Error ? err.message : t('admin.complaints.reply.error'))
+    } finally {
+      setSendingReply(false)
     }
   }
 
@@ -200,6 +225,50 @@ export function ComplaintDetailPage() {
             {saving ? t('common.loading') : t('admin.complaints.saveChanges')}
           </button>
         </Section>
+
+        <div className="lg:col-span-2">
+        <Section title={t('admin.complaints.reply.sectionTitle')}>
+          {complaint.admin_reply_sent_at && (
+            <p className="text-xs text-text-muted">
+              {t('admin.complaints.reply.alreadySentAt', { date: new Date(complaint.admin_reply_sent_at).toLocaleString() })}
+            </p>
+          )}
+
+          <div>
+            <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-text-muted">
+              {t('admin.complaints.reply.label')}
+            </label>
+            <textarea
+              value={replyDraft}
+              onChange={(e) => setReplyDraft(e.target.value)}
+              rows={4}
+              placeholder={t('admin.complaints.reply.placeholder')}
+              className="w-full rounded-lg border border-border bg-white px-3 py-2 text-sm text-brand-navy outline-none focus:border-brand-navy focus:ring-1 focus:ring-brand-navy"
+            />
+          </div>
+
+          {replyError && <div className="mt-3 rounded-lg border border-error/25 bg-error-bg px-4 py-3 text-sm text-error">{replyError}</div>}
+          {replyResult === 'sent' && (
+            <div className="mt-3 rounded-lg border border-success/25 bg-success-bg px-4 py-3 text-sm text-success">
+              {t('admin.complaints.reply.sent')}
+            </div>
+          )}
+          {replyResult === 'email_failed' && (
+            <div className="mt-3 rounded-lg border border-warning/25 bg-warning-bg px-4 py-3 text-sm text-warning">
+              {t('admin.complaints.reply.sentButEmailFailed')}
+            </div>
+          )}
+
+          <button
+            type="button"
+            onClick={() => void handleSendReply()}
+            disabled={sendingReply}
+            className="mt-4 rounded-lg bg-brand-gold px-4 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+          >
+            {sendingReply ? t('admin.complaints.reply.sending') : t('admin.complaints.reply.send')}
+          </button>
+        </Section>
+        </div>
       </div>
     </div>
   )

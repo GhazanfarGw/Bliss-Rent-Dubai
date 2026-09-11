@@ -15,6 +15,7 @@ import { ApiError } from '../_shared/errors.ts'
 import { fetchExtensionBookingIds } from '../_shared/email/extensionNotificationData.ts'
 import { triggerAdminOperationalEmail } from '../_shared/email/triggerAdminOperationalEmail.ts'
 import { createSupabaseAdminEmailLogStore } from '../_shared/email/supabaseAdminEmailLogStore.ts'
+import { getResendSenderConfig } from '../_shared/email/emailSenderConfig.ts'
 
 Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') {
@@ -60,7 +61,8 @@ Deno.serve(async (req: Request) => {
         emailLog: createSupabaseAdminEmailLogStore(supabaseAdmin),
         resendConfig: {
           apiKey: Deno.env.get('RESEND_API_KEY') ?? '',
-          fromAddress: Deno.env.get('RESEND_FROM_ADDRESS') ?? 'Bliss Rent <noreply@bliss.rent>',
+          fromAddress: getResendSenderConfig('admin', Deno.env).fromAddress,
+      replyTo: getResendSenderConfig('admin', Deno.env).replyTo,
         },
         siteBaseUrl: Deno.env.get('SITE_BASE_URL') ?? 'https://bliss.rent',
         bookingId,

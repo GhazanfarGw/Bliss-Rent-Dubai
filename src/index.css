@@ -198,36 +198,6 @@ body {
   }
 }
 
-@keyframes route-loader-drive {
-  0% {
-    transform: translateX(-10%) translateY(-50%);
-    opacity: 0.55;
-  }
-  20% {
-    opacity: 1;
-  }
-  50% {
-    transform: translateX(42vw) translateY(-50%);
-    opacity: 1;
-  }
-  100% {
-    transform: translateX(92vw) translateY(-50%);
-    opacity: 0.7;
-  }
-}
-
-@keyframes route-loader-pulse {
-  0%,
-  100% {
-    opacity: 0.75;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 1;
-    transform: scale(1.06);
-  }
-}
-
 .animate-marquee {
   animation: marquee-scroll 55s linear infinite;
 }
@@ -314,70 +284,6 @@ body {
   box-shadow: 0 18px 42px rgba(32, 28, 59, 0.18);
 }
 
-.route-loader-track {
-  position: relative;
-  width: min(76vw, 320px);
-  height: 32px;
-  overflow: hidden;
-  border-radius: 9999px;
-  background: linear-gradient(90deg, rgba(46, 42, 84, 0.12), rgba(180, 155, 108, 0.2), rgba(46, 42, 84, 0.12));
-}
-
-.route-loader-track::before,
-.route-loader-track::after {
-  content: '';
-  position: absolute;
-  inset: 50% 0 auto 0;
-  height: 2px;
-  background: rgba(46, 42, 84, 0.2);
-  transform: translateY(-50%);
-}
-
-.route-loader-car-wrap {
-  position: absolute;
-  left: 0;
-  top: 50%;
-  width: 86px;
-  height: 42px;
-  transform: translateY(-50%);
-  animation: route-loader-drive 4.8s ease-in-out infinite;
-}
-
-.route-loader-car {
-  width: 86px;
-  height: 42px;
-  color: var(--color-brand-navy);
-  filter: drop-shadow(0 8px 18px rgba(46, 42, 84, 0.18));
-}
-
-.route-loader-glow {
-  position: absolute;
-  inset: 50% auto auto 50%;
-  width: 120px;
-  height: 20px;
-  transform: translate(-50%, -50%);
-  border-radius: 9999px;
-  background: rgba(180, 155, 108, 0.2);
-  filter: blur(12px);
-  animation: route-loader-pulse 1.4s ease-in-out infinite;
-}
-
-.route-loader-static {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.7rem;
-  color: var(--color-brand-navy);
-  font-weight: 600;
-}
-
-.route-loader-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 9999px;
-  background: var(--color-brand-gold);
-  box-shadow: 0 0 0 5px rgba(180, 155, 108, 0.16);
-}
-
 .route-loader-text {
   margin: 0;
   color: var(--color-brand-navy);
@@ -388,11 +294,6 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .route-loader-car-wrap,
-  .route-loader-glow {
-    animation: none;
-  }
-
   .route-loader-overlay {
     background: rgba(17, 14, 28, 0.16);
   }

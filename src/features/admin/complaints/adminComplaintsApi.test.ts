@@ -2,19 +2,23 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { chainable } from '@/test/supabaseMock'
 
 const fromMock = vi.fn()
+const functionsInvokeMock = vi.fn()
 let lastUpdatePayload: Record<string, unknown> | null = null
 
 vi.mock('@/lib/supabaseClient', () => ({
   supabase: {
     from: (...args: unknown[]) => fromMock(...args),
+    functions: { invoke: (...args: unknown[]) => functionsInvokeMock(...args) },
   },
 }))
 
-const { fetchComplaints, updateComplaint } = await import('./adminComplaintsApi')
+const { fetchComplaints, updateComplaint, sendComplaintReply } = await import('./adminComplaintsApi')
 
 describe('adminComplaintsApi', () => {
   beforeEach(() => {
     fromMock.mockReset()
+    functionsInvokeMock.mockReset()
+    functionsInvokeMock.mockResolvedValue({ data: {}, error: null })
     lastUpdatePayload = null
   })
 
@@ -53,5 +57,41 @@ describe('adminComplaintsApi', () => {
 
     expect(lastUpdatePayload?.resolved_at).toBeNull()
     expect(lastUpdatePayload?.internal_notes).toBeNull()
+  })
+
+  it('saves the admin reply and best-effort triggers deliver-complaint-reply', async () => {
+    fromMock.mockImplementation(() => ({
+      update: (payload: Record<string, unknown>) => {
+        lastUpdatePayload = payload
+        return chainable({ data: null, error: null })
+      },
+    }))
+
+    const result = await sendComplaintReply('cm1', '  Sorry about that, refund issued.  ')
+
+    expect(lastUpdatePayload?.admin_reply_message).toBe('Sorry about that, refund issued.')
+    expect(typeof lastUpdatePayload?.admin_reply_sent_at).toBe('string')
+    expect(functionsInvokeMock).toHaveBeenCalledWith('deliver-complaint-reply', { body: { complaintId: 'cm1' } })
+    expect(result).toEqual({ emailTriggered: true })
+  })
+
+  it('never throws when the notify trigger fails — the save already succeeded', async () => {
+    fromMock.mockImplementation(() => ({
+      update: () => chainable({ data: null, error: null }),
+    }))
+    functionsInvokeMock.mockResolvedValue({ data: null, error: { message: 'network down' } })
+
+    const result = await sendComplaintReply('cm1', 'Reply text')
+
+    expect(result).toEqual({ emailTriggered: false })
+  })
+
+  it('throws (does not silently swallow) when the save itself fails', async () => {
+    fromMock.mockImplementation(() => ({
+      update: () => chainable({ data: null, error: { message: 'permission denied' } }),
+    }))
+
+    await expect(sendComplaintReply('cm1', 'Reply text')).rejects.toThrow('permission denied')
+    expect(functionsInvokeMock).not.toHaveBeenCalled()
   })
 })

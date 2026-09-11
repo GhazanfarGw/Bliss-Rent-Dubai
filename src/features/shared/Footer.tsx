@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import logoMark from '@/assets/brand/logo-mark.png'
 
 /**
  * Social links are placeholder "#" hrefs until real handles exist — swap
@@ -27,9 +28,7 @@ export function Footer() {
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
           <div>
             <div className="flex items-center gap-2">
-              <span className="flex h-8 w-8 items-center justify-center rounded-none bg-brand-gold text-[10px] font-black tracking-[0.18em] text-[#fff] shadow-none">
-                BR
-              </span>
+              <img src={logoMark} alt="Bliss Rent Dubai" className="h-8 w-auto" />
               <span className="text-sm font-semibold text-brand-navy">{t('nav.brand')}</span>
             </div>
             <p className="mt-3 max-w-xs text-sm leading-6 text-text-muted">{t('footer.tagline')}</p>

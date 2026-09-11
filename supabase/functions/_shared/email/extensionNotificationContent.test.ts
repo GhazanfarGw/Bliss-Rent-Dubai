@@ -92,6 +92,60 @@ describe('getExtensionNotificationContent', () => {
       })
       expect(content.message).toContain('يوم واحد')
     })
+
+    // 2026-09-05 — owner request: show a paid/added/new-total breakdown,
+    // not just "amount charged". previous_total_price is the new field
+    // request_booking_extension()/confirm_booking_extension_payment() now
+    // include in the notification payload (see
+    // 20260918000000_extension_price_preview_and_email_breakdown.sql).
+    it('shows a paid / added / new-total breakdown in English when previous_total_price is present', () => {
+      const content = getExtensionNotificationContent('extension_approved', 'en', {
+        requested_return_date: '2026-09-20',
+        extension_days: 2,
+        amount: 500,
+        currency: 'AED',
+        penalty_amount: null,
+        previous_total_price: 2000,
+      })
+      expect(content.message).toContain('AED 2,000')
+      expect(content.message).toContain('AED 500')
+      expect(content.message).toContain('AED 2,500')
+    })
+
+    it('includes the late-extension penalty in the new total when both previous_total_price and a penalty are present', () => {
+      const content = getExtensionNotificationContent('extension_approved', 'en', {
+        requested_return_date: '2026-09-20',
+        extension_days: 2,
+        amount: 500,
+        currency: 'AED',
+        penalty_amount: 100,
+        previous_total_price: 2000,
+      })
+      expect(content.message).toContain('AED 2,600')
+    })
+
+    it('shows the same breakdown in Arabic when previous_total_price is present', () => {
+      const content = getExtensionNotificationContent('extension_approved', 'ar', {
+        requested_return_date: '2026-09-20',
+        extension_days: 2,
+        amount: 500,
+        currency: 'AED',
+        previous_total_price: 2000,
+      })
+      expect(content.message).toContain('AED 2,000')
+      expect(content.message).toContain('AED 2,500')
+    })
+
+    it('falls back to the original "amount charged" wording when previous_total_price is absent (older/malformed payload)', () => {
+      const content = getExtensionNotificationContent('extension_approved', 'en', {
+        requested_return_date: '2026-09-20',
+        extension_days: 2,
+        amount: 500,
+        currency: 'AED',
+      })
+      expect(content.message).toContain('Amount charged: AED 500')
+      expect(content.message).not.toContain('New total')
+    })
   })
 
   describe('extension_rejected', () => {
@@ -123,6 +177,58 @@ describe('getExtensionNotificationContent', () => {
       expect(ar.statusTone).toBe('warning')
       expect(en.message.length).toBeGreaterThan(0)
       expect(ar.message.length).toBeGreaterThan(0)
+    })
+  })
+
+  // Phase 14 — admin_confirm_booking_vehicle()'s payload
+  // (supabase/migrations/20261001000000_phase14_reserved_vehicle_copies.sql).
+  // Deliberately NOT part of EXTENSION_NOTIFICATION_TYPES (see the
+  // 'covers exactly the 4 notification_type values' test above and the
+  // ExtensionNotificationType union's own comment) — plate_confirmed is
+  // delivered by its own bookingId-scoped pipeline, but shares this
+  // content function/switch statement, so its content is tested here too.
+  describe('plate_confirmed', () => {
+    const payload = {
+      booking_reference: 'BLS-D300AC89',
+      plate_number: 'BLS-NEW-9001',
+      make: 'Nissan',
+      model: 'Sentra',
+    }
+
+    it('mentions the confirmed plate and the vehicle name in English', () => {
+      const content = getExtensionNotificationContent('plate_confirmed', 'en', payload)
+      expect(content.message).toContain('BLS-NEW-9001')
+      expect(content.message).toContain('Nissan Sentra')
+      expect(content.statusTone).toBe('success')
+      expect(content.title).toBe('Vehicle confirmed')
+    })
+
+    it('renders Arabic content with the same plate and vehicle name', () => {
+      const content = getExtensionNotificationContent('plate_confirmed', 'ar', payload)
+      expect(content.message).toContain('BLS-NEW-9001')
+      expect(content.message).toContain('Nissan Sentra')
+      expect(content.title).toBe('تم تأكيد المركبة')
+      expect(content.statusTone).toBe('success')
+    })
+
+    it('falls back to a placeholder plate and omits the vehicle name when make/model are missing', () => {
+      const content = getExtensionNotificationContent('plate_confirmed', 'en', { booking_reference: 'BLS-D300AC89' })
+      expect(content.message).toContain('—')
+      expect(content.message).not.toContain('()')
+    })
+
+    it('omits the vehicle name in Arabic too when make/model are missing, without throwing', () => {
+      const content = getExtensionNotificationContent('plate_confirmed', 'ar', {})
+      expect(content.message).toContain('—')
+      expect(content.message).not.toContain('()')
+    })
+
+    it('only shows the vehicle name when both make and model are present', () => {
+      const makeOnly = getExtensionNotificationContent('plate_confirmed', 'en', { plate_number: 'BLS-X-1', make: 'Nissan' })
+      expect(makeOnly.message).not.toContain('Nissan')
+
+      const modelOnly = getExtensionNotificationContent('plate_confirmed', 'en', { plate_number: 'BLS-X-1', model: 'Sentra' })
+      expect(modelOnly.message).not.toContain('Sentra')
     })
   })
 })

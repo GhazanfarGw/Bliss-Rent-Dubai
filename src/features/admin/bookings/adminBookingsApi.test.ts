@@ -15,9 +15,15 @@ vi.mock('@/lib/supabaseClient', () => ({
   },
 }))
 
-const { fetchBookings, fetchBookingById, adminCancelBooking, adminStartRental, adminMarkReturned, fetchDriverDocumentUrl } = await import(
-  './adminBookingsApi'
-)
+const {
+  fetchBookings,
+  fetchBookingById,
+  adminCancelBooking,
+  adminStartRental,
+  adminMarkReturned,
+  adminConfirmBookingVehicle,
+  fetchDriverDocumentUrl,
+} = await import('./adminBookingsApi')
 
 describe('adminBookingsApi', () => {
   beforeEach(() => {
@@ -126,6 +132,75 @@ describe('adminBookingsApi', () => {
     it('raises AdminApiError for an illegal transition', async () => {
       rpcMock.mockResolvedValue({ data: null, error: { message: 'Only an active rental can be marked as returned (current status: completed).' } })
       await expect(adminMarkReturned('b1')).rejects.toThrow(/only an active rental/i)
+    })
+  })
+
+  // -------------------------------------------------------------------
+  // Phase 14 — admin_confirm_booking_vehicle RPC wrapper. Covers both the
+  // NEW-plate (new physical vehicle, inventory +1) and EXISTING-plate
+  // (repoint onto an already-real vehicle) result shapes the RPC can
+  // return, plus the best-effort plate_confirmed notification dispatch.
+  // -------------------------------------------------------------------
+
+  describe('adminConfirmBookingVehicle', () => {
+    it('calls the admin_confirm_booking_vehicle RPC with a trimmed plate and note', async () => {
+      rpcMock.mockResolvedValue({
+        data: [{ booking_id: 'b1', vehicle_id: 'v-new', plate_number: 'DXB-A-12345', is_new_physical_vehicle: true, changed: true }],
+        error: null,
+      })
+      const result = await adminConfirmBookingVehicle('b1', '  dxb-a-12345  ', '  ready for pickup  ')
+      expect(rpcMock).toHaveBeenCalledWith('admin_confirm_booking_vehicle', {
+        p_booking_id: 'b1',
+        p_plate_number: 'dxb-a-12345',
+        p_note: 'ready for pickup',
+      })
+      expect(result).toEqual({
+        bookingId: 'b1',
+        vehicleId: 'v-new',
+        plateNumber: 'DXB-A-12345',
+        isNewPhysicalVehicle: true,
+        changed: true,
+      })
+    })
+
+    it('reports an existing-vehicle reuse result (is_new_physical_vehicle: false) without creating inventory', async () => {
+      rpcMock.mockResolvedValue({
+        data: [{ booking_id: 'b1', vehicle_id: 'v-existing', plate_number: 'DXB-A-99999', is_new_physical_vehicle: false, changed: true }],
+        error: null,
+      })
+      const result = await adminConfirmBookingVehicle('b1', 'DXB-A-99999')
+      expect(result.isNewPhysicalVehicle).toBe(false)
+      expect(result.vehicleId).toBe('v-existing')
+    })
+
+    it('raises AdminApiError and never triggers notifications when the RPC fails (e.g. plate conflict)', async () => {
+      rpcMock.mockResolvedValue({ data: null, error: { message: 'That plate is already assigned to an overlapping booking.' } })
+      await expect(adminConfirmBookingVehicle('b1', 'DXB-A-1')).rejects.toThrow(/already assigned to an overlapping booking/i)
+      expect(functionsInvokeMock).not.toHaveBeenCalled()
+    })
+
+    it('raises AdminApiError when the RPC returns no row', async () => {
+      rpcMock.mockResolvedValue({ data: [], error: null })
+      await expect(adminConfirmBookingVehicle('b1', 'DXB-A-1')).rejects.toThrow(/no result/i)
+    })
+
+    it('triggers the plate_confirmed notification delivery after a successful confirm', async () => {
+      rpcMock.mockResolvedValue({
+        data: [{ booking_id: 'b1', vehicle_id: 'v1', plate_number: 'DXB-A-1', is_new_physical_vehicle: true, changed: true }],
+        error: null,
+      })
+      await adminConfirmBookingVehicle('b1', 'DXB-A-1')
+      expect(functionsInvokeMock).toHaveBeenCalledWith('deliver-plate-confirmation-notifications', { body: { bookingId: 'b1' } })
+    })
+
+    it('does not throw, and still returns the result, when the notification dispatch fails or rejects', async () => {
+      rpcMock.mockResolvedValue({
+        data: [{ booking_id: 'b1', vehicle_id: 'v1', plate_number: 'DXB-A-1', is_new_physical_vehicle: true, changed: true }],
+        error: null,
+      })
+      functionsInvokeMock.mockRejectedValue(new Error('network error'))
+      const result = await adminConfirmBookingVehicle('b1', 'DXB-A-1')
+      expect(result.bookingId).toBe('b1')
     })
   })
 

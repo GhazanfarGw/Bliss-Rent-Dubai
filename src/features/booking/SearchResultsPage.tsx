@@ -9,7 +9,9 @@ import { searchVehiclesWithAvailability, fetchAllAvailableVehicles, fetchLocatio
 import { criteriaToSearchParams, isCompleteCriteria, searchParamsToCriteria } from '@/features/booking/searchParams'
 import { validateDateRange, rentalDays } from '@/lib/dateRange'
 import { applyFilters, distinctBrands, distinctCategories, distinctTransmissions, sortByPrice } from '@/lib/vehicleFilters'
+import { groupPublicVehicles } from '@/lib/vehicleGrouping'
 import { EMPTY_FILTERS } from '@/types/domain'
+import { useDocumentTitle } from '@/lib/useDocumentTitle'
 import type { Location, SearchCriteria, SortOption, VehicleFilters, VehicleSearchResult } from '@/types/domain'
 
 type LoadState =
@@ -20,6 +22,7 @@ type LoadState =
 
 export function SearchResultsPage() {
   const { t, i18n } = useTranslation()
+  useDocumentTitle(t('searchResults.title'))
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
 
@@ -92,6 +95,13 @@ export function SearchResultsPage() {
     return sortByPrice(filtered, sort, days)
   }, [state, filters, sort, days])
 
+  // Task 1 — collapse same Make + Model + Year master listings into one
+  // card with a combined quantity; listings missing a valid price/image
+  // never render at all (see groupPublicVehicles). Grouped AFTER
+  // filter/sort so the sidebar filters and price sort keep working on
+  // the full, ungrouped fleet exactly as before.
+  const groupedVehicles = useMemo(() => groupPublicVehicles(filteredSorted), [filteredSorted])
+
   function handleSearch(next: SearchCriteria) {
     navigate({ pathname: '/search', search: criteriaToSearchParams(next).toString() })
   }
@@ -104,13 +114,13 @@ export function SearchResultsPage() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-      <section className="overflow-hidden rounded-[28px] border border-brand-gold/25 bg-[radial-gradient(circle_at_top,#1a1f2a_0%,#11161d_45%,#0b0e12_100%)] px-5 py-7 text-white shadow-[0_30px_80px_rgba(13,16,19,0.38)] sm:px-8 sm:py-9">
+      <section className="overflow-hidden bg-brand-gold px-5 py-7 text-white shadow-[0_30px_80px_rgba(13,16,19,0.38)] sm:px-8 sm:py-9">
         <div className="flex flex-wrap items-start justify-between gap-5">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-gold-light">{t('common.dubaiOnly')}</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white">{t('common.dubaiOnly')}</p>
             <h1 className="mt-2 text-2xl font-semibold tracking-[-0.04em] text-white sm:text-3xl">{t('searchResults.heroTitle')}</h1>
           </div>
-          {complete && <button type="button" onClick={() => setEditingSearch((current) => !current)} aria-expanded={editingSearch} className="inline-flex min-h-11 items-center rounded-none border border-brand-gold-light/40 bg-white/5 px-4 text-sm font-semibold text-white transition-all duration-200 hover:border-brand-gold-light hover:bg-brand-gold-light/10 focus:outline-none focus:ring-2 focus:ring-brand-gold">{t('searchResults.editSearch')}</button>}
+          {complete && <button type="button" onClick={() => setEditingSearch((current) => !current)} aria-expanded={editingSearch} className="inline-flex min-h-11 items-center border border-brand-gold-light/40 bg-white/5 px-4 text-sm font-semibold text-white transition-all duration-200 hover:border-brand-gold-light hover:bg-brand-gold-light/10 focus:outline-none focus:ring-2 focus:ring-brand-gold">{t('searchResults.editSearch')}</button>}
         </div>
         {complete && (
           <div className="mt-7 grid gap-3 text-sm sm:grid-cols-3">
@@ -165,16 +175,16 @@ export function SearchResultsPage() {
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-gold-dark">{t('searchResults.resultsEyebrow')}</p>
                 <h2 className="mt-1 text-xl font-semibold tracking-[-0.04em] text-brand-navy sm:text-2xl">{t('searchResults.title')}</h2>
               </div>
-              <p className="text-sm font-medium text-text-muted" aria-live="polite">{t('searchResults.resultsCount', { count: filteredSorted.length })}</p>
+              <p className="text-sm font-medium text-text-muted" aria-live="polite">{t('searchResults.resultsCount', { count: groupedVehicles.length })}</p>
             </div>
             <div className="lg:grid lg:grid-cols-[260px_minmax(0,1fr)] lg:items-start lg:gap-8">
-              <FilterBar categories={distinctCategories(state.vehicles)} brands={distinctBrands(state.vehicles)} transmissions={distinctTransmissions(state.vehicles)} filters={filters} sort={sort} resultCount={filteredSorted.length} onFiltersChange={setFilters} onSortChange={setSort} showAvailabilityFilter={hasDates} />
+              <FilterBar categories={distinctCategories(state.vehicles)} brands={distinctBrands(state.vehicles)} transmissions={distinctTransmissions(state.vehicles)} filters={filters} sort={sort} resultCount={groupedVehicles.length} onFiltersChange={setFilters} onSortChange={setSort} showAvailabilityFilter={hasDates} />
               <div className="mt-5 lg:mt-0">
-                {filteredSorted.length === 0 ? (
+                {groupedVehicles.length === 0 ? (
                   <StateMessage title={t('searchResults.noVehiclesTitle')} body={t('searchResults.filterZeroBody')} action={<button type="button" onClick={() => setFilters(EMPTY_FILTERS)} className="min-h-11 rounded-none bg-brand-gold px-4 text-sm font-semibold text-white shadow-[0_12px_24px_rgba(92,9,49,0.2)]">{t('searchResults.filters.clear')}</button>} />
                 ) : (
                   <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
-                    {filteredSorted.map((vehicle) => <VehicleCard key={vehicle.id} vehicle={vehicle} days={hasDates ? days : undefined} detailHref={`/vehicles/${vehicle.id}?${searchParams.toString()}`} isAvailable={vehicle.isAvailable} />)}
+                    {groupedVehicles.map(({ vehicle, quantity }) => <VehicleCard key={vehicle.id} vehicle={vehicle} days={hasDates ? days : undefined} detailHref={`/vehicles/${vehicle.id}?${searchParams.toString()}`} isAvailable={vehicle.isAvailable} quantity={quantity} />)}
                   </div>
                 )}
               </div>

@@ -21,6 +21,7 @@ export async function fetchCategories(): Promise<CategoryRow[]> {
  * PostgREST, not because the classification logic lives in this file
  * (it doesn't; the view is the single source of truth for that).
  */
+
 export async function fetchVehicles(): Promise<AdminVehicleWithDetails[]> {
   const [vehiclesRes, statusRes] = await Promise.all([
     supabase.from('vehicles').select(VEHICLE_SELECT).order('make').order('model'),
@@ -62,6 +63,14 @@ function draftToRow(draft: VehicleDraft): Omit<VehicleRow, 'id' | 'created_at'> 
     seats: Number(draft.seats),
     plate_number: draft.plateNumber.trim(),
     status: draft.status,
+    // Phase 14 — every vehicle created through this Add/Edit Vehicle admin
+    // UI is a real physical car with its own real plate, i.e. a master
+    // listing (is_master_listing = true, the column's own DB default and
+    // the correct value for every vehicle that isn't a booking-specific
+    // Reserved copy — Reserved copies are only ever created by
+    // create_booking() itself, never through this form).
+    is_master_listing: true,
+    master_vehicle_id: null,
   }
 }
 

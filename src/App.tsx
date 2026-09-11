@@ -19,6 +19,7 @@ import { ContactPage } from '@/features/content/ContactPage'
 import { PrivacyPolicyPage } from '@/features/content/PrivacyPolicyPage'
 import { CookiePolicyPage } from '@/features/content/CookiePolicyPage'
 import { BookingTermsPage } from '@/features/content/BookingTermsPage'
+import { NotFoundPage } from '@/features/content/NotFoundPage'
 import { AdminAuthProvider } from '@/features/admin/AdminAuthContext'
 import { AdminRoute } from '@/features/admin/AdminRoute'
 import { SuperAdminRoute } from '@/features/admin/SuperAdminRoute'
@@ -96,6 +97,14 @@ import { AdminSettingsPage } from '@/features/admin/settings/AdminSettingsPage'
  * from /search's own compact edit bar — reusing SearchWidget's exact
  * state, validation, and `onSearch` → /search flow via a new `card`
  * layout variant, no new booking logic anywhere.
+ *
+ * Proactive gap fix (no prior route existed for this at all): a
+ * `path="*"` catch-all inside the public Layout group renders
+ * NotFoundPage for any unmatched customer-facing URL — before this, an
+ * unknown URL silently rendered a blank content area inside the header/
+ * footer chrome. The admin section gets its own `path="*"` → redirect to
+ * `/admin` (the dashboard), matching how an internal tool should recover
+ * from a stale/mistyped admin URL.
  */
 function App() {
   return (
@@ -123,6 +132,7 @@ function App() {
               <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
               <Route path="/cookie-policy" element={<CookiePolicyPage />} />
               <Route path="/booking-terms" element={<BookingTermsPage />} />
+              <Route path="*" element={<NotFoundPage />} />
             </Route>
 
             <Route path="/admin/login" element={<AdminLoginPage />} />
@@ -167,6 +177,7 @@ function App() {
                 }
               />
               <Route path="settings" element={<AdminSettingsPage />} />
+              <Route path="*" element={<Navigate to="/admin" replace />} />
             </Route>
           </Routes>
         </RouteNavigationShell>

@@ -28,8 +28,16 @@ export interface SendEmailResult {
 
 export interface ResendConfig {
   apiKey: string
-  /** e.g. "Bliss Rent <noreply@bliss.rent>" */
+  /** e.g. "Bliss Rent <booking@bliss.rent>" */
   fromAddress: string
+  /**
+   * Phase 9N — optional Reply-To address. When set, a reply lands in a
+   * real monitored inbox (e.g. support@bliss.rent) instead of the
+   * automated sending address. Omitted entirely from the Resend request
+   * when not provided, so this is fully backward-compatible with every
+   * existing call site and test.
+   */
+  replyTo?: string
 }
 
 export type FetchLike = (url: string, init?: RequestInit) => Promise<Response>
@@ -55,6 +63,7 @@ export async function sendViaResend(
         to: params.to,
         subject: params.subject,
         html: params.html,
+        ...(config.replyTo ? { reply_to: [config.replyTo] } : {}),
       }),
     })
 

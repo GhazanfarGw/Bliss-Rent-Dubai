@@ -5,6 +5,7 @@ import { Menu } from 'lucide-react'
 import { useAdminAuth } from '@/features/admin/AdminAuthContext'
 import { LanguageSwitcher } from '@/features/shared/LanguageSwitcher'
 import { fetchPendingBookingsCount } from '@/features/admin/bookings/adminBookingsApi'
+import logoMark from '@/assets/brand/logo-mark.png'
 
 /** How often the sidebar re-checks the pending-bookings count for its workload badge. */
 const PENDING_COUNT_POLL_MS = 60_000
@@ -145,9 +146,7 @@ function SidebarContent({
   return (
     <>
       <div className="flex h-16 items-center gap-2 border-b border-brand-navy/10 px-5">
-        <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-navy text-xs font-bold text-white">
-          BR
-        </span>
+        <img src={logoMark} alt="Bliss Rent Dubai" className="h-8 w-auto" />
         <div>
           <p className="text-sm font-semibold leading-tight text-brand-navy">{t('nav.brand')}</p>
           <p className="text-[11px] leading-tight text-text-muted">{t('admin.nav.title')}</p>

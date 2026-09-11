@@ -1,17 +1,21 @@
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Cog, Users } from 'lucide-react'
+import { ArrowRight, Cog, MessageCircle, Users } from 'lucide-react'
 import type { VehicleWithDetails } from '@/types/domain'
 import type { PricingTerm } from '@/types/database'
 import { primaryImage } from '@/lib/vehicleImages'
 import { quoteForDays, cheapestHeadlineRate } from '@/lib/pricing'
 import { VehiclePhoto } from '@/features/booking/VehiclePhoto'
+import { whatsappUrlForVehicle } from '@/features/booking/contactLinks'
 
 interface VehicleCardProps {
   vehicle: VehicleWithDetails
   /** Rental length in days, when the customer already has dates selected (search results). */
   days?: number
   detailHref: string
+  /** Featured homepage cards use a focused hover CTA; search cards retain
+   * the full persistent action row. */
+  featured?: boolean
   /**
    * Only set on dated search results (see VehicleSearchResult) — `false`
    * means this vehicle has an overlapping booking for the searched dates.
@@ -19,6 +23,15 @@ interface VehicleCardProps {
    * instead of a bookable price.
    */
   isAvailable?: boolean
+  /**
+   * Task 1 (2026-09-11 scoped update) — set when this card represents a
+   * group of identical master listings (same Make + Model + Year, each
+   * with a valid price and image — see groupPublicVehicles in
+   * src/lib/vehicleGrouping.ts). Omitted (or 1) renders exactly as
+   * before; 2+ shows a small "x N available" quantity badge, the only
+   * card-design change this task makes.
+   */
+  quantity?: number
 }
 
 /** Translated (not hardcoded) per-term unit labels — see vehicleCard.* in en.ts/ar.ts. */
@@ -29,7 +42,7 @@ const TERM_I18N_KEY: Record<PricingTerm, string> = {
   '3_month': 'vehicleCard.per3Months',
 }
 
-export function VehicleCard({ vehicle, days, detailHref, isAvailable }: VehicleCardProps) {
+export function VehicleCard({ vehicle, days, detailHref, isAvailable, featured = false, quantity }: VehicleCardProps) {
   const { t } = useTranslation()
   const image = primaryImage(vehicle)
   const reserved = isAvailable === false
@@ -42,7 +55,7 @@ export function VehicleCard({ vehicle, days, detailHref, isAvailable }: VehicleC
   return (
     <div
       className={
-        'group flex flex-col self-start overflow-hidden rounded-none border bg-white shadow-none ring-1 ring-transparent transition-all duration-200 hover:-translate-y-1 hover:border-brand-gold/60 ' +
+        'group relative flex flex-col self-start overflow-hidden rounded-none border bg-white shadow-none ring-1 ring-transparent transition-all duration-200 hover:-translate-y-1 hover:border-brand-gold/60 ' +
         (reserved ? 'border-warning/40' : 'border-brand-navy/10')
       }
     >
@@ -57,12 +70,27 @@ export function VehicleCard({ vehicle, days, detailHref, isAvailable }: VehicleC
             {t('vehicleCard.reserved')}
           </span>
         )}
-        {!reserved && (
+        {!reserved && !featured && (
           <span className="absolute start-3 top-3 rounded-none bg-white/90 px-3 py-1.5 text-xs font-semibold text-brand-navy shadow-none">
             {t('vehicleCard.available')}
           </span>
         )}
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-20 opacity-0 transition-opacity group-hover:opacity-100" />
+        {!reserved && featured && vehicle.vehicle_categories && (
+          <span className="absolute start-3 top-3 rounded bg-white/90 px-2.5 py-1.5 text-[11px] font-semibold text-brand-gold">
+            {vehicle.vehicle_categories.name}
+          </span>
+        )}
+        <a
+          href={whatsappUrlForVehicle(`${vehicle.make} ${vehicle.model} ${vehicle.model_year}`)}
+          target="_blank"
+          rel="noreferrer"
+          aria-label={t('vehicleCard.whatsapp')}
+          title={t('vehicleCard.whatsapp')}
+          onClick={(e) => e.stopPropagation()}
+          className="absolute end-3 bottom-3 z-10 inline-flex h-9 w-9 items-center justify-center rounded-full bg-success text-white shadow-md transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white"
+        >
+          <MessageCircle className="h-4 w-4" aria-hidden="true" />
+        </a>
       </div>
 
       <div className="flex flex-col p-4">
@@ -72,7 +100,14 @@ export function VehicleCard({ vehicle, days, detailHref, isAvailable }: VehicleC
             <h3 className="mt-1 text-lg font-semibold leading-tight text-brand-navy">
               {vehicle.make} {vehicle.model}
             </h3>
-            <p className="mt-1 text-xs text-text-muted">{vehicle.model_year}</p>
+            <p className="mt-1 text-xs text-text-muted">
+              {vehicle.model_year}
+              {quantity != null && quantity > 1 && (
+                <span className="ms-2 inline-flex items-center rounded-full bg-brand-navy/8 px-2 py-0.5 text-[11px] font-semibold text-brand-navy">
+                  {t('vehicleCard.quantityAvailable', { count: quantity })}
+                </span>
+              )}
+            </p>
           </div>
           {!reserved && vehicle.vehicle_categories && (
             <span className="shrink-0 rounded-none bg-brand-gold/10 px-2.5 py-1 text-[11px] font-medium text-brand-navy">
@@ -119,7 +154,7 @@ export function VehicleCard({ vehicle, days, detailHref, isAvailable }: VehicleC
               <p className="text-xs font-medium text-text-muted">{t('vehicleCard.pricingSoon')}</p>
             )}
           </div>
-          <div className="grid grid-cols-2 gap-2">
+          {!featured && <div className="grid grid-cols-2 gap-2">
             <Link
               to={detailHref}
               className="inline-flex min-h-11 items-center justify-center rounded-none bg-brand-gold px-3 py-2 text-xs font-semibold text-white shadow-none transition-all hover:brightness-105 focus:outline-none focus:ring-2 focus:ring-brand-gold focus:ring-offset-2"
@@ -134,9 +169,21 @@ export function VehicleCard({ vehicle, days, detailHref, isAvailable }: VehicleC
                 {t('vehicleCard.viewDetails')}
               </Link>
             )}
-          </div>
+          </div>}
         </div>
       </div>
+      {featured && !reserved && (
+        <>
+          <div className="pointer-events-none absolute inset-0 z-10 bg-brand-navy/75 opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-focus-within:opacity-100" />
+          <Link
+            to={detailHref}
+            className="absolute inset-x-10 top-1/2 z-20 inline-flex min-h-11 -translate-y-1/2 items-center justify-center gap-3 rounded-lg border border-brand-champagne bg-brand-gold px-4 py-3 text-sm font-semibold text-white opacity-0 shadow-[0_12px_28px_rgba(11,19,43,0.3)] transition-opacity duration-200 group-hover:opacity-100 group-focus-within:opacity-100 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-brand-navy"
+          >
+            {t('vehicleCard.bookNow')}
+            <ArrowRight className="h-4 w-4 rtl:rotate-180" aria-hidden="true" />
+          </Link>
+        </>
+      )}
     </div>
   )
 }

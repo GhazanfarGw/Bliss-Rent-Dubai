@@ -21,7 +21,7 @@ const economyVehicle: VehicleWithDetails = {
   status: 'available',
   created_at: '2026-01-01T00:00:00Z',
   vehicle_categories: { id: 'cat-eco', name: 'Economy', description: null },
-  vehicle_images: [],
+  vehicle_images: [{ id: 'img-eco-1', vehicle_id: 'veh-eco-1', storage_path: 'veh-eco-1/main.jpg', is_primary: true, sort_order: 0 }],
   pricing: [
     { id: 'p1', vehicle_id: 'veh-eco-1', term: 'daily', list_price: 200, client_price: 180, currency: 'AED' },
   ],
@@ -39,7 +39,7 @@ const luxuryVehicle: VehicleWithDetails = {
   status: 'available',
   created_at: '2026-09-01T00:00:00Z',
   vehicle_categories: { id: 'cat-lux', name: 'Luxury', description: null },
-  vehicle_images: [],
+  vehicle_images: [{ id: 'img-lux-1', vehicle_id: 'veh-lux-1', storage_path: 'veh-lux-1/main.jpg', is_primary: true, sort_order: 0 }],
   pricing: [
     { id: 'p2', vehicle_id: 'veh-lux-1', term: 'daily', list_price: 7000, client_price: 5350, currency: 'AED' },
   ],

@@ -128,6 +128,68 @@ export async function adminConfirmBookingPayment(bookingId: string, note?: strin
   if (error) throw new AdminApiError(error.message)
 }
 
+export interface AdminConfirmBookingVehicleResult {
+  bookingId: string
+  vehicleId: string
+  plateNumber: string
+  isNewPhysicalVehicle: boolean
+  changed: boolean
+}
+
+/**
+ * Phase 14 — Super-Admin-only. Confirms the real plate for a booking's
+ * Reserved copy (see admin_confirm_booking_vehicle RPC,
+ * supabase/migrations/20261001000000_phase14_reserved_vehicle_copies.sql):
+ * a NEW plate turns the Reserved copy into a new physical vehicle
+ * (inventory +1); an EXISTING plate atomically repoints the booking onto
+ * that existing physical vehicle (after re-checking the date range is
+ * still free) and retires the temporary Reserved copy — Decision 1's
+ * "one real physical vehicle, one real plate" rule, reusing the same
+ * conflict-safe pattern as Phase 7 vehicle reassignment.
+ *
+ * After the RPC succeeds, best-effort (never throwing) triggers the
+ * plate_confirmed customer email + WhatsApp dispatch — same
+ * fire-and-forget convention as adminCancelBooking's emails above and
+ * adminExtensionsApi.ts's triggerExtensionNotificationEmails. A failure
+ * here never rolls back or hides the already-committed plate
+ * confirmation; it's just logged, since the notification record was
+ * already durably written by the RPC and can be redelivered later.
+ */
+export async function adminConfirmBookingVehicle(
+  bookingId: string,
+  plateNumber: string,
+  note?: string,
+): Promise<AdminConfirmBookingVehicleResult> {
+  const { data, error } = await supabase.rpc('admin_confirm_booking_vehicle', {
+    p_booking_id: bookingId,
+    p_plate_number: plateNumber.trim(),
+    p_note: note?.trim() ? note.trim() : null,
+  })
+  if (error) throw new AdminApiError(error.message)
+
+  const row = Array.isArray(data) ? data[0] : data
+  if (!row) throw new AdminApiError('admin_confirm_booking_vehicle returned no result.')
+
+  try {
+    const { error: notifyError } = await supabase.functions.invoke('deliver-plate-confirmation-notifications', {
+      body: { bookingId },
+    })
+    if (notifyError) {
+      console.error('deliver-plate-confirmation-notifications failed', notifyError)
+    }
+  } catch (err) {
+    console.error('deliver-plate-confirmation-notifications failed', err)
+  }
+
+  return {
+    bookingId: row.booking_id,
+    vehicleId: row.vehicle_id,
+    plateNumber: row.plate_number,
+    isNewPhysicalVehicle: row.is_new_physical_vehicle,
+    changed: row.changed,
+  }
+}
+
 /** Signed, short-lived URL for a private driver document. Never a public URL — see the driver-documents storage policy (admin read-only). */
 export async function fetchDriverDocumentUrl(path: string): Promise<string> {
   const { data, error } = await supabase.storage.from('driver-documents').createSignedUrl(path, 60)

@@ -232,12 +232,12 @@ export function DateRangePicker({ startDate, endDate, onChange, todayIso, row = 
         }
       >
         {row ? (
-          <span className="flex items-center gap-2 px-1 py-0.5">
-            <span className="ltr-nums font-medium">
+          <span className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 px-1 py-0.5">
+            <span className="ltr-nums min-w-0 font-medium">
               {startDate ? formatShortDate(startDate, i18n.language) : t('searchWidget.calendar.pickup')}
             </span>
             <ArrowIcon className="h-3.5 w-3.5 shrink-0 text-text-muted rtl:rotate-180" />
-            <span className="ltr-nums font-medium">
+            <span className="ltr-nums min-w-0 font-medium">
               {endDate ? formatShortDate(endDate, i18n.language) : t('searchWidget.calendar.return')}
             </span>
             {daysLabel && <span className="ms-1 rounded-full bg-brand-lavender/60 px-2 py-0.5 text-xs font-semibold text-brand-navy">{daysLabel}</span>}

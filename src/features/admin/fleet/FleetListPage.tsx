@@ -69,7 +69,7 @@ export function FleetListPage() {
         action={
           <Link
             to="/admin/fleet/new"
-            className="inline-flex items-center rounded-lg bg-brand-gold px-4 py-2 text-sm font-semibold text-white hover:bg-brand-gold-light"
+            className="inline-flex items-center bg-brand-gold px-4 py-2 text-sm font-semibold text-white hover:bg-brand-gold-light"
           >
             {t('admin.fleet.addVehicle')}
           </Link>

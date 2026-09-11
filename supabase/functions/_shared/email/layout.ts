@@ -83,7 +83,7 @@ ${renderHeader(props.language)}
   </td>
 </tr>
 ${renderStatusBanner(props.statusTone, props.statusMessage, props.language)}
-${renderBookingSummaryCard(props.summary, props.language)}
+${props.summary ? renderBookingSummaryCard(props.summary, props.language) : ''}
 ${props.extraContentHtml ?? ''}
 ${renderCtaButton(props.ctaUrl, ctaLabel, props.language)}
 ${renderFooter(props.language)}`

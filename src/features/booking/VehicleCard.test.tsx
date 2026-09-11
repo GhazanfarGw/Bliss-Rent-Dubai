@@ -42,4 +42,28 @@ describe('VehicleCard', () => {
     expect(screen.queryByRole('link', { name: /book now/i })).not.toBeInTheDocument()
     expect(screen.getByRole('link', { name: /view details/i })).toBeInTheDocument()
   })
+
+  it('always offers a direct WhatsApp contact link, using the centralized contact number', () => {
+    renderCard()
+
+    const whatsappLink = screen.getByRole('link', { name: /whatsapp/i })
+    expect(whatsappLink).toHaveAttribute('href', expect.stringContaining('https://wa.me/971547820057'))
+    expect(whatsappLink).toHaveAttribute('target', '_blank')
+  })
+
+  it('shows a quantity badge when this card represents a group of identical master listings', () => {
+    render(
+      <MemoryRouter>
+        <VehicleCard vehicle={vehicle} days={7} detailHref="/vehicles/vehicle-1" isAvailable quantity={4} />
+      </MemoryRouter>,
+    )
+
+    expect(screen.getByText('4 available')).toBeInTheDocument()
+  })
+
+  it('shows no quantity badge for a single (non-grouped) listing', () => {
+    renderCard()
+
+    expect(screen.queryByText(/available$/)).not.toBeInTheDocument()
+  })
 })

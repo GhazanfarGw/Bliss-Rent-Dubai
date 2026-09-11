@@ -234,21 +234,22 @@ describe('checkoutStorage — resumePendingBookingFromLookup (Manage Booking →
     expect(readPendingBookingIndicator()?.bookingReference).toBe('BLS-E16F5DC3')
   })
 
-  it('pre-fills the customer name into the checkout draft, without inventing driver/email/phone data', () => {
+  it('pre-fills the customer name (split first/last, best-effort) into the checkout draft, without inventing driver/email/phone data', () => {
     resumePendingBookingFromLookup(lookupResult)
     const draft = JSON.parse(sessionStorage.getItem('dxb-checkout:veh-1') ?? 'null')
-    expect(draft.customer.fullName).toBe('Ghazanfar Abbas')
+    expect(draft.customer.firstName).toBe('Ghazanfar')
+    expect(draft.customer.lastName).toBe('Abbas')
     expect(draft.customer.email).toBe('')
-    expect(draft.driver.fullName).toBe('')
+    expect(draft.driver.firstName).toBe('')
   })
 
   it('never overwrites a draft that already exists in this browser', () => {
     sessionStorage.setItem(
       'dxb-checkout:veh-1',
-      JSON.stringify({ vehicleId: 'veh-1', criteria, customer: { fullName: 'Existing Guest', email: 'a@b.com', phone: '' }, driver: { fullName: '', dateOfBirth: '', licenseNumber: '', licenseCountry: '', licenseExpiry: '' } }),
+      JSON.stringify({ vehicleId: 'veh-1', criteria, customer: { firstName: 'Existing', lastName: 'Guest', email: 'a@b.com', phone: '' }, driver: { isSameAsCustomer: true, firstName: '', lastName: '', phone: '', licenseNumber: '', licenseCountry: '', licenseExpiry: '' } }),
     )
     resumePendingBookingFromLookup(lookupResult)
     const draft = JSON.parse(sessionStorage.getItem('dxb-checkout:veh-1') ?? 'null')
-    expect(draft.customer.fullName).toBe('Existing Guest')
+    expect(draft.customer.firstName).toBe('Existing')
   })
 })

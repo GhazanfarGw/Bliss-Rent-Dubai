@@ -1,5 +1,5 @@
 import { describe, it, expect, afterEach, vi } from 'vitest'
-import { render, screen, fireEvent, act } from '@testing-library/react'
+import { render, screen, fireEvent, act, within } from '@testing-library/react'
 import { MemoryRouter, Routes, Route, useNavigate } from 'react-router-dom'
 import i18n from '@/i18n'
 import { NavBar } from '@/features/shared/NavBar'
@@ -62,26 +62,30 @@ describe('NavBar', () => {
 
     fireEvent.click(toggle)
     expect(toggle).toHaveAttribute('aria-expanded', 'true')
-    // Now two sets of the same links exist (desktop nav is hidden by CSS,
-    // but still in the DOM, plus the mobile drawer) — assert the drawer
-    // itself renders a Home link.
-    expect(screen.getAllByRole('link', { name: 'Home' }).length).toBeGreaterThanOrEqual(2)
+    const drawer = screen.getAllByRole('navigation').at(-1) as HTMLElement
+    expect(within(drawer).getByRole('link', { name: /Home.*Back to homepage/i })).toHaveAttribute('href', '/')
 
     fireEvent.click(toggle)
     expect(toggle).toHaveAttribute('aria-expanded', 'false')
   })
 
-  it('hides while scrolling down and returns while scrolling up', () => {
+  it('stays visible while scrolling and switches to the solid state', () => {
     renderNavBar()
     const header = screen.getByRole('banner')
 
+    expect(header.className).toContain('h-[4.5rem]')
+    expect(screen.getAllByRole('img', { name: 'Bliss Rent Dubai' })[1]).toHaveClass('h-11')
+
     Object.defineProperty(window, 'scrollY', { configurable: true, value: 240 })
     fireEvent.scroll(window)
-    expect(header.className).toContain('-translate-y-full')
+    expect(header.className).not.toContain('-translate-y-full')
+    expect(header.className).toContain('bg-white')
+    expect(header.className).toContain('h-[var(--header-h)]')
+    expect(screen.getAllByRole('img', { name: 'Bliss Rent Dubai' })[1]).toHaveClass('h-9')
 
     Object.defineProperty(window, 'scrollY', { configurable: true, value: 120 })
     fireEvent.scroll(window)
-    expect(header.className).toContain('translate-y-0')
+    expect(header.className).not.toContain('-translate-y-full')
   })
 
   it('switches the interface language, which also flips the document to RTL', async () => {

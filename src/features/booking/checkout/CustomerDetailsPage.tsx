@@ -1,4 +1,4 @@
-import { useState, type FormEvent, type ReactNode } from 'react'
+import { useState, type FormEvent } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useCheckoutContext } from '@/features/booking/checkout/useCheckoutContext'
@@ -6,8 +6,16 @@ import { CheckoutLoadGate } from '@/features/booking/checkout/CheckoutLoadGate'
 import { CheckoutStepLayout } from '@/features/booking/checkout/CheckoutStepLayout'
 import { validateCustomerDraft, type CustomerFieldErrors } from '@/features/booking/checkout/validation'
 import { criteriaToSearchParams } from '@/features/booking/searchParams'
+import { Button, Card, TextField } from '@/features/shared/ui'
 import type { CustomerDraft } from '@/types/domain'
 
+/**
+ * Step 4 — Customer Details (checkout v2, 2026-09-20). Deliberately just
+ * four fields: First Name, Last Name, Email, Phone/WhatsApp — the brief's
+ * own words are "clean and quick to complete, do not ask for unnecessary
+ * information", so nothing else lives here any more (no separate
+ * "optional" phone — it's required, since it's one of only four fields).
+ */
 export function CustomerDetailsPage() {
   const { t } = useTranslation()
   const { id: vehicleId } = useParams<{ id: string }>()
@@ -53,60 +61,60 @@ export function CustomerDetailsPage() {
       pickup={pickup}
       dropoff={dropoff}
     >
-      <form onSubmit={handleSubmit} noValidate className="space-y-4 rounded-2xl border border-brand-navy/10 bg-white p-5">
-        <Field label={t('checkout.customer.fullName')} error={translatedError(errors, 'fullName')}>
-          <input
-            type="text"
-            value={draft.customer.fullName}
-            onChange={(e) => handleChange({ fullName: e.target.value })}
-            className={inputClass}
-            placeholder={t('checkout.customer.fullNamePlaceholder')}
-            autoComplete="name"
-          />
-        </Field>
-        <Field label={t('checkout.customer.email')} error={translatedError(errors, 'email')}>
-          <input
+      <Card>
+        <p className="mb-5 text-sm text-text-muted">{t('checkout.customer.note')}</p>
+        <form onSubmit={handleSubmit} noValidate className="space-y-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <TextField
+              label={t('checkout.customer.firstName')}
+              value={draft.customer.firstName}
+              onChange={(e) => handleChange({ firstName: e.target.value })}
+              placeholder={t('checkout.customer.firstNamePlaceholder')}
+              autoComplete="given-name"
+              error={translatedError(errors, 'firstName')}
+              required
+            />
+            <TextField
+              label={t('checkout.customer.lastName')}
+              value={draft.customer.lastName}
+              onChange={(e) => handleChange({ lastName: e.target.value })}
+              placeholder={t('checkout.customer.lastNamePlaceholder')}
+              autoComplete="family-name"
+              error={translatedError(errors, 'lastName')}
+              required
+            />
+          </div>
+
+          <TextField
+            label={t('checkout.customer.email')}
             type="email"
             value={draft.customer.email}
             onChange={(e) => handleChange({ email: e.target.value })}
-            className={inputClass}
             placeholder="you@example.com"
             autoComplete="email"
+            error={translatedError(errors, 'email')}
+            required
           />
-        </Field>
-        <Field label={t('checkout.customer.phone')} error={translatedError(errors, 'phone')}>
-          <input
+
+          <TextField
+            label={t('checkout.customer.phone')}
             type="tel"
             value={draft.customer.phone}
             onChange={(e) => handleChange({ phone: e.target.value })}
-            className={inputClass}
             placeholder="+971 5X XXX XXXX"
             autoComplete="tel"
+            error={translatedError(errors, 'phone')}
+            hint={t('checkout.customer.phoneHint')}
+            required
           />
-        </Field>
 
-        <p className="text-xs text-text-muted">{t('checkout.customer.note')}</p>
-
-        <button
-          type="submit"
-          className="w-full rounded-lg bg-brand-navy px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-navy-light sm:w-auto"
-        >
-          {t('checkout.customer.continue')}
-        </button>
-      </form>
+          <div className="pt-2">
+            <Button type="submit" fullWidthOnMobile>
+              {t('checkout.customer.continue')}
+            </Button>
+          </div>
+        </form>
+      </Card>
     </CheckoutStepLayout>
   )
 }
-
-function Field({ label, error, children }: { label: string; error?: string; children: ReactNode }) {
-  return (
-    <label className="block">
-      <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-text-muted">{label}</span>
-      {children}
-      {error && <span className="mt-1 block text-xs font-medium text-error">{error}</span>}
-    </label>
-  )
-}
-
-const inputClass =
-  'w-full rounded-lg border border-border bg-white px-3 py-2.5 text-sm text-brand-navy outline-none transition-colors focus:border-brand-navy focus:ring-1 focus:ring-brand-navy'

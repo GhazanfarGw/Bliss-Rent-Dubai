@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type FormEvent, type ReactNode, type RefObject } from 'react'
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { lookupBooking, BookingLookupError } from '@/features/booking/lookupApi'
@@ -8,6 +8,8 @@ import { criteriaToSearchParams } from '@/features/booking/searchParams'
 import { ManageBookingHero } from '@/features/booking/ManageBookingHero'
 import { ManageBookingLookupCard } from '@/features/booking/ManageBookingLookupCard'
 import { Button, StatusBadge } from '@/features/shared/ui'
+import { useDocumentTitle } from '@/lib/useDocumentTitle'
+import { prefersReducedMotion } from '@/lib/motion'
 import type { BookingLookupResult } from '@/types/domain'
 
 type ViewState =
@@ -60,9 +62,23 @@ const EXTENDABLE_STATUSES = new Set(['confirmed', 'active'])
  * (`nav.manageBooking`), so this is reachable from every page's header,
  * not only from an email link or the homepage navigator's Manage
  * Booking tab.
+ *
+ * Frontend UX fix: a successful lookup used to render the result far
+ * below the lookup card with no scroll/focus transition, so a customer
+ * could easily miss that anything happened. `resultSectionRef` below is
+ * scrolled/focused into view any time `state.status` becomes `'found'` —
+ * including the very first render for the `prefetchedResult` handoff
+ * path, since that path already starts in the `'found'` state and this
+ * effect runs after every render, mount included. None of the lookup
+ * logic, RPC call, or booking data itself changed — only where the
+ * user's attention goes once the result exists. `handleSearchAnother`
+ * (wired to the new "Search another booking" action in ResultCard) just
+ * resets the same view state back to `'idle'` and clears the query field
+ * — it does not re-implement or bypass the existing lookup flow.
  */
 export function ManageBookingPage() {
   const { t } = useTranslation()
+  useDocumentTitle(t('manageBooking.title'))
   const [searchParams] = useSearchParams()
   const location = useLocation()
   const prefetchedResult = (location.state as { prefetchedResult?: BookingLookupResult } | null)?.prefetchedResult
@@ -70,6 +86,8 @@ export function ManageBookingPage() {
   const [state, setState] = useState<ViewState>(() =>
     prefetchedResult ? { status: 'found', result: prefetchedResult } : { status: 'idle' },
   )
+  const resultSectionRef = useRef<HTMLDivElement>(null)
+  const lookupSectionRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     // Mirrors the same defensive cleanup handleSubmit does below, for the
@@ -79,6 +97,21 @@ export function ManageBookingPage() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- only ever meant to run once, for the initial prefetched result
   }, [])
+
+  // Make the result the user's primary visible state: scroll/focus to it
+  // the moment a lookup succeeds. Runs after every render where the
+  // status is 'found', so it also covers the initial mount for the
+  // prefetchedResult handoff path (that path starts already 'found').
+  useEffect(() => {
+    if (state.status !== 'found') return
+    const behavior = prefersReducedMotion() ? 'auto' : 'smooth'
+    // jsdom (unit tests) doesn't implement scrollIntoView at all — guard so
+    // the real browser behavior isn't test-only code.
+    if (typeof resultSectionRef.current?.scrollIntoView === 'function') {
+      resultSectionRef.current.scrollIntoView({ behavior, block: 'start' })
+    }
+    resultSectionRef.current?.focus({ preventScroll: true })
+  }, [state.status])
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
@@ -105,21 +138,38 @@ export function ManageBookingPage() {
     }
   }
 
+  function handleSearchAnother() {
+    setState({ status: 'idle' })
+    setQuery('')
+    const behavior = prefersReducedMotion() ? 'auto' : 'smooth'
+    // Wait a tick so the lookup card (always mounted, but scrolled past
+    // once a result is showing) is back in normal flow before scrolling.
+    requestAnimationFrame(() => {
+      if (typeof lookupSectionRef.current?.scrollIntoView === 'function') {
+        lookupSectionRef.current.scrollIntoView({ behavior, block: 'start' })
+      }
+    })
+  }
+
   return (
     <div className="bg-[#f6f3ee]">
       <ManageBookingHero />
 
-      <div className="mx-auto max-w-4xl px-4 pb-14 sm:px-6 lg:px-8">
-        <ManageBookingLookupCard
-          query={query}
-          onQueryChange={setQuery}
-          onSubmit={(e) => void handleSubmit(e)}
-          loading={state.status === 'loading'}
-          notFound={state.status === 'not_found'}
-          errorMessage={state.status === 'error' ? state.message : null}
-        />
+      <div className="mx-auto max-w-4xl px-4 pb-14 sm:px-6 lg:px-8 mt-28 md:32">
+        <div ref={lookupSectionRef} className="scroll-mt-24">
+          <ManageBookingLookupCard
+            query={query}
+            onQueryChange={setQuery}
+            onSubmit={(e) => void handleSubmit(e)}
+            loading={state.status === 'loading'}
+            notFound={state.status === 'not_found'}
+            errorMessage={state.status === 'error' ? state.message : null}
+          />
+        </div>
 
-        {state.status === 'found' && <ResultCard result={state.result} />}
+        {state.status === 'found' && (
+          <ResultCard result={state.result} sectionRef={resultSectionRef} onSearchAnother={handleSearchAnother} />
+        )}
 
         <div className="mt-8 text-center">
           <Link to="/" className="text-sm font-semibold text-brand-navy underline decoration-brand-gold decoration-2 underline-offset-4">
@@ -131,7 +181,15 @@ export function ManageBookingPage() {
   )
 }
 
-function ResultCard({ result }: { result: BookingLookupResult }) {
+function ResultCard({
+  result,
+  sectionRef,
+  onSearchAnother,
+}: {
+  result: BookingLookupResult
+  sectionRef: RefObject<HTMLDivElement | null>
+  onSearchAnother: () => void
+}) {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const canExtend = EXTENDABLE_STATUSES.has(result.bookingStatus)
@@ -152,13 +210,21 @@ function ResultCard({ result }: { result: BookingLookupResult }) {
   }
 
   return (
-    <div className="mt-6 space-y-4 border border-[#ece7df] bg-white p-6 shadow-[0_20px_38px_rgba(18,20,23,0.06)] sm:p-8">
-      <div className="flex items-center justify-between gap-3 border-b border-brand-navy/8 pb-4">
+    <div
+      ref={sectionRef}
+      tabIndex={-1}
+      role="region"
+      aria-label={t('manageBooking.resultLabel')}
+      className="mt-6 scroll-mt-24 space-y-4 border border-[#ece7df] bg-white p-6 shadow-[0_20px_38px_rgba(18,20,23,0.06)] outline-none sm:p-8"
+    >
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-brand-navy/8 pb-4">
         <div>
           <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-brand-gold-dark">{t('manageBooking.resultLabel')}</p>
           <span className="mt-2 block font-mono text-base font-semibold text-brand-navy">{result.bookingReference}</span>
         </div>
-        <StatusBadge status={result.bookingStatus} translationPrefix="admin.status" />
+        <div className="flex items-center gap-3">
+          <StatusBadge status={result.bookingStatus} translationPrefix="admin.status" />
+        </div>
       </div>
       <Row label={t('checkout.confirmation.vehicle')} value={`${result.vehicleMake} ${result.vehicleModel}`} />
       <Row label={t('extendRental.vehicleNumberLabel')} value={result.vehiclePlate} />
@@ -182,8 +248,18 @@ function ResultCard({ result }: { result: BookingLookupResult }) {
           bookingReference={result.bookingReference}
           vehicleNumber={result.vehiclePlate}
           currentReturnDate={result.endDate}
+          vehicleId={result.vehicleId}
+          originalStartDate={result.startDate}
+          currentTotalPrice={result.totalPrice}
+          currency={result.currency}
         />
       )}
+
+      <div className="border-t border-brand-navy/8 pt-4">
+        <Button variant="outline" onClick={onSearchAnother} fullWidthOnMobile>
+          {t('manageBooking.searchAnother')}
+        </Button>
+      </div>
     </div>
   )
 }

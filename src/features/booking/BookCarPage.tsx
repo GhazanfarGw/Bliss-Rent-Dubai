@@ -4,6 +4,7 @@ import { SearchWidget } from '@/features/booking/SearchWidget'
 import { HERO_SLIDE_IMAGES } from '@/features/booking/heroSlides'
 import { criteriaToSearchParams } from '@/features/booking/searchParams'
 import { PageHero } from '@/features/shared/ui/PageHero'
+import { useDocumentTitle } from '@/lib/useDocumentTitle'
 import type { SearchCriteria } from '@/types/domain'
 
 // A different real hero photo than the homepage (index 4) and Manage
@@ -22,6 +23,7 @@ const BOOK_CAR_IMAGE_INDEX = 2
  */
 export function BookCarPage() {
   const { t } = useTranslation()
+  useDocumentTitle(t('bookCar.title'))
   const navigate = useNavigate()
   const image = HERO_SLIDE_IMAGES[BOOK_CAR_IMAGE_INDEX]
 
@@ -39,7 +41,7 @@ export function BookCarPage() {
         subtitle={t('bookCar.subtitle')}
       />
 
-      <div className="mx-auto max-w-3xl px-4 pb-16 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-3xl px-4 pb-16 sm:px-6 lg:px-8 mt-28 md:32">
         <div className="-mt-16 sm:-mt-20">
           <SearchWidget layout="card" onSearch={handleSearch} />
         </div>

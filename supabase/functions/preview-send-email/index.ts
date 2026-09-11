@@ -11,6 +11,7 @@ import { createClient } from 'jsr:@supabase/supabase-js@2'
 import { corsHeaders, jsonResponse } from '../_shared/cors.ts'
 import { handlePreviewSendEmail, PreviewSendError, type PreviewSendRequestBody, type PreviewSendDeps } from './logic.ts'
 import { sendViaResend } from '../_shared/email/resendProvider.ts'
+import { getResendSenderConfig } from '../_shared/email/emailSenderConfig.ts'
 
 Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') {
@@ -51,10 +52,11 @@ Deno.serve(async (req: Request) => {
       testModeRaw: Deno.env.get('TEST_MODE'),
       allowlistRaw: Deno.env.get('TEST_EMAIL_ALLOWLIST'),
     },
-    resendConfig: {
-      apiKey: Deno.env.get('RESEND_API_KEY') ?? '',
-      fromAddress: Deno.env.get('RESEND_FROM_ADDRESS') ?? 'Bliss Rent <noreply@bliss.rent>',
-    },
+    // 'customer' uses the customer sender; 'admin' and 'complaint' both
+    // land in an admin inbox, so both use the admin sender. Falls back to
+    // 'admin' for any unrecognized value — handlePreviewSendEmail below
+    // still does the real category validation and rejects it either way.
+    resendConfig: getResendSenderConfig(body.category === 'customer' ? 'customer' : 'admin', Deno.env),
     sendEmail: sendViaResend,
   }
 

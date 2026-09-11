@@ -35,7 +35,13 @@ export interface CustomerEmailProps {
   message: string
   statusTone: StatusTone
   statusMessage: string
-  summary: BookingSummary
+  /**
+   * Omitted for a customer email that isn't about any one booking — e.g.
+   * Task 3's admin_complaint_reply (2026-09-11), a Contact Us reply that
+   * may not reference a booking at all. Every booking-lifecycle email
+   * (9D-9J, Phase 14) still always supplies this.
+   */
+  summary?: BookingSummary
   /** Absolute URL for the primary CTA (built with buildManageBookingUrl). */
   ctaUrl: string
   /** Defaults to strings.manageBooking when omitted. */

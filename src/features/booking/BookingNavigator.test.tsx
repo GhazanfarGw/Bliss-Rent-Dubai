@@ -49,64 +49,71 @@ describe('BookingNavigator', () => {
     expect(screen.getByText(/check booking status/i)).toBeInTheDocument()
   })
 
-  describe('mobile dropdown', () => {
-    it('is closed by default and opens exactly one menu on click', async () => {
-      const user = userEvent.setup()
+  describe('mobile accordion', () => {
+    it('shows four closed accordion rows by default', () => {
       renderNavigator()
 
       expect(screen.queryByRole('listbox')).not.toBeInTheDocument()
-
-      const trigger = screen.getByRole('button', { name: /booking menu: search cars/i })
-      await user.click(trigger)
-
-      expect(screen.getByRole('listbox', { name: /booking menu/i })).toBeInTheDocument()
-      expect(trigger).toHaveAttribute('aria-expanded', 'true')
-      expect(within(screen.getByRole('listbox')).getAllByRole('option')).toHaveLength(4)
+      const accordionButtons = screen.getAllByRole('button').filter((button) => button.hasAttribute('aria-controls'))
+      expect(accordionButtons).toHaveLength(4)
+      expect(accordionButtons.every((button) => button.getAttribute('aria-expanded') === 'false')).toBe(true)
     })
 
-    it('selecting an option switches the panel and closes the menu automatically', async () => {
+    it('opens and closes a section, with only one panel open at a time', async () => {
       const user = userEvent.setup()
       renderNavigator()
 
-      await user.click(screen.getByRole('button', { name: /booking menu: search cars/i }))
-      await user.click(screen.getByRole('option', { name: /^contact/i }))
+      const searchRow = screen.getAllByRole('button', { name: /^search cars$/i }).find((button) => button.hasAttribute('aria-controls'))
+      const manageRow = screen.getAllByRole('button', { name: /^manage booking$/i }).find((button) => button.hasAttribute('aria-controls'))
+      expect(searchRow).toBeDefined()
+      expect(manageRow).toBeDefined()
 
-      expect(screen.queryByRole('listbox')).not.toBeInTheDocument()
-      expect(screen.getByRole('button', { name: /booking menu: contact/i })).toBeInTheDocument()
+      await user.click(searchRow!)
+      expect(searchRow).toHaveAttribute('aria-expanded', 'true')
+      expect(document.getElementById('booking-panel-search')).toBeInTheDocument()
+
+      await user.click(manageRow!)
+      expect(searchRow).toHaveAttribute('aria-expanded', 'false')
+      expect(manageRow).toHaveAttribute('aria-expanded', 'true')
+      expect(document.getElementById('booking-panel-search')).not.toBeInTheDocument()
+      expect(document.getElementById('booking-panel-manage')).toBeInTheDocument()
+
+      await user.click(manageRow!)
+      expect(manageRow).toHaveAttribute('aria-expanded', 'false')
+    })
+
+    it('opens and closes the Booking Status and Contact panels', async () => {
+      const user = userEvent.setup()
+      renderNavigator()
+
+      const statusRow = screen.getAllByRole('button', { name: /^booking status$/i }).find((button) => button.hasAttribute('aria-controls'))
+      const contactRow = screen.getAllByRole('button', { name: /^contact$/i }).find((button) => button.hasAttribute('aria-controls'))
+      expect(statusRow).toBeDefined()
+      expect(contactRow).toBeDefined()
+
+      await user.click(statusRow!)
+      expect(statusRow).toHaveAttribute('aria-expanded', 'true')
+      expect(document.getElementById('booking-panel-status')).toBeInTheDocument()
+      expect(screen.getByText(/check booking status/i)).toBeInTheDocument()
+
+      await user.click(contactRow!)
+      expect(statusRow).toHaveAttribute('aria-expanded', 'false')
+      expect(contactRow).toHaveAttribute('aria-expanded', 'true')
+      expect(document.getElementById('booking-panel-contact')).toBeInTheDocument()
       expect(screen.getByRole('link', { name: /whatsapp/i })).toBeInTheDocument()
+
+      await user.click(contactRow!)
+      expect(contactRow).toHaveAttribute('aria-expanded', 'false')
     })
 
-    it('closes on Escape without changing the active tab', async () => {
-      const user = userEvent.setup()
-      renderNavigator()
-
-      await user.click(screen.getByRole('button', { name: /booking menu: search cars/i }))
-      expect(screen.getByRole('listbox')).toBeInTheDocument()
-
-      await user.keyboard('{Escape}')
-      expect(screen.queryByRole('listbox')).not.toBeInTheDocument()
-      expect(screen.getByRole('button', { name: /booking menu: search cars/i })).toBeInTheDocument()
-    })
-
-    it('closes when clicking outside the menu', async () => {
-      const user = userEvent.setup()
-      renderNavigator()
-
-      await user.click(screen.getByRole('button', { name: /booking menu: search cars/i }))
-      expect(screen.getByRole('listbox')).toBeInTheDocument()
-
-      await user.click(document.body)
-      expect(screen.queryByRole('listbox')).not.toBeInTheDocument()
-    })
-
-    it('switching tabs from the desktop bar updates the mobile trigger label too', async () => {
+    it('desktop tab selection remains independent from mobile accordion state', async () => {
       const user = userEvent.setup()
       renderNavigator()
       const nav = screen.getByRole('navigation', { name: /booking navigator/i })
 
       await user.click(within(nav).getByRole('button', { name: /manage booking/i }))
 
-      expect(screen.getByRole('button', { name: /booking menu: manage booking/i })).toBeInTheDocument()
+      expect(within(nav).getByRole('button', { name: /manage booking/i })).toHaveAttribute('aria-current', 'page')
     })
   })
 })

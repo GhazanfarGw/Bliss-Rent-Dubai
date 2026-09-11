@@ -2,6 +2,8 @@ import { useState, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { supabase } from '@/lib/supabaseClient'
 import { SectionHeader } from '@/features/shared/ui/SectionHeader'
+import { Button } from '@/features/shared/ui/Button'
+import { useDocumentTitle } from '@/lib/useDocumentTitle'
 
 type FormState = { status: 'idle' | 'sending' | 'sent' }
 
@@ -18,6 +20,7 @@ type FormState = { status: 'idle' | 'sending' | 'sent' }
  */
 export function ContactPage() {
   const { t } = useTranslation()
+  useDocumentTitle(t('pages.contact.title'))
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [subject, setSubject] = useState('')
@@ -69,7 +72,7 @@ export function ContactPage() {
           {methods.map((m) => (
             <div key={m.label} className="rounded-xl border border-brand-navy/10 bg-white p-5">
               <p className="text-xs font-semibold uppercase tracking-wide text-text-muted">{m.label}</p>
-              <p className="mt-1 font-mono text-sm font-semibold text-brand-navy">{m.value}</p>
+              <p className="mt-1 break-words font-mono text-sm font-semibold text-brand-navy">{m.value}</p>
               {m.note && <p className="mt-1 text-xs text-text-muted">{m.note}</p>}
             </div>
           ))}
@@ -124,13 +127,9 @@ export function ContactPage() {
               {errors.message && <p className="mt-1 text-xs text-error">{errors.message}</p>}
             </label>
 
-            <button
-              type="submit"
-              disabled={state.status === 'sending'}
-              className="w-full rounded-lg bg-brand-gold px-6 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-brand-gold-light disabled:opacity-60"
-            >
+            <Button type="submit" loading={state.status === 'sending'} fullWidthOnMobile className="w-full">
               {state.status === 'sending' ? t('pages.contact.form.sending') : t('pages.contact.form.submit')}
-            </button>
+            </Button>
 
             {state.status === 'sent' && (
               <p className="rounded-lg border border-success/25 bg-success-bg px-4 py-3 text-sm text-success">

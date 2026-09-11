@@ -60,6 +60,10 @@ export async function searchVehiclesWithAvailability(
     .from('vehicles')
     .select(VEHICLE_SELECT)
     .eq('status', 'available')
+    // Task 1 (2026-09-11 scoped update) — Reserved copies (Phase 14,
+    // is_master_listing = false) are booking-specific clones and must
+    // never surface publicly; only master listings are customer-facing.
+    .eq('is_master_listing', true)
     .order('created_at', { ascending: false })
 
   if (error) throw new BookingApiError(error.message)
@@ -82,6 +86,8 @@ export async function fetchFeaturedVehicles(limit = 6): Promise<VehicleWithDetai
     .from('vehicles')
     .select(VEHICLE_SELECT)
     .eq('status', 'available')
+    // Task 1 — master listings only; see searchVehiclesWithAvailability above.
+    .eq('is_master_listing', true)
     .order('created_at', { ascending: false })
     .limit(limit)
 
@@ -107,6 +113,8 @@ export async function fetchFeaturedVehiclesByCategory(
       '*, vehicle_categories!inner(id, name, description), vehicle_images(id, storage_path, is_primary, sort_order), pricing(id, term, list_price, client_price, currency)',
     )
     .eq('status', 'available')
+    // Task 1 — master listings only; see searchVehiclesWithAvailability above.
+    .eq('is_master_listing', true)
     .eq('vehicle_categories.name', categoryName)
     .order('created_at', { ascending: false })
     .limit(limit)
@@ -127,6 +135,8 @@ export async function fetchAllAvailableVehicles(): Promise<VehicleWithDetails[]>
     .from('vehicles')
     .select(VEHICLE_SELECT)
     .eq('status', 'available')
+    // Task 1 — master listings only; see searchVehiclesWithAvailability above.
+    .eq('is_master_listing', true)
     .order('created_at', { ascending: false })
 
   if (error) throw new BookingApiError(error.message)
@@ -138,6 +148,9 @@ export async function fetchVehicleById(id: string): Promise<VehicleWithDetails |
     .from('vehicles')
     .select(VEHICLE_SELECT)
     .eq('id', id)
+    // Task 1 — a Reserved copy's id must never resolve on the public
+    // detail/booking page, even if guessed or linked directly.
+    .eq('is_master_listing', true)
     .maybeSingle()
 
   if (error) throw new BookingApiError(error.message)

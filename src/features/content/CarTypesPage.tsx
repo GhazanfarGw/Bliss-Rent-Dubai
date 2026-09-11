@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { SectionHeader } from '@/features/shared/ui/SectionHeader'
+import { useDocumentTitle } from '@/lib/useDocumentTitle'
 
 interface CategoryItem {
   name: string
@@ -17,6 +18,7 @@ interface CategoryItem {
  */
 export function CarTypesPage() {
   const { t } = useTranslation()
+  useDocumentTitle(t('pages.carTypes.title'))
   const categories = t('pages.carTypes.categories', { returnObjects: true }) as CategoryItem[]
 
   return (

@@ -51,12 +51,12 @@ export function CookieConsentBanner() {
       role="region"
       aria-label={t('cookieConsent.ariaLabel')}
       className={
-        'fixed inset-x-0 bottom-0 z-40 border-t border-[#ece7df] bg-white px-4 py-4 shadow-[0_-12px_30px_rgba(15,18,22,0.08)] sm:px-6 lg:px-8 ' +
+        'fixed inset-x-0 bottom-0 z-40 border-t border-[#ece7df] bg-white px-4 py-3 shadow-[0_-12px_30px_rgba(15,18,22,0.08)] sm:px-6 lg:px-8 ' +
         (reducedMotion ? '' : 'transition-transform duration-300 ease-out ') +
         (visible ? 'translate-y-0' : 'translate-y-full')
       }
     >
-      <div className="mx-auto flex max-w-7xl flex-col items-center gap-3 sm:flex-row sm:justify-between">
+      <div className="mx-auto flex max-w-7xl flex-col items-center gap-2 sm:flex-row sm:justify-between sm:gap-3">
         <p className="text-center text-sm leading-6 text-text-muted sm:text-start">
           {t('cookieConsent.message')}{' '}
           <Link to="/cookie-policy" className="font-semibold text-brand-navy underline decoration-brand-gold decoration-2 underline-offset-4">

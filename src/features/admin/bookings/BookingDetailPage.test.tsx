@@ -9,6 +9,7 @@ const adminConfirmBookingPaymentMock = vi.fn()
 const adminCancelBookingMock = vi.fn()
 const adminStartRentalMock = vi.fn()
 const adminMarkReturnedMock = vi.fn()
+const adminConfirmBookingVehicleMock = vi.fn()
 
 vi.mock('./adminBookingsApi', async () => {
   const actual = await vi.importActual<typeof import('./adminBookingsApi')>('./adminBookingsApi')
@@ -20,6 +21,7 @@ vi.mock('./adminBookingsApi', async () => {
     adminCancelBooking: (...args: unknown[]) => adminCancelBookingMock(...args),
     adminStartRental: (...args: unknown[]) => adminStartRentalMock(...args),
     adminMarkReturned: (...args: unknown[]) => adminMarkReturnedMock(...args),
+    adminConfirmBookingVehicle: (...args: unknown[]) => adminConfirmBookingVehicleMock(...args),
   }
 })
 
@@ -65,6 +67,14 @@ const pendingBooking: AdminBookingWithDetails = {
     plate_number: 'TEMP-ECO-04',
     status: 'available',
     created_at: '',
+    // Phase 14 — this fixture represents an already-confirmed, real
+    // physical vehicle (the pre-Phase-14 default for every existing row),
+    // so the new Confirm Vehicle action must NOT appear for it in any of
+    // the pre-existing tests below. See the dedicated
+    // 'Phase 14 — Confirm Vehicle action' describe block for the
+    // is_master_listing: false (still-a-Reserved-copy) case.
+    is_master_listing: true,
+    master_vehicle_id: null,
     vehicle_categories: { id: 'cat-eco', name: 'Economy', description: null },
   },
   pickup_location: { id: 'loc-1', name: 'Sharjah City Centre', is_active: true } as never,
@@ -90,6 +100,7 @@ describe('BookingDetailPage — manual payment confirmation (checkout resume-pay
     adminCancelBookingMock.mockReset()
     adminStartRentalMock.mockReset()
     adminMarkReturnedMock.mockReset()
+    adminConfirmBookingVehicleMock.mockReset()
     mockAdminRole = 'super_admin'
   })
 
@@ -145,6 +156,7 @@ describe('BookingDetailPage — Phase 11 controlled booking actions (replaces th
     adminCancelBookingMock.mockReset()
     adminStartRentalMock.mockReset()
     adminMarkReturnedMock.mockReset()
+    adminConfirmBookingVehicleMock.mockReset()
     mockAdminRole = 'super_admin'
   })
 
@@ -263,6 +275,124 @@ describe('BookingDetailPage — Phase 11 controlled booking actions (replaces th
     fireEvent.click(await screen.findByRole('button', { name: /yes, cancel booking/i }))
 
     await screen.findByText('Only a Super Admin can cancel a booking.')
+    expect(fetchBookingByIdMock).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe('BookingDetailPage — Phase 14 Confirm Vehicle action', () => {
+  const reservedCopyBooking: AdminBookingWithDetails = {
+    ...pendingBooking,
+    status: 'confirmed',
+    payments: [{ ...pendingBooking.payments[0], status: 'paid' }],
+    vehicles: {
+      ...pendingBooking.vehicles!,
+      plate_number: 'RSV-D300AC89',
+      is_master_listing: false,
+      master_vehicle_id: null,
+    },
+  } as unknown as AdminBookingWithDetails
+
+  beforeEach(() => {
+    fetchBookingByIdMock.mockReset()
+    adminConfirmBookingVehicleMock.mockReset()
+    mockAdminRole = 'super_admin'
+  })
+
+  it('shows "Confirm vehicle" for a Super Admin when the booking is still linked to its temporary Reserved copy', async () => {
+    fetchBookingByIdMock.mockResolvedValue(reservedCopyBooking)
+    renderPage()
+
+    expect(await screen.findByRole('button', { name: /confirm vehicle/i })).toBeInTheDocument()
+  })
+
+  it('shows the "awaiting plate confirmation" placeholder in the rental section instead of the internal RSV- placeholder', async () => {
+    fetchBookingByIdMock.mockResolvedValue(reservedCopyBooking)
+    renderPage()
+
+    await screen.findByText(/awaiting plate confirmation/i)
+    expect(screen.queryByText('RSV-D300AC89')).not.toBeInTheDocument()
+  })
+
+  it('does not show the action once the booking already points at a real, confirmed vehicle', async () => {
+    fetchBookingByIdMock.mockResolvedValue(pendingBooking) // is_master_listing: true fixture
+    renderPage()
+
+    await screen.findByText('bk-e16f5dc3')
+    expect(screen.queryByRole('button', { name: /confirm vehicle/i })).not.toBeInTheDocument()
+  })
+
+  it('shows a staff-hint instead of the action for a non-super_admin', async () => {
+    mockAdminRole = 'staff'
+    fetchBookingByIdMock.mockResolvedValue(reservedCopyBooking)
+    renderPage()
+
+    await screen.findByText(/only a super admin can confirm the vehicle/i)
+    expect(screen.queryByRole('button', { name: /confirm vehicle/i })).not.toBeInTheDocument()
+  })
+
+  it('requires a plate number before submitting', async () => {
+    fetchBookingByIdMock.mockResolvedValue(reservedCopyBooking)
+    renderPage()
+
+    fireEvent.click(await screen.findByRole('button', { name: /confirm vehicle/i }))
+    fireEvent.click(screen.getByRole('button', { name: /yes, confirm vehicle/i }))
+
+    await screen.findByText(/enter a plate number to continue/i)
+    expect(adminConfirmBookingVehicleMock).not.toHaveBeenCalled()
+  })
+
+  it('calls adminConfirmBookingVehicle with the entered plate, reloads, and shows the new-vehicle result banner', async () => {
+    fetchBookingByIdMock
+      .mockResolvedValueOnce(reservedCopyBooking)
+      .mockResolvedValueOnce({ ...reservedCopyBooking, vehicles: { ...reservedCopyBooking.vehicles!, plate_number: 'DXB-A-12345', is_master_listing: true } })
+    adminConfirmBookingVehicleMock.mockResolvedValue({
+      bookingId: 'bk-e16f5dc3',
+      vehicleId: 'veh-new',
+      plateNumber: 'DXB-A-12345',
+      isNewPhysicalVehicle: true,
+      changed: true,
+    })
+    renderPage()
+
+    fireEvent.click(await screen.findByRole('button', { name: /confirm vehicle/i }))
+    fireEvent.change(screen.getByPlaceholderText(/DXB-A-12345/i), { target: { value: 'DXB-A-12345' } })
+    fireEvent.click(screen.getByRole('button', { name: /yes, confirm vehicle/i }))
+
+    await waitFor(() => expect(adminConfirmBookingVehicleMock).toHaveBeenCalledWith('bk-e16f5dc3', 'DXB-A-12345', ''))
+    await waitFor(() => expect(fetchBookingByIdMock).toHaveBeenCalledTimes(2))
+    await screen.findByText(/added as a new vehicle in your fleet/i)
+  })
+
+  it('shows the existing-vehicle-reused result banner when is_new_physical_vehicle is false', async () => {
+    fetchBookingByIdMock
+      .mockResolvedValueOnce(reservedCopyBooking)
+      .mockResolvedValueOnce({ ...reservedCopyBooking, vehicles: { ...reservedCopyBooking.vehicles!, plate_number: 'DXB-A-99999', is_master_listing: true } })
+    adminConfirmBookingVehicleMock.mockResolvedValue({
+      bookingId: 'bk-e16f5dc3',
+      vehicleId: 'veh-existing',
+      plateNumber: 'DXB-A-99999',
+      isNewPhysicalVehicle: false,
+      changed: true,
+    })
+    renderPage()
+
+    fireEvent.click(await screen.findByRole('button', { name: /confirm vehicle/i }))
+    fireEvent.change(screen.getByPlaceholderText(/DXB-A-12345/i), { target: { value: 'DXB-A-99999' } })
+    fireEvent.click(screen.getByRole('button', { name: /yes, confirm vehicle/i }))
+
+    await screen.findByText(/matched to an existing vehicle in your fleet/i)
+  })
+
+  it('shows an inline error and does not reload the booking when the RPC rejects (e.g. plate conflict)', async () => {
+    fetchBookingByIdMock.mockResolvedValue(reservedCopyBooking)
+    adminConfirmBookingVehicleMock.mockRejectedValue(new Error('That plate is already assigned to an overlapping booking.'))
+    renderPage()
+
+    fireEvent.click(await screen.findByRole('button', { name: /confirm vehicle/i }))
+    fireEvent.change(screen.getByPlaceholderText(/DXB-A-12345/i), { target: { value: 'DXB-A-1' } })
+    fireEvent.click(screen.getByRole('button', { name: /yes, confirm vehicle/i }))
+
+    await screen.findByText('That plate is already assigned to an overlapping booking.')
     expect(fetchBookingByIdMock).toHaveBeenCalledTimes(1)
   })
 })

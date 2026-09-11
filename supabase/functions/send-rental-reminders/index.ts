@@ -9,6 +9,7 @@ import { createClient } from 'jsr:@supabase/supabase-js@2'
 import { corsHeaders, jsonResponse } from '../_shared/cors.ts'
 import { createSupabaseEmailLogStore } from '../_shared/email/supabaseEmailLogStore.ts'
 import { handleSendRentalRemindersRequest, SendRentalRemindersError } from './logic.ts'
+import { getResendSenderConfig } from '../_shared/email/emailSenderConfig.ts'
 
 Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') {
@@ -29,7 +30,8 @@ Deno.serve(async (req: Request) => {
       emailLog: createSupabaseEmailLogStore(supabaseAdmin),
       resendConfig: {
         apiKey: Deno.env.get('RESEND_API_KEY') ?? '',
-        fromAddress: Deno.env.get('RESEND_FROM_ADDRESS') ?? 'Bliss Rent <noreply@bliss.rent>',
+        fromAddress: getResendSenderConfig('customer', Deno.env).fromAddress,
+      replyTo: getResendSenderConfig('customer', Deno.env).replyTo,
       },
       siteBaseUrl: Deno.env.get('SITE_BASE_URL') ?? 'https://bliss.rent',
     })

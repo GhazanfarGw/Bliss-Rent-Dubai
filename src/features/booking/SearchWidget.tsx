@@ -163,7 +163,7 @@ export function SearchWidget({ initialValues, onSearch, compact = false, layout 
               type="checkbox"
               checked={sameReturnLocation}
               onChange={(e) => setSameReturnLocation(e.target.checked)}
-              className="h-4 w-4 rounded border-border text-brand-navy focus:ring-brand-navy"
+              className="h-4 w-4 border-border text-brand-navy focus:ring-brand-navy"
             />
             {t('searchWidget.sameReturnLocation')}
           </label>
@@ -229,7 +229,7 @@ export function SearchWidget({ initialValues, onSearch, compact = false, layout 
       onSubmit={handleSubmit}
       noValidate
       className={
-        'w-full rounded-[1.8rem] border border-[#dfe2de] bg-[#f7f7f5] shadow-[0_12px_30px_rgba(15,18,22,0.05)] ' +
+        'w-full border border-[#dfe2de] bg-[#f7f7f5] shadow-[0_12px_30px_rgba(15,18,22,0.05)] ' +
         (compact ? 'p-3 sm:p-4' : 'p-5 sm:p-6')
       }
     >
@@ -301,7 +301,7 @@ export function SearchWidget({ initialValues, onSearch, compact = false, layout 
           type="checkbox"
           checked={sameReturnLocation}
           onChange={(e) => setSameReturnLocation(e.target.checked)}
-          className="h-4 w-4 rounded border-border text-brand-navy focus:ring-brand-navy"
+          className="h-4 w-4 border-border text-brand-navy focus:ring-brand-navy"
         />
         {t('searchWidget.sameReturnLocation')}
       </label>

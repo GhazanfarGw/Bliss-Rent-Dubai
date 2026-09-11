@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { useDocumentTitle } from '@/lib/useDocumentTitle'
 
 interface ValueItem {
   title: string
@@ -13,6 +14,7 @@ interface ValueItem {
  */
 export function AboutPage() {
   const { t } = useTranslation()
+  useDocumentTitle(t('pages.about.title'))
   const storyParagraphs = t('pages.about.story.paragraphs', { returnObjects: true }) as string[]
   const values = t('pages.about.values.items', { returnObjects: true }) as ValueItem[]
 

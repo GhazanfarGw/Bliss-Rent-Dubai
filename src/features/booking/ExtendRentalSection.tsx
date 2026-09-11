@@ -3,6 +3,9 @@ import { useTranslation } from 'react-i18next'
 import { BadgeCheck } from 'lucide-react'
 import { submitExtendRentalRequest, ExtendRentalError } from '@/features/booking/extendRentalApi'
 import { extensionDaysBetween } from '@/lib/extensionPricing'
+import { Button } from '@/features/shared/ui/Button'
+import { useExtensionPriceEstimate } from '@/features/booking/useExtensionPriceEstimate'
+import { ExtensionPriceEstimateNote } from '@/features/booking/ExtensionPriceEstimateNote'
 
 type Step =
   | { step: 'idle' }
@@ -17,6 +20,11 @@ export interface ExtendRentalSectionProps {
   bookingReference: string
   vehicleNumber: string
   currentReturnDate: string
+  /** Added 2026-09-05 for the price-preview feature — all four already exist on the BookingLookupResult the caller (ManageBookingPage.tsx's ResultCard) already has in scope, so nothing new is fetched to supply these. */
+  vehicleId: string
+  originalStartDate: string
+  currentTotalPrice: number
+  currency: string
 }
 
 /**
@@ -36,10 +44,27 @@ export interface ExtendRentalSectionProps {
  * accepted (and may carry a configurable late-extension penalty the admin
  * applies during review).
  */
-export function ExtendRentalSection({ bookingReference, vehicleNumber, currentReturnDate }: ExtendRentalSectionProps) {
+export function ExtendRentalSection({
+  bookingReference,
+  vehicleNumber,
+  currentReturnDate,
+  vehicleId,
+  originalStartDate,
+  currentTotalPrice,
+  currency,
+}: ExtendRentalSectionProps) {
   const { t } = useTranslation()
   const [requestedReturnDate, setRequestedReturnDate] = useState('')
   const [state, setState] = useState<Step>({ step: 'idle' })
+  const selectedDays = requestedReturnDate ? extensionDaysBetween(currentReturnDate, requestedReturnDate) : null
+  const estimate = useExtensionPriceEstimate({
+    vehicleId,
+    originalStartDate,
+    originalEndDate: currentReturnDate,
+    originalTotalPrice: currentTotalPrice,
+    originalCurrency: currency,
+    extensionDays: selectedDays,
+  })
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
@@ -91,17 +116,23 @@ export function ExtendRentalSection({ bookingReference, vehicleNumber, currentRe
           </p>
         )}
 
+        {requestedReturnDate && (
+          <ExtensionPriceEstimateNote estimate={estimate} paidAmount={currentTotalPrice} paidCurrency={currency} />
+        )}
+
         <p className="rounded-lg border border-brand-lavender bg-brand-lavender/30 px-4 py-3 text-xs text-text-muted">
           {t('extendRental.notInstantNotice')}
         </p>
 
-        <button
+        <Button
           type="submit"
-          disabled={state.step === 'submitting' || !requestedReturnDate}
-          className="w-full rounded-lg bg-brand-navy px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-navy-light disabled:opacity-60 sm:w-auto"
+          variant="secondary"
+          loading={state.step === 'submitting'}
+          disabled={!requestedReturnDate}
+          fullWidthOnMobile
         >
           {state.step === 'submitting' ? t('extendRental.submitting') : t('extendRental.submitButton')}
-        </button>
+        </Button>
 
         {state.step === 'submit_failed' && (
           <p className="rounded-lg border border-error/25 bg-error-bg px-4 py-3 text-sm text-error">{state.message}</p>

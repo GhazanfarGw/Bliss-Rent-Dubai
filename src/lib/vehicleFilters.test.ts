@@ -20,6 +20,11 @@ function vehicle(overrides: Partial<VehicleWithDetails>): VehicleWithDetails {
     plate_number: 'A-1',
     status: 'available',
     created_at: '2026-01-01T00:00:00Z',
+    // Phase 14 — search/filter results are always master listings
+    // (available_vehicles() only ever returns is_master_listing = true
+    // rows), so that's the correct default for this fixture too.
+    is_master_listing: true,
+    master_vehicle_id: null,
     vehicle_categories: { id: 'cat-economy', name: 'Economy', description: null, created_at: '' },
     vehicle_images: [],
     pricing: [

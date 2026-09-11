@@ -188,10 +188,11 @@ function checkoutDraftKey(vehicleId: string): string {
  * The lookup is deliberately guest-safe and non-sensitive (see
  * lookup_booking_for_customer's own migration comment: no license/
  * document fields, no phone, no email) — so only the customer's full
- * name can be pre-filled into the checkout draft here. Email/phone and
- * every driver field are left blank; the only effect is cosmetic, on the
- * eventual Confirmation page's customer/driver name display for this one
- * resume path, never on the actual booking/payment record.
+ * name (split, best-effort, on the first space) can be pre-filled into
+ * the checkout draft here. Email/phone and every driver field are left
+ * blank; the only effect is cosmetic, on the eventual Confirmation page's
+ * customer/driver name display for this one resume path, never on the
+ * actual booking/payment record.
  */
 export function resumePendingBookingFromLookup(result: BookingLookupResult) {
   saveBookingResult({
@@ -228,6 +229,7 @@ export function resumePendingBookingFromLookup(result: BookingLookupResult) {
   try {
     const existing = sessionStorage.getItem(checkoutDraftKey(result.vehicleId))
     if (!existing) {
+      const [firstName, ...rest] = result.customerName.trim().split(/\s+/)
       sessionStorage.setItem(
         checkoutDraftKey(result.vehicleId),
         JSON.stringify({
@@ -238,7 +240,7 @@ export function resumePendingBookingFromLookup(result: BookingLookupResult) {
             pickupLocationId: result.pickupLocationId,
             dropoffLocationId: result.dropoffLocationId,
           },
-          customer: { ...EMPTY_CUSTOMER_DRAFT, fullName: result.customerName },
+          customer: { ...EMPTY_CUSTOMER_DRAFT, firstName: firstName ?? '', lastName: rest.join(' ') },
           driver: EMPTY_DRIVER_DRAFT,
         }),
       )
