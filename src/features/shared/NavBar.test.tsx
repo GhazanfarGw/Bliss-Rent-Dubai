@@ -36,23 +36,29 @@ describe('NavBar', () => {
     expect(screen.getAllByRole('link', { name: 'Fleet' }).length).toBeGreaterThan(0)
     expect(screen.getAllByRole('link', { name: 'Vehicle Collection' }).length).toBeGreaterThan(0)
     expect(screen.getAllByRole('link', { name: 'Services' }).length).toBeGreaterThan(0)
+    expect(screen.getAllByRole('link', { name: 'Booking Status' }).length).toBeGreaterThan(0)
     expect(screen.getAllByRole('link', { name: 'Manage Booking' }).length).toBeGreaterThan(0)
     expect(screen.getAllByRole('link', { name: 'Contact' }).length).toBeGreaterThan(0)
     expect(screen.getAllByRole('link', { name: 'Book Now' }).length).toBeGreaterThan(0)
   })
 
-  it('About/Car Types/Manage Booking/Contact are real pages; Services is still an in-page anchor', () => {
+  it('About/Car Types/Find My Car/Manage Booking/Contact are real, separate pages; Services is still an in-page anchor', () => {
     renderNavBar()
     const aboutLinks = screen.getAllByRole('link', { name: 'About' })
     const carTypeLinks = screen.getAllByRole('link', { name: 'Vehicle Collection' })
+    const findMyCarLinks = screen.getAllByRole('link', { name: 'Booking Status' })
     const manageBookingLinks = screen.getAllByRole('link', { name: 'Manage Booking' })
     const servicesLinks = screen.getAllByRole('link', { name: 'Services' })
     const contactLinks = screen.getAllByRole('link', { name: 'Contact' })
     expect(aboutLinks[0]).toHaveAttribute('href', '/about')
     expect(carTypeLinks[0]).toHaveAttribute('href', '/car-types')
+    expect(findMyCarLinks[0]).toHaveAttribute('href', '/find-my-car')
     expect(manageBookingLinks[0]).toHaveAttribute('href', '/manage-booking')
     expect(contactLinks[0]).toHaveAttribute('href', '/contact')
     expect(servicesLinks[0]).toHaveAttribute('href', '/#how-it-works')
+    // Find My Car and Manage Booking must be two distinct destinations,
+    // never the same page under two labels.
+    expect(findMyCarLinks[0]).not.toHaveAttribute('href', manageBookingLinks[0].getAttribute('href'))
   })
 
   it('mobile menu is closed by default and opens/closes via the hamburger button', () => {

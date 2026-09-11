@@ -84,6 +84,11 @@ export function Footer() {
                 </Link>
               </li>
               <li>
+                <Link to="/find-my-car" className="text-text-muted transition-colors hover:text-brand-navy">
+                  {t('footer.findMyCar')}
+                </Link>
+              </li>
+              <li>
                 <Link to="/manage-booking" className="text-text-muted transition-colors hover:text-brand-navy">
                   {t('footer.manageBooking')}
                 </Link>

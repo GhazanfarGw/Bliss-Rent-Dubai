@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { CarFront, ChevronRight, ClipboardCheck, Home, Info, LogIn, MapPin, Menu, Phone, Search, X } from 'lucide-react'
+import { CalendarSearch, CarFront, ChevronRight, ClipboardCheck, Home, Info, LogIn, MapPin, Menu, Phone, Search, X } from 'lucide-react'
 import { LanguageSwitcher } from '@/features/shared/LanguageSwitcher'
 import { LinkButton } from '@/features/shared/ui/LinkButton'
 import { PendingBookingIndicator } from '@/features/shared/PendingBookingIndicator'
@@ -30,20 +30,26 @@ function BrandMark({ compact = false }: { compact?: boolean }) {
   )
 }
 
-const NAV_ICONS = [Home, Info, CarFront, MapPin, ClipboardCheck, Phone]
-const NAV_DESCRIPTIONS = ['nav.homeDescription', 'nav.aboutDescription', 'nav.browseFleetDescription', 'nav.carTypesDescription', 'nav.manageBookingDescription', 'nav.contactDescription'] as const
+const NAV_ICONS = [Home, Info, CarFront, MapPin, CalendarSearch, ClipboardCheck, Phone]
+const NAV_DESCRIPTIONS = ['nav.homeDescription', 'nav.aboutDescription', 'nav.browseFleetDescription', 'nav.carTypesDescription', 'nav.findMyCarDescription', 'nav.manageBookingDescription', 'nav.contactDescription'] as const
 
 /**
  * Premium header. Desktop: logo, Home, About, Browse Fleet, Car Types,
- * Manage Booking, Contact (all real pages — see src/features/content/ and
- * ManageBookingPage.tsx), Services (still an in-page anchor to the
- * homepage's "How It Works" section, since it isn't its own page),
- * language switcher, and the primary "Search Cars"/"Book Now" CTA.
- * Mobile: hamburger drawer with the same links plus the CTA.
+ * Find My Car, Manage Booking, Contact (all real pages — see
+ * src/features/content/, FindMyCarPage.tsx, and ManageBookingPage.tsx),
+ * Services (still an in-page anchor to the homepage's "How It Works"
+ * section, since it isn't its own page), language switcher, and the
+ * primary "Search Cars"/"Book Now" CTA. Mobile: hamburger drawer with the
+ * same links plus the CTA.
  *
  * Manage Booking was previously reachable only from an email link, the
  * homepage navigator's own tab, or the footer — never the header itself —
  * so a guest browsing from any other page had no direct way there.
+ *
+ * Find My Car is a separate, dedicated header link (own icon/description
+ * in NAV_ICONS/NAV_DESCRIPTIONS above) so a guest who only wants a quick
+ * status check is never routed through the full Manage Booking page —
+ * see FindMyCarPage.tsx / BookingStatusPanel.tsx.
  *
  * The CTA points at /book (BookCarPage) rather than straight at /search:
  * its whole job is "start a booking", and BookCarPage is the dedicated
@@ -126,6 +132,7 @@ export function NavBar() {
     { to: '/about', label: t('nav.about'), end: false },
     { to: '/search', label: t('nav.browseFleet'), end: false },
     { to: '/car-types', label: t('nav.carTypes'), end: false },
+    { to: '/find-my-car', label: t('nav.findMyCar'), end: false },
     { to: '/manage-booking', label: t('nav.manageBooking'), end: false },
     { to: '/contact', label: t('nav.contact'), end: false },
   ]

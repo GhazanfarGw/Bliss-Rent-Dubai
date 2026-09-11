@@ -11,6 +11,7 @@ import { BookingSummaryPage } from '@/features/booking/checkout/BookingSummaryPa
 import { PaymentPage } from '@/features/booking/checkout/PaymentPage'
 import { ConfirmationPage } from '@/features/booking/checkout/ConfirmationPage'
 import { ManageBookingPage } from '@/features/booking/ManageBookingPage'
+import { FindMyCarPage } from '@/features/booking/FindMyCarPage'
 import { AboutPage } from '@/features/content/AboutPage'
 import { CarTypesPage } from '@/features/content/CarTypesPage'
 import { LocationsPage } from '@/features/content/LocationsPage'
@@ -91,6 +92,17 @@ import { AdminSettingsPage } from '@/features/admin/settings/AdminSettingsPage'
  * working as a redirect to /manage-booking for anyone with the old link.
  * See lookupApi.ts and the lookup_booking_for_customer() migration.
  *
+ * Split follow-up (requested directly in chat, header confusion fix):
+ * a guest clicking "Manage Booking" was landing on a page that also let
+ * them extend/pay, with no separate way to just check status — and the
+ * header had no dedicated status-check link at all. /find-my-car
+ * (FindMyCarPage) is a new, read-only destination that reuses
+ * BookingStatusPanel (the same minimal Client Name / Car / Car Number /
+ * Days Left component the homepage navigator's "Booking Status" tab
+ * already used) — no second lookup implementation. /manage-booking keeps
+ * its full lookup, ExtendRentalSection, and Continue-to-Payment flow
+ * exactly as before. Both are now separate header links (NavBar.tsx).
+ *
  * Frontend redesign follow-up (same requests as the header/hero/Manage
  * Booking page rework): /book (BookCarPage) adds a standalone "start a
  * booking" destination, separate from the homepage's embedded search and
@@ -122,6 +134,7 @@ function App() {
               <Route path="/checkout/:id/summary" element={<BookingSummaryPage />} />
               <Route path="/checkout/:id/payment/:bookingId" element={<PaymentPage />} />
               <Route path="/checkout/:id/confirmation/:bookingId" element={<ConfirmationPage />} />
+              <Route path="/find-my-car" element={<FindMyCarPage />} />
               <Route path="/manage-booking" element={<ManageBookingPage />} />
               <Route path="/extend-rental" element={<Navigate to="/manage-booking" replace />} />
               <Route path="/about" element={<AboutPage />} />
