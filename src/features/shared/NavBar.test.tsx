@@ -79,7 +79,10 @@ describe('NavBar', () => {
     renderNavBar()
     const header = screen.getByRole('banner')
 
-    expect(header.className).toContain('h-[4.5rem]')
+    // Header height stays constant (--header-h) in both transparent and
+    // solid states now, so TickerBar/StickySearchBar's fixed offsets never
+    // fall out of sync with the header's actual rendered height.
+    expect(header.className).toContain('h-[var(--header-h)]')
     expect(screen.getAllByRole('img', { name: 'Bliss Rent Dubai' })[1]).toHaveClass('h-11')
 
     Object.defineProperty(window, 'scrollY', { configurable: true, value: 240 })

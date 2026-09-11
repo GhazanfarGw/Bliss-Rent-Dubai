@@ -141,9 +141,16 @@ export function NavBar() {
   return (
     <header
       className={
-        'fixed top-0 z-40 w-full border-b ' +
-        (reducedMotion ? '' : 'transition-[background-color,border-color,box-shadow,color,height] duration-300 ease-out ') +
-        (transparent ? 'h-[4.5rem] ' : 'h-[var(--header-h)] ') +
+        'fixed top-0 z-40 h-[var(--header-h)] w-full border-b ' +
+        // Bug fix: the transparent (homepage-hero) state used to render at a
+        // taller 4.5rem while the scrolled/solid state used --header-h (4rem)
+        // — but TickerBar and StickySearchBar both position themselves at a
+        // fixed `top: var(--header-h)` regardless of which state the header is
+        // in, assuming the header is always exactly --header-h tall. That 8px
+        // mismatch showed up as a visible seam/overlap right at the top of the
+        // homepage. The header now stays exactly --header-h tall in both
+        // states, so every fixed element anchored to it lines up correctly.
+        (reducedMotion ? '' : 'transition-[background-color,border-color,box-shadow,color] duration-300 ease-out ') +
         (transparent ? 'border-transparent bg-transparent text-white ' : 'border-[#ece7df] bg-white text-brand-navy shadow-[0_8px_24px_rgba(11,19,43,0.07)]')
       }
     >
