@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { CalendarSearch, CarFront, ChevronRight, ClipboardCheck, Home, Info, LogIn, MapPin, Menu, Phone, Search, X } from 'lucide-react'
+import { CalendarSearch, CarFront, ChevronRight, ClipboardCheck, Home, Info, LogIn, Menu, Phone, X } from 'lucide-react'
 import { LanguageSwitcher } from '@/features/shared/LanguageSwitcher'
 import { LinkButton } from '@/features/shared/ui/LinkButton'
 import { PendingBookingIndicator } from '@/features/shared/PendingBookingIndicator'
@@ -30,17 +30,22 @@ function BrandMark({ compact = false }: { compact?: boolean }) {
   )
 }
 
-const NAV_ICONS = [Home, Info, CarFront, MapPin, CalendarSearch, ClipboardCheck, Phone]
-const NAV_DESCRIPTIONS = ['nav.homeDescription', 'nav.aboutDescription', 'nav.browseFleetDescription', 'nav.carTypesDescription', 'nav.findMyCarDescription', 'nav.manageBookingDescription', 'nav.contactDescription'] as const
+const NAV_ICONS = [Home, Info, CarFront, CalendarSearch, ClipboardCheck, Phone]
+const NAV_DESCRIPTIONS = ['nav.homeDescription', 'nav.aboutDescription', 'nav.browseFleetDescription', 'nav.findMyCarDescription', 'nav.manageBookingDescription', 'nav.contactDescription'] as const
 
 /**
- * Premium header. Desktop: logo, Home, About, Browse Fleet, Car Types,
- * Find My Car, Manage Booking, Contact (all real pages — see
- * src/features/content/, FindMyCarPage.tsx, and ManageBookingPage.tsx),
- * Services (still an in-page anchor to the homepage's "How It Works"
- * section, since it isn't its own page), language switcher, and the
- * primary "Search Cars"/"Book Now" CTA. Mobile: hamburger drawer with the
- * same links plus the CTA.
+ * Premium header. Desktop: logo, Home, About, Browse Fleet, Find My Car,
+ * Manage Booking, Contact (all real pages — see src/features/content/,
+ * FindMyCarPage.tsx, and ManageBookingPage.tsx), language switcher, and
+ * the primary "Search Cars"/"Book Now" CTA. Mobile: hamburger drawer with
+ * the same links plus the CTA.
+ *
+ * Vehicle Collection (car-types) and the Services in-page anchor
+ * (homepage's "How It Works" section) used to live here too; both were
+ * removed to declutter an increasingly crowded header ("Vehicle
+ * Collection" was wrapping to two lines at common desktop widths) and
+ * moved to the footer's Company column instead — still one click away,
+ * just not competing for header space. See Footer.tsx.
  *
  * Manage Booking was previously reachable only from an email link, the
  * homepage navigator's own tab, or the footer — never the header itself —
@@ -127,16 +132,18 @@ export function NavBar() {
     }
   }, [open])
 
+  // Vehicle Collection (car-types) and Services (the homepage's "How It
+  // Works" anchor) were removed from the header to declutter it — both
+  // still real destinations, just moved to the footer's Company column
+  // (Footer.tsx) instead of living in the primary nav.
   const links = [
     { to: '/', label: t('nav.home'), end: true },
     { to: '/about', label: t('nav.about'), end: false },
     { to: '/search', label: t('nav.browseFleet'), end: false },
-    { to: '/car-types', label: t('nav.carTypes'), end: false },
     { to: '/find-my-car', label: t('nav.findMyCar'), end: false },
     { to: '/manage-booking', label: t('nav.manageBooking'), end: false },
     { to: '/contact', label: t('nav.contact'), end: false },
   ]
-  const anchors = [{ to: { pathname: '/', hash: '#how-it-works' }, label: t('nav.services') }]
 
   return (
     <header
@@ -199,15 +206,6 @@ export function NavBar() {
               >
                 {link.label}
               </NavLink>
-            ))}
-            {anchors.map((anchor) => (
-              <Link
-                key={anchor.label}
-                to={anchor.to}
-                  className={'rounded-none px-3 py-2 text-sm font-medium transition-all ' + (transparent ? 'text-white/90 hover:text-white' : 'text-[#4a5360] hover:text-brand-gold')}
-              >
-                {anchor.label}
-              </Link>
             ))}
           </div>
         </nav>
@@ -304,21 +302,6 @@ export function NavBar() {
                 </NavLink>
               )
             })()
-          ))}
-          {anchors.map((anchor) => (
-            <Link
-              key={anchor.label}
-              to={anchor.to}
-              onClick={() => setOpen(false)}
-              className="flex min-h-14 items-center gap-3 border-b border-brand-navy/10 px-2 py-3 text-brand-navy transition-colors hover:text-brand-gold"
-            >
-              <Search className="h-5 w-5 shrink-0" aria-hidden="true" />
-              <span className="min-w-0 flex-1">
-                <span className="block text-base font-semibold">{anchor.label}</span>
-                <span className="mt-0.5 block text-xs text-text-muted">{t('nav.servicesDescription')}</span>
-              </span>
-              <ChevronRight className="h-4 w-4 shrink-0 rtl:rotate-180" aria-hidden="true" />
-            </Link>
           ))}
           <div className="mt-auto space-y-3 pt-5">
             <LinkButton

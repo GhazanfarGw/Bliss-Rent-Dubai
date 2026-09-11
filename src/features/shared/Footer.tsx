@@ -59,6 +59,14 @@ export function Footer() {
                 </Link>
               </li>
               <li>
+                {/* Moved here from the header nav (NavBar.tsx) to declutter it —
+                    still the same in-page anchor to the homepage's "How It Works"
+                    section, not a new destination. */}
+                <Link to={{ pathname: '/', hash: '#how-it-works' }} className="text-text-muted transition-colors hover:text-brand-navy">
+                  {t('nav.services')}
+                </Link>
+              </li>
+              <li>
                 <Link to="/car-types" className="text-text-muted transition-colors hover:text-brand-navy">
                   {t('footer.carTypes')}
                 </Link>
