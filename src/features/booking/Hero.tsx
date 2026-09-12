@@ -51,6 +51,22 @@ const HERO_TEXT_ROTATE_MS = 6000
  *    to the hero's bottom edge, since BookingSearchSection intentionally
  *    overlaps up onto that edge with its own card (see
  *    BookingSearchSection.tsx) and the fixed TickerBar sits there too.
+ *    Desktop-only (`lg:` and up, where the hero is a full-viewport-height
+ *    section) — see the mobile note below for why it's hidden elsewhere.
+ *
+ * Mobile isn't just this same layout scaled down — two things are
+ * deliberately different content decisions, not shrunk-in-place ones:
+ *  - The CTA row: below `sm`, "Book Now" is the one full-width strong
+ *    button and "View fleet" drops to a lighter underlined text link
+ *    (same <Link>, responsive classes — still exactly one "View fleet"
+ *    link in the DOM). Two full-width stacked blocks read heavy on a
+ *    small screen; at `sm` and up both render as the original
+ *    equally-weighted side-by-side buttons.
+ *  - The scroll cue above is hidden below `lg` entirely: it only makes
+ *    sense where the hero deliberately fills the whole viewport and
+ *    "there's more below" isn't obvious. Mobile's hero is a normal,
+ *    much shorter block that already previews the next section, so the
+ *    cue would just be extra vertical clutter there.
  *
  * All of the above skip themselves for prefers-reduced-motion, same as
  * every other autoplay/animation in this app (see src/lib/motion.ts).
@@ -151,13 +167,23 @@ export function Hero() {
             <p className="mt-5 max-w-lg text-base leading-7 text-white/80 sm:text-lg">{slide.body}</p>
           </div>
 
-          <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+          {/* Mobile gets a deliberately different CTA arrangement, not just
+              a shrunk desktop one: two full-width stacked blocks read heavy
+              on a small screen, so below `sm` "Book Now" stays the one
+              strong full-width button (fullWidthOnMobile) and "View fleet"
+              drops to a lighter underlined text link with a small arrow —
+              same destination, less visual weight. At `sm` and up both
+              render as the original equally-weighted side-by-side buttons
+              (Tailwind classes on the SAME <Link>, not a second element, so
+              there's still exactly one "View fleet" link in the DOM). */}
+          <div className="mt-7 flex flex-col items-start gap-3 sm:flex-row sm:items-center">
             {/* Direct navigation, not an on-page scroll: "Book Now" opens the
                 dedicated Book a Car page and "View fleet" opens the full
                 fleet listing, matching the header's own CTA/Fleet routes. */}
             <LinkButton
               to="/book"
               variant="primary"
+              fullWidthOnMobile
               className="group min-h-12 border border-brand-gold bg-brand-gold text-white shadow-none hover:brightness-105"
             >
               {t('hero.cta')}
@@ -165,9 +191,10 @@ export function Hero() {
             </LinkButton>
             <Link
               to="/search"
-              className="inline-flex min-h-12 items-center justify-center border border-white/70 bg-white px-5 py-3 text-sm font-semibold text-brand-navy transition-all hover:bg-brand-lavender"
+              className="inline-flex items-center gap-1.5 text-sm font-semibold text-white/85 underline decoration-white/40 underline-offset-4 transition-colors hover:text-white sm:min-h-12 sm:gap-0 sm:border sm:border-white/70 sm:bg-white sm:px-5 sm:py-3 sm:text-brand-navy sm:no-underline sm:transition-all sm:hover:bg-brand-lavender"
             >
               {t('hero.viewFleetCta')}
+              <ArrowRight className="h-3.5 w-3.5 sm:hidden" aria-hidden="true" />
             </Link>
           </div>
 
@@ -200,11 +227,19 @@ export function Hero() {
               hero's lower portion with its own -mt/z-10 card (see
               BookingSearchSection.tsx), so anything pinned to the hero's
               literal bottom would sit underneath that white card, or
-              behind the fixed TickerBar strip, on shorter viewports. */}
+              behind the fixed TickerBar strip, on shorter viewports.
+              `hidden lg:inline-flex` on purpose, not left visible
+              everywhere: it only earns its place where the hero
+              deliberately fills the whole viewport (`lg:min-h-[100vh]`
+              above) and "there's more below" isn't obvious. Below `lg`
+              the hero is a normal, much shorter block that already
+              previews the next section, and mobile users don't need a
+              hint to scroll — so this row is one more thing removed
+              from the mobile layout, not just shrunk in place. */}
           <button
             type="button"
             onClick={handleScrollCueClick}
-            className="mt-8 inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.28em] text-white/60 transition-colors hover:text-white/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-gold"
+            className="mt-8 hidden items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.28em] text-white/60 transition-colors hover:text-white/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-gold lg:inline-flex"
           >
             {t('hero.scrollCue')}
             <ChevronDown className={'h-4 w-4' + (reducedMotion ? '' : ' animate-bounce')} aria-hidden="true" />
