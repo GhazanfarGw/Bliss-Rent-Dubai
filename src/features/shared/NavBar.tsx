@@ -198,7 +198,9 @@ export function NavBar() {
                 className={({ isActive }) =>
                   'relative rounded-none px-3 py-2 text-sm font-medium transition-all ' +
                   (isActive
-                    ? 'text-brand-gold after:absolute after:inset-x-3 after:-bottom-1 after:h-0.5 after:bg-brand-champagne'
+                    ? (transparent
+                        ? 'text-white after:absolute after:inset-x-3 after:-bottom-1 after:h-0.5 after:bg-brand-champagne'
+                        : 'text-brand-gold after:absolute after:inset-x-3 after:-bottom-1 after:h-0.5 after:bg-brand-champagne')
                       : transparent
                       ? 'text-white/90 hover:text-white'
                       : 'text-[#4a5360] hover:text-brand-gold')
