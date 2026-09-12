@@ -1,0 +1,43 @@
+# Supabase CLI project configuration.
+# This project has NOT been linked to a live Supabase project yet.
+# Once you have a project (supabase.com/dashboard), run:
+#   supabase link --project-ref <your-project-ref>
+#   supabase db push        # applies migrations/
+#   supabase db seed        # applies seed/seed.sql (dev/staging only)
+
+project_id = "dubai-airport-rental"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "storage"]
+extra_search_path = ["public"]
+max_rows = 1000
+
+[db]
+port = 54322
+major_version = 15
+
+[studio]
+enabled = true
+port = 54323
+
+[auth]
+enabled = true
+# Website-only booking flow: customers authenticate via the website (or
+# book as a guest, matched by email — see docs/DATABASE.md). No WhatsApp
+# auth flow exists.
+site_url = "http://localhost:5173"
+additional_redirect_urls = ["http://localhost:5173"]
+jwt_expiry = 3600
+enable_signup = true
+
+[storage]
+enabled = true
+file_size_limit = "20MiB"
+
+[functions]
+# Edge Functions are where privileged, server-side-only logic runs (payment
+# confirmation, admin-only operations) — see docs/ARCHITECTURE.md. None are
+# implemented yet in Phase 0 beyond the health-check stub.
+enabled = true
