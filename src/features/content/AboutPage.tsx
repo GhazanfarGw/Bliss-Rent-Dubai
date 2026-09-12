@@ -1,13 +1,25 @@
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Compass, Eye, MapPin, ShieldCheck, Sparkles, Target } from 'lucide-react'
+import { Car, Compass, Eye, MapPin, ShieldCheck, Sparkles, Target } from 'lucide-react'
 import { useDocumentTitle } from '@/lib/useDocumentTitle'
 import { LinkButton } from '@/features/shared/ui/LinkButton'
+import { fetchAllAvailableVehicles, fetchLocations } from '@/features/booking/api'
 import heroLuxury from '@/assets/hero/hero-luxury.webp'
 
 interface ValueItem {
   title: string
   body: string
+}
+
+/** Live counts pulled from the same real fleet/locations queries the
+ *  homepage's category grid and search widget already use — never a
+ *  hand-typed number. Left null until the fetch resolves; the section
+ *  below simply doesn't render rather than ever showing a fake zero. */
+interface LiveStats {
+  vehicleCount: number
+  categoryNames: string[]
+  cityNames: string[]
 }
 
 // One icon per value, in the same order as pages.about.values.items
@@ -16,19 +28,41 @@ interface ValueItem {
 const VALUE_ICONS = [Eye, Sparkles, ShieldCheck, MapPin]
 
 /**
- * About Us — full brand-page redesign (Story, Vision, Mission, Values,
- * closing CTA), restyled to match the premium editorial system already
- * established sitewide (WhyChooseSection's eyebrow/headline pattern,
- * sharp-cornered bordered cards, gold accents). Every word of substance
- * still comes from pages.about.* in en.ts/ar.ts — real business facts
- * only, no invented awards, stats, testimonials, or team photos. The one
- * addition is pages.about.cta.heading, a plain booking prompt.
+ * About Us — full brand-page redesign (Story, live "Bliss Rent today"
+ * stats, Vision, Mission, Values, closing CTA), restyled to match the
+ * premium editorial system already established sitewide (WhyChooseSection's
+ * eyebrow/headline pattern, sharp-cornered bordered cards, gold accents).
+ * Every word of substance still comes from pages.about.* in en.ts/ar.ts —
+ * real business facts only. The stats section is the one place with
+ * numbers, and they're fetched live from the same fleet/locations queries
+ * the homepage already uses — never a hand-typed figure. New copy is
+ * limited to pages.about.cta.heading and pages.about.stats.*.
  */
 export function AboutPage() {
   const { t } = useTranslation()
   useDocumentTitle(t('pages.about.title'))
   const storyParagraphs = t('pages.about.story.paragraphs', { returnObjects: true }) as string[]
   const values = t('pages.about.values.items', { returnObjects: true }) as ValueItem[]
+  const [stats, setStats] = useState<LiveStats | null>(null)
+
+  useEffect(() => {
+    let cancelled = false
+    Promise.all([fetchAllAvailableVehicles(), fetchLocations()])
+      .then(([vehicles, locations]) => {
+        if (cancelled) return
+        const categoryNames = Array.from(
+          new Set(vehicles.map((v) => v.vehicle_categories?.name).filter((name): name is string => Boolean(name))),
+        ).sort()
+        const cityNames = Array.from(new Set(locations.map((l) => l.city))).sort()
+        setStats({ vehicleCount: vehicles.length, categoryNames, cityNames })
+      })
+      .catch(() => {
+        // Best-effort only — the stats section simply doesn't render.
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   return (
     <div>
@@ -70,6 +104,44 @@ export function AboutPage() {
           ))}
         </div>
       </section>
+
+      {/* Bliss Rent today — live data, not marketing copy: same fleet
+          and locations queries the homepage's category grid and search
+          widget already run. Renders nothing until the fetch resolves,
+          and nothing at all if it fails — never a fabricated number. */}
+      {stats && (
+        <section className="bg-brand-navy">
+          <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 lg:px-8">
+            <div className="mx-auto max-w-2xl text-center">
+              <h2 className="text-2xl font-black tracking-[-0.04em] text-white sm:text-3xl">{t('pages.about.stats.heading')}</h2>
+              <p className="mt-2 text-sm text-brand-lavender">{t('pages.about.stats.subtitle')}</p>
+            </div>
+            <div className="mt-9 grid gap-5 sm:grid-cols-3">
+              <div className="border border-white/15 bg-white/5 p-6 text-center">
+                <Car className="mx-auto h-6 w-6 text-brand-champagne" aria-hidden="true" />
+                <p className="mt-3 text-3xl font-black text-white">{stats.vehicleCount}</p>
+                <p className="mt-1 text-sm text-brand-lavender">{t('pages.about.stats.vehicles', { count: stats.vehicleCount })}</p>
+              </div>
+              <div className="border border-white/15 bg-white/5 p-6 text-center">
+                <Sparkles className="mx-auto h-6 w-6 text-brand-champagne" aria-hidden="true" />
+                <p className="mt-3 text-3xl font-black text-white">{stats.categoryNames.length}</p>
+                <p className="mt-1 text-sm text-brand-lavender">{t('pages.about.stats.categories', { count: stats.categoryNames.length })}</p>
+                {stats.categoryNames.length > 0 && (
+                  <p className="mt-2 text-xs text-brand-lavender/70">{stats.categoryNames.join(' · ')}</p>
+                )}
+              </div>
+              <div className="border border-white/15 bg-white/5 p-6 text-center">
+                <MapPin className="mx-auto h-6 w-6 text-brand-champagne" aria-hidden="true" />
+                <p className="mt-3 text-3xl font-black text-white">{stats.cityNames.length}</p>
+                <p className="mt-1 text-sm text-brand-lavender">{t('pages.about.stats.cities', { count: stats.cityNames.length })}</p>
+                {stats.cityNames.length > 0 && (
+                  <p className="mt-2 text-xs text-brand-lavender/70">{stats.cityNames.join(' · ')}</p>
+                )}
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Vision & Mission */}
       <section className="bg-[#f8f5f0]">
