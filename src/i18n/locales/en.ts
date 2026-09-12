@@ -1457,6 +1457,24 @@ const en = {
           { title: 'Local focus', body: "We know every city we serve — its airport, its roads, and its pickup points — before we ever list it live." },
         ],
       },
+      cta: {
+        heading: 'Ready to book your Dubai rental?',
+      },
+      stats: {
+        heading: 'Bliss Rent today',
+        subtitle: 'Live from our own booking system — not a marketing figure.',
+        // Single template per label rather than i18next's _one/_other split:
+        // this app's fleet/category/city counts are never exactly 0, 1, or
+        // 2, so one plural-sounding form always reads correctly — and it
+        // sidesteps a real i18next gap found while building this (Arabic
+        // needs zero/one/two/few/many/other; without all six, a missing
+        // category like "few" or "many" falls back to the BARE key, not
+        // "_other", so the existing carsCount_other pattern elsewhere in
+        // this file has the same latent bug for Arabic counts of 3-99).
+        vehicles: '{{count}} vehicles ready to book',
+        categories: '{{count}} vehicle categories',
+        cities: '{{count}} cities we operate in',
+      },
     },
     carTypes: {
       title: 'Our Car Types',
