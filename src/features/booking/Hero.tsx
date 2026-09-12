@@ -160,11 +160,19 @@ export function Hero() {
               by simply not applying the animation class (content still
               updates instantly, just without the transition). */}
           <div key={slideIndex} className={reducedMotion ? undefined : 'animate-hero-slide-fade'}>
-            <h1 className="max-w-[12ch] text-4xl font-black leading-[0.84] tracking-[-0.08em] text-white drop-shadow-[0_16px_28px_rgba(0,0,0,0.3)] sm:text-5xl lg:text-[5.4rem]">
+            {/* leading-[0.92]/tracking-[-0.065em] matches the same tight
+                "premium display heading" pair RequirementsSection already
+                uses at a similarly huge size — the old leading-[0.84] here
+                was tighter than that sitewide convention, tight enough
+                that a two-line title's descenders (a slide ending in "y",
+                "g", etc.) visually crowded the subtitle right below it on
+                every screen size. mt-6 on the subtitle (was mt-5) gives a
+                little extra breathing room on top of that. */}
+            <h1 className="max-w-[12ch] text-4xl font-black leading-[0.92] tracking-[-0.065em] text-white drop-shadow-[0_16px_28px_rgba(0,0,0,0.3)] sm:text-5xl lg:text-[5.4rem]">
               <span className="block text-white">{slide.title}</span>
             </h1>
 
-            <p className="mt-5 max-w-lg text-base leading-7 text-white/80 sm:text-lg">{slide.body}</p>
+            <p className="mt-6 max-w-lg text-base leading-7 text-white/80 sm:text-lg">{slide.body}</p>
           </div>
 
           {/* Mobile gets a deliberately different CTA arrangement, not just
