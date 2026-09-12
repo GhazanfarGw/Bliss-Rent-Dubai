@@ -22,9 +22,8 @@ const OUTPUT_PATH = resolve(__dirname, '../public/sitemap.xml')
 
 // Kept in sync with src/lib/useDocumentTitle.ts's own SITE_URL constant
 // and index.html's canonical/og:url tags — see that file's comment for
-// why this is the real production domain even though this local repo
-// isn't (yet) what's deployed there.
-const SITE_URL = 'https://bliss-rent-uae.vercel.app'
+// where this domain comes from.
+const SITE_URL = 'https://bliss.rent'
 
 try {
   process.loadEnvFile(resolve(__dirname, '../.env'))

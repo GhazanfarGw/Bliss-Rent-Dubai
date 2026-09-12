@@ -3,4 +3,4 @@ User-agent: *
 Allow: /
 Disallow: /admin/
 
-Sitemap: https://bliss-rent-uae.vercel.app/sitemap.xml
+Sitemap: https://bliss.rent/sitemap.xml

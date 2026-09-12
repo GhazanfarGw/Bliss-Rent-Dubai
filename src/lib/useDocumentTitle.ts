@@ -2,16 +2,13 @@ import { useEffect } from 'react'
 
 const SITE_NAME = 'Bliss Rent'
 
-// Bliss Rent's real, live production domain (bliss-rent-uae.vercel.app,
-// git-linked to GhazanfarGw/Bliss-Rent---UAE — see
-// claude/phase-14-deployment-status-2026-09-08.md). This local repo
-// (dubai-airport-rental-preview) isn't itself what's currently deployed
-// there, but this is the one real domain that exists for the business,
-// so canonical URLs and the sitemap are built from it rather than a
-// guessed placeholder. If the production domain ever changes, update
-// this constant, index.html's canonical/og:url tags, and
+// Bliss Rent's real, live production domain (bliss.rent, served by the
+// Vercel project "blissrentdubai", git-linked to this repo,
+// GhazanfarGw/Bliss-Rent-Dubai — confirmed directly from the Vercel
+// dashboard). If the production domain ever changes, update this
+// constant, index.html's canonical/og:url tags, and
 // scripts/generate-sitemap.mjs's own copy of the same value together.
-export const SITE_URL = 'https://bliss-rent-uae.vercel.app'
+export const SITE_URL = 'https://bliss.rent'
 
 // Kept in sync with index.html's <meta name="description">  — the
 // fallback used whenever a page doesn't (or can't yet) provide its own
