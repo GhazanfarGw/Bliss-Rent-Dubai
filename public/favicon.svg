@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Bliss Rent Dubai">
+  <defs>
+    <linearGradient id="brGold" x1="0%" x2="100%" y1="0%" y2="100%">
+      <stop offset="0%" stop-color="#f7e3b0" />
+      <stop offset="45%" stop-color="#d7aa63" />
+      <stop offset="100%" stop-color="#b57d3f" />
+    </linearGradient>
+  </defs>
+  <rect x="2" y="2" width="60" height="60" rx="18" fill="#11161d" />
+  <rect x="7" y="7" width="50" height="50" rx="15" fill="none" stroke="rgba(255,255,255,0.12)"/>
+  <path d="M18 44V20h8.6c8.6 0 13.7 5 13.7 12.3S35.1 44 26.6 44H18Zm8.6-18.1h.9c4.6 0 7.3 2.4 7.3 5.8s-2.7 5.8-7.3 5.8h-.9v-11.6Z" fill="url(#brGold)"/>
+  <path d="M38 20h8.4L46 44h-7.4l-.7-9.8h-4.2L32.8 44H25l3.1-24h8.4l-.7 8.8h4.6L38 20Zm-3.7 11.8h.6l-.7-7.6h-.7l-.7 7.6h.8Z" fill="url(#brGold)"/>
+</svg>
