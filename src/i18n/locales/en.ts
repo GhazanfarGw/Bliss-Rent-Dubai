@@ -1609,12 +1609,12 @@ const en = {
         },
         email: {
           label: 'Email',
-          value: '[support@bliss.rent]',
+          value: 'support@bliss.rent',
           note: 'For general questions, feedback, or anything not urgent.',
         },
         address: {
           label: 'Office',
-          value: '[Office address, Dubai, UAE]',
+          value: 'Apt 121B, Block B, Sajaya 7 Building, Manama Street, Nad Al Sheba 3, Dubai, UAE',
           note: 'Pickup happens at the airport and other agreed points in the cities we serve — this is our office address, not a pickup counter.',
         },
         hours: {
@@ -1623,6 +1623,7 @@ const en = {
           note: '',
         },
       },
+      getDirections: 'Get directions',
       form: {
         heading: 'Send us a message',
         name: 'Your name',
