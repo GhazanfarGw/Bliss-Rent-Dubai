@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <!-- Real brand favicon (generated from the supplied logo mark — see
+         src/assets/brand/logo-mark.png and the NavBar/Footer/admin brand
+         usage it's also used for). favicon.svg is the old generic
+         placeholder and is no longer referenced. -->
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta name="theme-color" content="#0b132b" />
+    <title>Bliss Rent — Dubai Airport Car Rental</title>
+    <meta
+      name="description"
+      content="Book premium and economy car rentals in Dubai with fast airport delivery, flexible pickup and return points across the UAE, and no hidden fees. Reserve online in minutes — no account needed."
+    />
+
+    <!-- Open Graph / Twitter card — title, description, and type only for
+         now. og:image and og:url both require an absolute URL per spec,
+         and this site doesn't have a production domain recorded anywhere
+         in the codebase yet; add those two once it's deployed, rather
+         than pointing them at a guessed domain. -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Bliss Rent" />
+    <meta property="og:title" content="Bliss Rent — Dubai Airport Car Rental" />
+    <meta
+      property="og:description"
+      content="Premium and economy car rentals in Dubai, with fast airport delivery and flexible pickup and return points across the UAE."
+    />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Bliss Rent — Dubai Airport Car Rental" />
+    <meta
+      name="twitter:description"
+      content="Premium and economy car rentals in Dubai, with fast airport delivery and flexible pickup and return points across the UAE."
+    />
+
+    <!-- Cairo covers both Latin and Arabic script cleanly in one family,
+         matching the bilingual EN/AR UI (see src/i18n/). -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Structured data: only facts already established elsewhere in the
+         app (name, real service area). No phone/address/social profile —
+         those are still bracketed placeholders on the Contact page
+         (pages.contact.methods.* in en.ts/ar.ts) and NavBar's social
+         links are placeholder URLs, so none of it is real yet; add them
+         here once real ones exist rather than publishing fabricated
+         contact details as structured data. -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "AutoRental",
+        "name": "Bliss Rent",
+        "description": "Book premium and economy car rentals in Dubai with fast airport delivery, flexible pickup and return points across the UAE, and no hidden fees.",
+        "areaServed": {
+          "@type": "City",
+          "name": "Dubai"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
