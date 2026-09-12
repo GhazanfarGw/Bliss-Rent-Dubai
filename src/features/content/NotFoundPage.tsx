@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { CarFront } from 'lucide-react'
 import { LinkButton } from '@/features/shared/ui/LinkButton'
-import { useDocumentTitle } from '@/lib/useDocumentTitle'
+import { useDocumentTitle, useNoIndex } from '@/lib/useDocumentTitle'
 
 /**
  * Catch-all for any URL that doesn't match a real route (typo, stale
@@ -14,6 +14,7 @@ import { useDocumentTitle } from '@/lib/useDocumentTitle'
 export function NotFoundPage() {
   const { t } = useTranslation()
   useDocumentTitle(t('pages.notFound.title'))
+  useNoIndex()
 
   return (
     <div className="mx-auto flex max-w-2xl flex-col items-center px-4 py-24 text-center sm:px-6">

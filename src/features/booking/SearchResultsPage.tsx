@@ -11,7 +11,7 @@ import { validateDateRange, rentalDays } from '@/lib/dateRange'
 import { applyFilters, distinctBrands, distinctCategories, distinctTransmissions, sortByPrice } from '@/lib/vehicleFilters'
 import { groupPublicVehicles } from '@/lib/vehicleGrouping'
 import { EMPTY_FILTERS } from '@/types/domain'
-import { useDocumentTitle } from '@/lib/useDocumentTitle'
+import { useDocumentTitle, useMetaDescription } from '@/lib/useDocumentTitle'
 import type { Location, SearchCriteria, SortOption, VehicleFilters, VehicleSearchResult } from '@/types/domain'
 
 type LoadState =
@@ -23,6 +23,7 @@ type LoadState =
 export function SearchResultsPage() {
   const { t, i18n } = useTranslation()
   useDocumentTitle(t('searchResults.title'))
+  useMetaDescription('Browse available cars for rent in Dubai — filter by category and dates to find the right vehicle, with transparent pricing and fast airport pickup.')
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
 

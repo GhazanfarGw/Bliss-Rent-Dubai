@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { SectionHeader } from '@/features/shared/ui/SectionHeader'
-import { useDocumentTitle } from '@/lib/useDocumentTitle'
+import { useDocumentTitle, useMetaDescription } from '@/lib/useDocumentTitle'
 
 interface LegalSection {
   heading: string
@@ -28,6 +28,7 @@ interface LegalPageProps {
 export function LegalPage({ title, updated, draftNotice, intro, sections }: LegalPageProps) {
   const { t } = useTranslation()
   useDocumentTitle(title)
+  useMetaDescription(intro)
   return (
     <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6">
       <SectionHeader title={title} description={updated} />

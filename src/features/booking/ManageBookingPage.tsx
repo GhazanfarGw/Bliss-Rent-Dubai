@@ -8,7 +8,7 @@ import { criteriaToSearchParams } from '@/features/booking/searchParams'
 import { ManageBookingHero } from '@/features/booking/ManageBookingHero'
 import { ManageBookingLookupCard } from '@/features/booking/ManageBookingLookupCard'
 import { Button, StatusBadge } from '@/features/shared/ui'
-import { useDocumentTitle } from '@/lib/useDocumentTitle'
+import { useDocumentTitle, useMetaDescription } from '@/lib/useDocumentTitle'
 import { prefersReducedMotion } from '@/lib/motion'
 import type { BookingLookupResult } from '@/types/domain'
 
@@ -79,6 +79,7 @@ const EXTENDABLE_STATUSES = new Set(['confirmed', 'active'])
 export function ManageBookingPage() {
   const { t } = useTranslation()
   useDocumentTitle(t('manageBooking.title'))
+  useMetaDescription('Manage your Bliss Rent booking — view your reservation, extend your rental, or continue to payment with your booking reference or vehicle plate.')
   const [searchParams] = useSearchParams()
   const location = useLocation()
   const prefetchedResult = (location.state as { prefetchedResult?: BookingLookupResult } | null)?.prefetchedResult

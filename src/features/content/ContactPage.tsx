@@ -5,7 +5,7 @@ import { Clock, Mail, MapPin, MessageCircle } from 'lucide-react'
 import { supabase } from '@/lib/supabaseClient'
 import { Button } from '@/features/shared/ui/Button'
 import { LinkButton } from '@/features/shared/ui/LinkButton'
-import { useDocumentTitle } from '@/lib/useDocumentTitle'
+import { useDocumentTitle, useMetaDescription } from '@/lib/useDocumentTitle'
 import { SUPPORT_EMAIL, SUPPORT_EMAIL_HREF, WHATSAPP_PHONE_DISPLAY, WHATSAPP_URL } from '@/features/booking/contactLinks'
 import heroSuv from '@/assets/hero/hero-suv.webp'
 
@@ -52,6 +52,7 @@ const OFFICE_MAPS_EMBED_URL = `https://maps.google.com/maps?q=${OFFICE_COORDS}&z
 export function ContactPage() {
   const { t } = useTranslation()
   useDocumentTitle(t('pages.contact.title'))
+  useMetaDescription(t('pages.contact.subtitle'))
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [subject, setSubject] = useState('')

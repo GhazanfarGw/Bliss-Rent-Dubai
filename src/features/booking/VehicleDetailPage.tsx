@@ -16,7 +16,7 @@ import { StateMessage, Spinner } from '@/features/shared/StateMessage'
 import { quoteForDays, cheapestHeadlineRate, TERM_LABELS } from '@/lib/pricing'
 import { rentalDays, validateDateRange } from '@/lib/dateRange'
 import { isCompleteCriteria, searchParamsToCriteria } from '@/features/booking/searchParams'
-import { useDocumentTitle } from '@/lib/useDocumentTitle'
+import { useDocumentTitle, useMetaDescription } from '@/lib/useDocumentTitle'
 import type { Location, SearchCriteria, VehicleWithDetails } from '@/types/domain'
 
 type LoadState =
@@ -24,6 +24,21 @@ type LoadState =
   | { status: 'error'; message: string }
   | { status: 'not_found' }
   | { status: 'loaded'; vehicle: VehicleWithDetails }
+
+/**
+ * Real, per-vehicle meta description built from the vehicle's own
+ * already-loaded make/model/year/category/seats/transmission and its
+ * cheapest real listed rate — never a generic "rent a car" line
+ * duplicated across every vehicle page, and nothing invented: every
+ * fact here is a field already rendered elsewhere on this same page.
+ */
+function buildVehicleMetaDescription(vehicle: VehicleWithDetails): string {
+  const category = vehicle.vehicle_categories?.name
+  const rate = cheapestHeadlineRate(vehicle.pricing)
+  const pricePart = rate ? ` From AED ${rate.client_price}/day.` : ''
+  const categoryPart = category ? ` — ${category} rental` : ''
+  return `Rent the ${vehicle.make} ${vehicle.model} (${vehicle.model_year}) in Dubai${categoryPart}, ${vehicle.seats} seats, ${vehicle.transmission} transmission.${pricePart} Book online with Bliss Rent.`
+}
 
 export function VehicleDetailPage() {
   const { t } = useTranslation()
@@ -88,6 +103,7 @@ export function VehicleDetailPage() {
   }, [id, hasDates, criteria.startDate, criteria.endDate])
 
   useDocumentTitle(state.status === 'loaded' ? `${state.vehicle.make} ${state.vehicle.model}` : null)
+  useMetaDescription(state.status === 'loaded' ? buildVehicleMetaDescription(state.vehicle) : null)
 
   if (state.status === 'loading') {
     return (

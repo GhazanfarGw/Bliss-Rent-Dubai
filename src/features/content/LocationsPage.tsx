@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { fetchLocations } from '@/features/booking/api'
 import { sortByOrder } from '@/features/booking/locationDisplay'
-import { useDocumentTitle } from '@/lib/useDocumentTitle'
+import { useDocumentTitle, useMetaDescription } from '@/lib/useDocumentTitle'
 import type { Location } from '@/types/domain'
 
 type ViewState = { status: 'loading' } | { status: 'error' } | { status: 'loaded'; locations: Location[] }
@@ -34,6 +34,7 @@ const CITY_IMAGE_MAP: Record<string, string> = {
 export function LocationsPage() {
   const { t } = useTranslation()
   useDocumentTitle(t('pages.locations.title'))
+  useMetaDescription(t('pages.locations.subtitle'))
   const [state, setState] = useState<ViewState>({ status: 'loading' })
 
   useEffect(() => {

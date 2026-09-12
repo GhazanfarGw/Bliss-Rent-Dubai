@@ -17,12 +17,19 @@
       name="description"
       content="Book premium and economy car rentals in Dubai with fast airport delivery, flexible pickup and return points across the UAE, and no hidden fees. Reserve online in minutes — no account needed."
     />
+    <!-- Static baseline for the "/" route. Every other route overrides
+         this at runtime via useMetaDescription (src/lib/useDocumentTitle.ts),
+         which is also where SITE_URL lives — update it there, here, and
+         in scripts/generate-sitemap.mjs together if the domain changes. -->
+    <link rel="canonical" href="https://bliss-rent-uae.vercel.app/" />
 
-    <!-- Open Graph / Twitter card — title, description, and type only for
-         now. og:image and og:url both require an absolute URL per spec,
-         and this site doesn't have a production domain recorded anywhere
-         in the codebase yet; add those two once it's deployed, rather
-         than pointing them at a guessed domain. -->
+    <!-- Open Graph / Twitter card. og:image is left out deliberately —
+         the only images in this repo are the hero photography (.webp,
+         not universally supported by link-preview crawlers) and small
+         favicon/app icons, no real 1200x630 social-share asset exists
+         yet. Add og:image (and its matching twitter:card upgrade to
+         summary_large_image) once one is designed, rather than pointing
+         it at an unsuitable placeholder. -->
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Bliss Rent" />
     <meta property="og:title" content="Bliss Rent — Dubai Airport Car Rental" />
@@ -30,6 +37,7 @@
       property="og:description"
       content="Premium and economy car rentals in Dubai, with fast airport delivery and flexible pickup and return points across the UAE."
     />
+    <meta property="og:url" content="https://bliss-rent-uae.vercel.app/" />
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:title" content="Bliss Rent — Dubai Airport Car Rental" />
     <meta

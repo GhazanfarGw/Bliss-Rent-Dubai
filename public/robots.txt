@@ -3,5 +3,4 @@ User-agent: *
 Allow: /
 Disallow: /admin/
 
-# Sitemap: add once this site has a production domain — a sitemap needs
-# absolute URLs, and none is recorded anywhere in this codebase yet.
+Sitemap: https://bliss-rent-uae.vercel.app/sitemap.xml
