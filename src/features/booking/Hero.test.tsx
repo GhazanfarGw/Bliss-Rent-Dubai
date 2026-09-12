@@ -13,7 +13,12 @@ describe('Hero', () => {
     expect(images).toHaveLength(1)
     expect(images[0]).toHaveAttribute('loading', 'eager')
 
-    expect(screen.getByRole('button', { name: /book now/i })).toBeInTheDocument()
+    const bookNowLink = screen.getByRole('link', { name: /book now/i })
+    expect(bookNowLink).toBeInTheDocument()
+    expect(bookNowLink).toHaveAttribute('href', '/book')
+
+    const viewFleetLink = screen.getByRole('link', { name: /view fleet/i })
+    expect(viewFleetLink).toHaveAttribute('href', '/search')
   })
 
   it('does not render any carousel controls (dots, arrows, slide counter)', () => {

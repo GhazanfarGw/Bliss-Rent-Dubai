@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { HERO_SLIDE_IMAGES } from '@/features/booking/heroSlides'
-import { prefersReducedMotion } from '@/lib/motion'
-import { Button } from '@/features/shared/ui/Button'
+import { Link } from 'react-router-dom'
+import { LinkButton } from '@/features/shared/ui/LinkButton'
 
 interface Slide {
   title: string
@@ -32,11 +32,6 @@ export function Hero() {
   const slides = t('hero.slides', { returnObjects: true }) as Slide[]
   const slide = slides[HERO_SLIDE_INDEX] ?? slides[0]
   const image = HERO_SLIDE_IMAGES[HERO_SLIDE_INDEX] ?? HERO_SLIDE_IMAGES[0]
-  const reducedMotion = prefersReducedMotion()
-
-  function scrollToBooking() {
-    document.getElementById('booking-section')?.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'start' })
-  }
 
   return (
     <section
@@ -81,21 +76,22 @@ export function Hero() {
           <p className="mt-5 max-w-lg text-base leading-7 text-white/80 sm:text-lg">{slide.body}</p>
 
           <div className="mt-7 flex flex-col gap-3 sm:flex-row">
-            <Button
-              type="button"
+            {/* Direct navigation, not an on-page scroll: "Book Now" opens the
+                dedicated Book a Car page and "View fleet" opens the full
+                fleet listing, matching the header's own CTA/Fleet routes. */}
+            <LinkButton
+              to="/book"
               variant="primary"
-              onClick={scrollToBooking}
               className="min-h-12 border border-brand-gold bg-brand-gold text-white shadow-none hover:brightness-105"
             >
               {t('hero.cta')}
-            </Button>
-            <button
-              type="button"
-              onClick={scrollToBooking}
+            </LinkButton>
+            <Link
+              to="/search"
               className="inline-flex min-h-12 items-center justify-center border border-white/70 bg-white px-5 py-3 text-sm font-semibold text-brand-navy transition-all hover:bg-brand-lavender"
             >
               {t('hero.viewFleetCta')}
-            </button>
+            </Link>
           </div>
           {/* No trust-badge row here (Phase 11) — the same rating/concierge/
               delivery facts already scroll in the TickerBar directly above
