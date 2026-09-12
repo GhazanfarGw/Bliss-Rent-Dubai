@@ -1624,6 +1624,13 @@ const en = {
         },
       },
       getDirections: 'Get directions',
+      visitOffice: {
+        heading: 'Visit our office',
+        subtitle: "You're welcome to visit — remember, this is our office, not a vehicle pickup point.",
+      },
+      cta: {
+        heading: 'Ready to book your Dubai rental?',
+      },
       form: {
         heading: 'Send us a message',
         name: 'Your name',
