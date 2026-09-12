@@ -250,8 +250,19 @@ export function NavBar() {
 
       <div
         className={
-          'pointer-events-none fixed inset-0 z-50 lg:hidden ' +
-          (open ? 'pointer-events-auto' : 'hidden')
+          // BUG FIX: both `pointer-events-none` and `pointer-events-auto`
+          // were present on this element at once while open (the base
+          // class plus the conditional one) — Tailwind's generated
+          // stylesheet always orders `.pointer-events-none` after
+          // `.pointer-events-auto`, so `none` wins the cascade regardless
+          // of which one was added last in the class string. Net effect:
+          // the drawer rendered and looked fine, but computed to
+          // `pointer-events: none` even while open, so every tap on a
+          // mobile menu link silently passed through to whatever was
+          // underneath instead of navigating. Fixed by never combining
+          // the two classes on the same element — only one applies now.
+          'fixed inset-0 z-50 lg:hidden ' +
+          (open ? 'pointer-events-auto' : 'pointer-events-none hidden')
         }
         aria-hidden={!open}
       >
