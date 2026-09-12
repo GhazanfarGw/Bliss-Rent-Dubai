@@ -32,10 +32,6 @@ import { prefersReducedMotion } from '@/lib/motion'
 export function TickerBar() {
   const { t } = useTranslation()
   const [rate, setRate] = useState<{ amount: number; currency: string } | null>(null)
-  const [headerVisible, setHeaderVisible] = useState(
-    () => document.documentElement.dataset.headerVisible !== 'false',
-  )
-  const [heroInView, setHeroInView] = useState(true)
   const reducedMotion = prefersReducedMotion()
 
   useEffect(() => {
@@ -56,26 +52,9 @@ export function TickerBar() {
     }
   }, [])
 
-  useEffect(() => {
-    function handleHeaderVisibility(event: Event) {
-      const nextVisible = (event as CustomEvent<{ visible: boolean }>).detail?.visible
-      if (typeof nextVisible === 'boolean') setHeaderVisible(nextVisible)
-    }
+   
 
-    window.addEventListener('headervisibilitychange', handleHeaderVisibility)
-    return () => window.removeEventListener('headervisibilitychange', handleHeaderVisibility)
-  }, [])
 
-  useEffect(() => {
-    const hero = document.getElementById('home-hero')
-    if (!hero) return
-
-    const observer = new IntersectionObserver(([entry]) => setHeroInView(entry.isIntersecting), {
-      threshold: 0,
-    })
-    observer.observe(hero)
-    return () => observer.disconnect()
-  }, [])
 
   const staticItems = t('home.ticker.items', { returnObjects: true }) as string[]
   const rateItem = rate
