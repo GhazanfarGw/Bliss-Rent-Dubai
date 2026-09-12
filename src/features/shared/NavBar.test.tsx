@@ -74,6 +74,26 @@ describe('NavBar', () => {
     expect(toggle).toHaveAttribute('aria-expanded', 'false')
   })
 
+  it('REGRESSION: the open mobile drawer overlay never carries both pointer-events-none and pointer-events-auto at once', () => {
+    // Real bug: the overlay's base classes always included
+    // `pointer-events-none`, with `pointer-events-auto` appended only
+    // while open — but Tailwind's generated stylesheet orders
+    // `.pointer-events-none` after `.pointer-events-auto`, so `none` won
+    // the cascade even while open, silently swallowing every tap on a
+    // mobile menu link. jsdom doesn't compute Tailwind's real cascade, so
+    // this asserts the class list directly: only one of the two classes
+    // may be present at a time.
+    renderNavBar()
+    const toggle = screen.getByRole('button', { name: /toggle menu/i })
+
+    fireEvent.click(toggle)
+    const drawer = screen.getAllByRole('navigation').at(-1) as HTMLElement
+    const overlay = drawer.closest('.fixed.inset-0.z-50') as HTMLElement
+    expect(overlay).not.toBeNull()
+    expect(overlay.className).toContain('pointer-events-auto')
+    expect(overlay.className).not.toContain('pointer-events-none')
+  })
+
   it('stays visible while scrolling and switches to the solid state', () => {
     renderNavBar()
     const header = screen.getByRole('banner')
