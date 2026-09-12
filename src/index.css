@@ -1,0 +1,300 @@
+@import "tailwindcss";
+
+/*
+ * Bliss Rent official brand system (Phase 10 — Premium Frontend
+ * UI/UX & Responsive Overhaul). Every customer-facing color must trace
+ * back to exactly one of these six approved colors:
+ *
+ *   Luxury Berry            #5C0931  -> --color-brand-gold (identifier kept
+ *                                       for backward compatibility — every
+ *                                       existing `bg-brand-gold`/`text-brand-gold`
+ *                                       class already renders the correct
+ *                                       Luxury Berry hex, unchanged)
+ *   Deep Space Blue         #0B132B  -> --color-brand-navy
+ *   Muted Champagne Gold    #D4AF37  -> --color-brand-champagne (new — the
+ *                                       one true "gold" accent; brand-gold
+ *                                       above is berry, not gold, despite
+ *                                       its name)
+ *   Sleek Platinum Gray     #F4F5F7  -> --color-brand-lavender (identifier
+ *                                       kept; value retuned from the old
+ *                                       warm beige to the official cool
+ *                                       platinum gray)
+ *   Crisp Clean White       #FFFFFF  -> --color-surface / literal white
+ *   Success Green           #10B981  -> --color-success
+ *
+ * No other hue is introduced. Tints/shades below (e.g. `-dark`/`-light`)
+ * are derived from these six, not new colors.
+ */
+@theme {
+  --color-brand-navy: #0b132b;
+  --color-brand-navy-dark: #070a1a;
+  --color-brand-navy-light: #1c2540;
+
+  --color-brand-lavender: #f4f5f7;
+  --color-brand-lavender-dark: #e2e4e9;
+
+  --color-brand-gold: #5C0931;
+  --color-brand-gold-dark: #430720;
+  --color-brand-gold-light: #8c4a62;
+
+  --color-brand-champagne: #d4af37;
+  --color-brand-champagne-dark: #ad8a25;
+  --color-brand-champagne-light: #e6c968;
+
+  --font-sans: 'Cairo', 'Noto Kufi Arabic', ui-sans-serif, system-ui, sans-serif;
+
+  /*
+   * Phase 8 — semantic tokens, additive only (retuned in Phase 10 to the
+   * official palette above — identifiers unchanged, only hex values and
+   * the two documented mismatches fixed).
+   *
+   * These give every "state" color (success/warning/error/info) and every
+   * neutral surface/border/text color a name derived from the brand
+   * palette, instead of components reaching for Tailwind's stock red,
+   * emerald, and amber utilities ad hoc.
+   */
+  --color-success: #10b981;
+  --color-success-bg: #e3faf1;
+  --color-warning: #96794a; /* == brand-gold-dark */
+  --color-warning-bg: #f7f0e2;
+  --color-error: #b3261e;
+  --color-error-bg: #fbeceb;
+  --color-info: #0b132b; /* == brand-navy (was a mismatched literal before Phase 10) */
+  --color-info-bg: #eef0f4; /* tint of brand-lavender/platinum (was a mismatched literal before Phase 10) */
+
+  --color-surface: #ffffff;
+  --color-surface-muted: #faf9f6;
+  --color-border: #e5e1d8;
+  --color-text: #1f1d2e;
+  --color-text-muted: #5c5a6b;
+}
+
+/*
+ * Single source of truth for the fixed header's height — NavBar's own
+ * `h-[var(--header-h)]` and every "clear the header" offset elsewhere
+ * (Layout's `<main>` top padding, HeroCarousel's full-bleed exception,
+ * StickySearchBar, FilterBar's mobile sticky bar) all read this one
+ * variable, so the header can never again get out of sync with the
+ * spacing that depends on it.
+ *
+ * `--ticker-h` is the same idea for the homepage TickerBar (Phase 11):
+ * a fixed strip pinned directly below the header. HeroCarousel's inner
+ * content clearance adds this on top of --header-h so heading text never
+ * sits under either bar; the ticker itself reads this for its own height.
+ */
+:root {
+  --header-h: 4rem;
+  --ticker-h: 2.25rem;
+}
+
+html[dir='rtl'] {
+  font-family: 'Cairo', 'Noto Kufi Arabic', ui-sans-serif, system-ui, sans-serif;
+}
+
+html,
+body {
+  max-width: 100%;
+  width: 100%;
+  overflow-x: hidden !important;
+  overscroll-behavior-x: none;
+  touch-action: pan-y;
+}
+
+html,
+body,
+#root {
+  min-width: 100%;
+}
+
+body {
+  position: relative;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.overflow-x-auto {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.overflow-x-auto::-webkit-scrollbar {
+  display: none;
+}
+
+.desktop-filter-options {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+
+.desktop-filter-options:hover,
+.desktop-filter-options:focus-within {
+  scrollbar-color: rgba(46, 42, 84, 0.32) transparent;
+}
+
+.desktop-filter-options::-webkit-scrollbar {
+  width: 5px;
+}
+
+.desktop-filter-options::-webkit-scrollbar-thumb {
+  border-radius: 9999px;
+  background: transparent;
+}
+
+.desktop-filter-options:hover::-webkit-scrollbar-thumb,
+.desktop-filter-options:focus-within::-webkit-scrollbar-thumb {
+  background: rgba(46, 42, 84, 0.32);
+}
+
+/* Numbers, dates, and currency codes stay left-to-right even inside RTL
+   Arabic layout — mixing digit direction into RTL text is a well-known
+   readability problem, so these are pinned explicitly rather than left
+   to bidi auto-detection. */
+.ltr-nums {
+  direction: ltr;
+  unicode-bidi: isolate;
+  display: inline-block;
+}
+
+/* BrandsMarquee — an infinite horizontal scroll built from two identical
+   copies of the brand list placed side by side; animating the wrapper by
+   exactly -50% loops seamlessly since the second copy is a perfect mirror
+   of the first. Direction is fixed (not RTL-flipped) since this is purely
+   decorative motion, not reading order. Paused on hover/focus and skipped
+   entirely for prefers-reduced-motion (BrandsMarquee.tsx renders a static
+   row instead of applying this class in that case). */
+@keyframes marquee-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes slide-in-right {
+  from {
+    transform: translateX(110%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+/* Mirror of slide-in-right for the mobile nav drawer in RTL, where the
+   panel docks at the logical "end" (the left edge) and must slide in from
+   the left, not the right. */
+@keyframes slide-in-left {
+  from {
+    transform: translateX(-110%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.animate-marquee {
+  animation: marquee-scroll 55s linear infinite;
+}
+
+.animate-marquee:hover,
+.animate-marquee:focus-within {
+  animation-play-state: running;
+}
+
+/* Homepage Featured Vehicles sliders — Economy and Luxury each auto-scroll
+   continuously in opposite directions (built the same way as
+   BrandsMarquee above: the vehicle list duplicated once so animating the
+   combined row by exactly -50% loops seamlessly), and — unlike
+   .animate-marquee above — genuinely pause while a shopper is looking at
+   one, on hover or keyboard focus, so they can read a card without it
+   sliding away. The duplicated copy is marked `inert`/`aria-hidden` in
+   the component, so this is purely decorative motion, never doubled
+   reading or tab order. */
+/* Named by the direction cards visually travel, not text direction —
+   this is decorative motion (same as BrandsMarquee), never RTL-flipped
+   for Arabic. */
+@keyframes featured-marquee-move-left {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes featured-marquee-move-right {
+  from {
+    transform: translateX(-50%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.animate-featured-marquee-left {
+  animation: featured-marquee-move-left 36s linear infinite;
+}
+
+.animate-featured-marquee-right {
+  animation: featured-marquee-move-right 36s linear infinite;
+}
+
+.animate-featured-marquee-left:hover,
+.animate-featured-marquee-left:focus-within,
+.animate-featured-marquee-right:hover,
+.animate-featured-marquee-right:focus-within {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-featured-marquee-left,
+  .animate-featured-marquee-right {
+    animation: none;
+  }
+}
+
+.route-loader-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(17, 14, 28, 0.28);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.route-loader-panel {
+  width: min(88vw, 420px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 1.2rem 1rem 1rem;
+  border-radius: 1.25rem;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(46, 42, 84, 0.12);
+  box-shadow: 0 18px 42px rgba(32, 28, 59, 0.18);
+}
+
+.route-loader-text {
+  margin: 0;
+  color: var(--color-brand-navy);
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  text-align: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .route-loader-overlay {
+    background: rgba(17, 14, 28, 0.16);
+  }
+}
