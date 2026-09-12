@@ -168,6 +168,26 @@ body {
    decorative motion, not reading order. Paused on hover/focus and skipped
    entirely for prefers-reduced-motion (BrandsMarquee.tsx renders a static
    row instead of applying this class in that case). */
+/* Hero heading/body text rotation (Task: bring back auto-changing hero
+   copy after the Phase 11 single-slide simplification, while keeping the
+   image itself fixed — see Hero.tsx). A short fade+rise on each text
+   swap, skipped entirely for prefers-reduced-motion (Hero.tsx doesn't
+   apply this class in that case, same pattern as BrandsMarquee below). */
+@keyframes hero-slide-fade {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-hero-slide-fade {
+  animation: hero-slide-fade 500ms ease-out;
+}
+
 @keyframes marquee-scroll {
   from {
     transform: translateX(0);

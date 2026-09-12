@@ -1,37 +1,54 @@
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { HERO_SLIDE_IMAGES } from '@/features/booking/heroSlides'
 import { Link } from 'react-router-dom'
 import { LinkButton } from '@/features/shared/ui/LinkButton'
+import { prefersReducedMotion } from '@/lib/motion'
 
 interface Slide {
   title: string
   body: string
 }
 
-// The single static hero image/copy pair — reuses the exact same real
-// asset and i18n content the former HeroCarousel rotated through (index 4:
-// the premium sports-coupe shot, "Drive Dubai your way" / "A mix of
-// premium and economy vehicles for city drives, short stays, and smooth
-// arrivals." — a fitting general welcome line, nothing new invented).
+// The hero IMAGE stays pinned (Phase 11 decision, unchanged) — only the
+// heading/body text auto-rotates through all 5 real slides below. Index 4
+// ("Drive Dubai your way" / "A mix of premium and economy vehicles for
+// city drives, short stays, and smooth arrivals.") is still where both
+// the image and the text rotation start, so the very first paint matches
+// what Phase 11 shipped.
 const HERO_SLIDE_INDEX = 4
+const HERO_TEXT_ROTATE_MS = 6000
 
 /**
- * The homepage's main visual focus, simplified per the Phase 11 header/hero
- * redesign: ONE static hero image — no carousel, no autoplay, no
- * dots/arrows/slide counter — with the site header overlaid transparently
- * on top of it (see NavBar). Structurally inspired by airline-style hero
- * layouts (the owner's reference); an ORIGINAL Bliss Rent treatment, not a
- * visual copy. Replaces HeroCarousel.tsx, which is removed.
+ * The homepage's main visual focus. Phase 11 pinned this to one static
+ * image with no autoplay at all; per later feedback the heading/body text
+ * should auto-change again (image and everything else stays as Phase 11
+ * left it — no dots/arrows/slide counter, no image rotation, same layout,
+ * same transparent-header treatment — see NavBar).
  *
- * Reuses the exact same real image asset (HERO_SLIDE_IMAGES) and i18n copy
- * (`hero.*`) the former carousel used — just pinned to one slide instead of
- * rotating through five, so no new content is invented.
+ * Reuses the exact same real i18n copy (`hero.slides`, all 5 entries) the
+ * original HeroCarousel rotated through — nothing new invented — just the
+ * TEXT rotates on a plain interval now; HERO_SLIDE_IMAGES/HERO_SLIDE_INDEX
+ * still pick a single fixed image, unchanged from Phase 11. Skips the
+ * rotation entirely for prefers-reduced-motion, same as every other
+ * autoplay/animation in this app (see src/lib/motion.ts).
  */
 export function Hero() {
   const { t } = useTranslation()
   const slides = t('hero.slides', { returnObjects: true }) as Slide[]
-  const slide = slides[HERO_SLIDE_INDEX] ?? slides[0]
+  const [slideIndex, setSlideIndex] = useState(HERO_SLIDE_INDEX)
+  const slide = slides[slideIndex] ?? slides[0]
   const image = HERO_SLIDE_IMAGES[HERO_SLIDE_INDEX] ?? HERO_SLIDE_IMAGES[0]
+
+  useEffect(() => {
+    if (prefersReducedMotion()) return
+    const slideCount = slides.length
+    if (slideCount <= 1) return
+    const id = setInterval(() => {
+      setSlideIndex((current) => (current + 1) % slideCount)
+    }, HERO_TEXT_ROTATE_MS)
+    return () => clearInterval(id)
+  }, [slides.length])
 
   return (
     <section
@@ -69,11 +86,17 @@ export function Hero() {
             {t('hero.badge')}
           </div>
 
-          <h1 className="max-w-[12ch] text-4xl font-black leading-[0.84] tracking-[-0.08em] text-white drop-shadow-[0_16px_28px_rgba(0,0,0,0.3)] sm:text-5xl lg:text-[5.4rem]">
-            <span className="block text-white">{slide.title}</span>
-          </h1>
+          {/* key={slideIndex} remounts this block on every rotation so the
+              fade-in plays each time; skipped for prefers-reduced-motion
+              by simply not applying the animation class (content still
+              updates instantly, just without the transition). */}
+          <div key={slideIndex} className={prefersReducedMotion() ? undefined : 'animate-hero-slide-fade'}>
+            <h1 className="max-w-[12ch] text-4xl font-black leading-[0.84] tracking-[-0.08em] text-white drop-shadow-[0_16px_28px_rgba(0,0,0,0.3)] sm:text-5xl lg:text-[5.4rem]">
+              <span className="block text-white">{slide.title}</span>
+            </h1>
 
-          <p className="mt-5 max-w-lg text-base leading-7 text-white/80 sm:text-lg">{slide.body}</p>
+            <p className="mt-5 max-w-lg text-base leading-7 text-white/80 sm:text-lg">{slide.body}</p>
+          </div>
 
           <div className="mt-7 flex flex-col gap-3 sm:flex-row">
             {/* Direct navigation, not an on-page scroll: "Book Now" opens the
