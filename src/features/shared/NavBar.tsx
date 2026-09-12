@@ -268,7 +268,7 @@ export function NavBar() {
         }
         aria-hidden={!open}
       >
-        <div className="absolute inset-0 bg-brand-gold/30 backdrop-blur-[2px]" onClick={() => setOpen(false)} />
+        <div className="absolute inset-0 bg-white backdrop-blur-[2px]" onClick={() => setOpen(false)} />
 
         <nav
           className={
