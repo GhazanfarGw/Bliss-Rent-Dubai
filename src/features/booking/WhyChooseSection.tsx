@@ -26,9 +26,12 @@ export function WhyChooseSection() {
 
         <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {items.map((item, i) => (
-            <div key={item.title} className="border border-[#ece7df] bg-white p-5 shadow-none backdrop-blur-sm">
+            <div
+              key={item.title}
+              className="group border border-[#ece7df] bg-white p-5 shadow-none backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-brand-gold/40 hover:shadow-[0_24px_48px_rgba(92,9,49,0.1)]"
+            >
               <div className="flex items-center gap-4">
-                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-none bg-brand-gold text-sm font-semibold text-white shadow-none">
+                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-none bg-brand-gold text-sm font-semibold text-white shadow-none transition-all duration-300 group-hover:scale-105 group-hover:shadow-[0_0_0_6px_rgba(212,175,55,0.18)]">
                   {i + 1}
                 </span>
                 <h3 className="text-base font-semibold text-brand-navy">{item.title}</h3>

@@ -50,13 +50,21 @@ export function BrandsMarquee() {
     <section className="py-8 sm:py-16">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="text-center">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.32em] text-brand-gold-dark">Trusted by drivers</p>
+          <p className="inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.32em] text-brand-gold-dark">
+            <span className="relative flex h-1.5 w-1.5">
+              {!reducedMotion && (
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-champagne opacity-75" />
+              )}
+              <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-brand-gold" />
+            </span>
+            Trusted by drivers
+          </p>
           <h2 className="mt-3 text-center text-[2rem] font-black tracking-[-0.06em] text-brand-navy sm:text-[3rem]">
             {t('home.brands.title')}
           </h2>
         </div>
 
-        <div className="mt-10 overflow-hidden">
+        <div className={'mt-10 overflow-hidden ' + (shouldLoop ? '[mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)] [-webkit-mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)]' : '')}>
           <div className="overflow-x-hidden pb-1">
             <div className={'flex min-w-max items-stretch gap-4 sm:gap-6 ' + (shouldLoop ? 'animate-marquee' : 'flex-wrap justify-center')}>
               {items.map((brand, index) => {
@@ -77,7 +85,7 @@ export function BrandsMarquee() {
 
 function BrandCard({ name }: { name: string }) {
   return (
-    <div className="flex h-full w-[100px] shrink-0 flex-col items-center justify-between rounded-none py-2 shadow-none transition-all duration-300 hover:-translate-y-1 hover:border-brand-gold/50">
+    <div className="flex h-full w-[100px] shrink-0 flex-col items-center justify-between rounded-none border border-transparent py-2 shadow-none transition-all duration-300 hover:-translate-y-1 hover:border-brand-gold/50 hover:shadow-[0_18px_36px_rgba(92,9,49,0.1)]">
       <div className="flex h-24 w-full items-center justify-center sm:h-24">
         {renderBrandMark(name)}
       </div>
