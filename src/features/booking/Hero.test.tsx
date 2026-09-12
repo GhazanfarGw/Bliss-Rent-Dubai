@@ -1,8 +1,21 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { render, screen, act } from '@testing-library/react'
+import { render, screen, act, waitFor } from '@testing-library/react'
 import { Hero } from '@/features/booking/Hero'
 
+const fetchAllAvailableVehicles = vi.fn()
+const fetchLocations = vi.fn()
+
+vi.mock('@/features/booking/api', () => ({
+  fetchAllAvailableVehicles: (...args: unknown[]) => fetchAllAvailableVehicles(...args),
+  fetchLocations: (...args: unknown[]) => fetchLocations(...args),
+}))
+
 describe('Hero', () => {
+  beforeEach(() => {
+    fetchAllAvailableVehicles.mockReset().mockResolvedValue([])
+    fetchLocations.mockReset().mockResolvedValue([])
+  })
+
   it('renders a single static hero image with its heading and CTA', () => {
     render(<Hero />)
 
@@ -67,6 +80,45 @@ describe('Hero', () => {
 
       expect(screen.getByRole('heading', { level: 1 }).textContent).toBe(firstTitle)
       vi.unstubAllGlobals()
+    })
+  })
+
+  describe('live trust-signal row', () => {
+    it('shows the real fetched vehicle and city counts once loaded', async () => {
+      fetchAllAvailableVehicles.mockResolvedValue([{ id: '1' }, { id: '2' }, { id: '3' }])
+      fetchLocations.mockResolvedValue([
+        { city: 'Dubai' },
+        { city: 'Dubai' },
+        { city: 'Abu Dhabi' },
+      ])
+
+      render(<Hero />)
+
+      await waitFor(() => expect(screen.getByText('3')).toBeInTheDocument())
+      expect(screen.getByText('2')).toBeInTheDocument()
+    })
+
+    it('renders no stat row at all when the fetch fails — no fake fallback', async () => {
+      fetchAllAvailableVehicles.mockRejectedValue(new Error('network error'))
+      fetchLocations.mockResolvedValue([])
+
+      render(<Hero />)
+
+      await waitFor(() => expect(fetchAllAvailableVehicles).toHaveBeenCalled())
+      expect(screen.queryByText(/vehicles ready to book/i)).not.toBeInTheDocument()
+    })
+  })
+
+  describe('scroll cue', () => {
+    it('smooth-scrolls to the booking section when clicked', () => {
+      document.body.innerHTML = '<div id="booking-section"></div>'
+      const scrollIntoView = vi.fn()
+      document.getElementById('booking-section')!.scrollIntoView = scrollIntoView
+
+      render(<Hero />)
+      screen.getByRole('button', { name: /scroll to explore/i }).click()
+
+      expect(scrollIntoView).toHaveBeenCalledWith(expect.objectContaining({ behavior: 'smooth' }))
     })
   })
 })

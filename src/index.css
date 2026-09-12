@@ -188,6 +188,24 @@ body {
   animation: hero-slide-fade 500ms ease-out;
 }
 
+/* Hero background image — a slow, one-time "ken burns" style drift so the
+   pinned hero photo (still a single fixed image — see Hero.tsx) feels
+   alive rather than a flat static poster. Runs once on mount and holds at
+   its final scale (`forwards`), skipped entirely for
+   prefers-reduced-motion, same pattern as every other animation here. */
+@keyframes hero-image-drift {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.06);
+  }
+}
+
+.animate-hero-image-drift {
+  animation: hero-image-drift 20s ease-out forwards;
+}
+
 @keyframes marquee-scroll {
   from {
     transform: translateX(0);

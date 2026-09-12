@@ -1,13 +1,20 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { HERO_SLIDE_IMAGES } from '@/features/booking/heroSlides'
 import { Link } from 'react-router-dom'
+import { ArrowRight, Car, ChevronDown, MapPin } from 'lucide-react'
+import { HERO_SLIDE_IMAGES } from '@/features/booking/heroSlides'
 import { LinkButton } from '@/features/shared/ui/LinkButton'
+import { fetchAllAvailableVehicles, fetchLocations } from '@/features/booking/api'
 import { prefersReducedMotion } from '@/lib/motion'
 
 interface Slide {
   title: string
   body: string
+}
+
+interface HeroStats {
+  vehicleCount: number
+  cityCount: number
 }
 
 // The hero IMAGE stays pinned (Phase 11 decision, unchanged) — only the
@@ -22,23 +29,40 @@ const HERO_TEXT_ROTATE_MS = 6000
 /**
  * The homepage's main visual focus. Phase 11 pinned this to one static
  * image with no autoplay at all; per later feedback the heading/body text
- * should auto-change again (image and everything else stays as Phase 11
- * left it — no dots/arrows/slide counter, no image rotation, same layout,
- * same transparent-header treatment — see NavBar).
+ * auto-changes again (image and layout stay as Phase 11 left it — no
+ * dots/arrows/slide counter, no image swapping, same transparent-header
+ * treatment — see NavBar), and this pass adds three more premium touches
+ * requested afterwards:
  *
- * Reuses the exact same real i18n copy (`hero.slides`, all 5 entries) the
- * original HeroCarousel rotated through — nothing new invented — just the
- * TEXT rotates on a plain interval now; HERO_SLIDE_IMAGES/HERO_SLIDE_INDEX
- * still pick a single fixed image, unchanged from Phase 11. Skips the
- * rotation entirely for prefers-reduced-motion, same as every other
- * autoplay/animation in this app (see src/lib/motion.ts).
+ *  - A slow, one-time "ken burns" drift on the pinned image (never swaps
+ *    which photo shows, just a subtle zoom so it doesn't feel like a flat
+ *    static poster) — `.animate-hero-image-drift` in index.css.
+ *  - A compact trust-signal row under the CTAs, fetched live from the
+ *    same fleet/locations queries AboutPage's stats section and
+ *    TickerBar's rate already use — never a hand-typed figure. This is
+ *    deliberately different data from TickerBar's scrolling strip
+ *    (service policies) so the two don't repeat each other in the same
+ *    viewport; best-effort only, same as TickerBar — on failure the row
+ *    just doesn't render.
+ *  - A small "Scroll to explore" cue under the stats row that
+ *    smooth-scrolls to the booking search section, matching the same
+ *    `#booking-section` anchor the header CTA and final-CTA button
+ *    already use. Kept inline in the content column rather than pinned
+ *    to the hero's bottom edge, since BookingSearchSection intentionally
+ *    overlaps up onto that edge with its own card (see
+ *    BookingSearchSection.tsx) and the fixed TickerBar sits there too.
+ *
+ * All of the above skip themselves for prefers-reduced-motion, same as
+ * every other autoplay/animation in this app (see src/lib/motion.ts).
  */
 export function Hero() {
   const { t } = useTranslation()
   const slides = t('hero.slides', { returnObjects: true }) as Slide[]
   const [slideIndex, setSlideIndex] = useState(HERO_SLIDE_INDEX)
+  const [stats, setStats] = useState<HeroStats | null>(null)
   const slide = slides[slideIndex] ?? slides[0]
   const image = HERO_SLIDE_IMAGES[HERO_SLIDE_INDEX] ?? HERO_SLIDE_IMAGES[0]
+  const reducedMotion = prefersReducedMotion()
 
   useEffect(() => {
     if (prefersReducedMotion()) return
@@ -49,6 +73,32 @@ export function Hero() {
     }, HERO_TEXT_ROTATE_MS)
     return () => clearInterval(id)
   }, [slides.length])
+
+  useEffect(() => {
+    let cancelled = false
+    Promise.all([fetchAllAvailableVehicles(), fetchLocations()])
+      .then(([vehicles, locations]) => {
+        if (cancelled) return
+        const cityCount = new Set(locations.map((l) => l.city)).size
+        setStats({ vehicleCount: vehicles.length, cityCount })
+      })
+      .catch(() => {
+        // No fake fallback — the stat row just stays absent, same as
+        // TickerBar's live rate item.
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  function handleScrollCueClick() {
+    const target = document.getElementById('booking-section')
+    // jsdom (unit tests) doesn't implement scrollIntoView — guard, same
+    // pattern as ManageBookingPage.tsx.
+    if (typeof target?.scrollIntoView === 'function') {
+      target.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'start' })
+    }
+  }
 
   return (
     <section
@@ -63,7 +113,10 @@ export function Hero() {
         alt={t(image.altKey)}
         loading="eager"
         fetchPriority="high"
-        className="absolute inset-0 h-full w-full object-cover object-center saturate-[1.1] contrast-[1.05]"
+        className={
+          'absolute inset-0 h-full w-full object-cover object-center saturate-[1.1] contrast-[1.05]' +
+          (reducedMotion ? '' : ' animate-hero-image-drift')
+        }
       />
       {/* The image itself stays bright and clearly visible — only a soft
           bottom-up gradient for the headline/CTA to sit on, plus a light
@@ -90,7 +143,7 @@ export function Hero() {
               fade-in plays each time; skipped for prefers-reduced-motion
               by simply not applying the animation class (content still
               updates instantly, just without the transition). */}
-          <div key={slideIndex} className={prefersReducedMotion() ? undefined : 'animate-hero-slide-fade'}>
+          <div key={slideIndex} className={reducedMotion ? undefined : 'animate-hero-slide-fade'}>
             <h1 className="max-w-[12ch] text-4xl font-black leading-[0.84] tracking-[-0.08em] text-white drop-shadow-[0_16px_28px_rgba(0,0,0,0.3)] sm:text-5xl lg:text-[5.4rem]">
               <span className="block text-white">{slide.title}</span>
             </h1>
@@ -105,9 +158,10 @@ export function Hero() {
             <LinkButton
               to="/book"
               variant="primary"
-              className="min-h-12 border border-brand-gold bg-brand-gold text-white shadow-none hover:brightness-105"
+              className="group min-h-12 border border-brand-gold bg-brand-gold text-white shadow-none hover:brightness-105"
             >
               {t('hero.cta')}
+              <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" aria-hidden="true" />
             </LinkButton>
             <Link
               to="/search"
@@ -116,9 +170,45 @@ export function Hero() {
               {t('hero.viewFleetCta')}
             </Link>
           </div>
-          {/* No trust-badge row here (Phase 11) — the same rating/concierge/
-              delivery facts already scroll in the TickerBar directly above
-              this hero, so repeating them here was redundant. */}
+
+          {/* Live trust signals — only the two numbers AboutPage's own
+              stats section already treats as real (fleet size, city
+              count). Absent entirely until the fetch resolves; never a
+              placeholder/skeleton number. */}
+          {stats && (
+            <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2">
+              <div className="flex items-center gap-2">
+                <Car className="h-4 w-4 text-brand-gold" aria-hidden="true" />
+                <span className="text-sm font-semibold text-white">{stats.vehicleCount}</span>
+                <span className="text-xs text-white/70">{t('pages.about.stats.vehicles', { count: stats.vehicleCount })}</span>
+              </div>
+              <div className="hidden h-4 w-px bg-white/25 sm:block" aria-hidden="true" />
+              <div className="flex items-center gap-2">
+                <MapPin className="h-4 w-4 text-brand-gold" aria-hidden="true" />
+                <span className="text-sm font-semibold text-white">{stats.cityCount}</span>
+                <span className="text-xs text-white/70">{t('pages.about.stats.cities', { count: stats.cityCount })}</span>
+              </div>
+            </div>
+          )}
+
+          {/* Scroll cue — a purely navigational nudge toward the booking
+              search directly below, reusing the same #booking-section
+              anchor the header CTA and homepage's final-CTA button
+              already scroll to. Deliberately placed inline in this
+              content column (not absolutely pinned to the hero's own
+              bottom edge): BookingSearchSection overlaps up onto the
+              hero's lower portion with its own -mt/z-10 card (see
+              BookingSearchSection.tsx), so anything pinned to the hero's
+              literal bottom would sit underneath that white card, or
+              behind the fixed TickerBar strip, on shorter viewports. */}
+          <button
+            type="button"
+            onClick={handleScrollCueClick}
+            className="mt-8 inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.28em] text-white/60 transition-colors hover:text-white/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-gold"
+          >
+            {t('hero.scrollCue')}
+            <ChevronDown className={'h-4 w-4' + (reducedMotion ? '' : ' animate-bounce')} aria-hidden="true" />
+          </button>
         </div>
       </div>
     </section>
