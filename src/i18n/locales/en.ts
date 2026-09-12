@@ -608,6 +608,12 @@ const en = {
       notFoundBody: 'Your booking may have been created in a different browser or tab, or your browser storage was cleared. Please start again — no payment has been taken.',
       securedByStripe: 'Payments are processed securely by Stripe. Bliss Rent never sees or stores your card details.',
     },
+    paymentPending: {
+      title: 'Payment',
+      heading: 'Online payment is temporarily paused',
+      body: "We're finishing a few checks on our payment system. Your booking details below are saved — message us on WhatsApp with your booking reference and our team will confirm your payment and rental directly.",
+      whatsappCta: 'Continue on WhatsApp',
+    },
     confirmation: {
       confirmed: 'Booking confirmed',
       received: 'Booking received',
@@ -1450,6 +1456,9 @@ const en = {
           { title: 'Reliability', body: 'A fleet that is inspected and maintained, so the car you booked is the car you get.' },
           { title: 'Local focus', body: "We know every city we serve — its airport, its roads, and its pickup points — before we ever list it live." },
         ],
+      },
+      cta: {
+        heading: 'Ready to book your Dubai rental?',
       },
     },
     carTypes: {
