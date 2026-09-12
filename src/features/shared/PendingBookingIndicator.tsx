@@ -3,9 +3,11 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import {
   readPendingBookingIndicator,
+  clearActiveBooking,
   PENDING_BOOKING_EVENT,
   type ActiveBookingPointer,
 } from '@/features/booking/checkout/checkoutStorage'
+import { lookupBooking } from '@/features/booking/lookupApi'
 import { criteriaToSearchParams } from '@/features/booking/searchParams'
 import { Button } from '@/features/shared/ui'
 
@@ -19,6 +21,22 @@ import { Button } from '@/features/shared/ui'
  * fires PENDING_BOOKING_EVENT (create-booking success, payment success,
  * or a stale pointer getting cleaned up), since sessionStorage writes
  * don't otherwise trigger a re-render in this same tab.
+ *
+ * BUG FIX (reported: reminder kept showing a booking that no longer
+ * existed after an admin data reset): this pointer is pure client-side
+ * sessionStorage with no expiry — it used to be trusted forever, with
+ * nothing ever re-checking it against the server after it was first
+ * saved. If the browser tab outlives the booking (paid/cancelled from
+ * another device, or the underlying row is gone entirely, e.g. an admin
+ * reset/test-data wipe), the reminder had no way to find out and kept
+ * showing stale details with a "Continue to payment" button that led
+ * nowhere real. Now validates the pointer once per bookingId via the
+ * same guest-safe `lookup_booking_for_customer` RPC Manage Booking
+ * already uses, and silently clears it (same `clearActiveBooking` used
+ * everywhere else this pointer is invalidated) when the booking is gone
+ * or no longer `pending_payment` — mirroring the exact defensive-cleanup
+ * pattern already used in ManageBookingPage.tsx, just applied on load
+ * instead of only after a manual lookup.
  */
 export function PendingBookingIndicator() {
   const { t } = useTranslation()
@@ -28,6 +46,11 @@ export function PendingBookingIndicator() {
   const [open, setOpen] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
 
+  // Tracks which bookingId has already been checked against the server
+  // this page-load, so re-renders / route changes / the same pointer
+  // reappearing don't re-fire the lookup RPC repeatedly.
+  const validatedBookingId = useRef<string | null>(null)
+
   useEffect(() => {
     function refresh() {
       setPending(readPendingBookingIndicator())
@@ -36,6 +59,33 @@ export function PendingBookingIndicator() {
     window.addEventListener(PENDING_BOOKING_EVENT, refresh)
     return () => window.removeEventListener(PENDING_BOOKING_EVENT, refresh)
   }, [])
+
+  useEffect(() => {
+    if (!pending) return
+    if (validatedBookingId.current === pending.bookingId) return
+    validatedBookingId.current = pending.bookingId
+
+    let cancelled = false
+    lookupBooking(pending.bookingReference)
+      .then((result) => {
+        if (cancelled) return
+        // Not found (row gone entirely — e.g. an admin data reset) or
+        // resolved to something other than still-awaiting-payment: this
+        // reminder is stale, so drop it exactly like every other place
+        // that invalidates this pointer.
+        if (!result || result.bookingStatus !== 'pending_payment') {
+          clearActiveBooking(pending.vehicleId)
+        }
+      })
+      .catch(() => {
+        // Best-effort only — a transient network/lookup error should
+        // never falsely clear a real pending booking, so just leave the
+        // reminder as-is and let the next mount/route-change try again.
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [pending])
 
   // Also refresh on navigation (e.g. right after a payment succeeds and
   // the pointer was cleared) — the event above already covers same-tick
@@ -100,7 +150,17 @@ export function PendingBookingIndicator() {
         <div
           role="dialog"
           aria-label={t('nav.pendingBooking.panelLabel')}
-          className="absolute end-0 top-12 z-50 w-80 max-w-[calc(100vw-2rem)] rounded-none border border-brand-navy/10 bg-white p-4 text-start shadow-[0_20px_38px_rgba(18,20,23,0.14)]"
+          // Below `lg`, this button sits in the middle of the mobile header
+          // (language switcher + hamburger still to its right), so anchoring
+          // the panel to the BUTTON via `absolute end-0` let a 320px-wide
+          // panel overshoot off the left edge of the screen on narrow
+          // viewports — exactly the overlap/alignment bug reported. Fixed by
+          // anchoring to the VIEWPORT instead (`fixed inset-x-4`) below `lg`,
+          // clearing the fixed header with a flat `top-20` (comfortably above
+          // both the 4rem and 4.5rem/transparent header heights). From `lg`
+          // up the button is part of the right-aligned desktop nav cluster,
+          // where anchoring to the button itself is safe again.
+          className="fixed inset-x-4 top-20 z-50 rounded-none border border-brand-navy/10 bg-white p-4 text-start shadow-[0_20px_38px_rgba(18,20,23,0.14)] lg:absolute lg:inset-x-auto lg:end-0 lg:top-12 lg:w-80 lg:max-w-[calc(100vw-2rem)]"
         >
           <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-brand-gold-dark">
             {t('nav.pendingBooking.title')}
