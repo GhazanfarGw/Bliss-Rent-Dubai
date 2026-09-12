@@ -1,0 +1,132 @@
+import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
+import { fetchLocations } from '@/features/booking/api'
+import type { Location } from '@/types/domain'
+
+const PREVIEW_LIMIT = 10
+
+/**
+ * Homepage teaser for the full /locations page — a dark band showing a
+ * handful of real, active pickup/drop-off points (same fetchLocations()
+ * the search widget uses, so this can't drift out of sync with what's
+ * actually bookable) plus a "View all locations" button. Honest to
+ * Bliss Rent's actual, currently-live coverage (whatever cities exist in
+ * `locations` today — no city names are hardcoded here or in the
+ * translated copy) rather than a full-UAE door-to-door delivery claim.
+ * The business is UAE-wide by design; which cities are actually live is
+ * data, not something this component (or its copy) should assume.
+ */
+export function LocationsPreviewSection() {
+  const { t } = useTranslation()
+  const [locations, setLocations] = useState<Location[] | null>(null)
+
+  useEffect(() => {
+    let cancelled = false
+    fetchLocations()
+      .then((data) => {
+        if (!cancelled) setLocations(data)
+      })
+      .catch(() => {
+        if (!cancelled) setLocations([])
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  const preview = (locations ?? []).slice(0, PREVIEW_LIMIT)
+  const cityNames = Array.from(new Set((locations ?? []).map((l) => l.city)))
+
+  return (
+    <section className="bg-[#f7f4ef]">
+      <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.32em] text-brand-gold-dark">
+          {t('home.locationsPreview.eyebrow')}
+        </p>
+        <h2 className="mt-3 max-w-2xl text-3xl font-black tracking-[-0.06em] text-brand-navy sm:text-4xl">
+          <HighlightCities text={t('home.locationsPreview.title')} cityNames={cityNames} />
+        </h2>
+        <p className="mt-3 max-w-2xl text-sm leading-6 text-text-muted">{t('home.locationsPreview.subtitle')}</p>
+
+        {locations === null && <p className="mt-8 text-sm text-text-muted">{t('home.locationsPreview.loading')}</p>}
+
+        {locations !== null && preview.length === 0 && (
+          <p className="mt-8 max-w-xl text-sm text-text-muted">{t('home.locationsPreview.emptyBody')}</p>
+        )}
+
+        {preview.length > 0 && (
+          <div className="mt-8 grid gap-3 sm:grid-cols-3 lg:grid-cols-5">
+            {preview.map((loc) => (
+              <div
+                key={loc.id}
+                className="flex min-w-0 items-center gap-2 rounded-2xl border border-[#ece7df] bg-white px-4 py-3 text-sm font-medium text-[#1f2430] shadow-[0_16px_30px_rgba(17,20,29,0.04)]"
+              >
+                <PinIcon className="h-4 w-4 shrink-0 text-brand-gold-dark" />
+                <span className="min-w-0 truncate">{loc.name}</span>
+              </div>
+            ))}
+          </div>
+        )}
+
+        <Link
+          to="/locations"
+          className="mt-10 inline-flex items-center gap-2 border border-brand-gold/60 bg-brand-gold px-5 py-2.5 text-sm font-semibold text-white shadow-[0_8px_16px_rgba(186,142,92,0.18)] transition-transform hover:-translate-y-0.5"
+        >
+          {t('home.locationsPreview.viewAll')}
+          <ArrowIcon className="h-4 w-4 rtl:rotate-180" />
+        </Link>
+      </div>
+    </section>
+  )
+}
+
+/**
+ * Highlights any real, currently-live city name in gold within an
+ * otherwise white heading — the proper nouns worth the visual accent.
+ * Deliberately data-driven from `locations.city` rather than a hardcoded
+ * pair of names: this component (and the heading copy it wraps) must
+ * keep working unchanged as cities are added or removed, without a code
+ * change per city. If no city name appears in the heading text (e.g. a
+ * fully generic heading), this simply renders the text unstyled.
+ */
+function HighlightCities({ text, cityNames }: { text: string; cityNames: string[] }) {
+  if (cityNames.length === 0) return <>{text}</>
+  const pattern = new RegExp(`(${cityNames.map(escapeRegExp).join('|')})`)
+  const parts = text.split(pattern)
+  const highlighted = new Set(cityNames)
+  return (
+    <>
+      {parts.map((part, i) =>
+        highlighted.has(part) ? (
+          <span key={i} className="text-brand-gold">
+            {part}
+          </span>
+        ) : (
+          <span key={i}>{part}</span>
+        ),
+      )}
+    </>
+  )
+}
+
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
+function PinIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className={className} aria-hidden="true">
+      <path d="M12 21s-6.5-6.06-6.5-11A6.5 6.5 0 0 1 18.5 10c0 4.94-6.5 11-6.5 11Z" />
+      <circle cx="12" cy="10" r="2.2" />
+    </svg>
+  )
+}
+
+function ArrowIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className={className} aria-hidden="true">
+      <path d="M5 12h14M13 6l6 6-6 6" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
