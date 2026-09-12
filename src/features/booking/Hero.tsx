@@ -176,8 +176,17 @@ export function Hero() {
                 that a two-line title's descenders (a slide ending in "y",
                 "g", etc.) visually crowded the subtitle right below it on
                 every screen size. mt-6 on the subtitle (was mt-5) gives a
-                little extra breathing room on top of that. */}
-            <h1 className="max-w-[12ch] text-4xl font-black leading-[0.92] tracking-[-0.065em] text-white drop-shadow-[0_16px_28px_rgba(0,0,0,0.3)] sm:text-5xl lg:text-[5.4rem]">
+                little extra breathing room on top of that.
+                Base size dropped text-4xl -> text-3xl (mobile only —
+                sm/lg unchanged): the longer titles ("Airport arrivals,
+                made easy", "Choose your right ride") at font-black
+                text-4xl plus the full-width Book Now block right below
+                made the whole top of the mobile hero feel oversized —
+                heading and button both reading "big" back to back, per
+                live feedback. One step down keeps it a bold display
+                heading without it, and every slide's title still wraps
+                to exactly the same two lines it did before. */}
+            <h1 className="max-w-[12ch] text-3xl font-black leading-[0.92] tracking-[-0.065em] text-white drop-shadow-[0_16px_28px_rgba(0,0,0,0.3)] sm:text-5xl lg:text-[5.4rem]">
               <span className="block text-white">{slide.title}</span>
             </h1>
 
