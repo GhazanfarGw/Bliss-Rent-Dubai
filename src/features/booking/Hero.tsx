@@ -151,7 +151,16 @@ export function Hero() {
       <div className="relative z-10 mx-auto flex min-h-[600px] max-w-7xl items-end px-4 pb-12 pt-[calc(var(--header-h)+var(--ticker-h))] sm:px-6 lg:min-h-[100vh] lg:pb-16 lg:px-8">
         <div className="max-w-xl pb-20 md:pb-28 lg:pb-28">
           <div className="mb-5 inline-flex items-center gap-2 border border-[#fff]/35 bg-[#120f0a]/55 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.33em] text-[#fff] backdrop-blur-md shadow-[0_12px_28px_rgba(17,13,8,0.32)]">
-            <span className="h-2 w-2 bg-brand-gold" />
+            {/* "Live" pulsing dot — a brand-champagne ping ring behind the
+                existing static brand-gold square (both already-approved
+                brand colors, no new hue introduced). Skipped for
+                prefers-reduced-motion, leaving just the plain dot. */}
+            <span className="relative flex h-2 w-2">
+              {!reducedMotion && (
+                <span className="absolute inline-flex h-full w-full animate-ping bg-brand-champagne opacity-75" />
+              )}
+              <span className="relative inline-flex h-2 w-2 bg-brand-gold" />
+            </span>
             {t('hero.badge')}
           </div>
 
@@ -192,7 +201,19 @@ export function Hero() {
               to="/book"
               variant="primary"
               fullWidthOnMobile
-              className="group min-h-12 border border-brand-gold bg-brand-gold text-white shadow-none hover:brightness-105"
+              // A soft brand-champagne glow pulses behind the button below
+              // `sm`, where it's the single dominant CTA (see the mobile
+              // CTA note above). Desktop stays exactly shadow-none: the
+              // .animate-hero-cta-glow/.hero-cta-glow-static classes only
+              // carry any shadow/animation inside a max-width:639.98px
+              // media query in index.css (not a competing `sm:` utility
+              // here — see that file for why). Falls back to a fixed
+              // (non-pulsing) glow for prefers-reduced-motion instead of
+              // removing it outright.
+              className={
+                'group min-h-12 border border-brand-gold bg-brand-gold text-white shadow-none hover:brightness-105 ' +
+                (reducedMotion ? 'hero-cta-glow-static' : 'animate-hero-cta-glow')
+              }
             >
               {t('hero.cta')}
               <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" aria-hidden="true" />
@@ -211,14 +232,18 @@ export function Hero() {
               count). Absent entirely until the fetch resolves; never a
               placeholder/skeleton number. */}
           {stats && (
-            <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2">
-              <div className="flex items-center gap-2">
+            // Below `sm` each stat gets its own bordered/backdrop-blur
+            // chip (the same visual language as the badge above) so the
+            // numbers hold their own against the photo on a small screen;
+            // reset to the original plain inline pair at `sm` and up.
+            <div className="mt-6 flex flex-wrap items-center gap-x-3 gap-y-2 sm:gap-x-5">
+              <div className="flex items-center gap-2 border border-white/15 bg-white/10 px-3 py-1.5 backdrop-blur-sm sm:border-0 sm:bg-transparent sm:px-0 sm:py-0 sm:backdrop-blur-none">
                 <Car className="h-4 w-4 text-brand-gold" aria-hidden="true" />
                 <span className="text-sm font-semibold text-white">{stats.vehicleCount}</span>
                 <span className="text-xs text-white/70">{t('pages.about.stats.vehicles', { count: stats.vehicleCount })}</span>
               </div>
               <div className="hidden h-4 w-px bg-white/25 sm:block" aria-hidden="true" />
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 border border-white/15 bg-white/10 px-3 py-1.5 backdrop-blur-sm sm:border-0 sm:bg-transparent sm:px-0 sm:py-0 sm:backdrop-blur-none">
                 <MapPin className="h-4 w-4 text-brand-gold" aria-hidden="true" />
                 <span className="text-sm font-semibold text-white">{stats.cityCount}</span>
                 <span className="text-xs text-white/70">{t('pages.about.stats.cities', { count: stats.cityCount })}</span>
