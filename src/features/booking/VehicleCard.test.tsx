@@ -66,4 +66,24 @@ describe('VehicleCard', () => {
 
     expect(screen.queryByText(/available$/)).not.toBeInTheDocument()
   })
+
+  it('TEMPORARY: featured card hover CTA opens WhatsApp (not the booking flow) via the centralized helper', () => {
+    render(
+      <MemoryRouter>
+        <VehicleCard vehicle={vehicle} detailHref="/vehicles/vehicle-1" isAvailable featured />
+      </MemoryRouter>,
+    )
+
+    const links = screen.getAllByRole('link', { name: /whatsapp/i })
+    // Featured cards render both the small always-visible WhatsApp icon and
+    // this hover CTA — both must use the same centralized wa.me link.
+    expect(links.length).toBeGreaterThanOrEqual(2)
+    for (const link of links) {
+      expect(link).toHaveAttribute('href', expect.stringContaining('https://wa.me/971547820057'))
+      expect(link).toHaveAttribute('href', expect.stringContaining(encodeURIComponent('Toyota Camry')))
+      expect(link).toHaveAttribute('target', '_blank')
+    }
+
+    expect(screen.queryByRole('link', { name: /book now/i })).not.toBeInTheDocument()
+  })
 })

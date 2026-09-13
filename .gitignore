@@ -37,3 +37,12 @@ email-previews
 *.njsproj
 *.sln
 *.sw?
+
+# Local scratch/debug artifacts — never intended for the repo
+.claude-tmp/
+.deploy-bundles-tmp/
+dist_old_preverify/
+*.tar.gz
+_trace*.cjs
+*.tmp
+vite.config.testdev.ts

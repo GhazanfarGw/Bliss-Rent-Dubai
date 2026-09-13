@@ -32,10 +32,6 @@ import { prefersReducedMotion } from '@/lib/motion'
 export function TickerBar() {
   const { t } = useTranslation()
   const [rate, setRate] = useState<{ amount: number; currency: string } | null>(null)
-  const [headerVisible, setHeaderVisible] = useState(
-    () => document.documentElement.dataset.headerVisible !== 'false',
-  )
-  const [heroInView, setHeroInView] = useState(true)
   const reducedMotion = prefersReducedMotion()
 
   useEffect(() => {
@@ -56,26 +52,9 @@ export function TickerBar() {
     }
   }, [])
 
-  useEffect(() => {
-    function handleHeaderVisibility(event: Event) {
-      const nextVisible = (event as CustomEvent<{ visible: boolean }>).detail?.visible
-      if (typeof nextVisible === 'boolean') setHeaderVisible(nextVisible)
-    }
+   
 
-    window.addEventListener('headervisibilitychange', handleHeaderVisibility)
-    return () => window.removeEventListener('headervisibilitychange', handleHeaderVisibility)
-  }, [])
 
-  useEffect(() => {
-    const hero = document.getElementById('home-hero')
-    if (!hero) return
-
-    const observer = new IntersectionObserver(([entry]) => setHeroInView(entry.isIntersecting), {
-      threshold: 0,
-    })
-    observer.observe(hero)
-    return () => observer.disconnect()
-  }, [])
 
   const staticItems = t('home.ticker.items', { returnObjects: true }) as string[]
   const rateItem = rate
@@ -88,16 +67,8 @@ export function TickerBar() {
 
   return (
     <div
-      aria-hidden={!heroInView}
-      inert={!heroInView ? true : undefined}
-      className={
-        'fixed inset-x-0 z-30 h-[var(--ticker-h)] overflow-hidden border-b border-brand-champagne/25 bg-brand-navy text-white ' +
-        (reducedMotion ? '' : 'transition-[top,opacity,transform] duration-300 ') +
-        (headerVisible ? 'top-[var(--header-h)] ' : 'top-0 ') +
-        (heroInView ? 'translate-y-0 opacity-100' : 'pointer-events-none -translate-y-1 opacity-0')
-      }
-      role="region"
-      aria-label={t('home.ticker.ariaLabel')}
+      className=
+        "fixed inset-x-0 z-30 bottom-0 h-10 overflow-hidden border-b border-brand-champagne/25 bg-brand-gold-dark text-white"
     >
       <div className="flex h-full items-center overflow-x-hidden">
         <div className={'flex min-w-max items-center gap-8 whitespace-nowrap px-4 text-xs font-medium sm:px-6 ' + (shouldLoop ? 'animate-marquee' : 'flex-wrap justify-center gap-x-8 gap-y-1')}>

@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { ArrowRight, Cog, MessageCircle, Users } from 'lucide-react'
+import { Cog, MessageCircle, Users } from 'lucide-react'
 import type { VehicleWithDetails } from '@/types/domain'
 import type { PricingTerm } from '@/types/database'
 import { primaryImage } from '@/lib/vehicleImages'
@@ -175,13 +175,24 @@ export function VehicleCard({ vehicle, days, detailHref, isAvailable, featured =
       {featured && !reserved && (
         <>
           <div className="pointer-events-none absolute inset-0 z-10 bg-brand-navy/75 opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-focus-within:opacity-100" />
-          <Link
-            to={detailHref}
+          {/* TEMPORARY (see contactLinks.ts / Task 2): this hover CTA normally
+           * deep-links to the booking flow (`to={detailHref}`) — for now it
+           * opens the same centralized WhatsApp chat as the card's small
+           * always-visible icon button, while bookings are being handled
+           * directly over WhatsApp. Styling/layout/animation are unchanged;
+           * only the action + icon differ. To revert: swap this <a> back to
+           * `<Link to={detailHref}>{t('vehicleCard.bookNow')}<ArrowRight .../></Link>`
+           * (re-add `ArrowRight` to the lucide-react import above). */}
+          <a
+            href={whatsappUrlForVehicle(`${vehicle.make} ${vehicle.model} ${vehicle.model_year}`)}
+            target="_blank"
+            rel="noreferrer"
+            onClick={(e) => e.stopPropagation()}
             className="absolute inset-x-10 top-1/2 z-20 inline-flex min-h-11 -translate-y-1/2 items-center justify-center gap-3 rounded-lg border border-brand-champagne bg-brand-gold px-4 py-3 text-sm font-semibold text-white opacity-0 shadow-[0_12px_28px_rgba(11,19,43,0.3)] transition-opacity duration-200 group-hover:opacity-100 group-focus-within:opacity-100 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-brand-navy"
           >
-            {t('vehicleCard.bookNow')}
-            <ArrowRight className="h-4 w-4 rtl:rotate-180" aria-hidden="true" />
-          </Link>
+            {t('vehicleCard.whatsapp')}
+            <MessageCircle className="h-4 w-4" aria-hidden="true" />
+          </a>
         </>
       )}
     </div>

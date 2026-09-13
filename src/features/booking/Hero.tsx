@@ -186,7 +186,7 @@ export function Hero() {
                 live feedback. One step down keeps it a bold display
                 heading without it, and every slide's title still wraps
                 to exactly the same two lines it did before. */}
-            <h1 className="max-w-[12ch] text-3xl font-black leading-[0.92] tracking-[-0.065em] text-white drop-shadow-[0_16px_28px_rgba(0,0,0,0.3)] sm:text-5xl lg:text-[5.4rem]">
+            <h1 className="max-w-[12ch] text-4xl font-black leading-[0.92] tracking-[-0.065em] text-white drop-shadow-[0_16px_28px_rgba(0,0,0,0.3)] sm:text-5xl lg:text-[5.4rem]">
               <span className="block text-white">{slide.title}</span>
             </h1>
 

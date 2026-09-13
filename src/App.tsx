@@ -8,7 +8,11 @@ import { VehicleDetailPage } from '@/features/booking/VehicleDetailPage'
 import { CustomerDetailsPage } from '@/features/booking/checkout/CustomerDetailsPage'
 import { DriverDetailsPage } from '@/features/booking/checkout/DriverDetailsPage'
 import { BookingSummaryPage } from '@/features/booking/checkout/BookingSummaryPage'
-import { PaymentPage } from '@/features/booking/checkout/PaymentPage'
+// TEMPORARY (2026-09-11): PaymentPage import removed (route below uses
+// PaymentPendingPage instead) so it isn't flagged as unused. Revert: restore
+// `import { PaymentPage } from '@/features/booking/checkout/PaymentPage'` here
+// — see PaymentPendingPage.tsx's header comment for the rest of the revert.
+import { PaymentPendingPage } from '@/features/booking/checkout/PaymentPendingPage'
 import { ConfirmationPage } from '@/features/booking/checkout/ConfirmationPage'
 import { ManageBookingPage } from '@/features/booking/ManageBookingPage'
 import { FindMyCarPage } from '@/features/booking/FindMyCarPage'
@@ -132,7 +136,13 @@ function App() {
               <Route path="/checkout/:id/customer" element={<CustomerDetailsPage />} />
               <Route path="/checkout/:id/driver" element={<DriverDetailsPage />} />
               <Route path="/checkout/:id/summary" element={<BookingSummaryPage />} />
-              <Route path="/checkout/:id/payment/:bookingId" element={<PaymentPage />} />
+              {/* TEMPORARY (2026-09-11): real Stripe payment UI (PaymentPage) is
+                  swapped for PaymentPendingPage — a WhatsApp "payment pending" screen —
+                  while live checkout is paused for testing. Nothing about Stripe, the
+                  webhook, pricing, availability, or booking creation changed; only
+                  what renders at this route. Revert: change the element below back to
+                  <PaymentPage /> and remove the import above. */}
+              <Route path="/checkout/:id/payment/:bookingId" element={<PaymentPendingPage />} />
               <Route path="/checkout/:id/confirmation/:bookingId" element={<ConfirmationPage />} />
               <Route path="/find-my-car" element={<FindMyCarPage />} />
               <Route path="/manage-booking" element={<ManageBookingPage />} />
