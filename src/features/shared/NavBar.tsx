@@ -1,7 +1,7 @@
 import { Fragment, useEffect, useState } from 'react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { CalendarSearch, CarFront, ChevronRight, ClipboardCheck, Home, Info, LogIn, MapPin, Menu, Phone, X } from 'lucide-react'
+import { CalendarSearch, CarFront, ChevronRight, ClipboardCheck, Home, Info, MapPin, Menu, Phone, X } from 'lucide-react'
 import { LanguageSwitcher } from '@/features/shared/LanguageSwitcher'
 import { LinkButton } from '@/features/shared/ui/LinkButton'
 import { PendingBookingIndicator } from '@/features/shared/PendingBookingIndicator'
@@ -341,7 +341,7 @@ export function NavBar() {
             >
               {t('nav.searchCars')}
             </LinkButton>
-            
+
             <div className="border-t border-brand-navy/10 pt-3">
               <p className="mb-2 text-center text-xs font-semibold uppercase tracking-[0.18em] text-brand-gold">{t('nav.connect')}</p>
               <div className="flex items-center justify-center gap-3">
