@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { ArrowRight } from 'lucide-react'
 import { fetchFeaturedVehiclesByCategory } from '@/features/booking/api'
 import { VehicleCard } from '@/features/booking/VehicleCard'
 import { SectionHeader } from '@/features/shared/ui/SectionHeader'
 import { StateMessage } from '@/features/shared/StateMessage'
 import { groupPublicVehicles } from '@/lib/vehicleGrouping'
+import { prefersReducedMotion } from '@/lib/motion'
 import type { VehicleWithDetails } from '@/types/domain'
 
 interface FeaturedVehicleSliderProps {
@@ -63,13 +65,22 @@ function FeaturedVehicleSlider({ categoryName, label, viewAllLabel, emptyTitle, 
   return (
     <div className="mt-10 first:mt-0">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <p className="text-xs font-semibold uppercase tracking-[0.28em] text-brand-gold-dark">{label}</p>
+        <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.28em] text-brand-gold-dark">
+          <span className="relative flex h-1.5 w-1.5">
+            {!prefersReducedMotion() && (
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-champagne opacity-75" />
+            )}
+            <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-brand-gold" />
+          </span>
+          {label}
+        </p>
         {vehicles && vehicles.length > 0 && (
           <Link
             to="/search"
-            className="text-sm font-semibold text-brand-navy underline-offset-4 hover:text-brand-gold-dark hover:underline"
+            className="group inline-flex items-center gap-1 text-sm font-semibold text-brand-navy underline-offset-4 hover:text-brand-gold-dark hover:underline"
           >
             {viewAllLabel}
+            <ArrowRight className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-1 rtl:rotate-180" aria-hidden="true" />
           </Link>
         )}
       </div>
@@ -86,7 +97,7 @@ function FeaturedVehicleSlider({ categoryName, label, viewAllLabel, emptyTitle, 
         {!loading && (error || !vehicles || grouped.length === 0) && <StateMessage title={emptyTitle} body={emptyBody} />}
 
         {!loading && !error && vehicles && grouped.length > 0 && (
-          <div className="overflow-hidden pb-2">
+          <div className="overflow-hidden pb-2 [mask-image:linear-gradient(to_right,transparent,black_4%,black_96%,transparent)] [-webkit-mask-image:linear-gradient(to_right,transparent,black_4%,black_96%,transparent)]">
             <div
               className={`flex min-w-max gap-4 sm:gap-6 ${
                 direction === 'left' ? 'animate-featured-marquee-left' : 'animate-featured-marquee-right'
@@ -102,7 +113,7 @@ function FeaturedVehicleSlider({ categoryName, label, viewAllLabel, emptyTitle, 
                     key={`${group.vehicle.id}-${index}`}
                     aria-hidden={isDuplicate || undefined}
                     inert={isDuplicate}
-                    className="w-[82vw] max-w-[320px] shrink-0 rounded-[1.5rem] border border-[#e6dcc7] bg-white p-1 shadow-[0_18px_40px_rgba(16,20,29,0.04)] sm:w-[280px]"
+                    className="w-[82vw] max-w-[320px] shrink-0 rounded-[1.5rem] border border-[#e6dcc7] bg-white p-1 shadow-[0_18px_40px_rgba(16,20,29,0.04)] transition-all duration-300 hover:-translate-y-1 hover:border-brand-gold/50 hover:shadow-[0_26px_54px_rgba(16,20,29,0.12)] sm:w-[280px]"
                   >
                     <VehicleCard vehicle={group.vehicle} detailHref={`/vehicles/${group.vehicle.id}`} featured quantity={group.quantity} />
                   </div>

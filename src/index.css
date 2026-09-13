@@ -206,6 +206,51 @@ body {
   animation: hero-image-drift 20s ease-out forwards;
 }
 
+/* Mobile-only warm glow pulse behind the hero's single dominant CTA
+   ("Book Now" — the sole full-width button below `sm`, see Hero.tsx).
+   Uses --color-brand-champagne, the one approved "gold" accent in the
+   brand system (index.css palette comment above), layered as a soft
+   pulsing halo around the Luxury-Berry button itself — no new hue.
+   Scoped inside `max-width: 639.98px` (matching Tailwind's `sm`
+   breakpoint) INSTEAD OF being cancelled by a `sm:` utility class in
+   Hero.tsx's className: this file's own custom classes are inserted
+   after Tailwind's generated utilities in the compiled stylesheet, so
+   a `sm:shadow-none`/`sm:[animation:none]` utility of equal specificity
+   would lose that cascade-order tie and never actually turn the glow
+   off on desktop (a repeat of the same Tailwind cascade-order pitfall
+   documented elsewhere in this app — see NavBar's mobile-menu history).
+   Doing the responsive scoping in the media query itself sidesteps that
+   entirely: above 640px these classes carry no animation or shadow at
+   all, nothing to override. */
+@media (max-width: 639.98px) {
+  @keyframes hero-cta-glow {
+    0%,
+    100% {
+      box-shadow:
+        0 0 0 0 rgba(212, 175, 55, 0.45),
+        0 10px 24px rgba(5, 7, 13, 0.35);
+    }
+    50% {
+      box-shadow:
+        0 0 0 10px rgba(212, 175, 55, 0),
+        0 10px 24px rgba(5, 7, 13, 0.35);
+    }
+  }
+
+  .animate-hero-cta-glow {
+    animation: hero-cta-glow 2.4s ease-out infinite;
+  }
+
+  /* prefers-reduced-motion fallback for the glow above — a fixed halo
+     instead of removing it outright, same "still a bit of polish, just
+     not moving" approach as the rest of this file. */
+  .hero-cta-glow-static {
+    box-shadow:
+      0 0 0 4px rgba(212, 175, 55, 0.25),
+      0 10px 24px rgba(5, 7, 13, 0.35);
+  }
+}
+
 @keyframes marquee-scroll {
   from {
     transform: translateX(0);
@@ -335,4 +380,22 @@ body {
   .route-loader-overlay {
     background: rgba(17, 14, 28, 0.16);
   }
+}
+
+/* Homepage FAQ preview — the answer panel fades/slides in on expand (a
+   one-shot, user-triggered 200ms reveal, not an autoplaying animation, so
+   it isn't gated behind prefers-reduced-motion the way the Hero's
+   continuous ping/drift/glow effects are). */
+@keyframes faq-answer-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-faq-answer-in {
+  animation: faq-answer-in 0.2s ease-out;
 }

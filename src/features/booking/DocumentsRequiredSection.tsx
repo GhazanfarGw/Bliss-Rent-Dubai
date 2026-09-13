@@ -37,7 +37,7 @@ export function DocumentsRequiredSection() {
           {groups.map((group) => (
             <div
               key={group.title}
-              className="overflow-hidden border border-[#e7dcc7] bg-white shadow-[0_16px_38px_rgba(16,20,29,0.04)]"
+              className="overflow-hidden border border-[#e7dcc7] bg-white shadow-[0_16px_38px_rgba(16,20,29,0.04)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_26px_54px_rgba(16,20,29,0.1)]"
             >
               <div className="bg-brand-gold px-6 py-4">
                 <h3 className="text-base font-bold tracking-tight text-white">{group.title}</h3>
@@ -57,10 +57,10 @@ export function DocumentsRequiredSection() {
         <p className="mt-8 max-w-3xl text-sm leading-7 text-text-muted">{t('home.documents.note')}</p>
         <Link
           to="/contact"
-          className="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-brand-gold transition-colors hover:text-brand-gold-dark"
+          className="group mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-brand-gold transition-colors hover:text-brand-gold-dark"
         >
           {t('home.documents.contactLink')}
-          <ArrowRight className="h-4 w-4 rtl:rotate-180" aria-hidden="true" />
+          <ArrowRight className="h-4 w-4 rtl:rotate-180 transition-transform duration-200 group-hover:translate-x-1" aria-hidden="true" />
         </Link>
       </div>
     </section>

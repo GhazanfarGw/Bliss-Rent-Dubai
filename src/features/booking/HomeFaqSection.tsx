@@ -25,7 +25,7 @@ export function HomeFaqSection() {
         <div className="mt-8 divide-y divide-brand-navy/10 rounded-[1.5rem] border border-[#e7dcc7] bg-white shadow-[0_18px_36px_rgba(16,20,29,0.04)]">
           {items.map((item, index) => {
             const expanded = open === index
-            return <div key={item.question}><button type="button" aria-expanded={expanded} onClick={() => setOpen(expanded ? null : index)} className="flex min-h-14 w-full items-center justify-between gap-4 px-5 py-4 text-start focus:outline-none focus:ring-2 focus:ring-inset focus:ring-brand-gold"><span className="text-sm font-medium text-brand-navy">{item.question}</span><span className="text-xl text-brand-gold" aria-hidden="true">{expanded ? '−' : '+'}</span></button>{expanded && <p className="px-5 pb-5 text-sm leading-relaxed text-text-muted">{item.answer}</p>}</div>
+            return <div key={item.question}><button type="button" aria-expanded={expanded} onClick={() => setOpen(expanded ? null : index)} className="group flex min-h-14 w-full items-center justify-between gap-4 px-5 py-4 text-start transition-colors duration-200 hover:bg-brand-lavender/40 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-brand-gold"><span className="text-sm font-medium text-brand-navy transition-colors group-hover:text-brand-gold-dark">{item.question}</span><span className={'text-xl text-brand-gold transition-transform duration-300' + (expanded ? ' rotate-45' : '')} aria-hidden="true">+</span></button>{expanded && <p className="animate-faq-answer-in px-5 pb-5 text-sm leading-relaxed text-text-muted">{item.answer}</p>}</div>
           })}
         </div>
       </div>

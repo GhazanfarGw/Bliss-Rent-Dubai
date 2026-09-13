@@ -24,8 +24,11 @@ export function HowItWorksSection() {
 
         <ol className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {steps.map((step, i) => (
-            <li key={step.title} className="relative rounded-[1.5rem] border border-[#e8dcc6] bg-white p-5 shadow-[0_18px_36px_rgba(16,20,29,0.04)]">
-              <span className="flex h-11 w-11 items-center justify-center bg-brand-gold text-sm font-bold text-[#fff] shadow-[0_12px_24px_rgba(92,9,49,0.18)]">
+            <li
+              key={step.title}
+              className="group relative rounded-[1.5rem] border border-[#e8dcc6] bg-white p-5 shadow-[0_18px_36px_rgba(16,20,29,0.04)] transition-all duration-300 hover:-translate-y-1 hover:border-brand-gold/40 hover:shadow-[0_26px_54px_rgba(16,20,29,0.1)]"
+            >
+              <span className="flex h-11 w-11 items-center justify-center bg-brand-gold text-sm font-bold text-[#fff] shadow-[0_12px_24px_rgba(92,9,49,0.18)] transition-all duration-300 group-hover:scale-105 group-hover:shadow-[0_0_0_6px_rgba(212,175,55,0.2)]">
                 {i + 1}
               </span>
               <h3 className="mt-4 text-sm font-semibold text-brand-navy">{step.title}</h3>

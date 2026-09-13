@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { FindMyCarHero } from '@/features/booking/FindMyCarHero'
 import { BookingStatusPanel } from '@/features/booking/BookingStatusPanel'
-import { useDocumentTitle } from '@/lib/useDocumentTitle'
+import { useDocumentTitle, useMetaDescription } from '@/lib/useDocumentTitle'
 
 /**
  * Find My Car — the guest-facing, read-only "check my booking status"
@@ -21,6 +21,7 @@ import { useDocumentTitle } from '@/lib/useDocumentTitle'
 export function FindMyCarPage() {
   const { t } = useTranslation()
   useDocumentTitle(t('findMyCar.title'))
+  useMetaDescription('Check your Bliss Rent booking status — enter your reference number to see your vehicle, plate, and days remaining.')
 
   return (
     <div className="bg-[#f6f3ee]">

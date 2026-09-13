@@ -113,6 +113,7 @@ const en = {
     },
     badge: 'Dubai fleet arrivals',
     viewFleetCta: 'View fleet',
+    scrollCue: 'Scroll to explore',
     trust: {
       rating: '4.9/5 guest rating',
       concierge: '24/7 concierge',
@@ -1609,12 +1610,12 @@ const en = {
         },
         email: {
           label: 'Email',
-          value: '[support@bliss.rent]',
+          value: 'support@bliss.rent',
           note: 'For general questions, feedback, or anything not urgent.',
         },
         address: {
           label: 'Office',
-          value: '[Office address, Dubai, UAE]',
+          value: 'Apt 121B, Block B, Sajaya 7 Building, Manama Street, Nad Al Sheba 3, Dubai, UAE',
           note: 'Pickup happens at the airport and other agreed points in the cities we serve — this is our office address, not a pickup counter.',
         },
         hours: {
@@ -1622,6 +1623,14 @@ const en = {
           value: '[e.g. 24/7, or specific hours]',
           note: '',
         },
+      },
+      getDirections: 'Get directions',
+      visitOffice: {
+        heading: 'Visit our office',
+        subtitle: "You're welcome to visit — remember, this is our office, not a vehicle pickup point.",
+      },
+      cta: {
+        heading: 'Ready to book your Dubai rental?',
       },
       form: {
         heading: 'Send us a message',

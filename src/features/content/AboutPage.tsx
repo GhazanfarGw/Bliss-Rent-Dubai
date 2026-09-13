@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Car, Compass, Eye, MapPin, ShieldCheck, Sparkles, Target } from 'lucide-react'
-import { useDocumentTitle } from '@/lib/useDocumentTitle'
+import { useDocumentTitle, useMetaDescription } from '@/lib/useDocumentTitle'
 import { LinkButton } from '@/features/shared/ui/LinkButton'
 import { fetchAllAvailableVehicles, fetchLocations } from '@/features/booking/api'
 import heroLuxury from '@/assets/hero/hero-luxury.webp'
@@ -41,6 +41,7 @@ const VALUE_ICONS = [Eye, Sparkles, ShieldCheck, MapPin]
 export function AboutPage() {
   const { t } = useTranslation()
   useDocumentTitle(t('pages.about.title'))
+  useMetaDescription(t('pages.about.subtitle'))
   const storyParagraphs = t('pages.about.story.paragraphs', { returnObjects: true }) as string[]
   const values = t('pages.about.values.items', { returnObjects: true }) as ValueItem[]
   const [stats, setStats] = useState<LiveStats | null>(null)

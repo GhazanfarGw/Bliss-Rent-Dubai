@@ -1,8 +1,22 @@
-import { describe, it, expect, beforeEach } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/react'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { MemoryRouter, Routes, Route } from 'react-router-dom'
 import { PendingBookingIndicator } from './PendingBookingIndicator'
 import { saveActiveBooking, clearActiveBooking, type ActiveBookingPointer } from '@/features/booking/checkout/checkoutStorage'
+
+// The indicator now validates its pointer against the server (see the bug
+// fix in PendingBookingIndicator.tsx) — mocked here the same way
+// BookingStatusPanel.test.tsx mocks it, so these tests exercise the
+// component in isolation rather than making a real network call.
+const lookupMock = vi.fn()
+
+vi.mock('@/features/booking/lookupApi', async () => {
+  const actual = await vi.importActual<typeof import('@/features/booking/lookupApi')>('@/features/booking/lookupApi')
+  return {
+    ...actual,
+    lookupBooking: (...args: unknown[]) => lookupMock(...args),
+  }
+})
 
 const pointer: ActiveBookingPointer = {
   vehicleId: 'veh-1',
@@ -38,6 +52,11 @@ function renderIndicator(initialEntries: string[] = ['/']) {
 describe('PendingBookingIndicator (header reminder)', () => {
   beforeEach(() => {
     sessionStorage.clear()
+    lookupMock.mockReset()
+    // Default: the booking still exists and is still awaiting payment —
+    // matches every pre-existing test's assumption below, none of which
+    // are about server validation.
+    lookupMock.mockResolvedValue({ bookingStatus: 'pending_payment' })
   })
 
   it('renders nothing at all when there is no pending booking — never a misleading count', () => {
@@ -82,5 +101,46 @@ describe('PendingBookingIndicator (header reminder)', () => {
       </MemoryRouter>,
     )
     expect(screen.queryByRole('button', { name: /my booking/i })).not.toBeInTheDocument()
+  })
+
+  it('REGRESSION: a booking that no longer exists on the server (e.g. an admin data reset) stops showing, instead of lingering forever', async () => {
+    // Reported bug: the reminder trusted this sessionStorage pointer
+    // forever, with nothing ever re-checking it against the server — so a
+    // booking deleted server-side (admin reset/test-data wipe) kept
+    // showing here indefinitely, pointing at a payment page for a booking
+    // that no longer existed.
+    lookupMock.mockResolvedValue(null) // the RPC's "no such booking" result
+    saveActiveBooking(pointer)
+    renderIndicator()
+
+    expect(screen.getByRole('button', { name: /my booking/i })).toBeInTheDocument()
+
+    await waitFor(() => {
+      expect(screen.queryByRole('button', { name: /my booking/i })).not.toBeInTheDocument()
+    })
+    expect(lookupMock).toHaveBeenCalledWith(pointer.bookingReference)
+  })
+
+  it('REGRESSION: a booking resolved elsewhere (paid/cancelled from another device) also stops showing here', async () => {
+    lookupMock.mockResolvedValue({ bookingStatus: 'paid' })
+    saveActiveBooking(pointer)
+    renderIndicator()
+
+    expect(screen.getByRole('button', { name: /my booking/i })).toBeInTheDocument()
+    await waitFor(() => {
+      expect(screen.queryByRole('button', { name: /my booking/i })).not.toBeInTheDocument()
+    })
+  })
+
+  it('a transient lookup failure does not falsely clear a real pending booking', async () => {
+    lookupMock.mockRejectedValue(new Error('network hiccup'))
+    saveActiveBooking(pointer)
+    renderIndicator()
+
+    expect(screen.getByRole('button', { name: /my booking/i })).toBeInTheDocument()
+    await waitFor(() => expect(lookupMock).toHaveBeenCalled())
+    // Give any (incorrect) clear-on-error path a chance to run before asserting it didn't.
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    expect(screen.getByRole('button', { name: /my booking/i })).toBeInTheDocument()
   })
 })

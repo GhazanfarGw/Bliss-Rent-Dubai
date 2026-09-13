@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { fetchLocations } from '@/features/booking/api'
+import { prefersReducedMotion } from '@/lib/motion'
 import type { Location } from '@/types/domain'
 
 const PREVIEW_LIMIT = 10
@@ -41,7 +42,13 @@ export function LocationsPreviewSection() {
   return (
     <section className="bg-[#f7f4ef]">
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.32em] text-brand-gold-dark">
+        <p className="inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.32em] text-brand-gold-dark">
+          <span className="relative flex h-1.5 w-1.5">
+            {!prefersReducedMotion() && (
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-champagne opacity-75" />
+            )}
+            <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-brand-gold" />
+          </span>
           {t('home.locationsPreview.eyebrow')}
         </p>
         <h2 className="mt-3 max-w-2xl text-3xl font-black tracking-[-0.06em] text-brand-navy sm:text-4xl">
@@ -60,7 +67,7 @@ export function LocationsPreviewSection() {
             {preview.map((loc) => (
               <div
                 key={loc.id}
-                className="flex min-w-0 items-center gap-2 rounded-2xl border border-[#ece7df] bg-white px-4 py-3 text-sm font-medium text-[#1f2430] shadow-[0_16px_30px_rgba(17,20,29,0.04)]"
+                className="flex min-w-0 items-center gap-2 rounded-2xl border border-[#ece7df] bg-white px-4 py-3 text-sm font-medium text-[#1f2430] shadow-[0_16px_30px_rgba(17,20,29,0.04)] transition-all duration-300 hover:-translate-y-0.5 hover:border-brand-gold/50 hover:shadow-[0_20px_36px_rgba(17,20,29,0.1)]"
               >
                 <PinIcon className="h-4 w-4 shrink-0 text-brand-gold-dark" />
                 <span className="min-w-0 truncate">{loc.name}</span>
@@ -71,10 +78,10 @@ export function LocationsPreviewSection() {
 
         <Link
           to="/locations"
-          className="mt-10 inline-flex items-center gap-2 border border-brand-gold/60 bg-brand-gold px-5 py-2.5 text-sm font-semibold text-white shadow-[0_8px_16px_rgba(186,142,92,0.18)] transition-transform hover:-translate-y-0.5"
+          className="group mt-10 inline-flex items-center gap-2 border border-brand-gold/60 bg-brand-gold px-5 py-2.5 text-sm font-semibold text-white shadow-[0_8px_16px_rgba(186,142,92,0.18)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_16px_30px_rgba(186,142,92,0.32)]"
         >
           {t('home.locationsPreview.viewAll')}
-          <ArrowIcon className="h-4 w-4 rtl:rotate-180" />
+          <ArrowIcon className="h-4 w-4 rtl:rotate-180 transition-transform duration-200 group-hover:translate-x-1" />
         </Link>
       </div>
     </section>

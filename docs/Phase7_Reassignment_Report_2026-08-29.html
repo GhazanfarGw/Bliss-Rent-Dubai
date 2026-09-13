@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Bliss Rent — Phase 7 Completion Report (Rental Extension &amp; Booking Reassignment)</title>
+<style>
+  @page { margin: 0; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: 'Helvetica Neue', Arial, sans-serif; color: #2e2a54; font-size: 13px; line-height: 1.55; }
+  .cover {
+    height: 297mm; width: 210mm; display: flex; flex-direction: column; justify-content: center;
+    background: linear-gradient(160deg, #2e2a54 0%, #201c3b 100%); color: #fff; padding: 60px; page-break-after: always;
+  }
+  .cover .badge { display: inline-block; background: #b49b6c; color: #201c3b; font-weight: 700; font-size: 11px;
+    letter-spacing: 0.08em; text-transform: uppercase; padding: 6px 14px; border-radius: 999px; margin-bottom: 24px; }
+  .cover h1 { font-size: 30px; margin: 0 0 6px 0; }
+  .cover h1.sub-h1 { font-size: 20px; color: #d9c9a3; margin: 0 0 10px 0; font-weight: 600; }
+  .cover .sub { font-size: 15px; color: #d9c9a3; margin-bottom: 40px; }
+  .cover .meta { font-size: 12px; color: #cfc9e6; line-height: 2; }
+  .cover .statuses { margin-top: 30px; display: flex; gap: 10px; flex-wrap: wrap; }
+  .status-pill { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.25); border-radius: 8px;
+    padding: 10px 16px; font-size: 12px; }
+  .status-pill b { display: block; color: #b49b6c; font-size: 13px; margin-bottom: 2px; }
+  .page { padding: 30px 40px; }
+  h2 { color: #2e2a54; font-size: 19px; border-bottom: 2px solid #b49b6c; padding-bottom: 8px; margin-top: 36px; }
+  h3 { color: #2e2a54; font-size: 15px; margin-top: 22px; }
+  p { margin: 8px 0; }
+  table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 12px; }
+  th { background: #edebf4; color: #2e2a54; text-align: left; padding: 8px 10px; border: 1px solid #e0dcec; }
+  td { padding: 7px 10px; border: 1px solid #e0dcec; vertical-align: top; }
+  tr:nth-child(even) td { background: #f8f7fb; }
+  code, pre { font-family: 'SF Mono', Consolas, monospace; }
+  pre { background: #201c3b; color: #e8e4f5; padding: 14px 16px; border-radius: 8px; font-size: 10.5px;
+    overflow-x: auto; white-space: pre-wrap; word-break: break-word; }
+  .callout { border-left: 4px solid #b49b6c; background: #faf7f0; padding: 12px 16px; margin: 14px 0; border-radius: 0 6px 6px 0; }
+  .callout.action b { color: #96794a; }
+  .ok { color: #1f8a4d; font-weight: 700; }
+  .auto { color: #1f8a4d; font-weight: 700; }
+  .reviewed { color: #96794a; font-weight: 700; }
+  .pending { color: #b45309; font-weight: 700; }
+  ul { margin: 8px 0; padding-left: 20px; }
+  li { margin: 4px 0; }
+  .stop-banner { margin-top: 36px; background: #2e2a54; color: #fff; padding: 20px 24px; border-radius: 10px; }
+  .stop-banner b { color: #d9c9a3; }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <span class="badge">Phase 7 — continued</span>
+  <h1>PHASE 7 COMPLETION REPORT</h1>
+  <h1 class="sub-h1">Rental Extension &amp; Booking Reassignment</h1>
+  <div class="sub">Bliss Rent — Dubai Airport Rental</div>
+  <div class="meta">
+    Prepared for: Zaheer Muneer &amp; Hassan Raza (co-owners)<br>
+    Date: August 29, 2026<br>
+    Covers the expanded Phase 7 respecification: dual request channels, booking-reassignment conflict resolution, and late-extension penalty configuration — built on top of the narrower Phase 7 (extension &amp; extension payments) work already reported
+  </div>
+  <div class="statuses">
+    <div class="status-pill"><b>Migrations</b>1 new, local only</div>
+    <div class="status-pill"><b>Edge Function</b>1 new, not deployed</div>
+    <div class="status-pill"><b>Tests</b>246 / 246 passing</div>
+    <div class="status-pill"><b>Typecheck</b>Clean</div>
+    <div class="status-pill"><b>Build</b>Clean</div>
+    <div class="status-pill"><b>Lint</b>0 errors</div>
+    <div class="status-pill"><b>Production</b>Not deployed</div>
+    <div class="status-pill"><b>Phase 8</b>Not started</div>
+  </div>
+</div>
+
+<div class="page">
+
+<h2>1. Executive summary</h2>
+<p>This report covers the expanded Phase 7 respecification you sent after the original "Rental Extension &amp; Extension Payments" work was already reported: a second, customer-facing self-service request channel; a booking-reassignment engine that reassigns a conflicting future booking to a replacement vehicle instead of rejecting the extending customer; and a configurable late-extension penalty, independent from the existing extension-pricing configuration. Everything below was built, unit-tested, type-checked, built, and linted locally. Nothing has been deployed to production — no migration has been applied to your live Supabase project, and the new Edge Function has not been deployed. Two owner decisions remain open: the extension pricing policy (carried over from the original Phase 7 report) and the new late-extension penalty policy. Both are described in §26.</p>
+
+<h2>2. Existing functionality reused</h2>
+<table>
+  <tr><th>Component</th><th>Reused as-is</th></tr>
+  <tr><td><code>bookings_no_overlap</code></td><td>The Phase 0 exclusion constraint remains the single real double-booking guard. Not touched, weakened, or bypassed anywhere in this phase.</td></tr>
+  <tr><td><code>available_vehicles()</code></td><td>Phase 1's exact overlap+status search is the building block for replacement-vehicle search — called for the conflicting booking's own dates, never reimplemented.</td></tr>
+  <tr><td><code>get_booking_by_reference()</code>'s indistinguishable-failure pattern</td><td>Mirrored exactly for the new reference + vehicle-number verification (zero rows on any mismatch).</td></tr>
+  <tr><td><code>booking_extensions</code>, <code>extension_pricing_settings</code>, the original <code>request_booking_extension</code>/<code>confirm_booking_extension_payment</code></td><td>Extended in place (new columns, new statuses, new optional parameter) — not duplicated or replaced. Every previously-passing test for this system still passes unchanged.</td></tr>
+  <tr><td><code>is_admin()</code> / <code>is_active</code> (Staff Account Control)</td><td>Unchanged. Every new admin-facing function checks <code>is_admin()</code> the same way; a suspended admin is blocked automatically.</td></tr>
+  <tr><td><code>audit_logs</code></td><td>Reused for every new action type (conflict detected, replacement selected, future booking reassigned, notification generated) — no new logging table.</td></tr>
+  <tr><td>create-booking / confirm-payment Edge Function conventions</td><td>The new <code>submit-extension-request</code> function follows the identical thin-wrapper + pure-logic + shared-errors pattern.</td></tr>
+</table>
+
+<h2>3. New functionality</h2>
+<ul>
+  <li>A second, customer self-service request channel (verified by booking reference + vehicle number), landing in the same <code>booking_extensions</code> table as a <code>requested</code> row that does <b>not</b> auto-process.</li>
+  <li>A booking-reassignment conflict-resolution engine: when extending the exact vehicle would collide with a future booking on that same vehicle, the system searches for a suitable replacement vehicle for the <i>future</i> booking, reserves it safely, and moves it — instead of rejecting the extending customer or substituting their vehicle.</li>
+  <li>A new, independently configurable late-extension penalty mechanism (owner decision still pending — see §13, §26).</li>
+  <li>Full traceability for a vehicle reassignment (<code>vehicle_reassignments</code>) and domain-level customer-notification state (<code>booking_notifications</code>) for the affected customer.</li>
+  <li>An explicit admin rejection action for a customer-submitted request, since it no longer auto-resolves to rejected the way the old admin-channel conflict case did.</li>
+</ul>
+
+<h2>4. Frontend extension flow</h2>
+<p>New route <code>/extend-rental</code> (<code>ExtendRentalPage.tsx</code>), linked from both the booking confirmation page and the "manage my booking" page. Two steps, exactly as specified:</p>
+<ol>
+  <li><b>Verify</b> — the customer enters their booking reference and the vehicle's plate number (not email — a deliberately different, stronger check than the existing manage-booking lookup). A mismatch on either field produces the exact same generic message; the screen never reveals which one was wrong.</li>
+  <li><b>Request</b> — once verified, the customer picks a new return date and submits. There is no advance-notice window: 1 day before return, 5 days before, or already past the return date are all accepted (the last is simply flagged <code>is_late</code>). Submission shows a "request submitted, pending review" confirmation — never an instant approval, never a changed booking.</li>
+</ol>
+<p>The customer cannot modify booking dates, vehicle, payment status, or extension status directly — every mutation is server-side, via the Edge Function and its underlying SQL function only.</p>
+
+<h2>5. WhatsApp/support flow</h2>
+<p>Unchanged in spirit, tightened per the new spec: support now verifies <b>both</b> the booking reference and the vehicle number (previously only the reference/booking itself was relied on) before an admin records the request. The admin-facing form (<code>RentalExtensionsSection.tsx</code>) is unchanged for this path — it still records and can immediately process a confirmed request. Both channels run through the exact same <code>request_booking_extension()</code> function; nothing about the extension business logic is duplicated for WhatsApp.</p>
+
+<h2>6. Verification mechanism</h2>
+<p><code>verify_booking_for_extension()</code> (read-only, guest-callable) and <code>submit_extension_request_public()</code> (the actual insert, service-role only) both match on <code>upper(left(replace(booking_id::text,'-',''),8)) = reference_suffix AND plate_number = vehicle_number</code> (whitespace/case-insensitive), and both return zero rows / raise the identical generic error on <b>any</b> mismatch — the same indistinguishable-failure shape as Phase 6's <code>get_booking_by_reference()</code>. Neither can be used as an oracle to test whether a reference or a vehicle number exists on its own.</p>
+
+<h2>7. Availability logic</h2>
+<p>Unchanged core rule, reaffirmed: every check is against the exact <code>vehicle_id</code>, never the model, make, or category. The existing <code>check_vehicle_availability_for_extension()</code> preview is untouched. The real, race-safe guarantee remains <code>bookings_no_overlap</code>, applied at the moment <code>bookings.end_date</code> or <code>bookings.vehicle_id</code> is actually updated — never at the pre-check stage.</p>
+
+<h2>8. Future-booking conflict handling</h2>
+<p>New function <code>resolve_extension_conflict()</code>. When extending the exact vehicle would overlap a future non-cancelled booking on that same vehicle, the engine does not reject outright. It looks for a replacement vehicle for the <i>future</i> booking (never the extending customer's vehicle), locks the candidate row, re-checks its availability immediately before committing, and only then reassigns it. If no safe replacement exists, the extension is marked <code>conflict_unresolved</code> — nothing is changed, and the admin dashboard surfaces it for manual handling. This runs identically whether the extension came from the WhatsApp/support channel or the website self-service channel.</p>
+
+<h2>9. Replacement vehicle logic</h2>
+<p>Candidates come from <code>available_vehicles()</code> for the conflicting booking's own date range, ranked same model first, then same category, then any other available vehicle — excluding the vehicle already in conflict. No arbitrary downgrade, no automatic upgrade beyond the existing pricing rules (the replacement's own pricing is untouched by this phase). If ranking finds nothing available at all, the outcome is <code>conflict_unresolved</code>, never a silent choice.</p>
+
+<h2>10. Booking preservation</h2>
+<p>For the reassigned (future) booking: booking reference, customer, dates, pickup/drop-off, duration, and payment history all remain unchanged — only <code>vehicle_id</code> changes, recorded in a new <code>vehicle_reassignments</code> row (original vehicle, replacement vehicle, reason, who processed it, when). For the extending customer's own booking: the reference, per the unchanged rule from the original Phase 7 build, never changes — only <code>end_date</code> does. Neither party's booking reference is ever regenerated.</p>
+
+<h2>11. Payment/invoice</h2>
+<p>Unchanged design, reaffirmed: the extension's payment/invoice record (<code>booking_extensions</code> itself) stays entirely separate from the original booking's <code>payments</code> row. Cash still finalizes immediately; online still defers the actual <code>end_date</code>/reassignment commit to payment confirmation — which now also means the reassignment engine only runs once payment succeeds for an online-paid extension, so a future booking is never disturbed for an extension whose payment might still fail. No new real payment provider was introduced.</p>
+
+<h2>12. Pricing configuration</h2>
+<p>Unchanged from the original Phase 7 build: <code>extension_pricing_settings.policy</code> remains seeded <code>NULL</code>. <b>Extension pricing policy remains pending owner confirmation.</b></p>
+
+<h2>13. Late penalty configuration</h2>
+<p>New, independently configurable, and deliberately left unset: <code>extension_penalty_settings</code> supports a fixed fee, a per-day charge, or a percentage of the extension amount — but the policy column is seeded <code>NULL</code>, and both the SQL layer (<code>request_booking_extension</code>) and the TypeScript layer (<code>src/lib/extensionPenalty.ts</code>) refuse to process a late extension at all until the owner sets one. <b>Late-extension penalty calculation remains pending owner confirmation.</b></p>
+
+<h2>14. Database changes</h2>
+<p>One new migration: <code>supabase/migrations/20260903000000_phase7_booking_reassignment.sql</code> (not yet applied to production). It extends <code>booking_extensions</code> (new <code>source</code>, <code>is_late</code>, <code>penalty_amount</code>, <code>penalty_policy_used</code>, <code>conflict_booking_id</code>, <code>replacement_vehicle_id</code>, verification-audit columns; status widened from an enum to a checked text column so <code>requested</code>/<code>conflict_unresolved</code> could be added without an enum-transaction restriction), and adds three new tables: <code>extension_penalty_settings</code>, <code>vehicle_reassignments</code>, and <code>booking_notifications</code>. It replaces <code>request_booking_extension()</code> and <code>confirm_booking_extension_payment()</code> with versions that call the new <code>resolve_extension_conflict()</code> engine, and adds <code>verify_booking_for_extension()</code>, <code>submit_extension_request_public()</code>, and <code>reject_extension_request()</code>.</p>
+
+<h2>15. API/Edge Function changes</h2>
+<p>New Edge Function <code>submit-extension-request</code> (<code>index.ts</code>/<code>logic.ts</code>/<code>logic.test.ts</code>), following the exact <code>create-booking</code> convention — thin Deno HTTP wrapper, pure testable logic, shared <code>ApiError</code>/CORS helpers. <code>adminExtensionsApi.ts</code> gained <code>processExtensionRequest</code>, <code>rejectExtensionRequest</code>, <code>fetchPendingExtensionRequests</code>, and penalty-settings CRUD. New guest-facing client module <code>src/features/booking/extendRentalApi.ts</code>.</p>
+
+<h2>16. Admin Dashboard changes</h2>
+<p><code>RentalExtensionsSection.tsx</code> (per-booking) now shows a review queue for customer-submitted <code>requested</code>/<code>conflict_unresolved</code> rows with "Review &amp; process" and "Reject" actions, late/penalty fields in the form and history, and conflict/reassignment notices. <code>ExtensionsListPage.tsx</code> gained new status tabs and a source column. <code>AdminSettingsPage.tsx</code> gained an owner-only "Late-extension penalty policy" card, mirroring the existing pricing-policy card. Staff Account Control permissions are unchanged and fully enforced — no new privileges were granted to any staff role.</p>
+
+<h2>17. Security/RLS</h2>
+<p><code>extension_penalty_settings</code>, <code>vehicle_reassignments</code>, and <code>booking_notifications</code> all enable RLS with admin-only read policies and no direct write policy for any role — every write happens through a SECURITY DEFINER function. <code>submit_extension_request_public()</code> is revoked from <code>anon</code>/<code>authenticated</code> and granted only to <code>service_role</code> (Edge-Function-mediated, per this project's established guest-mutation convention). <code>verify_booking_for_extension()</code> is a read-only, zero-row-on-mismatch function, safe to grant directly to <code>anon</code>/<code>authenticated</code>. Every admin-facing mutation still checks <code>is_admin()</code> internally.</p>
+
+<h2>18. Audit logging</h2>
+<p>New action types recorded through the existing <code>audit_logs</code> table (no new logging system): <code>extension_customer_verification</code>, <code>extension_conflict_detected</code>, <code>replacement_vehicle_selected</code>, <code>future_booking_reassigned</code>, <code>customer_notification_generated</code>, alongside the existing <code>extension_requested</code>/<code>extension_approved</code>/<code>extension_rejected</code>/<code>extension_payment_recorded</code>/<code>booking_return_date_changed</code>.</p>
+
+<h2>19. Notifications</h2>
+<p><b>Audited and confirmed: no email/SMS/WhatsApp-sending infrastructure exists anywhere in this codebase.</b> WhatsApp today is a manual human support channel, not an integration this system can call. <code>ContactPage.tsx</code>'s own code comment says as much ("there is no email backend to actually deliver it to yet"). Per your explicit instruction not to invent a notification platform, this phase implements only the domain state: a new <code>booking_notifications</code> table records exactly what a customer should be told (vehicle reassignment, extension approval/rejection) with a customer-safe payload — never internal admin notes — and a <code>pending_delivery</code> status. Wiring a real send channel (e.g. the Resend integration already named as the planned provider) is explicitly flagged as a remaining dependency in §25.</p>
+
+<h2>20. Tests — 246/246 passing</h2>
+<p>31 new automated tests were added this phase (215 → 246), across <code>extensionPenalty.test.ts</code>, the rewritten <code>adminExtensionsApi.test.ts</code>, the new <code>submit-extension-request/logic.test.ts</code>, and the new <code>ExtendRentalPage.test.tsx</code>. As with every prior phase report, this sandbox has no live Postgres/Docker instance, so anything that only lives inside a plpgsql function body (the actual conflict-detection query, the replacement-vehicle ranking, the exclusion-constraint race behavior, RLS policies) is <b>code-reviewed</b>, not exercised by an automated test — the table below states that honestly against each of the 41 test cases named in your spec, grouped exactly as you listed them.</p>
+<table>
+  <tr><th>#</th><th>Group</th><th>Case</th><th>Coverage</th></tr>
+  <tr><td>1</td><td>Basic extension</td><td>Extend by 1 day (minimum bound) accepted</td><td class="auto">Automated</td></tr>
+  <tr><td>2</td><td>Basic extension</td><td>Extend by 30 days (maximum bound) accepted</td><td class="auto">Automated</td></tr>
+  <tr><td>3</td><td>Basic extension</td><td>Extend by 31 days rejected (out of bound)</td><td class="auto">Automated</td></tr>
+  <tr><td>4</td><td>Basic extension</td><td>Extend by 0 days rejected</td><td class="auto">Automated</td></tr>
+  <tr><td>5</td><td>Basic extension</td><td>Cash extension finalizes immediately (approved + paid)</td><td class="auto">Automated</td></tr>
+  <tr><td>6</td><td>Basic extension</td><td>Online extension stays pending until payment confirmed</td><td class="auto">Automated</td></tr>
+  <tr><td>7</td><td>Basic extension</td><td>Late extension (past return date) recognized, flagged <code>is_late</code></td><td class="auto">Automated</td></tr>
+  <tr><td>8</td><td>Basic extension</td><td>Configurable penalty applied to a late extension</td><td class="auto">Automated</td></tr>
+  <tr><td>9</td><td>Basic extension</td><td>Late extension refused when no penalty policy is configured</td><td class="auto">Automated</td></tr>
+  <tr><td>10</td><td>Basic extension</td><td>Extension refused when no pricing policy is configured</td><td class="auto">Automated</td></tr>
+  <tr><td>11</td><td>Verification</td><td>Correct reference + correct vehicle number verifies</td><td class="auto">Automated</td></tr>
+  <tr><td>12</td><td>Verification</td><td>Wrong vehicle number, correct reference → generic failure</td><td class="auto">Automated</td></tr>
+  <tr><td>13</td><td>Verification</td><td>Wrong reference, correct vehicle number → generic failure</td><td class="auto">Automated</td></tr>
+  <tr><td>14</td><td>Verification</td><td>Both wrong → identical generic failure (indistinguishable)</td><td class="auto">Automated</td></tr>
+  <tr><td>15</td><td>Verification</td><td>Cannot be used to probe/enumerate another customer's booking</td><td class="reviewed">Code-reviewed</td></tr>
+  <tr><td>16</td><td>Exact vehicle availability</td><td>Availability keys on exact <code>vehicle_id</code>, never model/category</td><td class="reviewed">Code-reviewed</td></tr>
+  <tr><td>17</td><td>Exact vehicle availability</td><td>Two same-model vehicles are never treated as interchangeable</td><td class="reviewed">Code-reviewed</td></tr>
+  <tr><td>18</td><td>Exact vehicle availability</td><td>Preview availability check never mutates state</td><td class="reviewed">Code-reviewed</td></tr>
+  <tr><td>19</td><td>Exact vehicle availability</td><td>Real guarantee is <code>bookings_no_overlap</code> at commit time</td><td class="reviewed">Code-reviewed</td></tr>
+  <tr><td>20</td><td>Future booking conflict</td><td>Conflict detected when extended window overlaps a future booking</td><td class="reviewed">Code-reviewed</td></tr>
+  <tr><td>21</td><td>Future booking conflict</td><td>Extension NOT auto-rejected merely because a future booking exists</td><td class="auto">Automated (API layer)</td></tr>
+  <tr><td>22</td><td>Future booking conflict</td><td>Same-model replacement preferred first</td><td class="reviewed">Code-reviewed</td></tr>
+  <tr><td>23</td><td>Future booking conflict</td><td>Same-category replacement used when no same-model vehicle is free</td><td class="reviewed">Code-reviewed</td></tr>
+  <tr><td>24</td><td>Future booking conflict</td><td>No replacement found → <code>conflict_unresolved</code>, nothing changed</td><td class="auto">Automated (API layer)</td></tr>
+  <tr><td>25</td><td>Future booking conflict</td><td>Extending customer keeps their original vehicle on success</td><td class="reviewed">Code-reviewed</td></tr>
+  <tr><td>26</td><td>Future booking conflict</td><td>Reassigned booking's reference/dates/customer info unchanged</td><td class="reviewed">Code-reviewed</td></tr>
+  <tr><td>27</td><td>Future booking conflict</td><td><code>vehicle_reassignments</code> row records original/replacement/reason</td><td class="reviewed">Code-reviewed</td></tr>
+  <tr><td>28</td><td>Future booking conflict</td><td>Last-moment race during reassignment rolls back atomically (23P01)</td><td class="reviewed">Code-reviewed</td></tr>
+  <tr><td>29</td><td>Payment</td><td>Cash extension payment recorded with full detail</td><td class="auto">Automated</td></tr>
+  <tr><td>30</td><td>Payment</td><td>Online payment confirmed via <code>confirm_booking_extension_payment</code></td><td class="auto">Automated</td></tr>
+  <tr><td>31</td><td>Payment</td><td>Confirming an already-resolved payment is a no-op (idempotent)</td><td class="reviewed">Code-reviewed</td></tr>
+  <tr><td>32</td><td>Payment</td><td>Extension invoice fully separate from original booking's payment history</td><td class="reviewed">Code-reviewed</td></tr>
+  <tr><td>33</td><td>Payment</td><td>No mock/test payment ever claimed as a real production gateway</td><td class="reviewed">Code-reviewed</td></tr>
+  <tr><td>34</td><td>Permissions</td><td>Customer cannot approve/process their own extension</td><td class="reviewed">Code-reviewed</td></tr>
+  <tr><td>35</td><td>Permissions</td><td>Suspended staff blocked from processing extensions</td><td class="reviewed">Code-reviewed</td></tr>
+  <tr><td>36</td><td>Permissions</td><td>Only an active admin can call the processing/confirmation/rejection functions</td><td class="reviewed">Code-reviewed</td></tr>
+  <tr><td>37</td><td>Permissions</td><td>RLS restricts reads to admins, no direct writes for any role</td><td class="reviewed">Code-reviewed</td></tr>
+  <tr><td>38</td><td>Regression</td><td>Full Phase 0–6 + Staff Account Control + original Phase 7 suite</td><td class="auto">Automated — 246/246</td></tr>
+  <tr><td>39</td><td>Regression</td><td><code>npx tsc --noEmit</code></td><td class="auto">Automated — clean</td></tr>
+  <tr><td>40</td><td>Regression</td><td><code>npm run build</code></td><td class="auto">Automated — clean</td></tr>
+  <tr><td>41</td><td>Regression</td><td><code>npm run lint</code></td><td class="auto">Automated — 0 errors, baseline warnings only</td></tr>
+</table>
+
+<h2>21. Typecheck</h2>
+<p class="ok"><code>npx tsc --noEmit</code> — clean, 0 errors.</p>
+
+<h2>22. Build</h2>
+<p class="ok"><code>npm run build</code> — clean, 212 modules transformed. The one warning present (a chunk-size advisory) is pre-existing and unrelated to this phase.</p>
+
+<h2>23. Lint</h2>
+<p class="ok"><code>npm run lint</code> (oxlint) — 0 errors, exactly 11 pre-existing warnings (the same baseline reported in the Staff Account Control and original Phase 7 reports), none new.</p>
+
+<h2>24. Phase 0–6 regression</h2>
+<p class="ok">All 215 previously-passing tests (Phase 0 through the original Phase 7 extension/payments build) still pass unchanged, alongside the 31 new tests — 246/246 total. Nothing in this phase modified an existing test's expected behavior beyond what the new optional parameters/fields required.</p>
+
+<h2>25. Known limitations</h2>
+<ul>
+  <li><b>No live database in this sandbox.</b> Every plpgsql-only behavior (conflict detection, replacement ranking, race-safety, RLS enforcement) is code-reviewed, not exercised by an automated test — see the table in §20. The migration has not been run against any real Postgres instance yet.</li>
+  <li><b>No real notification channel.</b> <code>booking_notifications</code> records what should be sent; nothing actually sends it. Wiring a real provider (e.g. Resend) is a separate, later integration.</li>
+  <li><b>A customer-submitted request's dates cannot be edited during admin review</b> — an admin can approve or reject exactly what was requested; changing the dates requires rejecting and asking the customer to resubmit. This was a deliberate scope decision to avoid ambiguity between what the customer verified and what gets approved.</li>
+  <li><b>The reassignment engine handles one primary conflicting booking per extension.</b> If several future bookings on the same vehicle would all conflict with the extended window, the engine currently resolves the earliest one; a second overlapping booking would require a second pass. This matches every worked example in your spec (which described exactly one conflicting future booking) but is worth flagging if that scenario turns out to be more common in practice.</li>
+</ul>
+
+<h2>26. Owner decisions still pending</h2>
+<div class="callout action">
+  <b>Extension pricing policy</b> — original booking's daily rate, the vehicle's current daily rate, or a separate custom extension rate. Set in Settings → Extension pricing policy once decided. Carried over, unresolved, from the original Phase 7 report.
+</div>
+<div class="callout action">
+  <b>Late-extension penalty policy</b> — a flat fixed fee, a per-day charge, a percentage of the extension amount, or another rule entirely. Set in Settings → Late-extension penalty policy once decided. Until then, a late extension cannot be processed by either channel.
+</div>
+
+<h2>27. Production deployment status</h2>
+<p class="pending"><b>Nothing in this phase has been deployed to production.</b> The migration exists only in this repository (and has been synced to your Desktop copy of the repository, per your earlier request) — it has not been applied to your live Supabase project. The <code>submit-extension-request</code> Edge Function has not been deployed. No customer can currently reach the self-service Extend Rental flow in production, and no admin-facing changes from this report are live yet.</p>
+
+<div class="stop-banner">
+  <p><b>Stop condition:</b> This is the full Phase 7 (Rental Extension &amp; Booking Reassignment) completion report, delivered as PDF and in-chat text, per standing instructions.</p>
+  <p>Two owner decisions are pending (§26). Nothing has been deployed to production. Phase 8 has not been started and will not begin until you give explicit go-ahead.</p>
+</div>
+
+</div>
+</body>
+</html>

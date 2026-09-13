@@ -25,10 +25,10 @@ export function RequirementsSection() {
           <p className="text-[10px] font-semibold uppercase tracking-[0.32em] text-brand-gold">
             {t('home.requirements.eyebrow')}
           </p>
-          <h2 className="mt-4 text-[clamp(2.8rem,5vw,6rem)] font-black leading-[0.92] tracking-[-0.065em] text-[#000] drop-shadow-[0_8px_24px_rgba(17,22,29,0.08)]">
+          <h2 className="mt-4 text-3xl font-black leading-[0.95] tracking-[-0.06em] text-[#000] sm:text-4xl lg:text-5xl drop-shadow-[0_8px_24px_rgba(17,22,29,0.08)]">
             {t('home.requirements.title')}
           </h2>
-          <p className="mt-4 max-w-2xl text-base leading-7 text-[#58616d]">
+          <p className="mt-3 max-w-2xl text-sm leading-6 text-[#58616d] sm:mt-4 sm:text-base sm:leading-7">
             {t('home.requirements.subtitle')}
           </p>
         </div>
@@ -37,15 +37,15 @@ export function RequirementsSection() {
           {items.map((item, i) => (
             <div
               key={item.title}
-              className="rounded-[1.75rem] border border-[#e7decf] bg-white/80 p-6 shadow-[0_18px_38px_rgba(17,22,29,0.06)] backdrop-blur-[2px]"
+              className="rounded-[1.75rem] border border-[#e7decf] bg-white/80 p-5 shadow-[0_18px_38px_rgba(17,22,29,0.06)] backdrop-blur-[2px] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_26px_50px_rgba(17,22,29,0.1)] sm:p-6"
             >
               <div className="flex items-center justify-between">
                 <RequirementIcon index={i} />
                 <span className="font-mono text-xs font-semibold tracking-[0.18em] text-brand-gold">{`0${i + 1}`}</span>
               </div>
-              <h3 className="mt-6 text-[1.6rem] font-semibold leading-tight tracking-[-0.04em] text-[#1b2430]">{item.title}</h3>
-              <p className="mt-3 text-[1.02rem] leading-8 text-[#5e6874]">{item.body}</p>
-              <div className="mt-6 h-px w-full bg-brand-gold" />
+              <h3 className="mt-5 text-lg font-semibold leading-tight tracking-[-0.02em] text-[#1b2430] sm:mt-6 sm:text-xl">{item.title}</h3>
+              <p className="mt-2.5 text-sm leading-6 text-[#5e6874] sm:mt-3 sm:text-base sm:leading-7">{item.body}</p>
+              <div className="mt-5 h-px w-full bg-brand-gold sm:mt-6" />
             </div>
           ))}
         </div>

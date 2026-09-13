@@ -97,6 +97,7 @@ const ar = {
     },
     badge: 'وصول أسطول دبي',
     viewFleetCta: 'عرض الأسطول',
+    scrollCue: 'مرر للأسفل لاستكشاف المزيد',
     trust: {
       rating: '٤.٩/٥ تقييم الضيوف',
       concierge: 'خدمة كونسيرج على مدار الساعة',
@@ -1584,12 +1585,12 @@ const ar = {
         },
         email: {
           label: 'البريد الإلكتروني',
-          value: '[support@bliss.rent]',
+          value: 'support@bliss.rent',
           note: 'للأسئلة العامة أو الملاحظات أو أي أمر غير عاجل.',
         },
         address: {
           label: 'المكتب',
-          value: '[عنوان المكتب، دبي، الإمارات العربية المتحدة]',
+          value: 'Apt 121B, Block B, Sajaya 7 Building, Manama Street, Nad Al Sheba 3, Dubai, UAE',
           note: 'الاستلام يتم من المطار ونقاط أخرى متفق عليها في المدن التي نخدمها — هذا عنوان مكتبنا وليس نقطة استلام.',
         },
         hours: {
@@ -1597,6 +1598,14 @@ const ar = {
           value: '[مثال: على مدار الساعة، أو ساعات محددة]',
           note: '',
         },
+      },
+      getDirections: 'الحصول على الاتجاهات',
+      visitOffice: {
+        heading: 'قم بزيارة مكتبنا',
+        subtitle: 'يسعدنا استقبالك — لكن تذكر أن هذا مكتبنا وليس نقطة استلام المركبات.',
+      },
+      cta: {
+        heading: 'هل أنت مستعد لحجز سيارتك في دبي؟',
       },
       form: {
         heading: 'أرسل لنا رسالة',
