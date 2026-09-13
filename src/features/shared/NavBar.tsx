@@ -5,7 +5,6 @@ import { CalendarSearch, CarFront, ChevronRight, ClipboardCheck, Home, Info, Log
 import { LanguageSwitcher } from '@/features/shared/LanguageSwitcher'
 import { LinkButton } from '@/features/shared/ui/LinkButton'
 import { PendingBookingIndicator } from '@/features/shared/PendingBookingIndicator'
-import { CitiesMenu } from '@/features/shared/CitiesMenu'
 import { WHATSAPP_URL } from '@/features/booking/contactLinks'
 import { prefersReducedMotion } from '@/lib/motion'
 import logoFull from '@/assets/brand/logo-full.png'
@@ -215,21 +214,10 @@ export function NavBar() {
 
         <div className="hidden items-center gap-4 lg:flex">
           <PendingBookingIndicator />
-          <Link
-            to="/admin/login"
-            className={
-              'flex items-center gap-1.5 rounded-none px-2 py-2 text-sm font-medium transition-colors ' +
-              (transparent ? 'text-white/80 hover:text-white' : 'text-[#4a5360] hover:text-brand-gold')
-            }
-          >
-            <LogIn className="h-4 w-4 shrink-0" aria-hidden="true" />
-            {t('nav.adminSignIn')}
-          </Link>
           <LanguageSwitcher tone={transparent ? 'light' : 'dark'} />
           {/* Cities selector sits right next to the primary CTA — the
               same "compact city-switcher beside the main action" pattern
               the reference layout used. */}
-          <CitiesMenu tone={transparent ? 'light' : 'dark'} />
           <LinkButton
             to="/book"
             variant="primary"

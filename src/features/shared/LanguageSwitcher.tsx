@@ -1,7 +1,7 @@
-import { Globe } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { storeLanguage, type SupportedLanguage } from '@/i18n'
 import { UaeFlag } from '@/features/shared/UaeFlag'
+import { UkFlag } from '@/features/shared/UkFlag'
 
 interface LanguageSwitcherProps {
   className?: string
@@ -14,14 +14,10 @@ interface LanguageSwitcherProps {
 /**
  * Toggles between English and Arabic. The button label shows the OTHER
  * language's name (i.e. what you'll switch to), matching the convention
- * on most bilingual GCC sites.
- *
- * Offering Arabic shows the real UAE flag next to it — Arabic is this
- * business's actual home-market language, so that's an honest pairing.
- * Offering English shows a plain globe icon instead of a national flag:
- * English isn't any one country's language, and picking a flag (UK? US?)
- * to represent it would be an arbitrary, not-quite-honest choice the
- * same way an invented logo would be.
+ * on most bilingual GCC sites. Offering Arabic shows the real UAE flag;
+ * offering English shows the UK flag — the common convention on
+ * bilingual Gulf-region sites, alongside the language-switcher's own
+ * name label so it never stands in as an unexplained country claim.
  */
 export function LanguageSwitcher({ className = '', tone = 'dark' }: LanguageSwitcherProps) {
   const { t, i18n } = useTranslation()
@@ -45,7 +41,7 @@ export function LanguageSwitcher({ className = '', tone = 'dark' }: LanguageSwit
       className={'flex items-center gap-1.5 rounded-none border px-3 py-1.5 text-sm font-semibold transition-colors ' + toneClass + (className ? ' ' + className : '')}
       aria-label={t('nav.switchLanguage')}
     >
-      {offeringArabic ? <UaeFlag className="h-3.5 w-auto shrink-0" /> : <Globe className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />}
+      {offeringArabic ? <UaeFlag className="h-3.5 w-auto shrink-0" /> : <UkFlag className="h-3.5 w-auto shrink-0" />}
       {t('nav.language')}
     </button>
   )
