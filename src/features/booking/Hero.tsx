@@ -168,7 +168,7 @@ export function Hero() {
               <span className="block text-white">{slide.title}</span>
             </h1>
 
-            <p className="md:mt-6 mt-3 max-w-lg md:text-base md:leading-7 text-white/80 sm:text-lg">{slide.body}</p>
+            <p className="mt-6 max-w-lg text-base leading-7 text-white/80 sm:text-lg">{slide.body}</p>
           </div>
 
           {/* Mobile gets a deliberately different CTA arrangement, not just
