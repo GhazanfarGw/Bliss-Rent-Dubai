@@ -1453,6 +1453,18 @@ const en = {
           "We're expanding city by city rather than spreading thin all at once — concentrating on doing airport pickup and city-wide drop-off properly in each city we add, starting with Dubai and Abu Dhabi.",
         ],
       },
+      fleet: {
+        eyebrow: 'Our fleet',
+        heading: 'What you can actually drive away in',
+        subtitle: 'Every category currently live and bookable — real cars, real photos, updated as the fleet changes.',
+        count_one: '{{count}} car',
+        count_other: '{{count}} cars',
+      },
+      coverage: {
+        eyebrow: 'Where we operate',
+        heading: 'Live in these cities today',
+        subtitle: 'Real pickup and drop-off coverage, city by city — see the Locations page for exact points.',
+      },
       visionMissionEyebrow: 'Looking ahead',
       vision: {
         heading: 'Our vision',
