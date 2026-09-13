@@ -352,6 +352,11 @@ export interface Database {
           // this text IS emailed to the customer verbatim once saved.
           admin_reply_message: string | null
           admin_reply_sent_at: string | null
+          // 20261007000000_support_chat.sql — bearer credential for the
+          // guest-facing Support Chat widget (see complaint_messages
+          // below), never complaint_id itself. Not shown anywhere in the
+          // admin dashboard.
+          access_token: string
         }
         Insert: {
           id?: string
@@ -366,8 +371,34 @@ export interface Database {
           resolution?: string | null
           admin_reply_message?: string | null
           admin_reply_sent_at?: string | null
+          access_token?: string
         }
         Update: Partial<Database['public']['Tables']['complaints']['Insert']>
+        Relationships: []
+      }
+      // 20261007000000_support_chat.sql — the Support Chat thread for a
+      // complaints row (customer + admin messages, optional photo).
+      // Complaints from before this table existed have no rows here; see
+      // that migration's own comment for how the admin thread view
+      // handles those.
+      complaint_messages: {
+        Row: {
+          id: string
+          complaint_id: string
+          sender: 'customer' | 'admin'
+          body: string | null
+          image_path: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          complaint_id: string
+          sender: 'customer' | 'admin'
+          body?: string | null
+          image_path?: string | null
+          created_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['complaint_messages']['Insert']>
         Relationships: []
       }
       audit_logs: {

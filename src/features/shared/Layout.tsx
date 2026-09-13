@@ -4,6 +4,7 @@ import { NavBar } from '@/features/shared/NavBar'
 import { Footer } from '@/features/shared/Footer'
 import { CookieConsentBanner } from '@/features/shared/CookieConsentBanner'
 import { FeedbackWidget } from '@/features/shared/FeedbackWidget'
+import { SupportChatWidget } from '@/features/shared/SupportChatWidget'
 import { prefersReducedMotion } from '@/lib/motion'
 
 export function Layout() {
@@ -36,6 +37,7 @@ export function Layout() {
       <Footer />
       <CookieConsentBanner />
       <FeedbackWidget />
+      <SupportChatWidget />
     </div>
   )
 }

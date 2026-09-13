@@ -1,6 +1,6 @@
 import { supabase } from '@/lib/supabaseClient'
 import { AdminApiError } from '@/features/admin/adminApi'
-import type { AdminComplaintWithDetails } from '@/types/domain'
+import type { AdminComplaintMessage, AdminComplaintWithDetails } from '@/types/domain'
 import type { Database } from '@/types/database'
 
 type ComplaintStatus = Database['public']['Tables']['complaints']['Row']['status']
@@ -91,4 +91,41 @@ export async function sendComplaintReply(id: string, replyMessage: string): Prom
   }
 
   return { emailTriggered: true }
+}
+
+// ---------------------------------------------------------------------------
+// Support Chat — the live thread the Support Chat widget's "message our
+// team" mode reads/writes to (see 20261007000000_support_chat.sql). This
+// is separate from the reply-by-email flow above: sendComplaintChatMessage
+// writes straight into complaint_messages under "admins manage complaint
+// messages" RLS (is_admin(), same as updateComplaint's own RLS-governed
+// write), and the visitor's widget picks it up by polling
+// support-chat-thread — there is no email step here, and no realtime
+// channel either, just a plain insert + the widget's own poll.
+// ---------------------------------------------------------------------------
+
+/** Every message in a complaint's Support Chat thread, oldest first. Complaints from before this table existed (the Contact Us form, or any older complaint) simply have none — ComplaintDetailPage synthesizes their description/admin_reply_message as bookend bubbles instead. */
+export async function fetchComplaintThread(complaintId: string): Promise<AdminComplaintMessage[]> {
+  const { data, error } = await supabase
+    .from('complaint_messages')
+    .select('*')
+    .eq('complaint_id', complaintId)
+    .order('created_at', { ascending: true })
+  if (error) throw new AdminApiError(error.message)
+  return data ?? []
+}
+
+/** Plain RLS-governed insert, sender fixed to 'admin' — a visitor's browser can never post one of these itself (it only ever calls support-chat-message, which the SQL function hard-codes to 'customer'). */
+export async function sendComplaintChatMessage(complaintId: string, body: string): Promise<void> {
+  const trimmed = body.trim()
+  if (!trimmed) return
+  const { error } = await supabase.from('complaint_messages').insert({ complaint_id: complaintId, sender: 'admin', body: trimmed })
+  if (error) throw new AdminApiError(error.message)
+}
+
+/** Short-lived signed URL for a photo in the private 'complaint-attachments' bucket — admins can read it (see "admins read complaint attachments" RLS), a visitor's browser never could, which is why support-chat-thread signs these server-side instead. */
+export async function getComplaintAttachmentUrl(imagePath: string): Promise<string | null> {
+  const { data, error } = await supabase.storage.from('complaint-attachments').createSignedUrl(imagePath, 60 * 30)
+  if (error || !data) return null
+  return data.signedUrl
 }

@@ -7,6 +7,9 @@ import type { AdminComplaintWithDetails } from '@/types/domain'
 const fetchComplaintByIdMock = vi.fn()
 const updateComplaintMock = vi.fn()
 const sendComplaintReplyMock = vi.fn()
+const fetchComplaintThreadMock = vi.fn()
+const sendComplaintChatMessageMock = vi.fn()
+const getComplaintAttachmentUrlMock = vi.fn()
 
 vi.mock('./adminComplaintsApi', async () => {
   const actual = await vi.importActual<typeof import('./adminComplaintsApi')>('./adminComplaintsApi')
@@ -15,6 +18,9 @@ vi.mock('./adminComplaintsApi', async () => {
     fetchComplaintById: (...args: unknown[]) => fetchComplaintByIdMock(...args),
     updateComplaint: (...args: unknown[]) => updateComplaintMock(...args),
     sendComplaintReply: (...args: unknown[]) => sendComplaintReplyMock(...args),
+    fetchComplaintThread: (...args: unknown[]) => fetchComplaintThreadMock(...args),
+    sendComplaintChatMessage: (...args: unknown[]) => sendComplaintChatMessageMock(...args),
+    getComplaintAttachmentUrl: (...args: unknown[]) => getComplaintAttachmentUrlMock(...args),
   }
 })
 
@@ -31,6 +37,7 @@ const baseComplaint: AdminComplaintWithDetails = {
   resolution: null,
   admin_reply_message: null,
   admin_reply_sent_at: null,
+  access_token: 'access-token-1',
   customers: { id: 'cust-1', full_name: 'Jane Renter', email: 'jane@example.com', phone: null, auth_user_id: null, created_at: '2026-01-01T00:00:00Z' } as unknown as AdminComplaintWithDetails['customers'],
   bookings: null,
 }
@@ -50,7 +57,11 @@ describe('ComplaintDetailPage — reply to customer', () => {
     fetchComplaintByIdMock.mockReset()
     updateComplaintMock.mockReset()
     sendComplaintReplyMock.mockReset()
+    fetchComplaintThreadMock.mockReset()
+    sendComplaintChatMessageMock.mockReset()
+    getComplaintAttachmentUrlMock.mockReset()
     fetchComplaintByIdMock.mockResolvedValue(baseComplaint)
+    fetchComplaintThreadMock.mockResolvedValue([])
   })
 
   it('sends a reply and shows confirmation once the email is triggered', async () => {
@@ -98,5 +109,66 @@ describe('ComplaintDetailPage — reply to customer', () => {
     await screen.findByText('Late delivery')
     expect(screen.getByDisplayValue('Previously sent reply.')).toBeInTheDocument()
     expect(screen.getByText(/Last sent/)).toBeInTheDocument()
+  })
+})
+
+describe('ComplaintDetailPage — live chat', () => {
+  beforeEach(() => {
+    fetchComplaintByIdMock.mockReset()
+    updateComplaintMock.mockReset()
+    sendComplaintReplyMock.mockReset()
+    fetchComplaintThreadMock.mockReset()
+    sendComplaintChatMessageMock.mockReset()
+    getComplaintAttachmentUrlMock.mockReset()
+    fetchComplaintByIdMock.mockResolvedValue(baseComplaint)
+  })
+
+  it('synthesizes the original description as the opening bubble when there is no real thread yet', async () => {
+    fetchComplaintThreadMock.mockResolvedValue([])
+    renderPage()
+
+    await screen.findByText('Late delivery')
+    // Appears twice once loaded: once in the read-only "Complaint details"
+    // section (always shown), and once as the synthesized opening chat
+    // bubble (only shown because the real thread came back empty).
+    await waitFor(() => expect(screen.getAllByText('My car was delivered 2 hours late.')).toHaveLength(2))
+  })
+
+  it('renders real thread messages from both the customer and the admin', async () => {
+    fetchComplaintThreadMock.mockResolvedValue([
+      { id: 'm1', complaint_id: 'c1', sender: 'customer', body: 'Any update?', image_path: null, created_at: '2026-09-10T13:00:00Z' },
+      { id: 'm2', complaint_id: 'c1', sender: 'admin', body: 'Looking into it now.', image_path: null, created_at: '2026-09-10T13:05:00Z' },
+    ])
+    renderPage()
+
+    await screen.findByText('Late delivery')
+    expect(await screen.findByText('Any update?')).toBeInTheDocument()
+    expect(screen.getByText('Looking into it now.')).toBeInTheDocument()
+  })
+
+  it('sends a chat reply and reloads the thread', async () => {
+    fetchComplaintThreadMock.mockResolvedValue([])
+    sendComplaintChatMessageMock.mockResolvedValue(undefined)
+    renderPage()
+
+    await screen.findByText('Late delivery')
+    fireEvent.change(screen.getByPlaceholderText('Type a message…'), { target: { value: 'We are on it!' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Send' }))
+
+    await waitFor(() => expect(sendComplaintChatMessageMock).toHaveBeenCalledWith('c1', 'We are on it!'))
+    expect(fetchComplaintThreadMock).toHaveBeenCalledTimes(2)
+  })
+
+  it('shows an error and keeps the draft when sending a chat reply fails', async () => {
+    fetchComplaintThreadMock.mockResolvedValue([])
+    sendComplaintChatMessageMock.mockRejectedValue(new Error('permission denied'))
+    renderPage()
+
+    await screen.findByText('Late delivery')
+    fireEvent.change(screen.getByPlaceholderText('Type a message…'), { target: { value: 'We are on it!' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Send' }))
+
+    expect(await screen.findByText('permission denied')).toBeInTheDocument()
+    expect(screen.getByDisplayValue('We are on it!')).toBeInTheDocument()
   })
 })

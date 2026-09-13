@@ -11,6 +11,7 @@ type BookingRow = Database['public']['Tables']['bookings']['Row']
 type BookingStatusHistoryRow = Database['public']['Tables']['booking_status_history']['Row']
 type PaymentRow = Database['public']['Tables']['payments']['Row']
 type ComplaintRow = Database['public']['Tables']['complaints']['Row']
+type ComplaintMessageRow = Database['public']['Tables']['complaint_messages']['Row']
 type AuditLogRow = Database['public']['Tables']['audit_logs']['Row']
 type EmailLogRow = Database['public']['Tables']['email_log']['Row']
 type AdminProfileRow = Database['public']['Tables']['admin_profiles']['Row']
@@ -213,6 +214,9 @@ export type AdminComplaintWithDetails = ComplaintRow & {
   customers: CustomerRow | null
   bookings: BookingRow | null
 }
+
+/** Support Chat thread row (see complaint_messages, 20261007000000_support_chat.sql) — read/written straight off the table, no join. */
+export type AdminComplaintMessage = ComplaintMessageRow
 
 export type AdminAuditLogEntry = AuditLogRow
 
