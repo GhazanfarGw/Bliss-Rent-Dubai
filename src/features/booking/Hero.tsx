@@ -126,7 +126,7 @@ export function Hero() {
           hero, so it isn't affected by this padding. Height increased
           (owner's request, referencing airline-style full hero sections)
           so the hero image reads as a real full-bleed visual, not a strip. */}
-      <div className="relative z-10 mx-auto flex md:min-h-[600px] max-w-7xl items-end px-4 pb-24 pt-[calc(var(--header-h)+var(--ticker-h))] sm:px-6 lg:min-h-[95vh] lg:pb-16 lg:px-8">
+      <div className="relative z-10 mx-auto flex min-h-[600px] max-w-7xl items-end px-4 pb-20 pt-[calc(var(--header-h)+var(--ticker-h))] sm:px-6 lg:min-h-[95vh] lg:pb-16 lg:px-8">
         <div className="max-w-xl pb-20 md:pb-28 lg:pb-28">
           <div className="mb-5 inline-flex items-center gap-2 border border-[#fff]/35 bg-[#120f0a]/55 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.33em] text-[#fff] backdrop-blur-md shadow-[0_12px_28px_rgba(17,13,8,0.32)]">
             {/* "Live" pulsing dot — a brand-champagne ping ring behind the
