@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type FormEvent, type ReactNode, type RefOb
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { lookupBooking, BookingLookupError } from '@/features/booking/lookupApi'
+import { lastNameMatches } from '@/features/booking/manageBookingVerify'
 import { ExtendRentalSection } from '@/features/booking/ExtendRentalSection'
 import { resumePendingBookingFromLookup, clearActiveBooking } from '@/features/booking/checkout/checkoutStorage'
 import { criteriaToSearchParams } from '@/features/booking/searchParams'
@@ -63,6 +64,27 @@ const EXTENDABLE_STATUSES = new Set(['confirmed', 'active'])
  * not only from an email link or the homepage navigator's Manage
  * Booking tab.
  *
+ * Frontend simplification (airline "manage booking" reference): the
+ * two-column steps/form lookup card became a plain, compact two-field
+ * form — booking reference/plate + last name, verified together via
+ * manageBookingVerify.ts's lastNameMatches (the same helper the homepage
+ * navigator's ManageBookingVerifyPanel already uses). This page's lookup
+ * used to accept the reference or plate ALONE; it now requires the last
+ * name to match too, same as that navigator panel. `handleSubmit` below
+ * does the required-fields check, then the lookup, then the last-name
+ * check — a mismatch or a nonexistent reference both land on the same
+ * generic 'not_found' state, so neither ever reveals which was wrong.
+ *
+ * Full redesign (drop the hero): per a direct follow-up request, the page
+ * no longer opens with a hero at all — ManageBookingHero is now a plain,
+ * flat text header (eyebrow + rule + heading, no photo) instead of the
+ * full-bleed PageHero treatment above. The outer wrapper here dropped the
+ * warm-surface background and the lookup card's negative-margin overlap
+ * (both existed only to sit a white card over a photo that no longer
+ * exists) for a single flat white page instead. No lookup/verification
+ * logic changed — only this file's own layout wrapper and which
+ * components it renders.
+ *
  * Frontend UX fix: a successful lookup used to render the result far
  * below the lookup card with no scroll/focus transition, so a customer
  * could easily miss that anything happened. `resultSectionRef` below is
@@ -84,6 +106,7 @@ export function ManageBookingPage() {
   const location = useLocation()
   const prefetchedResult = (location.state as { prefetchedResult?: BookingLookupResult } | null)?.prefetchedResult
   const [query, setQuery] = useState(() => prefetchedResult?.bookingReference ?? searchParams.get('ref') ?? '')
+  const [lastName, setLastName] = useState('')
   const [state, setState] = useState<ViewState>(() =>
     prefetchedResult ? { status: 'found', result: prefetchedResult } : { status: 'idle' },
   )
@@ -116,11 +139,14 @@ export function ManageBookingPage() {
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
-    if (!query.trim()) return
+    if (!query.trim() || !lastName.trim()) {
+      setState({ status: 'error', message: t('manageBooking.errorRequired') })
+      return
+    }
     setState({ status: 'loading' })
     try {
       const result = await lookupBooking(query)
-      if (result) {
+      if (result && lastNameMatches(result.customerName, lastName)) {
         setState({ status: 'found', result })
         // Defensive cleanup: if this browser still has an active-booking
         // pointer for this vehicle (e.g. a stale tab) but the booking is
@@ -129,6 +155,9 @@ export function ManageBookingPage() {
         // resume panel never show something that's already resolved.
         if (result.bookingStatus !== 'pending_payment') clearActiveBooking(result.vehicleId)
       } else {
+        // Deliberately the same generic state whether the reference/plate
+        // doesn't exist or the last name doesn't match it — never reveal
+        // which (see ManageBookingVerifyPanel, which does the same).
         setState({ status: 'not_found' })
       }
     } catch (err) {
@@ -142,6 +171,7 @@ export function ManageBookingPage() {
   function handleSearchAnother() {
     setState({ status: 'idle' })
     setQuery('')
+    setLastName('')
     const behavior = prefersReducedMotion() ? 'auto' : 'smooth'
     // Wait a tick so the lookup card (always mounted, but scrolled past
     // once a result is showing) is back in normal flow before scrolling.
@@ -153,14 +183,16 @@ export function ManageBookingPage() {
   }
 
   return (
-    <div className="bg-surface-warm">
-      <ManageBookingHero />
+    <div className="bg-white">
+      <div className="mx-auto max-w-3xl px-4 py-14 sm:px-6 sm:py-20 lg:px-8">
+        <ManageBookingHero />
 
-      <div className="mx-auto max-w-4xl px-4 pb-14 sm:px-6 lg:px-8 mt-28 md:32">
         <div ref={lookupSectionRef} className="scroll-mt-24">
           <ManageBookingLookupCard
             query={query}
             onQueryChange={setQuery}
+            lastName={lastName}
+            onLastNameChange={setLastName}
             onSubmit={(e) => void handleSubmit(e)}
             loading={state.status === 'loading'}
             notFound={state.status === 'not_found'}
@@ -169,10 +201,12 @@ export function ManageBookingPage() {
         </div>
 
         {state.status === 'found' && (
-          <ResultCard result={state.result} sectionRef={resultSectionRef} onSearchAnother={handleSearchAnother} />
+          <div className="mt-10">
+            <ResultCard result={state.result} sectionRef={resultSectionRef} onSearchAnother={handleSearchAnother} />
+          </div>
         )}
 
-        <div className="mt-8 text-center">
+        <div className="mt-10 text-center">
           <Link to="/" className="text-sm font-semibold text-brand-navy underline decoration-brand-gold decoration-2 underline-offset-4">
             {t('checkout.confirmation.backToHome')}
           </Link>
@@ -216,7 +250,7 @@ function ResultCard({
       tabIndex={-1}
       role="region"
       aria-label={t('manageBooking.resultLabel')}
-      className="mt-6 scroll-mt-24 space-y-4 border border-[#ece7df] bg-white p-6 shadow-[0_20px_38px_rgba(18,20,23,0.06)] outline-none sm:p-8"
+      className="scroll-mt-24 space-y-4 border border-[#ece7df] bg-white p-6 shadow-[0_20px_38px_rgba(18,20,23,0.06)] outline-none sm:p-8"
     >
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-brand-navy/8 pb-4">
         <div>

@@ -4,11 +4,14 @@ import { ManageBookingLookupCard } from '@/features/booking/ManageBookingLookupC
 
 function renderCard(overrides: Partial<Parameters<typeof ManageBookingLookupCard>[0]> = {}) {
   const onQueryChange = vi.fn()
+  const onLastNameChange = vi.fn()
   const onSubmit = vi.fn((e: { preventDefault: () => void }) => e.preventDefault())
-  render(
+  const { container } = render(
     <ManageBookingLookupCard
       query=""
       onQueryChange={onQueryChange}
+      lastName=""
+      onLastNameChange={onLastNameChange}
       onSubmit={onSubmit}
       loading={false}
       notFound={false}
@@ -16,25 +19,38 @@ function renderCard(overrides: Partial<Parameters<typeof ManageBookingLookupCard
       {...overrides}
     />,
   )
-  return { onQueryChange, onSubmit }
+  return { onQueryChange, onLastNameChange, onSubmit, container }
 }
 
 describe('ManageBookingLookupCard', () => {
-  it('renders the numbered steps explaining the flow', () => {
-    renderCard()
-    expect(screen.getByText('Enter your details')).toBeInTheDocument()
-    expect(screen.getByText('Review your booking')).toBeInTheDocument()
-    expect(screen.getByText('Extend or pay')).toBeInTheDocument()
+  it('renders no card border/box — a plain form flowing on the page', () => {
+    const { container } = renderCard()
+    // The outermost element is the <form> itself, not a bordered/shadowed wrapper div.
+    expect(container.firstElementChild?.tagName).toBe('FORM')
   })
 
   it('reports field changes and submits via the provided callbacks — no logic of its own', () => {
-    const { onQueryChange, onSubmit } = renderCard()
+    const { onQueryChange, onLastNameChange, onSubmit } = renderCard()
 
-    fireEvent.change(screen.getByPlaceholderText('BLS-XXXXXXXX or ABC-123'), { target: { value: 'BLS-ABCDEF12' } })
+    fireEvent.change(screen.getByPlaceholderText('Booking Reference or Vehicle Plate Number'), { target: { value: 'BLS-ABCDEF12' } })
     expect(onQueryChange).toHaveBeenCalledWith('BLS-ABCDEF12')
 
-    fireEvent.click(screen.getByRole('button', { name: /find my car/i }))
+    fireEvent.change(screen.getByPlaceholderText('Last Name'), { target: { value: 'Renter' } })
+    expect(onLastNameChange).toHaveBeenCalledWith('Renter')
+
+    fireEvent.click(screen.getByRole('button', { name: /find my booking/i }))
     expect(onSubmit).toHaveBeenCalled()
+  })
+
+  it('gives the help icon an accessible name, since it carries no visible text', () => {
+    renderCard()
+    expect(screen.getByRole('button', { name: /what's a booking reference/i })).toBeInTheDocument()
+  })
+
+  it('links to a real WhatsApp chat, not an invented account-login flow', () => {
+    renderCard()
+    const link = screen.getByRole('link', { name: /whatsapp/i })
+    expect(link).toHaveAttribute('href', expect.stringContaining('wa.me'))
   })
 
   it('shows the loading label and disables the button while loading', () => {

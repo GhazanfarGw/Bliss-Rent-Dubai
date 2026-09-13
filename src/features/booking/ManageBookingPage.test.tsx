@@ -106,13 +106,14 @@ function renderPageWithCheckoutRoutes(initialEntries: string[] = ['/manage-booki
   )
 }
 
-// Matches manageBooking.submit — updated to the current copy ("Find my
-// car") by the concurrent Phase 8 frontend redesign; this file's other
-// pre-existing tests were failing purely on that copy change, unrelated
-// to anything in Phase 9D. See the Phase 9D completion report.
-function fillAndSubmit(query: string) {
-  fireEvent.change(screen.getByPlaceholderText('BLS-XXXXXXXX or ABC-123'), { target: { value: query } })
-  fireEvent.click(screen.getByRole('button', { name: /find my car/i }))
+// Matches manageBooking.submit — "Find My Booking" per the flat, airline-
+// reference-modeled redesign. `lastName` defaults to the surname on
+// confirmedResult/completedResult ('Jane Renter'); tests against
+// pendingPaymentResult ('Ghazanfar Abbas') pass 'Abbas' explicitly.
+function fillAndSubmit(query: string, lastName = 'Renter') {
+  fireEvent.change(screen.getByPlaceholderText('Booking Reference or Vehicle Plate Number'), { target: { value: query } })
+  fireEvent.change(screen.getByPlaceholderText('Last Name'), { target: { value: lastName } })
+  fireEvent.click(screen.getByRole('button', { name: /find my booking/i }))
 }
 
 describe('ManageBookingPage', () => {
@@ -122,7 +123,7 @@ describe('ManageBookingPage', () => {
     sessionStorage.clear()
   })
 
-  it('shows the booking summary when found by booking reference', async () => {
+  it('shows the booking summary when found by booking reference and matching last name', async () => {
     lookupMock.mockResolvedValue(confirmedResult)
     renderPage()
     fillAndSubmit('BLS-ABCDEF12')
@@ -134,13 +135,31 @@ describe('ManageBookingPage', () => {
     expect(lookupMock).toHaveBeenCalledWith('BLS-ABCDEF12')
   })
 
-  it('shows the booking summary when found by vehicle plate alone', async () => {
+  it('shows the booking summary when found by vehicle plate alone (plus matching last name)', async () => {
     lookupMock.mockResolvedValue(confirmedResult)
     renderPage()
     fillAndSubmit('ABC-123')
 
     await waitFor(() => expect(screen.getByText('BLS-ABCDEF12')).toBeInTheDocument())
     expect(lookupMock).toHaveBeenCalledWith('ABC-123')
+  })
+
+  it('shows a required-fields error without calling the lookup when either field is empty', async () => {
+    renderPage()
+    fireEvent.change(screen.getByPlaceholderText('Booking Reference or Vehicle Plate Number'), { target: { value: 'BLS-ABCDEF12' } })
+    fireEvent.click(screen.getByRole('button', { name: /find my booking/i }))
+
+    expect(await screen.findByText(/please enter both/i)).toBeInTheDocument()
+    expect(lookupMock).not.toHaveBeenCalled()
+  })
+
+  it('shows the same generic not-found message, never the booking, when the last name does not match', async () => {
+    lookupMock.mockResolvedValue(confirmedResult)
+    renderPage()
+    fillAndSubmit('BLS-ABCDEF12', 'WrongName')
+
+    await waitFor(() => expect(screen.getByText(/couldn't find a booking/i)).toBeInTheDocument())
+    expect(screen.queryByText('Toyota Camry')).not.toBeInTheDocument()
   })
 
   it('shows a generic not-found message, never fake data, when nothing matches', async () => {
@@ -191,15 +210,16 @@ describe('ManageBookingPage', () => {
     it('pre-fills the lookup field from the ref query parameter, without auto-submitting', () => {
       renderPage(['/manage-booking?ref=BLS-ABCDEF12'])
 
-      expect(screen.getByPlaceholderText('BLS-XXXXXXXX or ABC-123')).toHaveValue('BLS-ABCDEF12')
+      expect(screen.getByPlaceholderText('Booking Reference or Vehicle Plate Number')).toHaveValue('BLS-ABCDEF12')
       expect(lookupMock).not.toHaveBeenCalled()
     })
 
-    it('still looks up the booking once the customer presses the button themselves', async () => {
+    it('still looks up the booking once the customer enters their last name and presses the button', async () => {
       lookupMock.mockResolvedValue(confirmedResult)
       renderPage(['/manage-booking?ref=BLS-ABCDEF12'])
 
-      fireEvent.click(screen.getByRole('button', { name: /find my car/i }))
+      fireEvent.change(screen.getByPlaceholderText('Last Name'), { target: { value: 'Renter' } })
+      fireEvent.click(screen.getByRole('button', { name: /find my booking/i }))
 
       await waitFor(() => expect(screen.getByText('BLS-ABCDEF12')).toBeInTheDocument())
       expect(lookupMock).toHaveBeenCalledWith('BLS-ABCDEF12')
@@ -207,7 +227,7 @@ describe('ManageBookingPage', () => {
 
     it('leaves the field empty, exactly as before, when there is no ref parameter', () => {
       renderPage()
-      expect(screen.getByPlaceholderText('BLS-XXXXXXXX or ABC-123')).toHaveValue('')
+      expect(screen.getByPlaceholderText('Booking Reference or Vehicle Plate Number')).toHaveValue('')
     })
 
     it('still lets the customer overwrite a pre-filled reference and search for something else', async () => {
@@ -229,7 +249,7 @@ describe('ManageBookingPage', () => {
     it('shows a Continue to Payment action for a pending_payment booking', async () => {
       lookupMock.mockResolvedValue(pendingPaymentResult)
       renderPage()
-      fillAndSubmit('BLS-E16F5DC3')
+      fillAndSubmit('BLS-E16F5DC3', 'Abbas')
 
       await waitFor(() => expect(screen.getByText('BLS-E16F5DC3')).toBeInTheDocument())
       expect(screen.getByRole('button', { name: /continue to payment/i })).toBeInTheDocument()
@@ -247,7 +267,7 @@ describe('ManageBookingPage', () => {
     it('resuming seeds the booking result + active-booking pointer and navigates straight to the Payment step', async () => {
       lookupMock.mockResolvedValue(pendingPaymentResult)
       renderPageWithCheckoutRoutes()
-      fillAndSubmit('BLS-E16F5DC3')
+      fillAndSubmit('BLS-E16F5DC3', 'Abbas')
 
       await waitFor(() => expect(screen.getByText('BLS-E16F5DC3')).toBeInTheDocument())
       fireEvent.click(screen.getByRole('button', { name: /continue to payment/i }))
@@ -287,7 +307,7 @@ describe('ManageBookingPage', () => {
 
     it('pre-fills the lookup field with the prefetched reference too', () => {
       renderWithPrefetchedResult(confirmedResult)
-      expect(screen.getByPlaceholderText('BLS-XXXXXXXX or ABC-123')).toHaveValue('BLS-ABCDEF12')
+      expect(screen.getByPlaceholderText('Booking Reference or Vehicle Plate Number')).toHaveValue('BLS-ABCDEF12')
     })
 
     it('still shows Continue to Payment for a prefetched pending_payment booking', () => {
@@ -297,7 +317,7 @@ describe('ManageBookingPage', () => {
 
     it('behaves exactly as before when there is no prefetched result', () => {
       renderPage()
-      expect(screen.getByPlaceholderText('BLS-XXXXXXXX or ABC-123')).toHaveValue('')
+      expect(screen.getByPlaceholderText('Booking Reference or Vehicle Plate Number')).toHaveValue('')
       expect(screen.queryByText('BLS-ABCDEF12')).not.toBeInTheDocument()
     })
   })

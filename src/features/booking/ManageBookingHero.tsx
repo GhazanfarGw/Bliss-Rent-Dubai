@@ -1,33 +1,36 @@
 import { useTranslation } from 'react-i18next'
-import { HERO_SLIDE_IMAGES } from '@/features/booking/heroSlides'
-import { PageHero } from '@/features/shared/ui/PageHero'
-
-// Reuses one of the homepage hero's own real vehicle photos (index 1: the
-// sedan shot) rather than a new/invented image — just a different index
-// than Hero.tsx's HERO_SLIDE_INDEX (4) and BookCarPage's (2), so each page
-// reads as its own place rather than a repeat of the others.
-const MANAGE_BOOKING_IMAGE_INDEX = 1
 
 /**
- * The Manage Booking page's own hero, built on the shared `PageHero`
- * primitive (see src/features/shared/ui/PageHero.tsx) — distinct from the
- * homepage's full-bleed Hero and from the plain color-strip banner other
- * content pages use (About, Car Types, …). Manage Booking gets the fuller
- * treatment because, unlike a static info page, it's a real task a guest
- * lands on directly from an email link — it deserves to feel like a
- * proper destination, not an afterthought.
+ * The Manage Booking page's own header. Direct redesign request: this
+ * page doesn't need a hero at all — no photo, no PageHero badge/overlay —
+ * just a plain, flat header modeled on an airline "manage booking"
+ * reference page: a small eyebrow label over a rule, then one large
+ * heading in the brand's berry-maroon accent (`brand-gold` — see
+ * index.css's palette note: Luxury Berry #5C0931, despite the "gold"
+ * identifier) that states the two ways to look a booking up, the same way
+ * the reference page's own heading does double duty as both title and
+ * field instructions.
+ *
+ * Replaces the earlier full-bleed photo treatment (PageHero) that every
+ * other secondary page still uses — deliberately, per that request: a
+ * guest here is trying to get a task done, not previewing the fleet, so
+ * the page drops straight into the form instead of a decorative banner.
  */
 export function ManageBookingHero() {
   const { t } = useTranslation()
-  const image = HERO_SLIDE_IMAGES[MANAGE_BOOKING_IMAGE_INDEX]
 
   return (
-    <PageHero
-      imageSrc={image.src}
-      imageAlt={t(image.altKey)}
-      badge={t('manageBooking.heroBadge')}
-      title={t('manageBooking.title')}
-      subtitle={t('manageBooking.subtitle')}
-    />
+    <div>
+      <p className="text-xs font-bold uppercase tracking-[0.24em] text-brand-champagne-dark">{t('manageBooking.title')}</p>
+      <hr className="mt-3 border-brand-navy/15" />
+
+      <h1 className="mt-6 max-w-2xl text-2xl font-black leading-[1.15] tracking-[-0.04em] text-brand-gold sm:text-3xl lg:text-4xl">
+        {t('manageBooking.formHeading')}
+      </h1>
+      {/* Full context for screen readers only — sighted users get it from
+       *  the heading + the two field placeholders below, matching the
+       *  reference page's own economy of visible text. */}
+      <p className="sr-only">{t('manageBooking.subtitle')}</p>
+    </div>
   )
 }

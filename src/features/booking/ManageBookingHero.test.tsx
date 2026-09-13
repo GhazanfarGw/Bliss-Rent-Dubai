@@ -3,16 +3,16 @@ import { render, screen } from '@testing-library/react'
 import { ManageBookingHero } from '@/features/booking/ManageBookingHero'
 
 describe('ManageBookingHero', () => {
-  it('shows the real Manage Booking title and subtitle — no invented copy', () => {
+  it('shows the real Manage Booking eyebrow and instructional heading — no invented copy', () => {
     render(<ManageBookingHero />)
-    expect(screen.getByRole('heading', { level: 1, name: 'Manage Booking' })).toBeInTheDocument()
-    expect(screen.getByText(/enter your booking reference or vehicle plate number/i)).toBeInTheDocument()
+    expect(screen.getByText('Manage Booking')).toBeInTheDocument()
+    expect(
+      screen.getByRole('heading', { level: 1, name: /booking reference or vehicle plate number and last name/i }),
+    ).toBeInTheDocument()
   })
 
-  it('renders a real hero photo, not a placeholder', () => {
+  it('is a plain flat header — no hero photo', () => {
     render(<ManageBookingHero />)
-    const img = screen.getByRole('img')
-    expect(img.tagName).toBe('IMG')
-    expect(img.getAttribute('src')).toBeTruthy()
+    expect(screen.queryByRole('img')).not.toBeInTheDocument()
   })
 })

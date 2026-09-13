@@ -1,17 +1,15 @@
 import type { FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Search } from 'lucide-react'
+import { Search, UserRound, HelpCircle } from 'lucide-react'
 import { inputClass } from '@/features/shared/ui/inputClasses'
 import { Button } from '@/features/shared/ui/Button'
-
-interface Step {
-  title: string
-  body: string
-}
+import { WHATSAPP_URL } from '@/features/booking/contactLinks'
 
 export interface ManageBookingLookupCardProps {
   query: string
   onQueryChange: (value: string) => void
+  lastName: string
+  onLastNameChange: (value: string) => void
   onSubmit: (e: FormEvent) => void
   loading: boolean
   notFound: boolean
@@ -19,70 +17,102 @@ export interface ManageBookingLookupCardProps {
 }
 
 /**
- * The Manage Booking page's own lookup UI — built specifically for this
- * page rather than reusing SearchWidget/BookingNavigator's tab-and-pill
- * treatment (the "same car find navigator everywhere" the redesign brief
- * called out). A light, editorial two-column layout instead: numbered
- * steps on one side explaining what happens, the actual field + button on
- * the other. All state and submit handling stay in ManageBookingPage —
- * this component is presentational only, so the lookupBooking() call and
- * every existing view-state branch are completely unchanged.
+ * The Manage Booking page's lookup form. Rebuilt per a direct redesign
+ * request modeled on an airline "manage booking" reference page: two
+ * fields and a help affordance flow directly on the page — no card
+ * border, no shadow, no rounded box — a rule, then a single right-aligned
+ * button below it, exactly like that reference. `Button`'s own default
+ * styling already gives the sharp corners and borderless brand-maroon
+ * fill the redesign asked for (see buttonClasses.ts — `rounded-none`,
+ * `bg-brand-gold` with no border, unchanged).
+ *
+ * Differs from the reference in the one place blindly copying it would
+ * ship something false: this project has no customer login/account
+ * system at all (see lookupApi.ts) — there is nothing to send a "log in
+ * to your account" link to. The reference's secondary link is replaced
+ * with a real, working one (WhatsApp — contactLinks.ts's WHATSAPP_URL)
+ * in the same visual slot.
+ *
+ * Presentational only — all state, the lookupBooking() call, and the
+ * last-name check live in ManageBookingPage.
  */
-export function ManageBookingLookupCard({ query, onQueryChange, onSubmit, loading, notFound, errorMessage }: ManageBookingLookupCardProps) {
+export function ManageBookingLookupCard({
+  query,
+  onQueryChange,
+  lastName,
+  onLastNameChange,
+  onSubmit,
+  loading,
+  notFound,
+  errorMessage,
+}: ManageBookingLookupCardProps) {
   const { t } = useTranslation()
-  const steps = t('manageBooking.steps', { returnObjects: true }) as Step[]
 
   return (
-    <div className="-mt-16 overflow-hidden border border-[#ece7df] bg-white shadow-[0_30px_70px_rgba(17,20,29,0.1)] sm:-mt-20 lg:grid lg:grid-cols-5">
-      <div className="bg-surface-warm-alt p-6 sm:p-8 lg:col-span-2 lg:p-10">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-brand-gold-dark">{t('manageBooking.eyebrow')}</p>
-        <ol className="mt-5 space-y-6">
-          {steps.map((step, index) => (
-            <li key={step.title} className="flex gap-4">
-              <span className="flex h-8 w-8 shrink-0 items-center justify-center border border-brand-gold/40 text-sm font-bold text-brand-gold-dark">
-                {index + 1}
-              </span>
-              <div>
-                <p className="text-sm font-bold text-brand-navy">{step.title}</p>
-                <p className="mt-1 text-sm leading-6 text-text-muted">{step.body}</p>
-              </div>
-            </li>
-          ))}
-        </ol>
+    <form onSubmit={onSubmit} noValidate className="mt-10 sm:mt-12">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-3">
+        <label className="relative block flex-1">
+          <span className="sr-only">{t('manageBooking.queryLabel')}</span>
+          <Search className="pointer-events-none absolute inset-y-0 start-3 my-auto h-4.5 w-4.5 text-text-muted" aria-hidden="true" />
+          <input
+            type="text"
+            value={query}
+            onChange={(e) => onQueryChange(e.target.value)}
+            placeholder={t('manageBooking.queryLabel')}
+            className={inputClass() + ' py-3 ps-10'}
+            autoComplete="off"
+          />
+        </label>
+
+        <button
+          type="button"
+          className="mx-auto flex h-9 w-9 shrink-0 items-center justify-center text-text-muted transition-colors hover:text-brand-gold sm:mx-0"
+          aria-label={t('manageBooking.helpAriaLabel')}
+          title={t('manageBooking.helpText')}
+        >
+          <HelpCircle className="h-5 w-5" aria-hidden="true" />
+        </button>
+
+        <label className="relative block flex-1">
+          <span className="sr-only">{t('manageBooking.lastNameLabel')}</span>
+          <UserRound className="pointer-events-none absolute inset-y-0 start-3 my-auto h-4.5 w-4.5 text-text-muted" aria-hidden="true" />
+          <input
+            type="text"
+            value={lastName}
+            onChange={(e) => onLastNameChange(e.target.value)}
+            placeholder={t('manageBooking.lastNameLabel')}
+            className={inputClass() + ' py-3 ps-10'}
+            autoComplete="family-name"
+          />
+        </label>
       </div>
 
-      <div className="p-6 sm:p-8 lg:col-span-3 lg:p-10">
-        <h2 className="text-xl font-black tracking-[-0.04em] text-brand-navy sm:text-2xl">{t('manageBooking.formHeading')}</h2>
-        <p className="mt-2 text-sm leading-6 text-text-muted">{t('manageBooking.formIntro')}</p>
+      <p className="mt-4 text-sm leading-6 text-text-muted">
+        <a
+          href={WHATSAPP_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="font-semibold text-brand-navy underline decoration-brand-gold decoration-2 underline-offset-4"
+        >
+          {t('manageBooking.helpLinkCta')}
+        </a>{' '}
+        {t('manageBooking.helpLinkBody')}
+      </p>
 
-        <form onSubmit={onSubmit} noValidate className="mt-6 space-y-4">
-          <label className="block">
-            <span className="mb-2 block text-xs font-semibold uppercase tracking-wide text-text-muted">{t('manageBooking.queryLabel')}</span>
-            <div className="relative">
-              <Search className="pointer-events-none absolute inset-y-0 start-3 my-auto h-4.5 w-4.5 text-text-muted" aria-hidden="true" />
-              <input
-                type="text"
-                value={query}
-                onChange={(e) => onQueryChange(e.target.value)}
-                placeholder="BLS-XXXXXXXX or ABC-123"
-                className={inputClass() + ' ps-10'}
-                autoComplete="off"
-              />
-            </div>
-          </label>
+      {notFound && (
+        <p className="mt-4 rounded-lg border border-warning/30 bg-warning-bg px-4 py-3 text-sm text-warning">{t('manageBooking.notFound')}</p>
+      )}
+      {errorMessage && (
+        <p className="mt-4 rounded-lg border border-error/25 bg-error-bg px-4 py-3 text-sm text-error">{errorMessage}</p>
+      )}
 
-          <Button type="submit" loading={loading} fullWidthOnMobile>
-            {loading ? t('manageBooking.checking') : t('manageBooking.submit')}
-          </Button>
+      <hr className="mt-8 border-brand-navy/15 sm:mt-10" />
 
-          {notFound && (
-            <p className="rounded-lg border border-warning/30 bg-warning-bg px-4 py-3 text-sm text-warning">{t('manageBooking.notFound')}</p>
-          )}
-          {errorMessage && (
-            <p className="rounded-lg border border-error/25 bg-error-bg px-4 py-3 text-sm text-error">{errorMessage}</p>
-          )}
-        </form>
+      <div className="mt-6 flex justify-center sm:justify-end">
+        <Button type="submit" loading={loading} fullWidthOnMobile>
+          {loading ? t('manageBooking.checking') : t('manageBooking.submit')}
+        </Button>
       </div>
-    </div>
+    </form>
   )
 }
