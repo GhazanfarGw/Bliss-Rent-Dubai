@@ -141,7 +141,7 @@ export function PendingBookingIndicator() {
           <circle cx="7.5" cy="15" r="1.25" fill="currentColor" stroke="none" />
           <circle cx="16.5" cy="15" r="1.25" fill="currentColor" stroke="none" />
         </svg>
-        <span className="absolute -end-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-brand-champagne px-1 text-[10px] font-bold text-brand-navy">
+        <span className="absolute -end-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-none bg-brand-champagne px-1 text-[10px] font-bold text-brand-navy">
           1
         </span>
       </button>

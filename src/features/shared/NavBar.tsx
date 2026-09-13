@@ -343,7 +343,7 @@ export function NavBar() {
                 target="_blank"
                 rel="noreferrer"
                 aria-label="Instagram"
-                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-brand-gold/10 bg-white/70 text-brand-gold shadow-sm transition-colors hover:bg-brand-lavender"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-none border border-brand-gold/10 bg-white/70 text-brand-gold shadow-sm transition-colors hover:bg-brand-lavender"
               >
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-4 w-4" aria-hidden="true">
                   <rect x="3.5" y="3.5" width="17" height="17" rx="5" />
@@ -356,7 +356,7 @@ export function NavBar() {
                 target="_blank"
                 rel="noreferrer"
                 aria-label="Facebook"
-                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-brand-gold/10 bg-white/70 text-brand-gold shadow-sm transition-colors hover:bg-brand-lavender"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-none border border-brand-gold/10 bg-white/70 text-brand-gold shadow-sm transition-colors hover:bg-brand-lavender"
               >
                 <svg viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4" aria-hidden="true">
                   <path d="M13.5 21v-8h2.5l.4-3h-2.9V7.5c0-.9.3-1.5 1.6-1.5H16V3.1c-.3 0-1.4-.1-2.7-.1-2.7 0-4.5 1.7-4.5 4.7V10H6.5v3h2.3v8h4.7Z" />
@@ -367,7 +367,7 @@ export function NavBar() {
                 target="_blank"
                 rel="noreferrer"
                 aria-label="WhatsApp"
-                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-brand-gold/10 bg-white/70 text-brand-gold shadow-sm transition-colors hover:bg-brand-lavender"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-none border border-brand-gold/10 bg-white/70 text-brand-gold shadow-sm transition-colors hover:bg-brand-lavender"
               >
                 <svg viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4" aria-hidden="true">
                   <path d="M19.05 4.95A9.9 9.9 0 0 0 12 2a9.94 9.94 0 0 0-8.64 15.12L2 22l5.02-1.31A9.9 9.9 0 0 0 12 22c5.52 0 10-4.48 10-10a9.9 9.9 0 0 0-2.95-7.05ZM12 19.2c-1.52 0-3.01-.41-4.29-1.19l-.31-.18-2.98.78.8-2.9-.2-.3A8.18 8.18 0 0 1 3.8 12a8.2 8.2 0 1 1 14.46 5.8l-.25.2-2.88.75.77 2.65-.18.3A8.14 8.14 0 0 1 12 19.2Zm4.53-6.12c-.25-.13-1.47-.72-1.7-.81-.22-.09-.39-.13-.55.13-.16.25-.62.81-.76.98-.14.16-.27.18-.52.06-.25-.13-1.05-.39-1.99-1.25-.73-.65-1.22-1.45-1.36-1.7-.14-.25-.02-.38.11-.5.11-.11.25-.27.38-.41.13-.13.17-.22.25-.38.08-.16.04-.3-.02-.41-.06-.13-.55-1.32-.75-1.81-.2-.48-.4-.4-.55-.41h-.48c-.16 0-.41.06-.62.3-.21.25-.79.78-.79 1.9s.82 2.21.93 2.36c.11.16 1.62 2.48 3.92 3.46.55.24.98.39 1.31.5.55.18 1.06.15 1.45.09.44-.06 1.47-.6 1.67-1.18.2-.58.2-1.08.14-1.19-.06-.1-.22-.16-.47-.29Z" />

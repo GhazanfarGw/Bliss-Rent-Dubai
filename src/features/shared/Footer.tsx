@@ -1,22 +1,18 @@
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import logoMark from '@/assets/brand/logo-full.png'
+import { PAYMENT_LOGOS } from '@/lib/paymentLogos'
 
 /**
  * Social links are placeholder "#" hrefs until real handles exist — swap
  * the href on each icon once the business's actual social accounts are
- * set up. Payment badges are generic text pills (not the trademarked
- * network logos) since no real gateway is connected yet (see PaymentPage's
- * test-mode banner) — swap these for the real gateway's supported-card
- * icons once one is chosen.
+ * set up.
  */
 const SOCIAL_LINKS = [
   { name: 'Facebook', href: '#', icon: FacebookIcon },
   { name: 'Instagram', href: '#', icon: InstagramIcon },
   { name: 'X (Twitter)', href: '#', icon: XIcon },
 ]
-
-const PAYMENT_BADGES = ['VISA', 'Mastercard', 'Amex', 'Apple Pay']
 
 export function Footer() {
   const { t } = useTranslation()
@@ -132,12 +128,14 @@ export function Footer() {
           <div className="flex items-center gap-2">
             <span className="text-[10px] font-semibold uppercase tracking-[0.22em] text-text-muted">{t('footer.weAccept')}</span>
             <div className="flex gap-1.5">
-              {PAYMENT_BADGES.map((label) => (
+              {PAYMENT_LOGOS.map((logo) => (
                 <span
-                  key={label}
-                  className="rounded border border-[#e5dfd6] bg-white px-2 py-1 text-[10px] font-semibold tracking-wide text-[#1f2430]"
+                  key={logo.name}
+                  className="flex h-6 w-9 items-center justify-center rounded-none border border-[#e5dfd6] bg-white"
                 >
-                  {label}
+                  <svg viewBox="0 0 24 24" role="img" aria-label={logo.name} className="h-3.5 w-3.5">
+                    <path d={logo.path} fill={`#${logo.hex}`} />
+                  </svg>
                 </span>
               ))}
             </div>
