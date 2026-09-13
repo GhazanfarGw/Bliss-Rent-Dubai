@@ -139,7 +139,7 @@ export function BookingSummaryPage() {
         dropoff={dropoff}
       >
         <div className="space-y-4">
-          <div className="rounded-2xl border border-brand-champagne/40 bg-brand-champagne/10 p-5">
+          <div className="rounded-none border border-brand-champagne/40 bg-brand-champagne/10 p-5">
             <p className="text-sm font-semibold text-brand-navy">{t('checkout.summary.resumeTitle')}</p>
             <p className="mt-1 text-sm text-text-muted">{t('checkout.summary.resumeBody')}</p>
           </div>
@@ -215,7 +215,7 @@ export function BookingSummaryPage() {
         </Section>
 
         {incompleteStep && (
-          <div className="rounded-lg border border-error/25 bg-error-bg px-4 py-3 text-sm text-error">
+          <div className="rounded-none border border-error/25 bg-error-bg px-4 py-3 text-sm text-error">
             <p className="font-medium">
               {incompleteStep === 'customer' ? t('checkout.summary.incompleteCustomer') : t('checkout.summary.incompleteDriver')}
             </p>
@@ -229,7 +229,7 @@ export function BookingSummaryPage() {
         )}
 
         {submitError && (
-          <div className="rounded-lg border border-error/25 bg-error-bg px-4 py-3 text-sm text-error">
+          <div className="rounded-none border border-error/25 bg-error-bg px-4 py-3 text-sm text-error">
             <p className="font-medium">{submitError.message}</p>
             {submitError.unavailable && (
               <Link to="/search" className="mt-2 inline-block font-semibold underline">
@@ -262,7 +262,7 @@ export function BookingSummaryPage() {
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <div className="rounded-2xl border border-brand-navy/10 bg-white p-5">
+    <div className="rounded-none border border-brand-navy/10 bg-white p-5">
       <h2 className="text-sm font-semibold text-brand-navy">{title}</h2>
       <dl className="mt-3 space-y-2 text-sm">{children}</dl>
     </div>

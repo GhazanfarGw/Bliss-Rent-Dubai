@@ -41,7 +41,7 @@ export function ConfirmationPage() {
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-12 sm:px-6">
-      <div className="rounded-2xl border border-success/25 bg-success-bg p-6 text-center">
+      <div className="rounded-none border border-success/25 bg-success-bg p-6 text-center">
         <BadgeCheck className="mx-auto h-8 w-8 text-success" aria-hidden="true" />
         <h1 className="mt-2 text-xl font-bold text-brand-navy">
           {isConfirmed ? t('checkout.confirmation.confirmed') : t('checkout.confirmation.received')}
@@ -52,7 +52,7 @@ export function ConfirmationPage() {
         </p>
       </div>
 
-      <div className="mt-6 space-y-4 rounded-2xl border border-brand-navy/10 bg-white p-6">
+      <div className="mt-6 space-y-4 rounded-none border border-brand-navy/10 bg-white p-6">
         <Row label={t('checkout.confirmation.vehicle')} value={`${snapshot.vehicleMake} ${snapshot.vehicleModel}`} />
         <Row label={t('checkout.confirmation.rentalDates')} value={`${snapshot.startDate} → ${snapshot.endDate}`} />
         <Row label={t('checkout.confirmation.pickup')} value={snapshot.pickupLocationName} />
@@ -64,7 +64,7 @@ export function ConfirmationPage() {
         <Row label={t('checkout.confirmation.bookingStatus')} value={snapshot.bookingStatus} highlight={isConfirmed} />
       </div>
 
-      <div className="mt-6 rounded-2xl border border-brand-navy/10 bg-brand-lavender/30 p-6">
+      <div className="mt-6 rounded-none border border-brand-navy/10 bg-brand-lavender/30 p-6">
         <h2 className="text-sm font-semibold text-brand-navy">{t('checkout.confirmation.whatNext')}</h2>
         <ul className="mt-3 space-y-2 text-sm text-text-muted">
           <li>• {t('checkout.confirmation.next1')}</li>

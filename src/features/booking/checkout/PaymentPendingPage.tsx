@@ -108,7 +108,7 @@ function PaymentPendingBody({ vehicle, vehicleId, qs, bookingReference, currency
           </div>
         </div>
 
-        <div className="rounded-lg border border-brand-gold/30 bg-brand-gold/5 px-4 py-4 text-sm">
+        <div className="rounded-none border border-brand-gold/30 bg-brand-gold/5 px-4 py-4 text-sm">
           <p className="font-semibold text-brand-navy">{t('checkout.paymentPending.heading')}</p>
           <p className="mt-1 text-text-muted">{t('checkout.paymentPending.body')}</p>
         </div>

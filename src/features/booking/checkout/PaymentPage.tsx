@@ -189,7 +189,7 @@ function PaymentStepBody({ vehicleId, vehicle, criteria, pickup, dropoff, draft,
     return (
       <Card>
         <div className="space-y-4">
-          <div className="rounded-lg border border-error/25 bg-error-bg px-4 py-3 text-sm text-error">
+          <div className="rounded-none border border-error/25 bg-error-bg px-4 py-3 text-sm text-error">
             {initError ?? t('checkout.payment.genericError')}
           </div>
           <Link to={`/checkout/${vehicleId}/summary?${qs}`} className="text-sm font-semibold text-text-muted underline hover:text-brand-navy">
@@ -273,7 +273,7 @@ function StripePaymentForm({ vehicleId, qs, bookingResult, onSuccess }: StripePa
 
         <PaymentElement />
 
-        {payError && <div className="rounded-lg border border-error/25 bg-error-bg px-4 py-3 text-sm text-error">{payError}</div>}
+        {payError && <div className="rounded-none border border-error/25 bg-error-bg px-4 py-3 text-sm text-error">{payError}</div>}
 
         <div className="flex flex-wrap items-center gap-4">
           <Button type="submit" loading={submitting} disabled={!stripe || !elements} fullWidthOnMobile>

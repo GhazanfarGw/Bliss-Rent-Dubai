@@ -66,8 +66,8 @@ function CheckoutStepper({ steps, stepIndex }: { steps: string[]; stepIndex: num
           <span>{t('checkout.stepOfTotal', { current: stepIndex + 1, total: steps.length })}</span>
           <span className="text-text-muted">{steps[stepIndex]}</span>
         </div>
-        <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-surface-muted" role="progressbar" aria-valuenow={progressPercent} aria-valuemin={0} aria-valuemax={100}>
-          <div className="h-full rounded-full bg-brand-gold transition-all duration-300" style={{ width: `${progressPercent}%` }} />
+        <div className="mt-2 h-1.5 w-full overflow-hidden rounded-none bg-surface-muted" role="progressbar" aria-valuenow={progressPercent} aria-valuemin={0} aria-valuemax={100}>
+          <div className="h-full rounded-none bg-brand-gold transition-all duration-300" style={{ width: `${progressPercent}%` }} />
         </div>
       </div>
 
@@ -89,9 +89,9 @@ function CheckoutStepper({ steps, stepIndex }: { steps: string[]; stepIndex: num
                 </span>
               </div>
               {i < steps.length - 1 && (
-                <div className="mx-2 h-0.5 flex-1 rounded-full bg-surface-muted" aria-hidden="true">
+                <div className="mx-2 h-0.5 flex-1 rounded-none bg-surface-muted" aria-hidden="true">
                   <div
-                    className="h-full rounded-full bg-brand-gold transition-all duration-300"
+                    className="h-full rounded-none bg-brand-gold transition-all duration-300"
                     style={{ width: i < stepIndex ? '100%' : '0%' }}
                   />
                 </div>
@@ -107,7 +107,7 @@ function CheckoutStepper({ steps, stepIndex }: { steps: string[]; stepIndex: num
 function StepIcon({ state, number }: { state: 'done' | 'active' | 'upcoming'; number: number }) {
   if (state === 'done') {
     return (
-      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-gold text-white">
+      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-none bg-brand-gold text-white">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} className="h-3.5 w-3.5" aria-hidden="true">
           <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
         </svg>
@@ -117,7 +117,7 @@ function StepIcon({ state, number }: { state: 'done' | 'active' | 'upcoming'; nu
   return (
     <span
       className={
-        'flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[11px] font-bold ' +
+        'flex h-7 w-7 shrink-0 items-center justify-center rounded-none text-[11px] font-bold ' +
         (state === 'active' ? 'bg-brand-gold text-white ring-4 ring-brand-gold/15' : 'bg-surface-muted text-text-muted')
       }
     >

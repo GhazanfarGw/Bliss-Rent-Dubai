@@ -87,7 +87,7 @@ export function DriverDetailsPage() {
           </fieldset>
 
           {draft.driver.isSameAsCustomer ? (
-            <div className="rounded-lg bg-brand-lavender/40 px-4 py-3 text-sm text-brand-navy">
+            <div className="rounded-none bg-brand-lavender/40 px-4 py-3 text-sm text-brand-navy">
               <p className="font-semibold">{t('checkout.driver.sameAsCustomerTitle')}</p>
               <p className="mt-1 text-text-muted">
                 {draft.customer.firstName || draft.customer.lastName
@@ -173,6 +173,14 @@ export function DriverDetailsPage() {
   )
 }
 
+/**
+ * The outer button follows the site's rounded-none redesign; the small
+ * indicator inside it deliberately stays circular — it's a genuine
+ * radio-button affordance (pick exactly one of two options), and that
+ * shape is a near-universal convention users rely on to recognize
+ * "choose one" at a glance, not a decorative choice the sharp-editorial
+ * radius rule was meant to cover.
+ */
 function DriverToggleOption({ selected, onSelect, label }: { selected: boolean; onSelect: () => void; label: string }) {
   return (
     <button
@@ -180,7 +188,7 @@ function DriverToggleOption({ selected, onSelect, label }: { selected: boolean; 
       aria-pressed={selected}
       onClick={onSelect}
       className={
-        'flex items-center gap-3 rounded-lg border px-4 py-3 text-start text-sm font-semibold transition-colors ' +
+        'flex items-center gap-3 rounded-none border px-4 py-3 text-start text-sm font-semibold transition-colors ' +
         (selected
           ? 'border-brand-navy bg-brand-navy text-white'
           : 'border-border bg-white text-brand-navy hover:border-brand-navy/40')

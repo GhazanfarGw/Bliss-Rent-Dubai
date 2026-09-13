@@ -28,12 +28,12 @@ export function CheckoutSummaryCard({ vehicle, startDate, endDate, pickup, dropo
   const quote = quoteForDays(vehicle.pricing, days)
 
   return (
-    <aside className="rounded-2xl border border-brand-navy/10 bg-white p-5 shadow-sm">
+    <aside className="rounded-none border border-brand-navy/10 bg-white p-5 shadow-sm">
       <div className="flex gap-3">
         <VehiclePhoto
           storagePath={image?.storage_path ?? null}
           alt={`${vehicle.make} ${vehicle.model}`}
-          className="h-16 w-24 shrink-0 rounded-lg"
+          className="h-16 w-24 shrink-0 rounded-none"
         />
         <div>
           <p className="text-sm font-semibold text-brand-navy">
