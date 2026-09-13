@@ -106,8 +106,11 @@ describe('Hero', () => {
 
       renderHero()
 
-      await waitFor(() => expect(screen.getByText('3')).toBeInTheDocument())
-      expect(screen.getByText('2')).toBeInTheDocument()
+      // The count and label render as one interpolated string (see
+      // pages.about.stats.vehicles/cities in en.ts), not a standalone
+      // number node — matches the actual "N vehicles/cities…" text.
+      await waitFor(() => expect(screen.getByText(/3 vehicles ready to book/i)).toBeInTheDocument())
+      expect(screen.getByText(/2 cities we operate in/i)).toBeInTheDocument()
     })
 
     it('renders no stat row at all when the fetch fails — no fake fallback', async () => {

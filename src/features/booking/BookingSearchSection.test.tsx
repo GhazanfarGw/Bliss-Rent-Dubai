@@ -97,7 +97,13 @@ describe('BookingSearchSection', () => {
     const nav = screen.getByRole('navigation', { name: /booking navigator/i })
     await user.click(within(nav).getByRole('button', { name: /manage booking/i }))
 
-    expect(screen.getByText(/manage your booking/i)).toBeInTheDocument()
+    // ManageBookingVerifyPanel's idle form has no heading of its own any
+    // more — d199ef0's larger inline-verify rewrite dropped the
+    // `home.navigator.manage.heading`/`.intro` render (the translation
+    // keys are still there, just unused now) — so the two real lookup
+    // fields are what confirms the panel switched, via their current
+    // placeholders (home.navigator.manage.referencePlaceholder/
+    // lastNamePlaceholder in en.ts).
     expect(screen.getByPlaceholderText('BLS-XXXXXXXX')).toBeInTheDocument()
     expect(screen.getByPlaceholderText(/renter/i)).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /select pickup point/i })).not.toBeInTheDocument()
