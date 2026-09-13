@@ -1,12 +1,20 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { ArrowRight, Car, Compass, Eye, MapPin, ShieldCheck, Sparkles, Target } from 'lucide-react'
+import { ArrowRight, Car, Compass, Eye, Mail, MapPin, MessageCircle, ShieldCheck, Sparkles, Target } from 'lucide-react'
 import { useDocumentTitle, useMetaDescription } from '@/lib/useDocumentTitle'
 import { LinkButton } from '@/features/shared/ui/LinkButton'
 import { fetchAllAvailableVehicles, fetchLocations } from '@/features/booking/api'
 import { VehiclePhoto } from '@/features/booking/VehiclePhoto'
 import { TYPE_ICON, TYPE_ORDER, sortByOrder } from '@/features/booking/locationDisplay'
+import {
+  OFFICE_ADDRESS,
+  OFFICE_MAPS_EMBED_URL,
+  OFFICE_MAPS_URL,
+  SUPPORT_EMAIL,
+  SUPPORT_EMAIL_HREF,
+  WHATSAPP_URL,
+} from '@/features/booking/contactLinks'
 import { primaryImage } from '@/lib/vehicleImages'
 import { prefersReducedMotion } from '@/lib/motion'
 import heroPremium from '@/assets/hero/hero-premium.webp'
@@ -286,6 +294,79 @@ export function AboutPage() {
                 </div>
               )
             })}
+          </div>
+        </div>
+      </section>
+
+      {/* Right here in Dubai — the real office address + a live embedded
+          map (same verified coordinates and keyless iframe ContactPage
+          uses, now shared via contactLinks.ts instead of duplicated),
+          plus direct WhatsApp/email links — real, established contact
+          channels, not new ones invented for this page. */}
+      <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
+        <div className="mx-auto max-w-2xl text-center">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.32em] text-brand-gold">{t('pages.about.connect.eyebrow')}</p>
+          <h2 className="mt-3 text-3xl font-black tracking-[-0.06em] text-brand-navy sm:text-4xl">{t('pages.about.connect.heading')}</h2>
+          <p className="mt-2 text-sm leading-6 text-text-muted">{t('pages.about.connect.subtitle')}</p>
+        </div>
+        <div className="mt-10 grid gap-5 lg:grid-cols-2">
+          <div className="overflow-hidden border border-[#ece7df] bg-white shadow-(--shadow-card)">
+            <iframe
+              src={OFFICE_MAPS_EMBED_URL}
+              title={t('pages.about.connect.officeLabel')}
+              loading="lazy"
+              className="h-56 w-full border-0 sm:h-72"
+            />
+            <div className="p-6">
+              <div className="flex items-start gap-3">
+                <MapPin className="mt-0.5 h-5 w-5 shrink-0 text-brand-gold-dark" aria-hidden="true" />
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-text-muted">{t('pages.about.connect.officeLabel')}</p>
+                  <p className="mt-1 text-sm leading-6 text-brand-navy">{OFFICE_ADDRESS}</p>
+                </div>
+              </div>
+              <a
+                href={OFFICE_MAPS_URL}
+                target="_blank"
+                rel="noreferrer"
+                className="mt-4 inline-flex text-sm font-semibold text-brand-gold-dark underline-offset-2 hover:underline"
+              >
+                {t('pages.contact.getDirections')}
+              </a>
+            </div>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
+            <a
+              href={WHATSAPP_URL}
+              target="_blank"
+              rel="noreferrer"
+              className="group flex items-center gap-4 border border-[#ece7df] bg-white p-6 shadow-(--shadow-card) transition-all duration-300 hover:-translate-y-1 hover:border-brand-gold/40 hover:shadow-(--shadow-card-hover)"
+            >
+              <span className="flex h-11 w-11 shrink-0 items-center justify-center bg-success text-white transition-transform duration-300 group-hover:scale-105">
+                <MessageCircle className="h-5 w-5" aria-hidden="true" />
+              </span>
+              <span className="text-base font-semibold text-brand-navy">{t('pages.about.connect.whatsappCta')}</span>
+            </a>
+            <a
+              href={SUPPORT_EMAIL_HREF}
+              className="group flex items-center gap-4 border border-[#ece7df] bg-white p-6 shadow-(--shadow-card) transition-all duration-300 hover:-translate-y-1 hover:border-brand-gold/40 hover:shadow-(--shadow-card-hover)"
+            >
+              <span className="flex h-11 w-11 shrink-0 items-center justify-center bg-brand-navy text-white transition-transform duration-300 group-hover:scale-105">
+                <Mail className="h-5 w-5" aria-hidden="true" />
+              </span>
+              <span className="min-w-0 text-base font-semibold text-brand-navy">
+                {t('pages.about.connect.emailCta')}
+                <span className="block truncate text-sm font-normal text-text-muted">{SUPPORT_EMAIL}</span>
+              </span>
+            </a>
+            <Link
+              to="/contact"
+              className="group flex items-center justify-between gap-3 border border-brand-gold/40 bg-brand-gold/5 p-6 text-start transition-colors hover:bg-brand-gold/10 sm:col-span-2 lg:col-span-1"
+            >
+              <span className="text-sm font-semibold text-brand-gold-dark">{t('pages.about.connect.contactPageCta')}</span>
+              <ArrowRight className="h-4 w-4 shrink-0 text-brand-gold-dark transition-transform duration-200 group-hover:translate-x-1 rtl:rotate-180" aria-hidden="true" />
+            </Link>
           </div>
         </div>
       </section>

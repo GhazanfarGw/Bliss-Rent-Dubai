@@ -1465,6 +1465,15 @@ const en = {
         heading: 'Live in these cities today',
         subtitle: 'Real pickup and drop-off coverage, city by city — see the Locations page for exact points.',
       },
+      connect: {
+        eyebrow: 'Real people, real office',
+        heading: 'Right here in Dubai',
+        subtitle: "Not just a website — a real UAE-based team, at a real office, reachable directly. No call center, no ticket queue.",
+        officeLabel: 'Our office',
+        whatsappCta: 'Chat on WhatsApp',
+        emailCta: 'Email us',
+        contactPageCta: 'Full contact details',
+      },
       visionMissionEyebrow: 'Looking ahead',
       vision: {
         heading: 'Our vision',

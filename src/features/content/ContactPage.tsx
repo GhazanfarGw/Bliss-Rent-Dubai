@@ -6,29 +6,18 @@ import { supabase } from '@/lib/supabaseClient'
 import { Button } from '@/features/shared/ui/Button'
 import { LinkButton } from '@/features/shared/ui/LinkButton'
 import { useDocumentTitle, useMetaDescription } from '@/lib/useDocumentTitle'
-import { SUPPORT_EMAIL, SUPPORT_EMAIL_HREF, WHATSAPP_PHONE_DISPLAY, WHATSAPP_URL } from '@/features/booking/contactLinks'
+import {
+  OFFICE_ADDRESS,
+  OFFICE_MAPS_EMBED_URL,
+  OFFICE_MAPS_URL,
+  SUPPORT_EMAIL,
+  SUPPORT_EMAIL_HREF,
+  WHATSAPP_PHONE_DISPLAY,
+  WHATSAPP_URL,
+} from '@/features/booking/contactLinks'
 import heroSuv from '@/assets/hero/hero-suv.webp'
 
 type FormState = { status: 'idle' | 'sending' | 'sent' }
-
-const OFFICE_ADDRESS = 'Apt 121B, Block B, Sajaya 7 Building, Manama Street, Nad Al Sheba 3, Dubai, UAE'
-// Verified live in Google Maps (searching "Sajaya 7 Building, Manama
-// Street, Nad Al Sheba 3, Dubai" resolves to a real listed place, "Sajaya
-// 7" — a corporate office at "Al Manama St, Nad Al Sheba 3, Dubai",
-// exactly matching this address) — coordinates: 25.163296, 55.382061.
-// The FULL address (with apartment/block) is what's shown to customers
-// above; the map/directions links use these coordinates instead of the
-// full address string, because geocoding the full string (with the
-// apartment/block prefix) does NOT resolve to this building — it falls
-// back to an unrelated result several kilometers away in Al Quoz. Pinning
-// to the verified coordinates keeps the map accurate regardless of how
-// Google's text geocoder handles the address string.
-const OFFICE_COORDS = '25.163296,55.382061'
-const OFFICE_MAPS_URL = `https://www.google.com/maps/dir/?api=1&destination=${OFFICE_COORDS}`
-// Keyless Google Maps embed (maps.google.com/maps?...&output=embed) — no
-// API key, no billing account, just a plain iframe centered on the
-// verified coordinates above.
-const OFFICE_MAPS_EMBED_URL = `https://maps.google.com/maps?q=${OFFICE_COORDS}&z=16&output=embed`
 
 /**
  * Contact Us — full premium redesign: real hero photography banner

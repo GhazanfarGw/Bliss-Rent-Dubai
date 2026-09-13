@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { MemoryRouter } from 'react-router-dom'
 import '@/i18n'
 
 const functionsInvokeMock = vi.fn()
@@ -12,6 +13,17 @@ vi.mock('@/lib/supabaseClient', () => ({
 }))
 
 const { ContactPage } = await import('./ContactPage')
+
+// ContactPage renders real <Link>s (e.g. the closing CTA), which need a
+// Router context to exist at all — same MemoryRouter-wrapping convention
+// as VehicleCard.test.tsx/Hero.test.tsx.
+function renderContactPage() {
+  return render(
+    <MemoryRouter>
+      <ContactPage />
+    </MemoryRouter>,
+  )
+}
 
 /**
  * Phase 9H — ContactPage.tsx's form previously had no backend at all (a
@@ -33,7 +45,7 @@ describe('ContactPage', () => {
 
   it('submits the form to the submit-complaint Edge Function with the entered fields', async () => {
     const user = userEvent.setup()
-    render(<ContactPage />)
+    renderContactPage()
     await fillValidForm(user)
     await user.click(screen.getByRole('button', { name: /send message/i }))
 
@@ -44,7 +56,7 @@ describe('ContactPage', () => {
 
   it('shows the success message and clears the form after a successful submission', async () => {
     const user = userEvent.setup()
-    render(<ContactPage />)
+    renderContactPage()
     await fillValidForm(user)
     await user.click(screen.getByRole('button', { name: /send message/i }))
 
@@ -54,7 +66,7 @@ describe('ContactPage', () => {
 
   it('does not call the Edge Function when client-side validation fails', async () => {
     const user = userEvent.setup()
-    render(<ContactPage />)
+    renderContactPage()
     await user.click(screen.getByRole('button', { name: /send message/i }))
 
     expect(functionsInvokeMock).not.toHaveBeenCalled()
@@ -64,7 +76,7 @@ describe('ContactPage', () => {
   it('shows an inline error and does not falsely report success when the Edge Function returns an error', async () => {
     functionsInvokeMock.mockResolvedValue({ data: null, error: { message: 'function unavailable' } })
     const user = userEvent.setup()
-    render(<ContactPage />)
+    renderContactPage()
     await fillValidForm(user)
     await user.click(screen.getByRole('button', { name: /send message/i }))
 
@@ -75,7 +87,7 @@ describe('ContactPage', () => {
   it('shows an inline error when invoking the Edge Function itself rejects (network failure)', async () => {
     functionsInvokeMock.mockRejectedValue(new Error('network error'))
     const user = userEvent.setup()
-    render(<ContactPage />)
+    renderContactPage()
     await fillValidForm(user)
     await user.click(screen.getByRole('button', { name: /send message/i }))
 

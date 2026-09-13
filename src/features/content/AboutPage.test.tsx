@@ -56,8 +56,9 @@ describe('AboutPage', () => {
   })
 
   it('shows the live stats strip only once real data resolves — never a fabricated number', async () => {
-    renderIt()
+    const first = renderIt()
     expect(screen.queryByText('Bliss Rent today')).not.toBeInTheDocument()
+    first.unmount()
 
     fetchAllAvailableVehicles.mockResolvedValue([
       vehicle({ id: 'v1', categoryId: 'cat-eco', categoryName: 'Economy' }),
@@ -99,5 +100,13 @@ describe('AboutPage', () => {
     renderIt()
     expect(screen.getByRole('link', { name: /book now/i })).toHaveAttribute('href', '/book')
     expect(screen.getByRole('link', { name: /view fleet/i })).toHaveAttribute('href', '/search')
+  })
+
+  it('links directly to the real, established WhatsApp/email/office channels — never new ones invented for this page', () => {
+    renderIt()
+    expect(screen.getByRole('link', { name: /chat on whatsapp/i })).toHaveAttribute('href', 'https://wa.me/971547820057')
+    expect(screen.getByRole('link', { name: /email us/i })).toHaveAttribute('href', 'mailto:support@bliss.rent')
+    expect(screen.getByText(/Sajaya 7 Building/)).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /full contact details/i })).toHaveAttribute('href', '/contact')
   })
 })
