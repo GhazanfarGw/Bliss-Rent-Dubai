@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { CalendarSearch, CarFront, ChevronRight, ClipboardCheck, Home, Info, LogIn, Menu, Phone, X } from 'lucide-react'
+import { CalendarSearch, CarFront, ChevronRight, ClipboardCheck, Home, Info, LogIn, MapPin, Menu, Phone, X } from 'lucide-react'
 import { LanguageSwitcher } from '@/features/shared/LanguageSwitcher'
 import { LinkButton } from '@/features/shared/ui/LinkButton'
 import { PendingBookingIndicator } from '@/features/shared/PendingBookingIndicator'
+import { CitiesMenu } from '@/features/shared/CitiesMenu'
 import { WHATSAPP_URL } from '@/features/booking/contactLinks'
 import { prefersReducedMotion } from '@/lib/motion'
 import logoFull from '@/assets/brand/logo-full.png'
@@ -225,6 +226,10 @@ export function NavBar() {
             {t('nav.adminSignIn')}
           </Link>
           <LanguageSwitcher tone={transparent ? 'light' : 'dark'} />
+          {/* Cities selector sits right next to the primary CTA — the
+              same "compact city-switcher beside the main action" pattern
+              the reference layout used. */}
+          <CitiesMenu tone={transparent ? 'light' : 'dark'} />
           <LinkButton
             to="/book"
             variant="primary"
@@ -291,13 +296,12 @@ export function NavBar() {
             </button>
           </div>
 
-          {links.map((link) => (
-            (() => {
-              const Icon = NAV_ICONS[links.indexOf(link)]
-              const descriptionKey = NAV_DESCRIPTIONS[links.indexOf(link)]
-              return (
+          {links.map((link, i) => {
+            const Icon = NAV_ICONS[i]
+            const descriptionKey = NAV_DESCRIPTIONS[i]
+            return (
+              <Fragment key={link.to}>
                 <NavLink
-                  key={link.to}
                   to={link.to}
                   end={link.end}
                   onClick={() => setOpen(false)}
@@ -313,9 +317,30 @@ export function NavBar() {
                   </span>
                   <ChevronRight className="h-4 w-4 shrink-0 rtl:rotate-180" aria-hidden="true" />
                 </NavLink>
-              )
-            })()
-          ))}
+                {/* Same position as the desktop Cities dropdown — right
+                    after Fleet. No dropdown here (a mobile drawer has no
+                    room for one); this just links straight to the full
+                    Locations page. */}
+                {i === 2 && (
+                  <NavLink
+                    to="/locations"
+                    onClick={() => setOpen(false)}
+                    className={({ isActive }) =>
+                      'flex min-h-14 items-center gap-3 border-b border-brand-navy/10 px-2 py-3 transition-colors ' +
+                      (isActive ? 'text-brand-gold' : 'text-brand-navy hover:text-brand-gold')
+                    }
+                  >
+                    <MapPin className="h-5 w-5 shrink-0" aria-hidden="true" />
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-base font-semibold">{t('nav.cities')}</span>
+                      <span className="mt-0.5 block text-xs text-text-muted">{t('nav.citiesDescription')}</span>
+                    </span>
+                    <ChevronRight className="h-4 w-4 shrink-0 rtl:rotate-180" aria-hidden="true" />
+                  </NavLink>
+                )}
+              </Fragment>
+            )
+          })}
           <div className="mt-auto space-y-3 pt-5">
             <LinkButton
               to="/book"
