@@ -1,7 +1,19 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { ArrowRight, Car, Compass, Eye, Mail, MapPin, MessageCircle, ShieldCheck, Sparkles, Target } from 'lucide-react'
+import {
+  ArrowRight,
+  CalendarCheck,
+  Car,
+  Compass,
+  Eye,
+  Mail,
+  MapPin,
+  MessageCircle,
+  ShieldCheck,
+  Sparkles,
+  Target,
+} from 'lucide-react'
 import { useDocumentTitle, useMetaDescription } from '@/lib/useDocumentTitle'
 import { LinkButton } from '@/features/shared/ui/LinkButton'
 import { fetchAllAvailableVehicles, fetchLocations } from '@/features/booking/api'
@@ -46,25 +58,18 @@ interface CityCoverage {
 const VALUE_ICONS = [Eye, Sparkles, ShieldCheck, MapPin]
 
 /**
- * About Us — full brand-page rebuild, pushed to the same bold "spicy
- * premium" treatment the homepage already carries (gradient-clip
- * headlines, glow-on-hover cards with an animated top accent line,
- * RequirementsSection's numbered-index pattern for Values), and
- * deliberately light — no flat dark-navy section backgrounds anywhere
- * on the page (the hero banner's photo-with-gradient-wash is a
- * different thing: a backdrop for white text over a photo, not a
- * dark content block). Every word of substance still comes from
- * pages.about.* in en.ts/ar.ts — real business facts only; the
- * *.eyebrow strings are pure section labels, not claims.
- *
- * Two sections here (Our Fleet, Where We Operate) go beyond the
- * original 3-number stat strip to real, richer, live data: a full
- * per-category breakdown with real photos (same fetchAllAvailableVehicles
- * query FeaturedVehicles/VehicleCategoriesSection already use) and a
- * full per-city coverage list with real location types (same
- * fetchLocations() query the search widget uses) — both render nothing
- * until resolved, and nothing at all on failure, never a fabricated
- * number or a placeholder category/city.
+ * About Us — the site's "company profile" page, ordered as one
+ * continuous, real narrative rather than a loose bag of sections: who
+ * we are (Story) -> a quick credibility snapshot (live stats) -> the
+ * business model at a glance (a real tree diagram: what we offer / where
+ * we operate / how booking works) -> the detail behind each of those
+ * three (Fleet, Coverage) -> why we do it this way (Vision & Mission,
+ * Values) -> how to actually reach us (real office + WhatsApp/email) ->
+ * book. Every word of substance still comes from pages.about.* in
+ * en.ts/ar.ts — real business facts only; *.eyebrow strings are pure
+ * section labels, not claims. Nothing here fabricates company history,
+ * team size, or credentials the business hasn't supplied — those would
+ * need real facts from the owner, not an invented number.
  */
 export function AboutPage() {
   const { t } = useTranslation()
@@ -72,6 +77,7 @@ export function AboutPage() {
   useMetaDescription(t('pages.about.subtitle'))
   const storyParagraphs = t('pages.about.story.paragraphs', { returnObjects: true }) as string[]
   const values = t('pages.about.values.items', { returnObjects: true }) as ValueItem[]
+  const bookingSteps = t('home.howItWorks.steps', { returnObjects: true }) as unknown[]
   const reducedMotion = prefersReducedMotion()
 
   const [vehicles, setVehicles] = useState<VehicleWithDetails[] | null>(null)
@@ -87,7 +93,7 @@ export function AboutPage() {
       })
       .catch(() => {
         // Best-effort only, same discipline as every other live section
-        // sitewide — these two sections simply don't render.
+        // sitewide — these sections simply don't render.
       })
     return () => {
       cancelled = true
@@ -103,12 +109,13 @@ export function AboutPage() {
   return (
     <div>
       {/* Banner — the real fleet-lineup hero photo (same asset Hero.tsx's
-          carousel uses), with the same "Live" pulsing badge + Ken-Burns
-          drift Hero.tsx established, so the brand page opens with the
-          same energy as the homepage instead of a quieter static crop.
-          This dark wash is a photo backdrop for legible white text, not
-          a flat content-block background — the rest of the page below
-          stays light throughout. */}
+          carousel uses), the same "Live" pulsing badge + Ken-Burns drift
+          Hero.tsx established, and — new — the same live vehicle/city
+          stat chips Hero.tsx shows, so this page's own hero carries the
+          same first-glance credibility signal the homepage's does. This
+          dark wash is a photo backdrop for legible white text, not a
+          flat content-block background — the rest of the page stays
+          light throughout. */}
       <section className="relative isolate overflow-hidden bg-brand-navy">
         <img
           src={heroPremium}
@@ -133,6 +140,22 @@ export function AboutPage() {
             {t('pages.about.title')}
           </h1>
           <p className="mx-auto mt-5 max-w-2xl text-sm leading-7 text-brand-lavender sm:text-base">{t('pages.about.subtitle')}</p>
+
+          {vehicles && locations && (
+            <div className="mt-7 flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
+              <div className="flex items-center gap-2 border border-white/15 bg-white/10 px-3 py-1.5 backdrop-blur-sm">
+                <Car className="h-4 w-4 text-brand-gold" aria-hidden="true" />
+                <span className="text-sm font-semibold text-white">{vehicleCount}</span>
+                <span className="text-xs text-white/70">{t('pages.about.stats.vehicles', { count: vehicleCount })}</span>
+              </div>
+              <div className="hidden h-4 w-px bg-white/25 sm:block" aria-hidden="true" />
+              <div className="flex items-center gap-2 border border-white/15 bg-white/10 px-3 py-1.5 backdrop-blur-sm">
+                <MapPin className="h-4 w-4 text-brand-gold" aria-hidden="true" />
+                <span className="text-sm font-semibold text-white">{cityCount}</span>
+                <span className="text-xs text-white/70">{t('pages.about.stats.cities', { count: cityCount })}</span>
+              </div>
+            </div>
+          )}
         </div>
       </section>
 
@@ -159,10 +182,9 @@ export function AboutPage() {
         </div>
       </section>
 
-      {/* Bliss Rent today — a quick, scannable strip of the same three
-          live numbers this page always showed; the detailed breakdowns
-          below (Our Fleet, Where We Operate) are the real new depth, so
-          this strip stays condensed rather than repeating their detail. */}
+      {/* Bliss Rent today — a quick, scannable credibility snapshot right
+          after the story; the business-model diagram and detailed
+          sections right below are where the real depth lives. */}
       {vehicles && locations && (
         <section className="bg-surface-warm-alt">
           <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
@@ -178,12 +200,39 @@ export function AboutPage() {
         </section>
       )}
 
+      {/* The business model, at a glance — a real tree diagram: what we
+          offer (Our Fleet), where we operate (Our Coverage), and how
+          booking works (the same real 4-step flow HowItWorksSection
+          describes, just its step count here) — the three real pillars
+          of this business, each a live number, not three invented
+          labels. The detailed sections right below unpack the first
+          two branches; the booking flow is fully detailed on the
+          homepage/Book a Car page, not repeated here. */}
+      {vehicles && locations && (
+        <section>
+          <div className="mx-auto max-w-5xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
+            <div className="mx-auto max-w-2xl text-center">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.32em] text-brand-gold">{t('pages.about.model.eyebrow')}</p>
+              <h2 className="mt-3 text-3xl font-black tracking-[-0.06em] text-brand-navy sm:text-4xl">{t('pages.about.model.heading')}</h2>
+              <p className="mt-2 text-sm leading-6 text-text-muted">{t('pages.about.model.subtitle')}</p>
+            </div>
+            <div className="mt-12 overflow-x-auto">
+              <BusinessModelTree
+                categoryCount={categoryCount}
+                cityCount={cityCount}
+                stepCount={bookingSteps.length}
+              />
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Our Fleet — real per-category breakdown: an actual representative
           photo, the category's own real description (vehicle_categories.
           description), and a live count, for every category that
           currently has at least one available vehicle. */}
       {fleetCategories && fleetCategories.length > 0 && (
-        <section>
+        <section className="bg-surface-warm-alt">
           <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
             <div className="mx-auto max-w-2xl text-center">
               <p className="text-[10px] font-semibold uppercase tracking-[0.32em] text-brand-gold">{t('pages.about.fleet.eyebrow')}</p>
@@ -225,7 +274,7 @@ export function AboutPage() {
           delivery) actually exist there — same fixed order and icons
           LocationField's picker and the Locations page already use. */}
       {cityCoverage && cityCoverage.length > 0 && (
-        <section className="bg-surface-warm-alt">
+        <section>
           <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
             <div className="mx-auto max-w-2xl text-center">
               <p className="text-[10px] font-semibold uppercase tracking-[0.32em] text-brand-gold">{t('pages.about.coverage.eyebrow')}</p>
@@ -255,7 +304,7 @@ export function AboutPage() {
       )}
 
       {/* Vision & Mission */}
-      <section>
+      <section className="bg-surface-warm-alt">
         <div className="mx-auto max-w-5xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
           <p className="text-center text-[10px] font-semibold uppercase tracking-[0.36em] text-brand-gold">
             {t('pages.about.visionMissionEyebrow')}
@@ -268,105 +317,105 @@ export function AboutPage() {
       </section>
 
       {/* Values — RequirementsSection's numbered-index card pattern. */}
-      <section className="bg-surface-warm-alt">
-        <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
-          <div className="mx-auto max-w-2xl text-center">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.32em] text-brand-gold">{t('pages.about.values.eyebrow')}</p>
-            <h2 className="mt-3 text-3xl font-black tracking-[-0.06em] text-brand-navy sm:text-4xl">{t('pages.about.values.heading')}</h2>
-          </div>
-          <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {values.map((item, i) => {
-              const Icon = VALUE_ICONS[i] ?? ShieldCheck
-              return (
-                <div
-                  key={item.title}
-                  className="group border border-[#ece7df] bg-white p-6 shadow-(--shadow-card) transition-all duration-300 hover:-translate-y-1 hover:border-brand-gold/40 hover:shadow-(--shadow-card-hover)"
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="flex h-11 w-11 items-center justify-center bg-brand-gold text-white shadow-none transition-all duration-300 group-hover:scale-105 group-hover:shadow-[0_0_0_6px_rgba(212,175,55,0.18)]">
-                      <Icon className="h-5 w-5" aria-hidden="true" />
-                    </span>
-                    <span className="font-mono text-xs font-semibold tracking-[0.18em] text-brand-gold">{`0${i + 1}`}</span>
-                  </div>
-                  <h3 className="mt-5 text-sm font-semibold text-brand-navy">{item.title}</h3>
-                  <p className="mt-2 text-sm leading-7 text-text-muted">{item.body}</p>
-                  <div className="mt-5 h-px w-full bg-brand-gold/30 transition-colors duration-300 group-hover:bg-brand-gold" />
+      <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
+        <div className="mx-auto max-w-2xl text-center">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.32em] text-brand-gold">{t('pages.about.values.eyebrow')}</p>
+          <h2 className="mt-3 text-3xl font-black tracking-[-0.06em] text-brand-navy sm:text-4xl">{t('pages.about.values.heading')}</h2>
+        </div>
+        <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {values.map((item, i) => {
+            const Icon = VALUE_ICONS[i] ?? ShieldCheck
+            return (
+              <div
+                key={item.title}
+                className="group border border-[#ece7df] bg-white p-6 shadow-(--shadow-card) transition-all duration-300 hover:-translate-y-1 hover:border-brand-gold/40 hover:shadow-(--shadow-card-hover)"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="flex h-11 w-11 items-center justify-center bg-brand-gold text-white shadow-none transition-all duration-300 group-hover:scale-105 group-hover:shadow-[0_0_0_6px_rgba(212,175,55,0.18)]">
+                    <Icon className="h-5 w-5" aria-hidden="true" />
+                  </span>
+                  <span className="font-mono text-xs font-semibold tracking-[0.18em] text-brand-gold">{`0${i + 1}`}</span>
                 </div>
-              )
-            })}
-          </div>
+                <h3 className="mt-5 text-sm font-semibold text-brand-navy">{item.title}</h3>
+                <p className="mt-2 text-sm leading-7 text-text-muted">{item.body}</p>
+                <div className="mt-5 h-px w-full bg-brand-gold/30 transition-colors duration-300 group-hover:bg-brand-gold" />
+              </div>
+            )
+          })}
         </div>
       </section>
 
       {/* Right here in Dubai — the real office address + a live embedded
           map (same verified coordinates and keyless iframe ContactPage
-          uses, now shared via contactLinks.ts instead of duplicated),
-          plus direct WhatsApp/email links — real, established contact
-          channels, not new ones invented for this page. */}
-      <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
-        <div className="mx-auto max-w-2xl text-center">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.32em] text-brand-gold">{t('pages.about.connect.eyebrow')}</p>
-          <h2 className="mt-3 text-3xl font-black tracking-[-0.06em] text-brand-navy sm:text-4xl">{t('pages.about.connect.heading')}</h2>
-          <p className="mt-2 text-sm leading-6 text-text-muted">{t('pages.about.connect.subtitle')}</p>
-        </div>
-        <div className="mt-10 grid gap-5 lg:grid-cols-2">
-          <div className="overflow-hidden border border-[#ece7df] bg-white shadow-(--shadow-card)">
-            <iframe
-              src={OFFICE_MAPS_EMBED_URL}
-              title={t('pages.about.connect.officeLabel')}
-              loading="lazy"
-              className="h-56 w-full border-0 sm:h-72"
-            />
-            <div className="p-6">
-              <div className="flex items-start gap-3">
-                <MapPin className="mt-0.5 h-5 w-5 shrink-0 text-brand-gold-dark" aria-hidden="true" />
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-wide text-text-muted">{t('pages.about.connect.officeLabel')}</p>
-                  <p className="mt-1 text-sm leading-6 text-brand-navy">{OFFICE_ADDRESS}</p>
+          uses, shared via contactLinks.ts), plus direct WhatsApp/email
+          links — real, established contact channels, not new ones
+          invented for this page. */}
+      <section className="bg-surface-warm-alt">
+        <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
+          <div className="mx-auto max-w-2xl text-center">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.32em] text-brand-gold">{t('pages.about.connect.eyebrow')}</p>
+            <h2 className="mt-3 text-3xl font-black tracking-[-0.06em] text-brand-navy sm:text-4xl">{t('pages.about.connect.heading')}</h2>
+            <p className="mt-2 text-sm leading-6 text-text-muted">{t('pages.about.connect.subtitle')}</p>
+          </div>
+          <div className="mt-10 grid gap-5 lg:grid-cols-2">
+            <div className="overflow-hidden border border-[#ece7df] bg-white shadow-(--shadow-card)">
+              <iframe
+                src={OFFICE_MAPS_EMBED_URL}
+                title={t('pages.about.connect.officeLabel')}
+                loading="lazy"
+                className="h-56 w-full border-0 sm:h-72"
+              />
+              <div className="p-6">
+                <div className="flex items-start gap-3">
+                  <MapPin className="mt-0.5 h-5 w-5 shrink-0 text-brand-gold-dark" aria-hidden="true" />
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-wide text-text-muted">{t('pages.about.connect.officeLabel')}</p>
+                    <p className="mt-1 text-sm leading-6 text-brand-navy">{OFFICE_ADDRESS}</p>
+                  </div>
                 </div>
+                <a
+                  href={OFFICE_MAPS_URL}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="mt-4 inline-flex text-sm font-semibold text-brand-gold-dark underline-offset-2 hover:underline"
+                >
+                  {t('pages.contact.getDirections')}
+                </a>
               </div>
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
               <a
-                href={OFFICE_MAPS_URL}
+                href={WHATSAPP_URL}
                 target="_blank"
                 rel="noreferrer"
-                className="mt-4 inline-flex text-sm font-semibold text-brand-gold-dark underline-offset-2 hover:underline"
+                className="group flex items-center gap-4 border border-[#ece7df] bg-white p-6 shadow-(--shadow-card) transition-all duration-300 hover:-translate-y-1 hover:border-brand-gold/40 hover:shadow-(--shadow-card-hover)"
               >
-                {t('pages.contact.getDirections')}
+                <span className="flex h-11 w-11 shrink-0 items-center justify-center bg-success text-white transition-transform duration-300 group-hover:scale-105">
+                  <MessageCircle className="h-5 w-5" aria-hidden="true" />
+                </span>
+                <span className="text-base font-semibold text-brand-navy">{t('pages.about.connect.whatsappCta')}</span>
               </a>
+              <a
+                href={SUPPORT_EMAIL_HREF}
+                className="group flex items-center gap-4 border border-[#ece7df] bg-white p-6 shadow-(--shadow-card) transition-all duration-300 hover:-translate-y-1 hover:border-brand-gold/40 hover:shadow-(--shadow-card-hover)"
+              >
+                <span className="flex h-11 w-11 shrink-0 items-center justify-center bg-brand-navy text-white transition-transform duration-300 group-hover:scale-105">
+                  <Mail className="h-5 w-5" aria-hidden="true" />
+                </span>
+                <span className="min-w-0 text-base font-semibold text-brand-navy">
+                  {t('pages.about.connect.emailCta')}
+                  <span className="block truncate text-sm font-normal text-text-muted">{SUPPORT_EMAIL}</span>
+                </span>
+              </a>
+              <Link
+                to="/contact"
+                className="group flex items-center justify-between gap-3 border border-brand-gold/40 bg-brand-gold/5 p-6 text-start transition-colors hover:bg-brand-gold/10 sm:col-span-2 lg:col-span-1"
+              >
+                <span className="text-sm font-semibold text-brand-gold-dark">{t('pages.about.connect.contactPageCta')}</span>
+                <ArrowRight className="h-4 w-4 shrink-0 text-brand-gold-dark transition-transform duration-200 group-hover:translate-x-1 rtl:rotate-180" aria-hidden="true" />
+              </Link>
             </div>
-          </div>
-
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
-            <a
-              href={WHATSAPP_URL}
-              target="_blank"
-              rel="noreferrer"
-              className="group flex items-center gap-4 border border-[#ece7df] bg-white p-6 shadow-(--shadow-card) transition-all duration-300 hover:-translate-y-1 hover:border-brand-gold/40 hover:shadow-(--shadow-card-hover)"
-            >
-              <span className="flex h-11 w-11 shrink-0 items-center justify-center bg-success text-white transition-transform duration-300 group-hover:scale-105">
-                <MessageCircle className="h-5 w-5" aria-hidden="true" />
-              </span>
-              <span className="text-base font-semibold text-brand-navy">{t('pages.about.connect.whatsappCta')}</span>
-            </a>
-            <a
-              href={SUPPORT_EMAIL_HREF}
-              className="group flex items-center gap-4 border border-[#ece7df] bg-white p-6 shadow-(--shadow-card) transition-all duration-300 hover:-translate-y-1 hover:border-brand-gold/40 hover:shadow-(--shadow-card-hover)"
-            >
-              <span className="flex h-11 w-11 shrink-0 items-center justify-center bg-brand-navy text-white transition-transform duration-300 group-hover:scale-105">
-                <Mail className="h-5 w-5" aria-hidden="true" />
-              </span>
-              <span className="min-w-0 text-base font-semibold text-brand-navy">
-                {t('pages.about.connect.emailCta')}
-                <span className="block truncate text-sm font-normal text-text-muted">{SUPPORT_EMAIL}</span>
-              </span>
-            </a>
-            <Link
-              to="/contact"
-              className="group flex items-center justify-between gap-3 border border-brand-gold/40 bg-brand-gold/5 p-6 text-start transition-colors hover:bg-brand-gold/10 sm:col-span-2 lg:col-span-1"
-            >
-              <span className="text-sm font-semibold text-brand-gold-dark">{t('pages.about.connect.contactPageCta')}</span>
-              <ArrowRight className="h-4 w-4 shrink-0 text-brand-gold-dark transition-transform duration-200 group-hover:translate-x-1 rtl:rotate-180" aria-hidden="true" />
-            </Link>
           </div>
         </div>
       </section>
@@ -463,6 +512,56 @@ function SpicyCard({ icon: Icon, heading, body }: { icon: typeof Compass; headin
       </span>
       <h2 className="mt-5 text-lg font-bold text-brand-navy">{heading}</h2>
       <p className="mt-2 text-sm leading-7 text-text-muted">{body}</p>
+    </div>
+  )
+}
+
+/**
+ * The business model as a real tree: Bliss Rent Dubai (root) branching
+ * into the three real pillars of the business — what's offered (Our
+ * Fleet), where it's offered (Our Coverage), and how a booking actually
+ * happens (Booking Flow) — each labeled with a real, live number, never
+ * an invented one. Built from plain flex layout + thin divs for the
+ * connecting lines (no absolutely-positioned pseudo-elements to keep
+ * correct in RTL) — a symmetric "root, then evenly spaced branches"
+ * shape stays correct regardless of text direction.
+ */
+function BusinessModelTree({
+  categoryCount,
+  cityCount,
+  stepCount,
+}: {
+  categoryCount: number
+  cityCount: number
+  stepCount: number
+}) {
+  const { t } = useTranslation()
+  const branches = [
+    { icon: Car, title: t('pages.about.model.fleetBranch'), value: t('pages.about.fleet.count', { count: categoryCount }) },
+    { icon: MapPin, title: t('pages.about.model.coverageBranch'), value: t('pages.locations.pointCount', { count: cityCount }) },
+    { icon: CalendarCheck, title: t('pages.about.model.bookingBranch'), value: t('pages.about.model.stepCount', { count: stepCount }) },
+  ]
+
+  return (
+    <div className="flex min-w-[520px] flex-col items-center">
+      <div className="border-2 border-brand-navy bg-brand-navy px-6 py-3 text-center">
+        <p className="text-sm font-black uppercase tracking-[0.1em] text-white">{t('nav.brand')}</p>
+      </div>
+      <div className="h-8 w-px bg-brand-gold" aria-hidden="true" />
+      <div className="flex w-full items-start">
+        {branches.map((branch, i) => (
+          <div key={branch.title} className="flex flex-1 items-start">
+            {i > 0 && <div className="mt-5 h-px flex-1 bg-brand-gold/40" aria-hidden="true" />}
+            <div className="flex flex-1 flex-col items-center px-2 text-center">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center border-2 border-brand-gold bg-white text-brand-gold-dark">
+                <branch.icon className="h-5 w-5" aria-hidden="true" />
+              </span>
+              <p className="mt-3 text-sm font-bold text-brand-navy">{branch.title}</p>
+              <p className="mt-1 text-xs font-semibold text-brand-gold-dark">{branch.value}</p>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   )
 }

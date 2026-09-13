@@ -1453,6 +1453,16 @@ const en = {
           "We're expanding city by city rather than spreading thin all at once — concentrating on doing airport pickup and city-wide drop-off properly in each city we add, starting with Dubai and Abu Dhabi.",
         ],
       },
+      model: {
+        eyebrow: 'How Bliss Rent works',
+        heading: 'The business, at a glance',
+        subtitle: 'Three real pillars — what we offer, where we operate, and how booking actually works — each a live number, not a marketing claim.',
+        fleetBranch: 'Our Fleet',
+        coverageBranch: 'Our Coverage',
+        bookingBranch: 'Booking Flow',
+        stepCount_one: '{{count}} simple step',
+        stepCount_other: '{{count}} simple steps',
+      },
       fleet: {
         eyebrow: 'Our fleet',
         heading: 'What you can actually drive away in',

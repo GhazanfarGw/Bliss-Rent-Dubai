@@ -68,7 +68,25 @@ describe('AboutPage', () => {
     renderIt()
 
     await waitFor(() => expect(screen.getByText('Bliss Rent today')).toBeInTheDocument())
-    expect(screen.getByText('2 vehicles ready to book')).toBeInTheDocument()
+    // Appears twice by design — once in the hero's own stat chips, once
+    // in the "Bliss Rent today" stats strip right below the story.
+    expect(screen.getAllByText('2 vehicles ready to book').length).toBeGreaterThanOrEqual(2)
+  })
+
+  it('shows the business-model tree with real branch counts, including the real booking step count', async () => {
+    fetchAllAvailableVehicles.mockResolvedValue([
+      vehicle({ id: 'v1', categoryId: 'cat-eco', categoryName: 'Economy' }),
+      vehicle({ id: 'v2', categoryId: 'cat-lux', categoryName: 'Luxury' }),
+    ])
+    fetchLocations.mockResolvedValue([{ city: 'Dubai', type: 'airport' }])
+    renderIt()
+
+    await screen.findByText('The business, at a glance')
+    expect(screen.getByText('Our Fleet')).toBeInTheDocument()
+    expect(screen.getByText('Our Coverage')).toBeInTheDocument()
+    expect(screen.getByText('Booking Flow')).toBeInTheDocument()
+    // 4 real steps from home.howItWorks.steps — never a hand-typed number.
+    expect(screen.getByText('4 simple steps')).toBeInTheDocument()
   })
 
   it('shows a real per-category fleet breakdown with a live count and deep-links to a filtered search', async () => {
