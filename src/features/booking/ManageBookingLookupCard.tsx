@@ -34,7 +34,7 @@ export function ManageBookingLookupCard({ query, onQueryChange, onSubmit, loadin
 
   return (
     <div className="-mt-16 overflow-hidden border border-[#ece7df] bg-white shadow-[0_30px_70px_rgba(17,20,29,0.1)] sm:-mt-20 lg:grid lg:grid-cols-5">
-      <div className="bg-[#f8f5f0] p-6 sm:p-8 lg:col-span-2 lg:p-10">
+      <div className="bg-surface-warm-alt p-6 sm:p-8 lg:col-span-2 lg:p-10">
         <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-brand-gold-dark">{t('manageBooking.eyebrow')}</p>
         <ol className="mt-5 space-y-6">
           {steps.map((step, index) => (

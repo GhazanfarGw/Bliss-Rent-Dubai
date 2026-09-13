@@ -114,11 +114,6 @@ const en = {
     badge: 'Dubai fleet arrivals',
     viewFleetCta: 'View fleet',
     scrollCue: 'Scroll to explore',
-    trust: {
-      rating: '4.9/5 guest rating',
-      concierge: '24/7 concierge',
-      delivery: 'Airport delivery in 15 min',
-    },
   },
   home: {
     categories: {

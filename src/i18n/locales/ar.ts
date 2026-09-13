@@ -98,11 +98,6 @@ const ar = {
     badge: 'وصول أسطول دبي',
     viewFleetCta: 'عرض الأسطول',
     scrollCue: 'مرر للأسفل لاستكشاف المزيد',
-    trust: {
-      rating: '٤.٩/٥ تقييم الضيوف',
-      concierge: 'خدمة كونسيرج على مدار الساعة',
-      delivery: 'توصيل من المطار خلال ١٥ دقيقة',
-    },
   },
   home: {
     categories: {

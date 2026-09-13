@@ -37,12 +37,12 @@ export function HomePage() {
   }
 
   return (
-    <div className="bg-[#f6f3ee] text-brand-navy">
+    <div className="bg-surface-warm text-brand-navy">
       <TickerBar />
       <Hero />
       <BookingSearchSection onSearch={handleSearch} />
 
-      <section className="bg-[#f8f5f0] py-12 text-brand-navy sm:py-14">
+      <section className="bg-surface-warm-alt py-12 text-brand-navy sm:py-14">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-3xl text-center">
             <p className="text-[10px] font-semibold uppercase tracking-[0.32em] text-brand-gold-dark">{t('home.premiumHighlights.eyebrow')}</p>
@@ -73,7 +73,7 @@ export function HomePage() {
 
       <BrandsMarquee />
 
-      <div className="bg-[#f6f3ee]">
+      <div className="bg-surface-warm">
         <FeaturedVehicles />
         <WhyChooseSection />
         <RequirementsSection />
@@ -82,7 +82,7 @@ export function HomePage() {
         <HowItWorksSection />
         <HomeFaqSection />
 
-        <section className="relative overflow-hidden bg-[#f7f4ef] px-4 py-16 text-center sm:px-6 lg:px-8">
+        <section className="relative overflow-hidden bg-surface-warm px-4 py-16 text-center sm:px-6 lg:px-8">
           <div
             aria-hidden="true"
             className="pointer-events-none absolute left-1/2 top-0 h-72 w-72 -translate-x-1/2 -translate-y-1/3 rounded-full bg-brand-champagne/20 blur-3xl"

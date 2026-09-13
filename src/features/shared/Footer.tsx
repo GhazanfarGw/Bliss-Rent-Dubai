@@ -22,7 +22,7 @@ export function Footer() {
   const { t } = useTranslation()
 
   return (
-    <footer className="border-t border-[#ece7df] bg-[#f7f4ef] text-[#1f2430]">
+    <footer className="border-t border-[#ece7df] bg-surface-warm text-[#1f2430]">
       <img className='w-full mx-auto justify-center' src='./footerbaner.jpg' alt="Footer Logo" />
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">

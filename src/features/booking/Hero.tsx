@@ -4,17 +4,12 @@ import { Link } from 'react-router-dom'
 import { ArrowRight, Car, ChevronDown, MapPin } from 'lucide-react'
 import { HERO_SLIDE_IMAGES } from '@/features/booking/heroSlides'
 import { LinkButton } from '@/features/shared/ui/LinkButton'
-import { fetchAllAvailableVehicles, fetchLocations } from '@/features/booking/api'
+import { useFleetStats } from '@/features/booking/useFleetStats'
 import { prefersReducedMotion } from '@/lib/motion'
 
 interface Slide {
   title: string
   body: string
-}
-
-interface HeroStats {
-  vehicleCount: number
-  cityCount: number
 }
 
 // The hero IMAGE stays pinned (Phase 11 decision, unchanged) — only the
@@ -75,7 +70,7 @@ export function Hero() {
   const { t } = useTranslation()
   const slides = t('hero.slides', { returnObjects: true }) as Slide[]
   const [slideIndex, setSlideIndex] = useState(HERO_SLIDE_INDEX)
-  const [stats, setStats] = useState<HeroStats | null>(null)
+  const stats = useFleetStats()
   const slide = slides[slideIndex] ?? slides[0]
   const image = HERO_SLIDE_IMAGES[HERO_SLIDE_INDEX] ?? HERO_SLIDE_IMAGES[0]
   const reducedMotion = prefersReducedMotion()
@@ -89,23 +84,6 @@ export function Hero() {
     }, HERO_TEXT_ROTATE_MS)
     return () => clearInterval(id)
   }, [slides.length])
-
-  useEffect(() => {
-    let cancelled = false
-    Promise.all([fetchAllAvailableVehicles(), fetchLocations()])
-      .then(([vehicles, locations]) => {
-        if (cancelled) return
-        const cityCount = new Set(locations.map((l) => l.city)).size
-        setStats({ vehicleCount: vehicles.length, cityCount })
-      })
-      .catch(() => {
-        // No fake fallback — the stat row just stays absent, same as
-        // TickerBar's live rate item.
-      })
-    return () => {
-      cancelled = true
-    }
-  }, [])
 
   function handleScrollCueClick() {
     const target = document.getElementById('booking-section')

@@ -19,7 +19,7 @@ export function RequirementsSection() {
   const items = t('home.requirements.items', { returnObjects: true }) as RequirementItem[]
 
   return (
-    <section className="bg-[#f1eee9]">
+    <section className="bg-surface-warm-alt">
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="max-w-5xl">
           <p className="text-[10px] font-semibold uppercase tracking-[0.32em] text-brand-gold">

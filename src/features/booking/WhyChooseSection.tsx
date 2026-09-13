@@ -16,7 +16,7 @@ export function WhyChooseSection() {
   const items = t('home.whyChoose.items', { returnObjects: true }) as WhyChooseItem[]
 
   return (
-    <section id="why-choose" className="scroll-mt-20 bg-[#f8f5f0]">
+    <section id="why-choose" className="scroll-mt-20 bg-surface-warm-alt">
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-3xl text-center">
           <p className="text-[10px] font-semibold uppercase tracking-[0.36em] text-brand-gold-dark">Why travelers choose us</p>

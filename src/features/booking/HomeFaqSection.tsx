@@ -12,7 +12,7 @@ export function HomeFaqSection() {
   const [open, setOpen] = useState<number | null>(null)
 
   return (
-    <section className="bg-[radial-gradient(circle_at_top,_rgba(212,175,106,0.08),transparent_28%),#f7f3ee]">
+    <section className="bg-[radial-gradient(circle_at_top,_rgba(212,175,106,0.08),transparent_28%),var(--color-surface-warm)]">
       <div className="mx-auto max-w-3xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>

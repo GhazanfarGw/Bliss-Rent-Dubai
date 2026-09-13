@@ -240,7 +240,7 @@ export function NavBar() {
           <LanguageSwitcher tone={transparent ? 'light' : 'dark'} />
           <button
             type="button"
-            className="inline-flex h-11 w-11 items-center justify-center rounded-none border border-[#e6e1d9] bg-[#f7f4ef] text-brand-navy shadow-sm transition-colors hover:bg-[#f1eee8]"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-none border border-[#e6e1d9] bg-surface-warm text-brand-navy shadow-sm transition-colors hover:bg-surface-warm-alt"
             aria-label={t('nav.toggleMenu')}
             aria-expanded={open}
             onClick={() => setOpen((v) => !v)}

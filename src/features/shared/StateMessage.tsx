@@ -16,7 +16,7 @@ interface StateMessageProps {
 }
 
 const TONE_CLASSES: Record<NonNullable<StateMessageProps['tone']>, { box: string; title: string; body: string }> = {
-  neutral: { box: 'border-brand-gold/10 bg-[#f1eee9]/40', title: 'text-brand-gold', body: 'text-text-muted' },
+  neutral: { box: 'border-brand-gold/10 bg-surface-warm-alt/40', title: 'text-brand-gold', body: 'text-text-muted' },
   error: { box: 'border-error/30 bg-error-bg', title: 'text-error', body: 'text-error' },
   success: { box: 'border-success/30 bg-success-bg', title: 'text-success', body: 'text-success' },
 }

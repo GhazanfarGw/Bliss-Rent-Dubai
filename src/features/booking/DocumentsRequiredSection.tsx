@@ -29,7 +29,7 @@ export function DocumentsRequiredSection() {
   const groups = t('home.documents.groups', { returnObjects: true }) as DocumentsGroup[]
 
   return (
-    <section className="bg-[#f8f5f0]">
+    <section className="bg-surface-warm-alt">
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <SectionHeader as="h2" title={t('home.documents.title')} description={t('home.documents.subtitle')} />
 

@@ -24,7 +24,7 @@ export function FindMyCarPage() {
   useMetaDescription('Check your Bliss Rent booking status — enter your reference number to see your vehicle, plate, and days remaining.')
 
   return (
-    <div className="bg-[#f6f3ee]">
+    <div className="bg-surface-warm">
       <FindMyCarHero />
 
       <div className="mx-auto max-w-2xl px-4 pb-14 sm:px-6 lg:px-8 mt-28 md:32">

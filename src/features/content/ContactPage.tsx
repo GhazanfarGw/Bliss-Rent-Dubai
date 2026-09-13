@@ -230,7 +230,7 @@ export function ContactPage() {
       </div>
 
       {/* Visit our office — real address + a live embedded map, not just a link. */}
-      <section className="bg-[#f8f5f0]">
+      <section className="bg-surface-warm-alt">
         <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
           <div className="grid gap-8 lg:grid-cols-5">
             <div className="border border-[#ece7df] bg-white p-7 lg:col-span-2">

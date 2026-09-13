@@ -1,25 +1,14 @@
-import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Car, Compass, Eye, MapPin, ShieldCheck, Sparkles, Target } from 'lucide-react'
 import { useDocumentTitle, useMetaDescription } from '@/lib/useDocumentTitle'
 import { LinkButton } from '@/features/shared/ui/LinkButton'
-import { fetchAllAvailableVehicles, fetchLocations } from '@/features/booking/api'
+import { useFleetStats } from '@/features/booking/useFleetStats'
 import heroLuxury from '@/assets/hero/hero-luxury.webp'
 
 interface ValueItem {
   title: string
   body: string
-}
-
-/** Live counts pulled from the same real fleet/locations queries the
- *  homepage's category grid and search widget already use — never a
- *  hand-typed number. Left null until the fetch resolves; the section
- *  below simply doesn't render rather than ever showing a fake zero. */
-interface LiveStats {
-  vehicleCount: number
-  categoryNames: string[]
-  cityNames: string[]
 }
 
 // One icon per value, in the same order as pages.about.values.items
@@ -44,26 +33,7 @@ export function AboutPage() {
   useMetaDescription(t('pages.about.subtitle'))
   const storyParagraphs = t('pages.about.story.paragraphs', { returnObjects: true }) as string[]
   const values = t('pages.about.values.items', { returnObjects: true }) as ValueItem[]
-  const [stats, setStats] = useState<LiveStats | null>(null)
-
-  useEffect(() => {
-    let cancelled = false
-    Promise.all([fetchAllAvailableVehicles(), fetchLocations()])
-      .then(([vehicles, locations]) => {
-        if (cancelled) return
-        const categoryNames = Array.from(
-          new Set(vehicles.map((v) => v.vehicle_categories?.name).filter((name): name is string => Boolean(name))),
-        ).sort()
-        const cityNames = Array.from(new Set(locations.map((l) => l.city))).sort()
-        setStats({ vehicleCount: vehicles.length, categoryNames, cityNames })
-      })
-      .catch(() => {
-        // Best-effort only — the stats section simply doesn't render.
-      })
-    return () => {
-      cancelled = true
-    }
-  }, [])
+  const stats = useFleetStats()
 
   return (
     <div>
@@ -145,7 +115,7 @@ export function AboutPage() {
       )}
 
       {/* Vision & Mission */}
-      <section className="bg-[#f8f5f0]">
+      <section className="bg-surface-warm-alt">
         <div className="mx-auto max-w-5xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
           <div className="grid gap-5 sm:grid-cols-2">
             <div className="border border-[#ece7df] bg-white p-7">

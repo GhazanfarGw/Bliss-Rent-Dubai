@@ -40,7 +40,7 @@ export function LocationsPreviewSection() {
   const cityNames = Array.from(new Set((locations ?? []).map((l) => l.city)))
 
   return (
-    <section className="bg-[#f7f4ef]">
+    <section className="bg-surface-warm">
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <p className="inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.32em] text-brand-gold-dark">
           <span className="relative flex h-1.5 w-1.5">

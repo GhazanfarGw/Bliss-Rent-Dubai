@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen, act, waitFor } from '@testing-library/react'
+import { MemoryRouter } from 'react-router-dom'
 import { Hero } from '@/features/booking/Hero'
 
 const fetchAllAvailableVehicles = vi.fn()
@@ -10,6 +11,17 @@ vi.mock('@/features/booking/api', () => ({
   fetchLocations: (...args: unknown[]) => fetchLocations(...args),
 }))
 
+// Hero renders a real <Link to="/search"> (the "View fleet" CTA), which
+// needs a Router context to exist at all — same MemoryRouter-wrapping
+// convention as VehicleCard.test.tsx.
+function renderHero() {
+  return render(
+    <MemoryRouter>
+      <Hero />
+    </MemoryRouter>,
+  )
+}
+
 describe('Hero', () => {
   beforeEach(() => {
     fetchAllAvailableVehicles.mockReset().mockResolvedValue([])
@@ -17,7 +29,7 @@ describe('Hero', () => {
   })
 
   it('renders a single static hero image with its heading and CTA', () => {
-    render(<Hero />)
+    renderHero()
 
     const heading = screen.getByRole('heading', { level: 1 })
     expect(heading).toBeInTheDocument()
@@ -35,7 +47,7 @@ describe('Hero', () => {
   })
 
   it('does not render any carousel controls (dots, arrows, slide counter)', () => {
-    render(<Hero />)
+    renderHero()
 
     expect(screen.queryByRole('region', { name: /carousel/i })).not.toBeInTheDocument()
     expect(screen.queryAllByRole('button', { name: /go to slide/i })).toHaveLength(0)
@@ -52,7 +64,7 @@ describe('Hero', () => {
     })
 
     it('auto-changes the heading text over time, while the image stays the same', () => {
-      render(<Hero />)
+      renderHero()
       const firstTitle = screen.getByRole('heading', { level: 1 }).textContent
       const image = screen.getAllByRole('img')[0]
       const imageSrcBefore = image.getAttribute('src')
@@ -71,7 +83,7 @@ describe('Hero', () => {
       const matchMediaMock = vi.fn().mockReturnValue({ matches: true })
       vi.stubGlobal('matchMedia', matchMediaMock)
 
-      render(<Hero />)
+      renderHero()
       const firstTitle = screen.getByRole('heading', { level: 1 }).textContent
 
       act(() => {
@@ -92,7 +104,7 @@ describe('Hero', () => {
         { city: 'Abu Dhabi' },
       ])
 
-      render(<Hero />)
+      renderHero()
 
       await waitFor(() => expect(screen.getByText('3')).toBeInTheDocument())
       expect(screen.getByText('2')).toBeInTheDocument()
@@ -102,7 +114,7 @@ describe('Hero', () => {
       fetchAllAvailableVehicles.mockRejectedValue(new Error('network error'))
       fetchLocations.mockResolvedValue([])
 
-      render(<Hero />)
+      renderHero()
 
       await waitFor(() => expect(fetchAllAvailableVehicles).toHaveBeenCalled())
       expect(screen.queryByText(/vehicles ready to book/i)).not.toBeInTheDocument()
@@ -115,7 +127,7 @@ describe('Hero', () => {
       const scrollIntoView = vi.fn()
       document.getElementById('booking-section')!.scrollIntoView = scrollIntoView
 
-      render(<Hero />)
+      renderHero()
       screen.getByRole('button', { name: /scroll to explore/i }).click()
 
       expect(scrollIntoView).toHaveBeenCalledWith(expect.objectContaining({ behavior: 'smooth' }))

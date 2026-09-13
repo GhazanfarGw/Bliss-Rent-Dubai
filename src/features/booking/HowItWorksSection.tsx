@@ -15,7 +15,7 @@ export function HowItWorksSection() {
   const steps = t('home.howItWorks.steps', { returnObjects: true }) as Step[]
 
   return (
-    <section id="how-it-works" className="scroll-mt-20 bg-[#f6f3ee]">
+    <section id="how-it-works" className="scroll-mt-20 bg-surface-warm">
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="max-w-2xl">
           <h2 className="text-3xl font-black tracking-[-0.06em] text-brand-navy sm:text-4xl">{t('home.howItWorks.title')}</h2>
