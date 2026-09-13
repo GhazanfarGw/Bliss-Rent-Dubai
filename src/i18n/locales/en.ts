@@ -461,6 +461,13 @@ const en = {
     quantityAvailable: '{{count}} available',
   },
   vehicleDetail: {
+    gallery: {
+      expand: 'View full-screen photo',
+      counter: '{{current}} / {{total}}',
+      thumbnail: 'View photo {{number}}',
+      previous: 'Previous photo',
+      next: 'Next photo',
+    },
     chooseTripDetails: 'Set your trip details',
     chooseTripDetailsBody: 'Choose pickup, drop-off, and dates here to book this car.',
     backToResults: 'Back to results',
@@ -482,6 +489,14 @@ const en = {
     chooseDatesSuffix: 'to see full pricing and confirm availability.',
     continueBooking: 'Continue Booking',
     paymentNote: "You'll enter your details and pay on the next steps.",
+    airportPickup: 'Airport pickup',
+    airportPickupWithCode: 'Airport pickup — {{code}}',
+    selfDriveBadge: 'Self-drive, no chauffeur added',
+    supportBadge: 'Support from booking to return',
+    similarVehicles: {
+      title: 'More {{category}} vehicles',
+      titleGeneric: 'Similar vehicles',
+    },
     notFoundTitle: "We couldn't find that car",
     notFoundBody: 'It may have been removed from the fleet.',
     backToSearch: 'Back to search',

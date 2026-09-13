@@ -1,17 +1,20 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, KeyRound, LifeBuoy, Plane } from 'lucide-react'
 import { criteriaToSearchParams } from '@/features/booking/searchParams'
 import {
+  fetchAllAvailableVehicles,
   fetchLocations,
   fetchVehicleById,
   isVehicleAvailable,
   BookingApiError,
 } from '@/features/booking/api'
 import { VehicleGallery } from '@/features/booking/VehicleGallery'
+import { VehicleCard } from '@/features/booking/VehicleCard'
 import { CitySelect, LocationPickerButton } from '@/features/booking/LocationField'
 import { DateRangePicker } from '@/features/booking/DateRangePicker'
+import { DubaiOnlyBadge } from '@/features/shared/DubaiOnlyBadge'
 import { StateMessage, Spinner } from '@/features/shared/StateMessage'
 import { quoteForDays, cheapestHeadlineRate, TERM_LABELS } from '@/lib/pricing'
 import { rentalDays, validateDateRange } from '@/lib/dateRange'
@@ -57,6 +60,7 @@ export function VehicleDetailPage() {
   const [quickEditor, setQuickEditor] = useState<'dates' | 'pickup' | 'dropoff' | null>(null)
   const [quickCriteria, setQuickCriteria] = useState<Partial<SearchCriteria>>(criteria)
   const [quickPickupCity, setQuickPickupCity] = useState('Dubai')
+  const [similarVehicles, setSimilarVehicles] = useState<VehicleWithDetails[] | null>(null)
 
   useEffect(() => {
     if (!id) return
@@ -101,6 +105,33 @@ export function VehicleDetailPage() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, hasDates, criteria.startDate, criteria.endDate])
+
+  const loadedCategoryId = state.status === 'loaded' ? state.vehicle.category_id : null
+  const loadedVehicleId = state.status === 'loaded' ? state.vehicle.id : null
+
+  // "Similar vehicles" — other vehicles sharing this one's real category,
+  // from the exact same live, available-only fleet query
+  // FeaturedVehicles/VehicleCategoriesSection already use (no second
+  // fleet-fetching path, no invented recommendations). Absent entirely
+  // until resolved, and simply doesn't render on failure or when there
+  // are none — never a fabricated "you may also like" list.
+  useEffect(() => {
+    if (!loadedCategoryId || !loadedVehicleId) return
+    let cancelled = false
+    fetchAllAvailableVehicles()
+      .then((vehicles) => {
+        if (cancelled) return
+        setSimilarVehicles(
+          vehicles.filter((v) => v.category_id === loadedCategoryId && v.id !== loadedVehicleId).slice(0, 4),
+        )
+      })
+      .catch(() => {
+        if (!cancelled) setSimilarVehicles(null)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [loadedCategoryId, loadedVehicleId])
 
   useDocumentTitle(state.status === 'loaded' ? `${state.vehicle.make} ${state.vehicle.model}` : null)
   useMetaDescription(state.status === 'loaded' ? buildVehicleMetaDescription(state.vehicle) : null)
@@ -174,18 +205,21 @@ export function VehicleDetailPage() {
           <VehicleGallery images={vehicle.vehicle_images} alt={`${vehicle.make} ${vehicle.model}`} />
         </div>
 
-        <section className="rounded-2xl border border-brand-navy/10 bg-white p-5 shadow-sm sm:p-6 lg:sticky lg:top-24">
+        <section className="rounded-none border border-brand-navy/10 bg-white p-5 shadow-sm sm:p-6 lg:sticky lg:top-24">
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-3">
               <h1 className="text-2xl font-bold text-brand-navy">
                 {vehicle.make} {vehicle.model}
               </h1>
               {vehicle.vehicle_categories && (
-                <span className="rounded-full bg-brand-lavender px-3 py-1 text-xs font-medium text-brand-navy">
+                <span className="rounded-none bg-brand-lavender px-3 py-1 text-xs font-medium text-brand-navy">
                   {vehicle.vehicle_categories.name}
                 </span>
               )}
             </div>
+            {vehicle.vehicle_categories?.description && (
+              <p className="mt-2 text-sm leading-6 text-text-muted">{vehicle.vehicle_categories.description}</p>
+            )}
 
             <h2 className="mt-6 text-sm font-semibold text-brand-navy">{t('vehicleDetail.specifications')}</h2>
             <dl className="mt-3 grid grid-cols-2 gap-4 sm:grid-cols-3">
@@ -223,6 +257,14 @@ export function VehicleDetailPage() {
             <div className="mt-4 space-y-2 border-t border-brand-navy/10 pt-4 text-sm">
               <EditableRow label={t('vehicleDetail.dates')} value={displayHasDates ? `${quickCriteria.startDate} → ${quickCriteria.endDate}` : t('vehicleDetail.notSelected')} onClick={() => setQuickEditor('dates')} />
               <EditableRow label={t('vehicleDetail.pickup')} value={displayPickup?.name ?? t('vehicleDetail.notSelected')} onClick={() => { setQuickPickupCity(displayPickup?.city ?? 'Dubai'); setQuickEditor('pickup') }} />
+              {displayPickup?.type === 'airport' && (
+                <p className="flex items-center justify-end gap-1.5 text-xs font-medium text-brand-gold-dark">
+                  <Plane className="h-3.5 w-3.5" aria-hidden="true" />
+                  {displayPickup.airport_code
+                    ? t('vehicleDetail.airportPickupWithCode', { code: displayPickup.airport_code })
+                    : t('vehicleDetail.airportPickup')}
+                </p>
+              )}
               <EditableRow label={t('vehicleDetail.dropoff')} value={displayDropoff?.name ?? t('vehicleDetail.notSelected')} onClick={() => setQuickEditor('dropoff')} />
               <Row label={t('vehicleDetail.availability')} value={<AvailabilityBadge state={availability} />} />
             </div>
@@ -284,17 +326,51 @@ export function VehicleDetailPage() {
                 if (!id || !completeCriteria || !hasDates) return
                 navigate(`/checkout/${id}/customer?${criteriaToSearchParams(completeCriteria).toString()}`)
               }}
-              className="mt-5 w-full rounded-lg bg-brand-gold px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-gold-light disabled:cursor-not-allowed disabled:bg-surface-muted disabled:text-text-muted"
+              className="mt-5 w-full rounded-none bg-brand-gold px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-gold-light disabled:cursor-not-allowed disabled:bg-surface-muted disabled:text-text-muted"
             >
               {t('vehicleDetail.continueBooking')}
             </button>
             <p className="mt-2 text-center text-xs text-text-muted">
               {t('vehicleDetail.paymentNote')}
             </p>
+
+            {/* Real, already-established site-wide policies — the exact
+                same claims WhyChooseSection/DubaiOnlyBadge already make
+                elsewhere, just surfaced again at the point of decision,
+                never new copy invented for this page. */}
+            <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-brand-navy/10 pt-4">
+              <DubaiOnlyBadge />
+              <span className="inline-flex items-center gap-1.5 border border-brand-gold/50 bg-brand-gold/10 px-3 py-1 text-xs font-semibold text-brand-gold-dark">
+                <KeyRound className="h-3.5 w-3.5" aria-hidden="true" />
+                {t('vehicleDetail.selfDriveBadge')}
+              </span>
+              <span className="inline-flex items-center gap-1.5 border border-brand-gold/50 bg-brand-gold/10 px-3 py-1 text-xs font-semibold text-brand-gold-dark">
+                <LifeBuoy className="h-3.5 w-3.5" aria-hidden="true" />
+                {t('vehicleDetail.supportBadge')}
+              </span>
+            </div>
           </div>
         </section>
       </div>
 
+      {similarVehicles && similarVehicles.length > 0 && (
+        <section className="mt-12 border-t border-brand-navy/10 pt-10">
+          <h2 className="text-xl font-black tracking-[-0.04em] text-brand-navy sm:text-2xl">
+            {vehicle.vehicle_categories
+              ? t('vehicleDetail.similarVehicles.title', { category: vehicle.vehicle_categories.name })
+              : t('vehicleDetail.similarVehicles.titleGeneric')}
+          </h2>
+          <div className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {similarVehicles.map((similar) => (
+              <VehicleCard
+                key={similar.id}
+                vehicle={similar}
+                detailHref={`/vehicles/${similar.id}${searchParams.toString() ? `?${searchParams.toString()}` : ''}`}
+              />
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   )
 }

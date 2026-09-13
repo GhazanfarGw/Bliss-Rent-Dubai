@@ -87,7 +87,7 @@ export function VehicleCard({ vehicle, days, detailHref, isAvailable, featured =
           aria-label={t('vehicleCard.whatsapp')}
           title={t('vehicleCard.whatsapp')}
           onClick={(e) => e.stopPropagation()}
-          className="absolute end-3 bottom-3 z-10 inline-flex h-9 w-9 items-center justify-center rounded-full bg-success text-white shadow-md transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white"
+          className="absolute end-3 bottom-3 z-10 inline-flex h-9 w-9 items-center justify-center rounded-none bg-success text-white shadow-md transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white"
         >
           <MessageCircle className="h-4 w-4" aria-hidden="true" />
         </a>
@@ -103,7 +103,7 @@ export function VehicleCard({ vehicle, days, detailHref, isAvailable, featured =
             <p className="mt-1 text-xs text-text-muted">
               {vehicle.model_year}
               {quantity != null && quantity > 1 && (
-                <span className="ms-2 inline-flex items-center rounded-full bg-brand-navy/8 px-2 py-0.5 text-[11px] font-semibold text-brand-navy">
+                <span className="ms-2 inline-flex items-center rounded-none bg-brand-navy/8 px-2 py-0.5 text-[11px] font-semibold text-brand-navy">
                   {t('vehicleCard.quantityAvailable', { count: quantity })}
                 </span>
               )}
@@ -188,7 +188,7 @@ export function VehicleCard({ vehicle, days, detailHref, isAvailable, featured =
             target="_blank"
             rel="noreferrer"
             onClick={(e) => e.stopPropagation()}
-            className="absolute inset-x-10 top-1/2 z-20 inline-flex min-h-11 -translate-y-1/2 items-center justify-center gap-3 rounded-lg border border-brand-champagne bg-brand-gold px-4 py-3 text-sm font-semibold text-white opacity-0 shadow-[0_12px_28px_rgba(11,19,43,0.3)] transition-opacity duration-200 group-hover:opacity-100 group-focus-within:opacity-100 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-brand-navy"
+            className="absolute inset-x-10 top-1/2 z-20 inline-flex min-h-11 -translate-y-1/2 items-center justify-center gap-3 rounded-none border border-brand-champagne bg-brand-gold px-4 py-3 text-sm font-semibold text-white opacity-0 shadow-[0_12px_28px_rgba(11,19,43,0.3)] transition-opacity duration-200 group-hover:opacity-100 group-focus-within:opacity-100 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-brand-navy"
           >
             {t('vehicleCard.whatsapp')}
             <MessageCircle className="h-4 w-4" aria-hidden="true" />

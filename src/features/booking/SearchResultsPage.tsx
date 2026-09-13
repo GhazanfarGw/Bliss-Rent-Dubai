@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { SearchWidget } from '@/features/booking/SearchWidget'
@@ -38,6 +38,12 @@ export function SearchResultsPage() {
   const [sort, setSort] = useState<SortOption>('price_asc')
   const [locations, setLocations] = useState<Location[]>([])
   const [editingSearch, setEditingSearch] = useState(!complete)
+  // A deep-link from e.g. CarTypesPage ("/search?category=<id>") should
+  // pre-select that category filter on first load only — captured once in
+  // a ref (read directly, not via state) so the very next effect run
+  // below can consume-and-clear it without re-reading the URL, and so it
+  // never re-applies itself after the customer changes filters/dates.
+  const initialCategoryId = useRef(searchParams.get('category'))
 
   useEffect(() => {
     fetchLocations().then(setLocations).catch(() => setLocations([]))
@@ -46,7 +52,12 @@ export function SearchResultsPage() {
   useEffect(() => setEditingSearch(!complete), [complete])
 
   useEffect(() => {
-    setFilters(EMPTY_FILTERS)
+    if (initialCategoryId.current) {
+      setFilters({ ...EMPTY_FILTERS, categoryId: initialCategoryId.current })
+      initialCategoryId.current = null
+    } else {
+      setFilters(EMPTY_FILTERS)
+    }
 
     // Dates were entered but don't form a valid range (e.g. drop-off before
     // pickup) — that's a real validation error, not "no dates yet". Show
@@ -199,7 +210,7 @@ export function SearchResultsPage() {
 
 function SummaryItem({ label, value, detail }: { label: string; value: string; detail?: string }) {
   return (
-    <div className="rounded-2xl border border-brand-gold/25 bg-white/6 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-sm">
+    <div className="rounded-none border border-brand-gold/25 bg-white/6 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-sm">
       <p className="text-[10px] font-medium uppercase tracking-[0.16em] text-brand-gold-light/80">{label}</p>
       <p className="mt-2 truncate font-semibold text-white">{value}</p>
       {detail && <p className="mt-1 text-xs text-white/70">{detail}</p>}

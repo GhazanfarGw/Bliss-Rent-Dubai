@@ -453,6 +453,13 @@ const ar = {
     quantityAvailable: '{{count}} متوفرة',
   },
   vehicleDetail: {
+    gallery: {
+      expand: 'عرض الصورة بملء الشاشة',
+      counter: '{{current}} / {{total}}',
+      thumbnail: 'عرض الصورة {{number}}',
+      previous: 'الصورة السابقة',
+      next: 'الصورة التالية',
+    },
     chooseTripDetails: 'حدد تفاصيل رحلتك',
     chooseTripDetailsBody: 'اختر الاستلام والتسليم والتواريخ هنا لحجز هذه السيارة.',
     backToResults: 'العودة إلى النتائج',
@@ -474,6 +481,14 @@ const ar = {
     chooseDatesSuffix: 'لعرض السعر الكامل وتأكيد التوفر.',
     continueBooking: 'متابعة الحجز',
     paymentNote: 'ستقوم بإدخال بياناتك والدفع في الخطوات التالية.',
+    airportPickup: 'الاستلام من المطار',
+    airportPickupWithCode: 'الاستلام من المطار — {{code}}',
+    selfDriveBadge: 'قيادة ذاتية، بدون سائق مرافق',
+    supportBadge: 'دعم من الحجز حتى الإرجاع',
+    similarVehicles: {
+      title: 'المزيد من سيارات {{category}}',
+      titleGeneric: 'سيارات مشابهة',
+    },
     notFoundTitle: 'تعذر العثور على هذه السيارة',
     notFoundBody: 'ربما تمت إزالتها من الأسطول.',
     backToSearch: 'العودة إلى البحث',

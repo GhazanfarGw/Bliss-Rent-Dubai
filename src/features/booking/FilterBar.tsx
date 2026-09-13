@@ -47,7 +47,7 @@ export function FilterBar({
 
   return (
     <>
-      <aside className="hidden rounded-[24px] border border-[#eadfcf] bg-[#f8f5f1] p-4 shadow-none lg:sticky lg:top-[82px] lg:z-20 lg:self-start lg:block lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto">
+      <aside className="hidden rounded-none border border-[#eadfcf] bg-surface-warm-alt p-4 shadow-none lg:sticky lg:top-[82px] lg:z-20 lg:self-start lg:block lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto">
         <div className="flex items-start justify-between gap-2 border-b border-brand-navy/10 pb-4">
           <div>
             <h2 className="flex items-center gap-1.5 text-base font-semibold text-brand-navy">
@@ -97,13 +97,13 @@ export function FilterBar({
             <SlidersHorizontal className="h-4 w-4 shrink-0" aria-hidden="true" />
             {t('searchResults.filters.button')}
             {hasActiveFilters && (
-              <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-white px-1 text-[11px] font-bold text-brand-gold">
+              <span className="flex h-5 min-w-5 items-center justify-center rounded-none bg-white px-1 text-[11px] font-bold text-brand-gold">
                 {activeFilterCount}
               </span>
             )}
           </button>
         </div>
-        {hasActiveFilters && <div className="mt-2 flex gap-2 overflow-x-auto pb-1">{[filters.categoryId, filters.brand, filters.transmission, filters.availability].filter(Boolean).map((filter) => <span key={filter} className="shrink-0 rounded-full bg-brand-gold/10 px-3 py-1 text-xs font-medium text-brand-navy">{filter}</span>)}</div>}
+        {hasActiveFilters && <div className="mt-2 flex gap-2 overflow-x-auto pb-1">{[filters.categoryId, filters.brand, filters.transmission, filters.availability].filter(Boolean).map((filter) => <span key={filter} className="shrink-0 rounded-none bg-brand-gold/10 px-3 py-1 text-xs font-medium text-brand-navy">{filter}</span>)}</div>}
       </div>
 
       <Dialog open={mobileOpen} onClose={() => setMobileOpen(false)} title={t('searchResults.filters.title')} closeLabel={t('common.close')} mobileSheet maxWidthClassName="max-w-xl">
@@ -130,7 +130,7 @@ export function FilterBar({
             </select>
           </label>
           <div className="flex gap-3 border-t border-border pt-4">
-            <button type="button" onClick={clearFilters} className="inline-flex min-h-11 flex-1 items-center justify-center gap-1.5 rounded-full border border-brand-navy/15 px-4 text-sm font-semibold text-brand-navy">
+            <button type="button" onClick={clearFilters} className="inline-flex min-h-11 flex-1 items-center justify-center gap-1.5 rounded-none border border-brand-navy/15 px-4 text-sm font-semibold text-brand-navy">
               <X className="h-4 w-4 shrink-0" aria-hidden="true" />
               {t('searchResults.filters.clear')}
             </button>
@@ -232,7 +232,7 @@ function DropdownField({
         value={value ?? ''}
         onChange={(e) => onChange(e.target.value || null)}
         className={
-          'mt-2 block w-full border border-[#d9cbb8] bg-white px-3 text-sm text-brand-navy outline-none transition focus:border-brand-gold focus:ring-2 focus:ring-brand-gold/25 ' +
+          'mt-2 block w-full rounded-none border border-[#d9cbb8] bg-white px-3 text-sm text-brand-navy outline-none transition focus:border-brand-gold focus:ring-2 focus:ring-brand-gold/25 ' +
           (compact ? 'min-h-10' : 'min-h-11')
         }
       >
