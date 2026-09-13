@@ -2,9 +2,10 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { fetchLocations } from '@/features/booking/api'
-import { sortByOrder } from '@/features/booking/locationDisplay'
+import { sortByOrder, TYPE_ICON, TYPE_ORDER } from '@/features/booking/locationDisplay'
 import { useDocumentTitle, useMetaDescription } from '@/lib/useDocumentTitle'
 import type { Location } from '@/types/domain'
+import type { LocationType } from '@/types/database'
 
 type ViewState = { status: 'loading' } | { status: 'error' } | { status: 'loaded'; locations: Location[] }
 
@@ -31,6 +32,18 @@ const CITY_IMAGE_MAP: Record<string, string> = {
  * specifically so it reads correctly in both English and Arabic without
  * needing a separate translated heading per city.
  */
+// Maps each real `locations.type` to the matching already-translated
+// section heading (pages.locations.*Heading) — these existed in en.ts/
+// ar.ts all along, documented at the top of this file as "grouped by
+// type within each city", but were never actually wired up to anything
+// until now.
+const TYPE_HEADING_KEY: Record<LocationType, string> = {
+  airport: 'pages.locations.airportHeading',
+  city: 'pages.locations.cityHeading',
+  hotel: 'pages.locations.hotelHeading',
+  delivery: 'pages.locations.deliveryHeading',
+}
+
 export function LocationsPage() {
   const { t } = useTranslation()
   useDocumentTitle(t('pages.locations.title'))
@@ -59,12 +72,18 @@ export function LocationsPage() {
     const cityLocations = locations.filter((location) => location.city === city)
     const country = cityLocations[0]?.country ?? city
     const image = CITY_IMAGE_MAP[city] ?? 'https://images.unsplash.com/photo-1493246507139-91e8fad9978e?auto=format&fit=crop&w=1200&q=80'
+    // Real, live types actually present in this city today — never a
+    // fixed list — in the same fixed display order the search widget's
+    // pickers use.
+    const types = TYPE_ORDER.filter((type) => cityLocations.some((location) => location.type === type))
 
     return {
       id: city,
       city,
       country,
       image,
+      types,
+      pointCount: cityLocations.length,
     }
   })
 
@@ -78,7 +97,7 @@ export function LocationsPage() {
       {state.status === 'loading' && <p className="mt-8 text-sm text-text-muted">{t('pages.locations.loading')}</p>}
 
       {(state.status === 'error' || isEmpty) && (
-        <div className="mt-8 rounded-xl border border-brand-navy/10 bg-brand-lavender/30 px-5 py-6 text-center">
+        <div className="mt-8 rounded-none border border-brand-navy/10 bg-brand-lavender/30 px-5 py-6 text-center">
           <p className="text-sm font-semibold text-brand-navy">{t('pages.locations.emptyTitle')}</p>
           <p className="mt-1 text-sm text-text-muted">{t('pages.locations.emptyBody')}</p>
         </div>
@@ -86,11 +105,11 @@ export function LocationsPage() {
 
       {state.status === 'loaded' && !isEmpty && (
         <div className="mt-8 grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
-          {cityCards.map(({ id, city, country, image }) => (
+          {cityCards.map(({ id, city, country, image, types, pointCount }) => (
             <Link
               key={id}
               to="/search"
-              className="group overflow-hidden rounded-[20px] border border-border bg-white shadow-[0_8px_24px_rgba(32,28,59,0.06)] transition-transform duration-200 hover:-translate-y-1 hover:shadow-[0_16px_32px_rgba(32,28,59,0.12)]"
+              className="group overflow-hidden rounded-none border border-border bg-white shadow-[0_8px_24px_rgba(32,28,59,0.06)] transition-transform duration-200 hover:-translate-y-1 hover:shadow-[0_16px_32px_rgba(32,28,59,0.12)]"
             >
               <div
                 className="h-64 bg-cover bg-center bg-no-repeat"
@@ -105,10 +124,23 @@ export function LocationsPage() {
                   {city}
                 </h2>
 
-                <div className="mt-6 space-y-1 text-base text-text-muted">
-                  <p>Book until 31 Aug 26</p>
-                  <p>Economy Class Return</p>
+                {/* Real location types actually available in this city
+                    today (never a fixed list) — the same type icons
+                    LocationField's picker and LocationsPreviewSection
+                    use, paired with the translated headings this page's
+                    own file already carried but never rendered. */}
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {types.map((type) => (
+                    <span
+                      key={type}
+                      className="inline-flex items-center gap-1.5 border border-border bg-surface-warm px-2.5 py-1 text-xs font-medium text-brand-navy"
+                    >
+                      <span aria-hidden="true">{TYPE_ICON[type]}</span>
+                      {t(TYPE_HEADING_KEY[type])}
+                    </span>
+                  ))}
                 </div>
+                <p className="mt-4 text-sm text-text-muted">{t('pages.locations.pointCount', { count: pointCount })}</p>
               </div>
             </Link>
           ))}
@@ -120,7 +152,7 @@ export function LocationsPage() {
       <div className="mt-8 flex justify-center">
         <Link
           to="/search"
-          className="rounded-lg bg-brand-gold px-6 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-brand-gold-light"
+          className="rounded-none bg-brand-gold px-6 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-brand-gold-light"
         >
           {t('pages.locations.cta')}
         </Link>

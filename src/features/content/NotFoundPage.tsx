@@ -18,7 +18,7 @@ export function NotFoundPage() {
 
   return (
     <div className="mx-auto flex max-w-2xl flex-col items-center px-4 py-24 text-center sm:px-6">
-      <div className="flex h-16 w-16 items-center justify-center rounded-full bg-brand-lavender">
+      <div className="flex h-16 w-16 items-center justify-center rounded-none bg-brand-lavender">
         <CarFront className="h-8 w-8 text-brand-navy" aria-hidden="true" />
       </div>
       <p className="mt-6 text-sm font-semibold uppercase tracking-[0.28em] text-brand-gold-dark">404</p>

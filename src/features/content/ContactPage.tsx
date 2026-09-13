@@ -116,7 +116,7 @@ export function ContactPage() {
               href={WHATSAPP_URL}
               target="_blank"
               rel="noreferrer"
-              className="group flex gap-4 border border-[#ece7df] bg-white p-5 transition-all hover:-translate-y-0.5 hover:border-brand-gold hover:shadow-[0_16px_32px_rgba(16,20,29,0.06)]"
+              className="group flex gap-4 border border-[#ece7df] bg-white p-5 transition-all hover:-translate-y-0.5 hover:border-brand-gold hover:shadow-(--shadow-card-hover)"
             >
               <span className="flex h-11 w-11 shrink-0 items-center justify-center bg-brand-gold text-white">
                 <MessageCircle className="h-5 w-5" aria-hidden="true" />
@@ -133,7 +133,7 @@ export function ContactPage() {
             {/* Email — a real mailto: link. */}
             <a
               href={SUPPORT_EMAIL_HREF}
-              className="group flex gap-4 border border-[#ece7df] bg-white p-5 transition-all hover:-translate-y-0.5 hover:border-brand-gold hover:shadow-[0_16px_32px_rgba(16,20,29,0.06)]"
+              className="group flex gap-4 border border-[#ece7df] bg-white p-5 transition-all hover:-translate-y-0.5 hover:border-brand-gold hover:shadow-(--shadow-card-hover)"
             >
               <span className="flex h-11 w-11 shrink-0 items-center justify-center bg-brand-navy text-white">
                 <Mail className="h-5 w-5" aria-hidden="true" />

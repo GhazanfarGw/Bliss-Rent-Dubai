@@ -1433,6 +1433,7 @@ const en = {
   },
   pages: {
     draftBannerTitle: 'Draft — pending legal review',
+    legalTableOfContents: 'On this page',
     notFound: {
       title: 'Page not found',
       body: "The page you're looking for doesn't exist, or the link may be out of date. Let's get you back on track.",
@@ -1490,6 +1491,9 @@ const en = {
     carTypes: {
       title: 'Our Car Types',
       subtitle: 'From economical daily drivers to flagship luxury, browse the categories in the Bliss Rent fleet.',
+      fromDaily: 'From {{currency}} {{amount}}/day',
+      emptyTitle: 'Categories are being added',
+      emptyBody: 'Our fleet is managed live and updated regularly — check back soon, or search available cars to see current options.',
       categories: [
         {
           name: 'Economy',
@@ -1536,10 +1540,17 @@ const en = {
       emptyBody: 'Our pickup and drop-off points are managed live and updated regularly — check back soon, or search available cars to see current options.',
       note: 'Choose your exact pickup and drop-off points when you search for a car — availability is shown live.',
       cta: 'Search Cars',
+      pointCount_one: '{{count}} pickup point',
+      pointCount_other: '{{count}} pickup points',
     },
     faqs: {
       title: 'Frequently Asked Questions',
       subtitle: 'Quick answers about booking, eligibility, and renting with Bliss Rent.',
+      searchPlaceholder: 'Search questions…',
+      noResultsTitle: 'No matching questions',
+      noResultsBody: "Try a different search term, or contact us directly if you can't find what you're looking for.",
+      stillHaveQuestions: "Still have questions? We're happy to help.",
+      contactCta: 'Contact Us',
       categories: [
         {
           heading: 'Booking & payment',
