@@ -2,7 +2,6 @@ import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { ArrowRight } from 'lucide-react'
 import { Hero } from '@/features/booking/Hero'
-import { TickerBar } from '@/features/booking/TickerBar'
 import { BrandsMarquee } from '@/features/booking/BrandsMarquee'
 import { BookingSearchSection } from '@/features/booking/BookingSearchSection'
 import { WhyChooseSection } from '@/features/booking/WhyChooseSection'
@@ -38,7 +37,6 @@ export function HomePage() {
 
   return (
     <div className="bg-surface-warm text-brand-navy">
-      <TickerBar />
       <Hero />
       <BookingSearchSection onSearch={handleSearch} />
 

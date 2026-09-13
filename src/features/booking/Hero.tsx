@@ -126,8 +126,8 @@ export function Hero() {
           hero, so it isn't affected by this padding. Height increased
           (owner's request, referencing airline-style full hero sections)
           so the hero image reads as a real full-bleed visual, not a strip. */}
-      <div className="relative z-10 mx-auto flex md:min-h-[600px] max-w-7xl items-end px-4 pb-24 pt-[calc(var(--header-h)+var(--ticker-h))] sm:px-6 lg:min-h-[95vh] lg:pb-16 lg:px-8">
-        <div className="max-w-xl pb-20 md:pb-28 lg:pb-28">
+      <div className="relative z-10 mx-auto flex min-h-[600px] max-w-7xl items-end px-4 pb-20 pt-[calc(var(--header-h)+var(--ticker-h))] sm:px-6 lg:min-h-[99vh] lg:pb-20 lg:px-8">
+        <div className="max-w-xl pb-40 md:pb-28 lg:pb-28">
           <div className="mb-5 inline-flex items-center gap-2 border border-[#fff]/35 bg-[#120f0a]/55 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.33em] text-[#fff] backdrop-blur-md shadow-[0_12px_28px_rgba(17,13,8,0.32)]">
             {/* "Live" pulsing dot — a brand-champagne ping ring behind the
                 existing static brand-gold square (both already-approved
@@ -164,11 +164,11 @@ export function Hero() {
                 live feedback. One step down keeps it a bold display
                 heading without it, and every slide's title still wraps
                 to exactly the same two lines it did before. */}
-            <h1 className="md:max-w-[16ch] text-5xl font-semibold leading-[0.92] tracking-[-0.065em] text-white md:drop-shadow-[0_16px_28px_rgba(0,0,0,0.3)] sm:text-5xl lg:text-6xl">
+            <h1 className="text-5xl font-semibold leading-[0.92] tracking-[-0.065em] text-white md:drop-shadow-[0_16px_28px_rgba(0,0,0,0.3)] sm:text-5xl lg:text-6xl">
               <span className="block text-white">{slide.title}</span>
             </h1>
 
-            <p className="md:mt-6 mt-3 max-w-lg md:text-base md:leading-7 text-white/80 sm:text-lg">{slide.body}</p>
+            <p className="mt-6 max-w-lg text-base leading-7 text-white/80 sm:text-lg">{slide.body}</p>
           </div>
 
           {/* Mobile gets a deliberately different CTA arrangement, not just
@@ -222,7 +222,7 @@ export function Hero() {
             // chip (the same visual language as the badge above) so the
             // numbers hold their own against the photo on a small screen;
             // reset to the original plain inline pair at `sm` and up.
-            <div className="mt-6 flex flex-wrap items-center gap-x-3 gap-y-2 sm:gap-x-5 hidden lg:block md:block">
+            <div className="mt-6 flex flex-wrap items-center gap-x-3 gap-y-2 sm:gap-x-5">
               <div className="flex items-center gap-2 border border-white/15 bg-white/10 px-3 py-1.5 backdrop-blur-sm sm:border-0 sm:bg-transparent sm:px-0 sm:py-0 sm:backdrop-blur-none">
                 <Car className="h-4 w-4 text-white" aria-hidden="true" />
                 <span className="text-xs text-white/80">{t('pages.about.stats.vehicles', { count: stats.vehicleCount })}</span>
