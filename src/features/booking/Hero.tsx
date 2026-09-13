@@ -222,7 +222,7 @@ export function Hero() {
             // chip (the same visual language as the badge above) so the
             // numbers hold their own against the photo on a small screen;
             // reset to the original plain inline pair at `sm` and up.
-            <div className="mt-6 flex flex-wrap items-center gap-x-3 gap-y-2 sm:gap-x-5 hidden lg:block md:block">
+            <div className="mt-6 flex flex-wrap items-center gap-x-3 gap-y-2 sm:gap-x-5">
               <div className="flex items-center gap-2 border border-white/15 bg-white/10 px-3 py-1.5 backdrop-blur-sm sm:border-0 sm:bg-transparent sm:px-0 sm:py-0 sm:backdrop-blur-none">
                 <Car className="h-4 w-4 text-white" aria-hidden="true" />
                 <span className="text-xs text-white/80">{t('pages.about.stats.vehicles', { count: stats.vehicleCount })}</span>
