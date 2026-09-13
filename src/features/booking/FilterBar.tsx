@@ -90,10 +90,10 @@ export function FilterBar({
         </label>
       </aside>
 
-      <div className="sticky top-16 z-20 -mx-4 border-y border-brand-gold/20 bg-[#11161d]/95 px-4 py-3 text-white backdrop-blur lg:hidden">
+      <div className="sticky top-16 z-20 -mx-4 border-y border-brand-gold/20 bg-white px-4 py-3 text-black lg:hidden">
         <div className="flex items-center justify-between gap-3">
-          <span className="text-sm font-semibold text-white">{t('searchResults.resultsCount', { count: resultCount })}</span>
-          <button type="button" onClick={() => { setDraftFilters(filters); setMobileOpen(true) }} aria-expanded={mobileOpen} className="inline-flex min-h-11 items-center gap-2 rounded-none bg-brand-gold px-4 text-sm font-semibold text-white shadow-[0_10px_20px_rgba(92,9,49,0.25)] focus:outline-none focus:ring-2 focus:ring-brand-gold focus:ring-offset-2 focus:ring-offset-[#11161d]">
+          <span className="text-sm font-semibold text-black">{t('searchResults.resultsCount', { count: resultCount })}</span>
+          <button type="button" onClick={() => { setDraftFilters(filters); setMobileOpen(true) }} aria-expanded={mobileOpen} className="inline-flex min-h-11 items-center gap-2 rounded-none bg-brand-gold px-4 text-sm font-semibold text-white shadow-[0_10px_20px_rgba(92,9,49,0.25)] focus:outline-none focus:ring-2 focus:ring-brand-gold">
             <SlidersHorizontal className="h-4 w-4 shrink-0" aria-hidden="true" />
             {t('searchResults.filters.button')}
             {hasActiveFilters && (

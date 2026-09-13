@@ -341,16 +341,7 @@ export function NavBar() {
             >
               {t('nav.searchCars')}
             </LinkButton>
-
-            <Link
-              to="/admin/login"
-              onClick={() => setOpen(false)}
-              className="flex w-full items-center justify-center gap-2 rounded-none border border-brand-navy/10 bg-white/70 px-4 py-2.5 text-sm font-semibold text-brand-navy transition-colors hover:bg-brand-lavender"
-            >
-              <LogIn className="h-4 w-4 shrink-0" aria-hidden="true" />
-              {t('nav.adminSignIn')}
-            </Link>
-
+            
             <div className="border-t border-brand-navy/10 pt-3">
               <p className="mb-2 text-center text-xs font-semibold uppercase tracking-[0.18em] text-brand-gold">{t('nav.connect')}</p>
               <div className="flex items-center justify-center gap-3">
