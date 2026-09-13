@@ -1,5 +1,7 @@
+import { Globe } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { storeLanguage, type SupportedLanguage } from '@/i18n'
+import { UaeFlag } from '@/features/shared/UaeFlag'
 
 interface LanguageSwitcherProps {
   className?: string
@@ -9,9 +11,21 @@ interface LanguageSwitcherProps {
   tone?: 'dark' | 'light'
 }
 
-/** Toggles between English and Arabic. The button label shows the OTHER language's name (i.e. what you'll switch to), matching the convention on most bilingual GCC sites. */
+/**
+ * Toggles between English and Arabic. The button label shows the OTHER
+ * language's name (i.e. what you'll switch to), matching the convention
+ * on most bilingual GCC sites.
+ *
+ * Offering Arabic shows the real UAE flag next to it — Arabic is this
+ * business's actual home-market language, so that's an honest pairing.
+ * Offering English shows a plain globe icon instead of a national flag:
+ * English isn't any one country's language, and picking a flag (UK? US?)
+ * to represent it would be an arbitrary, not-quite-honest choice the
+ * same way an invented logo would be.
+ */
 export function LanguageSwitcher({ className = '', tone = 'dark' }: LanguageSwitcherProps) {
   const { t, i18n } = useTranslation()
+  const offeringArabic = i18n.language !== 'ar'
 
   function toggle() {
     const next: SupportedLanguage = i18n.language === 'ar' ? 'en' : 'ar'
@@ -28,9 +42,10 @@ export function LanguageSwitcher({ className = '', tone = 'dark' }: LanguageSwit
     <button
       type="button"
       onClick={toggle}
-      className={'rounded-none border px-3 py-1.5 text-sm font-semibold transition-colors ' + toneClass + (className ? ' ' + className : '')}
+      className={'flex items-center gap-1.5 rounded-none border px-3 py-1.5 text-sm font-semibold transition-colors ' + toneClass + (className ? ' ' + className : '')}
       aria-label={t('nav.switchLanguage')}
     >
+      {offeringArabic ? <UaeFlag className="h-3.5 w-auto shrink-0" /> : <Globe className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />}
       {t('nav.language')}
     </button>
   )

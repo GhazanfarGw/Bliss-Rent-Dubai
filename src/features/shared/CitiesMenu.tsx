@@ -4,31 +4,12 @@ import { useTranslation } from 'react-i18next'
 import { ChevronDown } from 'lucide-react'
 import { fetchLocations } from '@/features/booking/api'
 import { sortByOrder } from '@/features/booking/locationDisplay'
+import { UaeFlag } from '@/features/shared/UaeFlag'
 import type { Location } from '@/types/domain'
 
 interface CityEntry {
   city: string
   pointCount: number
-}
-
-// Every location in this app is in the UAE (see docs/ARCHITECTURE.md —
-// UAE-only by design), so the real national flag is an honest "logo" for
-// every city entry here — never an invented per-emirate crest/logo this
-// app has no license to show. Drawn as a plain inline SVG (public-domain
-// national flag, correct proportions/colors) rather than the 🇦🇪 emoji
-// character — some browser/OS/font combinations (confirmed on one
-// Windows Chrome setup while building this) render flag-sequence emoji
-// as bare two-letter text ("AE") instead of an actual flag glyph; an SVG
-// renders identically everywhere.
-function UaeFlag({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 20 14" className={className} aria-hidden="true">
-      <rect width="20" height="14" fill="#00732f" />
-      <rect y="4.667" width="20" height="4.667" fill="#fff" />
-      <rect y="9.333" width="20" height="4.667" fill="#000" />
-      <rect width="5" height="14" fill="#ff0000" />
-    </svg>
-  )
 }
 
 function summarizeCities(locations: Location[]): CityEntry[] {
