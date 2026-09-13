@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Clock, Mail, MapPin, MessageCircle } from 'lucide-react'
+import { Clock, Mail, MapPin, MessageCircle, Phone } from 'lucide-react'
 import { supabase } from '@/lib/supabaseClient'
 import { Button } from '@/features/shared/ui/Button'
 import { LinkButton } from '@/features/shared/ui/LinkButton'
@@ -10,6 +10,7 @@ import {
   OFFICE_ADDRESS,
   OFFICE_MAPS_EMBED_URL,
   OFFICE_MAPS_URL,
+  PHONE_URL,
   SUPPORT_EMAIL,
   SUPPORT_EMAIL_HREF,
   WHATSAPP_PHONE_DISPLAY,
@@ -18,6 +19,7 @@ import {
 import heroSuv from '@/assets/hero/hero-suv.webp'
 
 type FormState = { status: 'idle' | 'sending' | 'sent' }
+type FaqItem = { question: string; answer: string }
 
 /**
  * Contact Us — full premium redesign: real hero photography banner
@@ -27,13 +29,22 @@ type FormState = { status: 'idle' | 'sending' | 'sent' }
  * consistently here.
  *
  * Real-data changes alongside the visual redesign:
- *  - WhatsApp and email are real clickable links (wa.me / mailto:),
- *    reusing the single-source-of-truth constants from contactLinks.ts.
+ *  - WhatsApp, phone, and email are real clickable links (wa.me / tel: /
+ *    mailto:), reusing the single-source-of-truth constants from
+ *    contactLinks.ts. Phone reuses the WhatsApp number — there's no
+ *    separate landline — via the tel: link built in contactLinks.ts.
  *  - The office address placeholder is the real address, with both a
  *    "Get directions" link AND a live embedded map centered on it — no
  *    API key, no new backend call, just a plain maps.google.com iframe.
- *  - Support hours stays the existing bracketed placeholder — no real
- *    value was given for it, so nothing is invented.
+ *  - Support hours is now a real value (24/7) — the earlier bracketed
+ *    placeholder is gone now that a real value exists.
+ *
+ * FAQ shortcut section: a small, curated set of the questions people most
+ * often write in about (cancellations, documents, pickup/drop-off,
+ * mileage), shown right on this page so a visitor can self-serve before
+ * using the form — with a link through to the full FAQ page. Content
+ * lives in pages.contact.faqShortcut in the locale files, matching the
+ * canonical answers on the FAQ page rather than inventing new copy.
  *
  * Form submission logic (submit-complaint Edge Function, validation) is
  * unchanged from the Phase 9H implementation.
@@ -48,6 +59,8 @@ export function ContactPage() {
   const [message, setMessage] = useState('')
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [state, setState] = useState<FormState>({ status: 'idle' })
+  const [openFaq, setOpenFaq] = useState<number | null>(null)
+  const faqItems = t('pages.contact.faqShortcut.items', { returnObjects: true }) as FaqItem[]
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
@@ -119,6 +132,23 @@ export function ContactPage() {
               </div>
             </a>
 
+            {/* Call us — a real tel: link, same number as WhatsApp. */}
+            <a
+              href={PHONE_URL}
+              className="group flex gap-4 border border-[#ece7df] bg-white p-5 transition-all hover:-translate-y-0.5 hover:border-brand-gold hover:shadow-(--shadow-card-hover)"
+            >
+              <span className="flex h-11 w-11 shrink-0 items-center justify-center bg-brand-navy text-white">
+                <Phone className="h-5 w-5" aria-hidden="true" />
+              </span>
+              <div className="min-w-0">
+                <p className="text-xs font-semibold uppercase tracking-wide text-text-muted">{t('pages.contact.methods.phone.label')}</p>
+                <p className="mt-1 break-words font-mono text-sm font-semibold text-brand-navy group-hover:text-brand-gold-dark">
+                  {WHATSAPP_PHONE_DISPLAY}
+                </p>
+                <p className="mt-1 text-xs text-text-muted">{t('pages.contact.methods.phone.note')}</p>
+              </div>
+            </a>
+
             {/* Email — a real mailto: link. */}
             <a
               href={SUPPORT_EMAIL_HREF}
@@ -136,7 +166,7 @@ export function ContactPage() {
               </div>
             </a>
 
-            {/* Support hours — unchanged bracketed placeholder; no real value was given. */}
+            {/* Support hours — real value (24/7), no longer a placeholder. */}
             <div className="flex gap-4 border border-[#ece7df] bg-white p-5">
               <span className="flex h-11 w-11 shrink-0 items-center justify-center bg-brand-navy text-white">
                 <Clock className="h-5 w-5" aria-hidden="true" />
@@ -217,6 +247,55 @@ export function ContactPage() {
           </form>
         </div>
       </div>
+
+      {/* FAQ shortcut — a curated set of the questions people write in
+          about most, so a visitor can self-serve before using the form
+          above, with a link through to the full FAQ page. */}
+      <section className="border-t border-[#ece7df] bg-white">
+        <div className="mx-auto max-w-5xl px-4 py-16 sm:px-6 lg:py-20">
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.32em] text-brand-gold-dark">
+                {t('pages.contact.faqShortcut.eyebrow')}
+              </p>
+              <h2 className="mt-2 text-2xl font-black tracking-[-0.04em] text-brand-navy sm:text-3xl">
+                {t('pages.contact.faqShortcut.heading')}
+              </h2>
+              <p className="mt-2 max-w-xl text-sm leading-6 text-text-muted">{t('pages.contact.faqShortcut.subtitle')}</p>
+            </div>
+            <Link to="/faqs" className="text-sm font-semibold text-brand-navy underline-offset-4 hover:underline">
+              {t('pages.contact.faqShortcut.viewAll')}
+            </Link>
+          </div>
+
+          <div className="mt-8 divide-y divide-brand-navy/10 border border-[#ece7df]">
+            {faqItems.map((item, index) => {
+              const expanded = openFaq === index
+              return (
+                <div key={item.question}>
+                  <button
+                    type="button"
+                    aria-expanded={expanded}
+                    onClick={() => setOpenFaq(expanded ? null : index)}
+                    className="group flex min-h-14 w-full items-center justify-between gap-4 px-5 py-4 text-start transition-colors duration-200 hover:bg-brand-lavender/40 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-brand-gold"
+                  >
+                    <span className="text-sm font-medium text-brand-navy transition-colors group-hover:text-brand-gold-dark">
+                      {item.question}
+                    </span>
+                    <span
+                      className={'text-xl text-brand-gold transition-transform duration-300' + (expanded ? ' rotate-45' : '')}
+                      aria-hidden="true"
+                    >
+                      +
+                    </span>
+                  </button>
+                  {expanded && <p className="animate-faq-answer-in px-5 pb-5 text-sm leading-relaxed text-text-muted">{item.answer}</p>}
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      </section>
 
       {/* Visit our office — real address + a live embedded map, not just a link. */}
       <section className="bg-surface-warm-alt">

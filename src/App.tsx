@@ -42,6 +42,7 @@ import { PaymentsListPage } from '@/features/admin/payments/PaymentsListPage'
 import { ExtensionsListPage } from '@/features/admin/extensions/ExtensionsListPage'
 import { ComplaintsListPage } from '@/features/admin/complaints/ComplaintsListPage'
 import { ComplaintDetailPage } from '@/features/admin/complaints/ComplaintDetailPage'
+import { FeedbackListPage } from '@/features/admin/feedback/FeedbackListPage'
 import { PricingManagementPage } from '@/features/admin/pricing/PricingManagementPage'
 import { EmailManagementPage } from '@/features/admin/emails/EmailManagementPage'
 import { AuditLogPage } from '@/features/admin/auditlog/AuditLogPage'
@@ -121,6 +122,15 @@ import { AdminSettingsPage } from '@/features/admin/settings/AdminSettingsPage'
  * footer chrome. The admin section gets its own `path="*"` → redirect to
  * `/admin` (the dashboard), matching how an internal tool should recover
  * from a stale/mistyped admin URL.
+ *
+ * Site-wide Feedback widget (requested directly in chat, "add a Qatar-
+ * Airways-style feedback tab to every page"): FeedbackWidget.tsx is
+ * mounted once inside Layout, so it's not a route of its own — every
+ * public page gets the same sticky star-rating + message tab for free.
+ * /admin/feedback (FeedbackListPage) is the one new route this adds: a
+ * read-only view of what's submitted, same "admins manage/read X" RLS
+ * pattern as every other admin list page. See
+ * supabase/migrations/20261006000000_site_feedback.sql.
  */
 function App() {
   return (
@@ -181,6 +191,7 @@ function App() {
               <Route path="extensions" element={<ExtensionsListPage />} />
               <Route path="complaints" element={<ComplaintsListPage />} />
               <Route path="complaints/:id" element={<ComplaintDetailPage />} />
+              <Route path="feedback" element={<FeedbackListPage />} />
               <Route path="pricing" element={<PricingManagementPage />} />
               <Route path="emails" element={<EmailManagementPage />} />
               <Route

@@ -3,6 +3,7 @@ import { Outlet, useLocation } from 'react-router-dom'
 import { NavBar } from '@/features/shared/NavBar'
 import { Footer } from '@/features/shared/Footer'
 import { CookieConsentBanner } from '@/features/shared/CookieConsentBanner'
+import { FeedbackWidget } from '@/features/shared/FeedbackWidget'
 import { prefersReducedMotion } from '@/lib/motion'
 
 export function Layout() {
@@ -34,6 +35,7 @@ export function Layout() {
       </main>
       <Footer />
       <CookieConsentBanner />
+      <FeedbackWidget />
     </div>
   )
 }

@@ -38,7 +38,7 @@ import { Button } from '@/features/shared/ui'
  * pattern already used in ManageBookingPage.tsx, just applied on load
  * instead of only after a manual lookup.
  */
-export function PendingBookingIndicator() {
+export function PendingBookingIndicator({ tone = 'dark' }: { tone?: 'light' | 'dark' }) {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const location = useLocation()
@@ -113,6 +113,11 @@ export function PendingBookingIndicator() {
 
   if (!pending) return null
 
+  // Same transparent, tone-matched icon treatment as SiteSearch's trigger
+  // — white over the hero before scroll, the brand's active/accent gold
+  // once the header goes solid.
+  const triggerToneClass = tone === 'light' ? 'text-white hover:bg-white/10' : 'text-brand-gold hover:bg-brand-gold/10'
+
   function handleContinue() {
     if (!pending) return
     const qs = criteriaToSearchParams({
@@ -133,7 +138,7 @@ export function PendingBookingIndicator() {
         aria-haspopup="dialog"
         aria-expanded={open}
         aria-label={t('nav.pendingBooking.label')}
-        className="relative inline-flex h-10 w-10 items-center justify-center rounded-none border border-[#e6e1d9] bg-surface-warm text-brand-navy shadow-sm transition-colors hover:bg-surface-warm-alt"
+        className={'relative inline-flex h-10 w-10 items-center justify-center rounded-none bg-transparent transition-colors ' + triggerToneClass}
       >
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-5 w-5" aria-hidden="true">
           <path strokeLinecap="round" strokeLinejoin="round" d="M3 11l1.5-5A2 2 0 0 1 6.4 4.5h11.2a2 2 0 0 1 1.9 1.5L21 11" />

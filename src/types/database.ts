@@ -8,8 +8,8 @@
  *
  * Until then, this is kept in sync BY HAND with the migrations in
  * supabase/migrations/ — if you add a table or column there, add it
- * here too (most recently: email_log, in
- * 20260911000000_phase9_email_log_table.sql).
+ * here too (most recently: site_feedback, in
+ * 20261006000000_site_feedback.sql).
  */
 
 export type AdminRole = 'super_admin' | 'staff'
@@ -390,6 +390,26 @@ export interface Database {
           created_at?: string
         }
         Update: Partial<Database['public']['Tables']['audit_logs']['Insert']>
+        Relationships: []
+      }
+      site_feedback: {
+        Row: {
+          id: string
+          rating: number
+          message: string | null
+          page_path: string | null
+          locale: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          rating: number
+          message?: string | null
+          page_path?: string | null
+          locale?: string | null
+          created_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['site_feedback']['Insert']>
         Relationships: []
       }
       extension_pricing_settings: {

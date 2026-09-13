@@ -114,7 +114,19 @@ html,
 body {
   max-width: 100%;
   width: 100%;
-  overflow-x: hidden !important;
+  /* `clip`, not `hidden`: per the CSS overflow spec, pairing a non-visible
+     overflow-x with a default (visible) overflow-y silently forces that
+     overflow-y to `auto` too — turning html/body into their own scroll
+     container. Every `position: sticky` element in the app (this filter
+     sidebar, its mobile bar, StickySearchBar, TickerBar) computes its
+     stuck offset against the nearest such container, and once body/html
+     wrongly qualify as one, the browser scrolls the viewport while
+     sticky math is still keyed to body's own (never-moving) scroll
+     position — so nothing ever visually sticks; it just scrolls away
+     with the page. `clip` blocks horizontal overflow the same as
+     `hidden` without that side effect, so overflow-y stays `visible`
+     and sticky is computed against the real viewport again. */
+  overflow-x: clip !important;
   overscroll-behavior-x: none;
   touch-action: pan-y;
 }

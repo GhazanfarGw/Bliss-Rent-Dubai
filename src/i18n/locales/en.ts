@@ -51,6 +51,16 @@ const en = {
       panelLabel: 'Pending booking',
       title: 'You have an unpaid booking',
     },
+    search: {
+      ariaLabel: 'Search',
+      placeholder: 'Search pages or cars…',
+      resultsLabel: 'Search results',
+      pagesHeading: 'Pages',
+      carsHeading: 'Cars',
+      searchingCars: 'Searching cars…',
+      noResultsTitle: 'No matching results',
+      noResultsBody: 'Try a different search term, like “about”, “manage booking”, or a car brand.',
+    },
   },
   footer: {
     tagline: 'Dubai and UAE car rental with premium and value options, arranged for smooth arrivals and easy city driving.',
@@ -721,6 +731,7 @@ const en = {
       payments: 'Payments',
       extensions: 'Extensions',
       complaints: 'Complaints',
+      feedback: 'Feedback',
       pricing: 'Pricing',
       emails: 'Emails',
       auditLog: 'Audit Log',
@@ -1197,6 +1208,22 @@ const en = {
         emptyError: 'Please enter a reply before sending.',
       },
     },
+    feedback: {
+      subtitle: 'Star ratings and messages submitted anonymously through the site-wide Feedback tab.',
+      stats: {
+        total: 'Total responses',
+        average: 'Average rating',
+      },
+      columns: {
+        rating: 'Rating',
+        message: 'Message',
+        page: 'Page',
+        date: 'Date',
+      },
+      ratingValue: '{{count}} out of 5 stars',
+      emptyTitle: 'No feedback yet',
+      emptyBody: 'Once a visitor rates the site through the Feedback tab, it will show up here.',
+    },
     pricing: {
       subtitle: 'Manage the daily, weekly, monthly, and 3-month rate ladder for each vehicle.',
       selectVehicle: 'Vehicle',
@@ -1425,6 +1452,21 @@ const en = {
     learnMore: 'Cookie Policy',
     decline: 'Decline',
     accept: 'Accept',
+  },
+  feedback: {
+    buttonLabel: 'Feedback',
+    title: 'Share your feedback',
+    subtitle: "Tell us how we're doing — it takes less than a minute, and you don't need to sign in.",
+    ratingLabel: 'Rating',
+    starLabel: 'Rate {{count}} out of 5 stars',
+    messageLabel: 'Message (optional)',
+    messagePlaceholder: 'What can we improve?',
+    errorRating: 'Please choose a star rating.',
+    errorSubmit: 'We could not send your feedback. Please try again.',
+    sending: 'Sending…',
+    submit: 'Send feedback',
+    thankYouTitle: 'Thank you!',
+    thankYouBody: 'Your feedback helps us improve — we appreciate you taking the time.',
   },
   errorBoundary: {
     title: 'Something went wrong',
@@ -1666,6 +1708,11 @@ const en = {
           value: '+971 54 782 0057',
           note: 'Fastest way to reach us for anything about an existing booking or rental.',
         },
+        phone: {
+          label: 'Call us',
+          value: '+971 54 782 0057',
+          note: "Same number as WhatsApp — call if you'd rather speak to someone directly.",
+        },
         email: {
           label: 'Email',
           value: 'support@bliss.rent',
@@ -1678,14 +1725,39 @@ const en = {
         },
         hours: {
           label: 'Support hours',
-          value: '[e.g. 24/7, or specific hours]',
-          note: '',
+          value: '24/7',
+          note: 'Every day of the week, including public holidays.',
         },
       },
       getDirections: 'Get directions',
       visitOffice: {
         heading: 'Visit our office',
         subtitle: "You're welcome to visit — remember, this is our office, not a vehicle pickup point.",
+      },
+      faqShortcut: {
+        eyebrow: 'Before you write in',
+        heading: 'You might already have your answer',
+        subtitle: "A few of the questions people ask us most, right here — or browse the full list.",
+        viewAll: 'View all FAQs',
+        items: [
+          {
+            question: 'Can I cancel or change my booking?',
+            answer: 'Our cancellation and refund rules are set out in the Booking Terms & Conditions — please check there before booking.',
+          },
+          {
+            question: 'What documents does the driver need?',
+            answer:
+              "A valid driving license, valid through the end of the rental. Visitors should also carry an International Driving Permit (IDP) if their license requires one to drive in the UAE. Bring the physical license and ID to pickup.",
+          },
+          {
+            question: 'Where can I pick up and drop off my car?',
+            answer: 'Pickup is at the airport in the city you choose, and you can drop off anywhere across that city. See our Locations page for current pickup and drop-off points.',
+          },
+          {
+            question: 'Is there a mileage limit or fuel policy?',
+            answer: 'Yes — mileage allowance and fuel policy are set out in the Booking Terms & Conditions.',
+          },
+        ],
       },
       cta: {
         heading: 'Ready to book your Dubai rental?',

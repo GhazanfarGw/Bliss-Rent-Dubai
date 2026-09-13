@@ -5,6 +5,7 @@ import { CalendarSearch, CarFront, ChevronRight, ClipboardCheck, Home, Info, Log
 import { LanguageSwitcher } from '@/features/shared/LanguageSwitcher'
 import { LinkButton } from '@/features/shared/ui/LinkButton'
 import { PendingBookingIndicator } from '@/features/shared/PendingBookingIndicator'
+import { SiteSearch } from '@/features/shared/SiteSearch'
 import { WHATSAPP_URL } from '@/features/booking/contactLinks'
 import { prefersReducedMotion } from '@/lib/motion'
 import logoFull from '@/assets/brand/logo-full.png'
@@ -213,7 +214,8 @@ export function NavBar() {
         </nav>
 
         <div className="hidden items-center gap-4 lg:flex">
-          <PendingBookingIndicator />
+          <PendingBookingIndicator tone={transparent ? 'light' : 'dark'} />
+          <SiteSearch tone={transparent ? 'light' : 'dark'} />
           <LanguageSwitcher tone={transparent ? 'light' : 'dark'} />
           {/* Cities selector sits right next to the primary CTA — the
               same "compact city-switcher beside the main action" pattern
@@ -229,11 +231,12 @@ export function NavBar() {
         </div>
 
         <div className="flex items-center gap-2 lg:hidden">
-          <PendingBookingIndicator />
+          <PendingBookingIndicator tone={transparent ? 'light' : 'dark'} />
+          <SiteSearch tone={transparent ? 'light' : 'dark'} />
           <LanguageSwitcher tone={transparent ? 'light' : 'dark'} />
           <button
             type="button"
-            className="inline-flex h-11 w-11 items-center justify-center rounded-none border border-[#e6e1d9] bg-surface-warm text-brand-navy shadow-sm transition-colors hover:bg-surface-warm-alt"
+            className={'inline-flex h-11 w-11 items-center justify-center rounded-none bg-transparent transition-colors ' + (transparent ? 'text-white hover:bg-white/10' : 'text-brand-gold hover:bg-brand-gold/10')}
             aria-label={t('nav.toggleMenu')}
             aria-expanded={open}
             onClick={() => setOpen((v) => !v)}

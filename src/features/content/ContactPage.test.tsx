@@ -93,4 +93,32 @@ describe('ContactPage', () => {
 
     expect(await screen.findByText(/we could not send your message/i)).toBeInTheDocument()
   })
+
+  it('shows a real tel: link for calling, using the same number as WhatsApp', () => {
+    renderContactPage()
+    const callLink = screen.getByRole('link', { name: /call us/i })
+    expect(callLink).toHaveAttribute('href', 'tel:+971547820057')
+  })
+
+  it('shows the real 24/7 support hours instead of the old bracketed placeholder', () => {
+    renderContactPage()
+    expect(screen.getByText('24/7')).toBeInTheDocument()
+    expect(screen.queryByText(/\[e\.g\. 24\/7/i)).not.toBeInTheDocument()
+  })
+
+  it('renders the FAQ shortcut questions collapsed, expanding an answer on click', async () => {
+    const user = userEvent.setup()
+    renderContactPage()
+    const question = screen.getByRole('button', { name: /can i cancel or change my booking/i })
+    expect(screen.queryByText(/booking terms & conditions/i)).not.toBeInTheDocument()
+
+    await user.click(question)
+    expect(screen.getByText(/booking terms & conditions/i)).toBeInTheDocument()
+    expect(question).toHaveAttribute('aria-expanded', 'true')
+  })
+
+  it('links the FAQ shortcut through to the full FAQ page', () => {
+    renderContactPage()
+    expect(screen.getByRole('link', { name: /view all faqs/i })).toHaveAttribute('href', '/faqs')
+  })
 })

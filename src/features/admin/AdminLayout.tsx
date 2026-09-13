@@ -19,6 +19,7 @@ const NAV_ITEMS = [
   { to: '/admin/payments', key: 'payments', end: false },
   { to: '/admin/extensions', key: 'extensions', end: false },
   { to: '/admin/complaints', key: 'complaints', end: false },
+  { to: '/admin/feedback', key: 'feedback', end: false },
   { to: '/admin/pricing', key: 'pricing', end: false },
   { to: '/admin/emails', key: 'emails', end: false },
   { to: '/admin/audit-log', key: 'auditLog', end: false, superAdminOnly: true },

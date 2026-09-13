@@ -34,8 +34,8 @@ interface VehicleCardProps {
   quantity?: number
 }
 
-/** Translated (not hardcoded) per-term unit labels — see vehicleCard.* in en.ts/ar.ts. */
-const TERM_I18N_KEY: Record<PricingTerm, string> = {
+/** Translated (not hardcoded) per-term unit labels — see vehicleCard.* in en.ts/ar.ts. Exported so other compact vehicle previews (e.g. SiteSearch's car results) can label a rate the same way instead of re-deriving it. */
+export const TERM_I18N_KEY: Record<PricingTerm, string> = {
   daily: 'vehicleCard.perDay',
   weekly: 'vehicleCard.perWeek',
   monthly: 'vehicleCard.perMonth',

@@ -20,6 +20,16 @@ export const WHATSAPP_PHONE_DISPLAY = '+971 54 782 0057'
 export const WHATSAPP_URL = `https://wa.me/${WHATSAPP_PHONE_INTL}`
 
 /**
+ * Direct-call link for the same mobile number used for WhatsApp — there is
+ * no separate landline, so this is the one real number to call. `tel:`
+ * needs the leading `+` (unlike the wa.me path above, which wants bare
+ * digits), so it's built from WHATSAPP_PHONE_INTL rather than duplicating
+ * the digits. If a dedicated support line is ever added, split this out
+ * into its own constant instead of reusing the WhatsApp number.
+ */
+export const PHONE_URL = `tel:+${WHATSAPP_PHONE_INTL}`
+
+/**
  * A WhatsApp link pre-filled with a short, specific message about one
  * vehicle/category card — same number, same wa.me scheme, just with a
  * `?text=` query param (still a plain direct-chat URL, no API call).
