@@ -1445,6 +1445,7 @@ const en = {
       subtitle:
         "The UAE's straightforward, book-online car rental service — built for travelers who want a car waiting for them, not a phone call to make.",
       story: {
+        eyebrow: 'How it started',
         heading: 'Our story',
         paragraphs: [
           "Bliss Rent was created to solve one specific problem: renting a car in the UAE shouldn't mean phone tag, back-and-forth messages, or turning up at a counter with no idea what you'll actually drive away in.",
@@ -1452,6 +1453,7 @@ const en = {
           "We're expanding city by city rather than spreading thin all at once — concentrating on doing airport pickup and city-wide drop-off properly in each city we add, starting with Dubai and Abu Dhabi.",
         ],
       },
+      visionMissionEyebrow: 'Looking ahead',
       vision: {
         heading: 'Our vision',
         body: 'To be the easiest way to arrange a self-drive car rental across the UAE — a service where booking a car online is as simple, transparent, and fast as booking a hotel room.',
@@ -1461,6 +1463,7 @@ const en = {
         body: 'To give every customer clear pricing, a straightforward booking flow, and a well-maintained fleet — with honest communication at every step, from the moment they search to the moment they return the car.',
       },
       values: {
+        eyebrow: 'Our principles',
         heading: 'What we stand for',
         items: [
           { title: 'Transparency', body: 'The price you see is the price you pay — no hidden fees added at the counter.' },
@@ -1470,9 +1473,11 @@ const en = {
         ],
       },
       cta: {
+        eyebrow: "Let's get you moving",
         heading: 'Ready to book your Dubai rental?',
       },
       stats: {
+        eyebrow: 'By the numbers',
         heading: 'Bliss Rent today',
         subtitle: 'Live from our own booking system — not a marketing figure.',
         // Single template per label rather than i18next's _one/_other split:
