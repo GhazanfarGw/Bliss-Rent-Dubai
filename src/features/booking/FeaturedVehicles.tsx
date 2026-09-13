@@ -68,9 +68,9 @@ function FeaturedVehicleSlider({ categoryName, label, viewAllLabel, emptyTitle, 
         <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.28em] text-brand-gold-dark">
           <span className="relative flex h-1.5 w-1.5">
             {!prefersReducedMotion() && (
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-champagne opacity-75" />
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-none bg-brand-champagne opacity-75" />
             )}
-            <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-brand-gold" />
+            <span className="relative inline-flex h-1.5 w-1.5 rounded-none bg-brand-gold" />
           </span>
           {label}
         </p>
@@ -89,7 +89,7 @@ function FeaturedVehicleSlider({ categoryName, label, viewAllLabel, emptyTitle, 
         {loading && (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3" aria-hidden="true">
             {[0, 1, 2, 3].map((i) => (
-              <div key={i} className="h-72 animate-pulse rounded-[1.5rem] bg-[#efe7dc]" />
+              <div key={i} className="h-72 animate-pulse rounded-none bg-[#efe7dc]" />
             ))}
           </div>
         )}
@@ -113,7 +113,7 @@ function FeaturedVehicleSlider({ categoryName, label, viewAllLabel, emptyTitle, 
                     key={`${group.vehicle.id}-${index}`}
                     aria-hidden={isDuplicate || undefined}
                     inert={isDuplicate}
-                    className="w-[82vw] max-w-[320px] shrink-0 rounded-[1.5rem] border border-[#e6dcc7] bg-white p-1 shadow-[0_18px_40px_rgba(16,20,29,0.04)] transition-all duration-300 hover:-translate-y-1 hover:border-brand-gold/50 hover:shadow-[0_26px_54px_rgba(16,20,29,0.12)] sm:w-[280px]"
+                    className="w-[82vw] max-w-[320px] shrink-0 rounded-none border border-[#e6dcc7] bg-white p-1 shadow-(--shadow-card) transition-all duration-300 hover:-translate-y-1 hover:border-brand-gold/50 hover:shadow-(--shadow-card-hover) sm:w-[280px]"
                   >
                     <VehicleCard vehicle={group.vehicle} detailHref={`/vehicles/${group.vehicle.id}`} featured quantity={group.quantity} />
                   </div>

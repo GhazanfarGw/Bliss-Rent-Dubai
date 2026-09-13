@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+import { Car, CalendarSearch, CreditCard, IdCard } from 'lucide-react'
 
 interface Step {
   title: string
@@ -9,7 +10,15 @@ interface Step {
  * The real customer journey — choose dates/location, select a vehicle,
  * enter customer/driver details, complete booking/payment — all online.
  * Doubles as the header's "Services" anchor target.
+ *
+ * Each step keeps its sequence number (this is an ordered process, unlike
+ * WhyChooseSection's unordered feature list right above it) but also gets
+ * a distinct icon matched to what that step actually is, so the two
+ * sections don't read as the same plain numbered-badge pattern repeated
+ * twice on one page.
  */
+const STEP_ICONS = [CalendarSearch, Car, IdCard, CreditCard]
+
 export function HowItWorksSection() {
   const { t } = useTranslation()
   const steps = t('home.howItWorks.steps', { returnObjects: true }) as Step[]
@@ -23,18 +32,24 @@ export function HowItWorksSection() {
         </div>
 
         <ol className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {steps.map((step, i) => (
-            <li
-              key={step.title}
-              className="group relative rounded-[1.5rem] border border-[#e8dcc6] bg-white p-5 shadow-[0_18px_36px_rgba(16,20,29,0.04)] transition-all duration-300 hover:-translate-y-1 hover:border-brand-gold/40 hover:shadow-[0_26px_54px_rgba(16,20,29,0.1)]"
-            >
-              <span className="flex h-11 w-11 items-center justify-center bg-brand-gold text-sm font-bold text-[#fff] shadow-[0_12px_24px_rgba(92,9,49,0.18)] transition-all duration-300 group-hover:scale-105 group-hover:shadow-[0_0_0_6px_rgba(212,175,55,0.2)]">
-                {i + 1}
-              </span>
-              <h3 className="mt-4 text-sm font-semibold text-brand-navy">{step.title}</h3>
-              <p className="mt-1.5 text-sm leading-6 text-text-muted">{step.body}</p>
-            </li>
-          ))}
+          {steps.map((step, i) => {
+            const Icon = STEP_ICONS[i] ?? Car
+            return (
+              <li
+                key={step.title}
+                className="group relative rounded-none border border-[#e8dcc6] bg-white p-5 shadow-(--shadow-card) transition-all duration-300 hover:-translate-y-1 hover:border-brand-gold/40 hover:shadow-(--shadow-card-hover)"
+              >
+                <div className="flex items-center gap-3">
+                  <span className="flex h-11 w-11 shrink-0 items-center justify-center bg-brand-gold text-sm font-bold text-[#fff] shadow-[0_12px_24px_rgba(92,9,49,0.18)] transition-all duration-300 group-hover:scale-105 group-hover:shadow-[0_0_0_6px_rgba(212,175,55,0.2)]">
+                    {i + 1}
+                  </span>
+                  <Icon className="h-6 w-6 text-brand-gold" aria-hidden="true" />
+                </div>
+                <h3 className="mt-4 text-sm font-semibold text-brand-navy">{step.title}</h3>
+                <p className="mt-1.5 text-sm leading-6 text-text-muted">{step.body}</p>
+              </li>
+            )
+          })}
         </ol>
       </div>
     </section>

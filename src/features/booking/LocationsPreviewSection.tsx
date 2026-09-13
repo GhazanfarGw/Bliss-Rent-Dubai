@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { fetchLocations } from '@/features/booking/api'
 import { prefersReducedMotion } from '@/lib/motion'
+import { TYPE_ICON } from '@/features/booking/locationDisplay'
 import type { Location } from '@/types/domain'
 
 const PREVIEW_LIMIT = 10
@@ -45,9 +46,9 @@ export function LocationsPreviewSection() {
         <p className="inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.32em] text-brand-gold-dark">
           <span className="relative flex h-1.5 w-1.5">
             {!prefersReducedMotion() && (
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-champagne opacity-75" />
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-none bg-brand-champagne opacity-75" />
             )}
-            <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-brand-gold" />
+            <span className="relative inline-flex h-1.5 w-1.5 rounded-none bg-brand-gold" />
           </span>
           {t('home.locationsPreview.eyebrow')}
         </p>
@@ -64,15 +65,26 @@ export function LocationsPreviewSection() {
 
         {preview.length > 0 && (
           <div className="mt-8 grid gap-3 sm:grid-cols-3 lg:grid-cols-5">
-            {preview.map((loc) => (
-              <div
-                key={loc.id}
-                className="flex min-w-0 items-center gap-2 rounded-2xl border border-[#ece7df] bg-white px-4 py-3 text-sm font-medium text-[#1f2430] shadow-[0_16px_30px_rgba(17,20,29,0.04)] transition-all duration-300 hover:-translate-y-0.5 hover:border-brand-gold/50 hover:shadow-[0_20px_36px_rgba(17,20,29,0.1)]"
-              >
-                <PinIcon className="h-4 w-4 shrink-0 text-brand-gold-dark" />
-                <span className="min-w-0 truncate">{loc.name}</span>
-              </div>
-            ))}
+            {preview.map((loc) => {
+              // Same real, already-fetched sublabel rule LocationField's
+              // picker uses — airport code + city for airport locations,
+              // just the city otherwise — surfaced here for the first
+              // time instead of the plain pin+name every card used to
+              // show regardless of type.
+              const sublabel = loc.type === 'airport' && loc.airport_code ? `${loc.airport_code} · ${loc.city}` : loc.city
+              return (
+                <div
+                  key={loc.id}
+                  className="flex min-w-0 items-center gap-2.5 rounded-none border border-[#ece7df] bg-white px-4 py-3 text-sm font-medium text-[#1f2430] shadow-(--shadow-card) transition-all duration-300 hover:-translate-y-0.5 hover:border-brand-gold/50 hover:shadow-(--shadow-card-hover)"
+                >
+                  <span className="shrink-0 text-base leading-none" aria-hidden="true">{TYPE_ICON[loc.type]}</span>
+                  <span className="min-w-0">
+                    <span className="block truncate">{loc.name}</span>
+                    <span className="block truncate text-xs font-normal text-text-muted">{sublabel}</span>
+                  </span>
+                </div>
+              )
+            })}
           </div>
         )}
 
@@ -119,15 +131,6 @@ function HighlightCities({ text, cityNames }: { text: string; cityNames: string[
 
 function escapeRegExp(value: string): string {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-}
-
-function PinIcon({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className={className} aria-hidden="true">
-      <path d="M12 21s-6.5-6.06-6.5-11A6.5 6.5 0 0 1 18.5 10c0 4.94-6.5 11-6.5 11Z" />
-      <circle cx="12" cy="10" r="2.2" />
-    </svg>
-  )
 }
 
 function ArrowIcon({ className }: { className?: string }) {

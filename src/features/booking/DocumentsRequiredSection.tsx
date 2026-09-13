@@ -37,7 +37,7 @@ export function DocumentsRequiredSection() {
           {groups.map((group) => (
             <div
               key={group.title}
-              className="overflow-hidden border border-[#e7dcc7] bg-white shadow-[0_16px_38px_rgba(16,20,29,0.04)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_26px_54px_rgba(16,20,29,0.1)]"
+              className="overflow-hidden border border-[#e7dcc7] bg-white shadow-(--shadow-card) transition-all duration-300 hover:-translate-y-1 hover:shadow-(--shadow-card-hover)"
             >
               <div className="bg-brand-gold px-6 py-4">
                 <h3 className="text-base font-bold tracking-tight text-white">{group.title}</h3>

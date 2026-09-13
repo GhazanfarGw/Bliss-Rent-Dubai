@@ -114,4 +114,22 @@ describe('VehicleCategoriesSection', () => {
 
     await waitFor(() => expect(screen.getByText('Fleet categories will appear here')).toBeInTheDocument())
   })
+
+  it('shows the category’s real description when it has one, and nothing extra when it does not', async () => {
+    vi.mocked(fetchAllAvailableVehicles).mockResolvedValue([
+      vehicle({
+        id: 'v1',
+        categoryId: 'cat-lux',
+        categoryName: 'Luxury',
+        vehicle_categories: { id: 'cat-lux', name: 'Luxury', description: 'Top-tier comfort and performance.', created_at: '2026-01-01T00:00:00Z' },
+      }),
+      vehicle({ id: 'v2', categoryId: 'cat-eco', categoryName: 'Economy' }),
+    ])
+    renderIt()
+
+    expect(await screen.findByText('Top-tier comfort and performance.')).toBeInTheDocument()
+    // Economy's mock has description: null — its card renders no third line.
+    const economyCard = (await screen.findByText('Economy')).closest('a')
+    expect(economyCard?.querySelectorAll('p')).toHaveLength(1)
+  })
 })

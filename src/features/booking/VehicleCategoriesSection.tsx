@@ -16,6 +16,10 @@ const INITIAL_VISIBLE_COUNT = 10
 interface CategorySummary {
   id: string
   name: string
+  /** The category's own real description (vehicle_categories.description)
+   *  — fetched all along but never previously displayed anywhere; real
+   *  content, not new copy. Null for a category with none set. */
+  description: string | null
   /** Storage path of a real photo borrowed from one of this category's
    *  currently available vehicles — null when none of them has a photo
    *  yet yet (VehiclePhoto then renders its neutral placeholder, never a
@@ -68,7 +72,7 @@ export function VehicleCategoriesSection() {
         {vehicles === null && (
           <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5" aria-hidden="true">
             {[1, 2, 3, 4, 5].map((item) => (
-              <div key={item} className="aspect-[4/3] animate-pulse rounded-2xl bg-[#efe7dc]" />
+              <div key={item} className="aspect-[4/3] animate-pulse rounded-none bg-[#efe7dc]" />
             ))}
           </div>
         )}
@@ -84,7 +88,7 @@ export function VehicleCategoriesSection() {
                 <Link
                   key={category.id}
                   to="/search"
-                  className="group overflow-hidden rounded-2xl border border-[#e7dcc7] bg-white shadow-[0_16px_38px_rgba(16,20,29,0.04)] transition-all duration-300 hover:-translate-y-1 hover:border-brand-gold hover:shadow-[0_22px_48px_rgba(16,20,29,0.1)] focus:outline-none focus:ring-2 focus:ring-brand-gold focus:ring-offset-2"
+                  className="group overflow-hidden rounded-none border border-[#e7dcc7] bg-white shadow-(--shadow-card) transition-all duration-300 hover:-translate-y-1 hover:border-brand-gold hover:shadow-(--shadow-card-hover) focus:outline-none focus:ring-2 focus:ring-brand-gold focus:ring-offset-2"
                 >
                   <div className="aspect-[4/3] overflow-hidden bg-brand-lavender/60">
                     <VehiclePhoto
@@ -96,6 +100,9 @@ export function VehicleCategoriesSection() {
                   <div className="p-4">
                     <h3 className="text-sm font-bold tracking-tight text-brand-navy sm:text-base">{category.name}</h3>
                     <p className="mt-1 text-sm text-text-muted">{t('home.categories.carsCount', { count: category.availableCount })}</p>
+                    {category.description && (
+                      <p className="mt-1.5 line-clamp-2 text-xs leading-5 text-text-muted/80">{category.description}</p>
+                    )}
                   </div>
                 </Link>
               ))}
@@ -106,7 +113,7 @@ export function VehicleCategoriesSection() {
                 <button
                   type="button"
                   onClick={() => setExpanded(true)}
-                  className="inline-flex items-center gap-2 rounded-full border border-brand-navy/15 bg-white px-6 py-3 text-sm font-semibold text-brand-navy shadow-sm transition-colors hover:border-brand-gold hover:text-brand-gold-dark"
+                  className="inline-flex items-center gap-2 rounded-none border border-brand-navy/15 bg-white px-6 py-3 text-sm font-semibold text-brand-navy shadow-sm transition-colors hover:border-brand-gold hover:text-brand-gold-dark"
                 >
                   {t('home.categories.seeMore')}
                   <ChevronDown className="h-4 w-4" aria-hidden="true" />
@@ -139,6 +146,7 @@ function summarizeCategories(vehicles: VehicleWithDetails[]): CategorySummary[] 
       byId.set(category.id, {
         id: category.id,
         name: category.name,
+        description: category.description ?? null,
         photoStoragePath: image?.storage_path ?? null,
         availableCount: 1,
       })

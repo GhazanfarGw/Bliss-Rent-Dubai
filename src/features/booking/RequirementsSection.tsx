@@ -37,7 +37,7 @@ export function RequirementsSection() {
           {items.map((item, i) => (
             <div
               key={item.title}
-              className="rounded-[1.75rem] border border-[#e7decf] bg-white/80 p-5 shadow-[0_18px_38px_rgba(17,22,29,0.06)] backdrop-blur-[2px] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_26px_50px_rgba(17,22,29,0.1)] sm:p-6"
+              className="rounded-none border border-[#e7decf] bg-white/80 p-5 shadow-(--shadow-card) backdrop-blur-[2px] transition-all duration-300 hover:-translate-y-1 hover:shadow-(--shadow-card-hover) sm:p-6"
             >
               <div className="flex items-center justify-between">
                 <RequirementIcon index={i} />

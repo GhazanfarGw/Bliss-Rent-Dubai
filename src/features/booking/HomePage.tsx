@@ -85,7 +85,7 @@ export function HomePage() {
         <section className="relative overflow-hidden bg-surface-warm px-4 py-16 text-center sm:px-6 lg:px-8">
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute left-1/2 top-0 h-72 w-72 -translate-x-1/2 -translate-y-1/3 rounded-full bg-brand-champagne/20 blur-3xl"
+            className="pointer-events-none absolute left-1/2 top-0 h-72 w-72 -translate-x-1/2 -translate-y-1/3 rounded-none bg-brand-champagne/20 blur-3xl"
           />
           <div className="relative mx-auto max-w-4xl border border-[#ece7df] bg-white p-8 shadow-[0_30px_70px_rgba(17,20,29,0.08)] sm:p-12">
             <p className="text-[10px] font-semibold uppercase tracking-[0.32em] text-brand-gold-dark">Fleet choices, simplified</p>

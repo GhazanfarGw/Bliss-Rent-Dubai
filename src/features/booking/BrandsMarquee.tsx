@@ -53,9 +53,9 @@ export function BrandsMarquee() {
           <p className="inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.32em] text-brand-gold-dark">
             <span className="relative flex h-1.5 w-1.5">
               {!reducedMotion && (
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-champagne opacity-75" />
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-none bg-brand-champagne opacity-75" />
               )}
-              <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-brand-gold" />
+              <span className="relative inline-flex h-1.5 w-1.5 rounded-none bg-brand-gold" />
             </span>
             Trusted by drivers
           </p>
