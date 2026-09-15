@@ -98,7 +98,7 @@ export function AdminLoginPage() {
 
         {state.step === 'credentials' ? (
           <>
-            <h1 className="mt-5 text-xl font-bold text-brand-navy">{t('admin.login.title')}</h1>
+            <h1 className="mt-5 text-xl font-semibold text-brand-navy">{t('admin.login.title')}</h1>
             <p className="mt-1 text-sm text-text-muted">{t('admin.login.subtitle')}</p>
 
             {notAuthorized && (
@@ -162,7 +162,7 @@ export function AdminLoginPage() {
           </>
         ) : (
           <>
-            <h1 className="mt-5 text-xl font-bold text-brand-navy">{t('admin.login.code.title')}</h1>
+            <h1 className="mt-5 text-xl font-semibold text-brand-navy">{t('admin.login.code.title')}</h1>
             <p className="mt-1 text-sm text-text-muted">
               {t('admin.login.code.subtitle', { email: state.maskedEmail })}
             </p>

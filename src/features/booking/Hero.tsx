@@ -2,13 +2,17 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { ArrowRight, Car, ChevronDown, MapPin } from 'lucide-react'
-import { HERO_SLIDE_IMAGES } from '@/features/booking/heroSlides'
+import { HERO_SLIDE_IMAGES, HERO_VIDEO_SOURCES } from '@/features/booking/heroSlides'
 import { LinkButton } from '@/features/shared/ui/LinkButton'
 import { useFleetStats } from '@/features/booking/useFleetStats'
 import { prefersReducedMotion } from '@/lib/motion'
 
 interface Slide {
   title: string
+  /** Optional second heading line, rendered italic below `title` — only
+   *  the pinned slide (index 4, "Drive Your Journey" / "with Bliss Rent")
+   *  has one; the other four rotating slides are single-line titles. */
+  titleAccent?: string
   body: string
 }
 
@@ -29,9 +33,12 @@ const HERO_TEXT_ROTATE_MS = 6000
  * treatment — see NavBar), and this pass adds three more premium touches
  * requested afterwards:
  *
- *  - A slow, one-time "ken burns" drift on the pinned image (never swaps
- *    which photo shows, just a subtle zoom so it doesn't feel like a flat
- *    static poster) — `.animate-hero-image-drift` in index.css.
+ *  - The pinned background is now a looping muted video instead of a
+ *    static photo (see HERO_VIDEO_SOURCES in heroSlides.ts) — the video's
+ *    own motion replaces the old one-time "ken burns" zoom drift, so that
+ *    animation class is no longer applied here. `prefers-reduced-motion`
+ *    still gets the original still image (HERO_SLIDE_IMAGES[HERO_SLIDE_INDEX],
+ *    also used as the video's `poster`) instead of the video element at all.
  *  - A compact trust-signal row under the CTAs, fetched live from the
  *    same fleet/locations queries AboutPage's stats section and
  *    TickerBar's rate already use — never a hand-typed figure. This is
@@ -102,16 +109,30 @@ export function Hero() {
       id="home-hero"
       className="relative isolate -mt-[var(--header-h)] overflow-hidden bg-brand-navy"
     >
-      <img
-        src={image.src}
-        alt={t(image.altKey)}
-        loading="eager"
-        fetchPriority="high"
-        className={
-          'absolute inset-0 h-full w-full object-cover object-center saturate-[1.1] contrast-[1.05]' +
-          (reducedMotion ? '' : ' animate-hero-image-drift')
-        }
-      />
+      {reducedMotion ? (
+        // No autoplaying video for prefers-reduced-motion — same still
+        // frame the video would otherwise open on.
+        <img
+          src={image.src}
+          alt={t(image.altKey)}
+          loading="eager"
+          fetchPriority="high"
+          className="absolute inset-0 h-full w-full object-cover object-center saturate-[1.1] contrast-[1.05]"
+        />
+      ) : (
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          poster={image.src}
+          aria-label={t(image.altKey)}
+          className="absolute inset-0 h-full w-full object-cover object-center saturate-[1.1] contrast-[1.05]"
+        >
+          <source src={HERO_VIDEO_SOURCES.webm} type="video/webm" />
+          <source src={HERO_VIDEO_SOURCES.mp4} type="video/mp4" />
+        </video>
+      )}
       {/* The image itself stays bright and clearly visible — only a soft
           bottom-up gradient for the headline/CTA to sit on, plus a light
           band behind the transparent header so its text stays legible.
@@ -164,8 +185,26 @@ export function Hero() {
                 live feedback. One step down keeps it a bold display
                 heading without it, and every slide's title still wraps
                 to exactly the same two lines it did before. */}
-            <h1 className="text-5xl font-semibold leading-[0.92] tracking-[-0.065em] text-white md:drop-shadow-[0_16px_28px_rgba(0,0,0,0.3)] sm:text-5xl lg:text-6xl">
+            {/* [font-family:var(--font-hero-serif)] — an elegant serif
+                treatment (Playfair Display, falling back to Cairo for
+                Arabic — see index.css) distinct from the sitewide sans
+                heading everywhere else. titleAccent (only on the pinned
+                "Drive Your Journey" slide) renders as an italic second
+                line, matching the Bliss Rent brand mockup this look is
+                taken from; the other four rotating slides have no accent
+                line and stay single-line. */}
+            <h1 className="font-hero-serif text-5xl font-medium leading-[1.05] tracking-[-0.01em] text-white md:drop-shadow-[0_16px_28px_rgba(0,0,0,0.3)] sm:text-5xl lg:text-6xl">
               <span className="block text-white">{slide.title}</span>
+              {slide.titleAccent && (
+                <>
+                  {/* Visually a line break (both spans are `block`), but a
+                      literal space in the text so the two lines don't fuse
+                      into one run-on word ("...Journeywith...") in the
+                      accessible name / textContent. */}
+                  {' '}
+                  <span className="block italic text-white/90">{slide.titleAccent}</span>
+                </>
+              )}
             </h1>
 
             <p className="mt-6 max-w-lg text-base leading-7 text-white/80 sm:text-lg">{slide.body}</p>

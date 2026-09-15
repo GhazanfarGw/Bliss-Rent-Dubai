@@ -52,7 +52,7 @@ export function LocationsPreviewSection() {
           </span>
           {t('home.locationsPreview.eyebrow')}
         </p>
-        <h2 className="mt-3 max-w-2xl text-3xl font-black tracking-[-0.06em] text-brand-navy sm:text-4xl">
+        <h2 className="font-hero-serif mt-3 max-w-2xl text-3xl font-black tracking-[-0.06em] text-brand-navy sm:text-4xl">
           <HighlightCities text={t('home.locationsPreview.title')} cityNames={cityNames} />
         </h2>
         <p className="mt-3 max-w-2xl text-sm leading-6 text-text-muted">{t('home.locationsPreview.subtitle')}</p>

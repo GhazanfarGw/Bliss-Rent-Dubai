@@ -10,6 +10,15 @@ interface SectionHeaderProps {
    *  customer-facing page), 'h3' for a sub-section nested under its own
    *  h2 (e.g. one of several independent sliders within a page section). */
   as?: 'h1' | 'h2' | 'h3'
+  /** Opt-in only — pass 'marketing' from customer-facing call sites (Car
+   *  Types, FAQ, Legal, Featured Vehicles, Vehicle Categories, Documents
+   *  Required) to pick up the sitewide serif heading treatment
+   *  (--font-hero-serif, see index.css) and the same normalized
+   *  text-3xl/sm:text-4xl size every other major customer-facing
+   *  heading uses. Every admin page uses this same component without
+   *  this prop and is deliberately unaffected — admin section labels
+   *  stay Cairo/sans at their existing size. */
+  emphasis?: 'marketing'
 }
 
 /**
@@ -18,12 +27,16 @@ interface SectionHeaderProps {
  * `AdminPageHeader` now aliases straight through with zero visual
  * change for every existing admin page.
  */
-export function SectionHeader({ title, description, action, as = 'h1' }: SectionHeaderProps) {
+export function SectionHeader({ title, description, action, as = 'h1', emphasis }: SectionHeaderProps) {
   const Heading = as
+  const headingClass =
+    emphasis === 'marketing'
+      ? 'font-hero-serif text-3xl font-black tracking-[-0.06em] text-brand-navy sm:text-4xl'
+      : 'text-2xl font-black tracking-[-0.06em] text-brand-navy sm:text-3xl lg:text-[3.0rem]'
   return (
     <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
       <div className="max-w-2xl">
-        <Heading className="text-2xl font-black tracking-[-0.06em] text-brand-navy sm:text-3xl lg:text-[3.0rem]">
+        <Heading className={headingClass}>
           <span className="bg-gradient-to-r from-brand-navy via-brand-navy-light to-brand-gold-dark bg-clip-text text-transparent">
             {title}
           </span>

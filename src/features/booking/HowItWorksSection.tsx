@@ -27,7 +27,7 @@ export function HowItWorksSection() {
     <section id="how-it-works" className="scroll-mt-20 bg-surface-warm">
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="max-w-2xl">
-          <h2 className="text-3xl font-black tracking-[-0.06em] text-brand-navy sm:text-4xl">{t('home.howItWorks.title')}</h2>
+          <h2 className="font-hero-serif text-3xl font-black tracking-[-0.06em] text-brand-navy sm:text-4xl">{t('home.howItWorks.title')}</h2>
           <p className="mt-3 text-sm leading-6 text-text-muted">{t('home.howItWorks.subtitle')}</p>
         </div>
 

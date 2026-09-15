@@ -46,11 +46,18 @@
     />
 
     <!-- Cairo covers both Latin and Arabic script cleanly in one family,
-         matching the bilingual EN/AR UI (see src/i18n/). -->
+         matching the bilingual EN/AR UI (see src/i18n/). Playfair Display
+         is Latin-only, used for the sitewide serif heading treatment (see
+         --font-hero-serif in index.css, applied to the homepage hero and
+         every major section/page heading) — Arabic glyphs fall through
+         to Cairo automatically since it's second in that font-family
+         stack. Weights: 500/600 cover the hero's own font-medium/italic
+         accent; 700/900 cover the font-bold/font-black weight most other
+         headings sitewide already use. -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;0,700;0,900;1,500;1,600&display=swap"
       rel="stylesheet"
     />
 

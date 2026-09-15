@@ -53,7 +53,7 @@ export function BookingStatusPanel() {
     const { summary } = state
     return (
       <div>
-        <h2 className="text-2xl font-black tracking-[-0.04em] text-brand-navy sm:text-3xl">{t('home.navigator.status.heading')}</h2>
+        <h2 className="font-hero-serif text-3xl font-black tracking-[-0.04em] text-brand-navy sm:text-4xl">{t('home.navigator.status.heading')}</h2>
         <div className="mt-6 space-y-3 rounded-2xl border border-brand-gold/20 bg-[linear-gradient(180deg,#ffffff_0%,#f9f5f1_100%)] p-5">
           <StatusRow icon={UserRound} label={t('home.navigator.status.result.clientName')} value={summary.clientName} />
           <StatusRow icon={Car} label={t('home.navigator.status.result.carName')} value={summary.carName} />
@@ -77,7 +77,7 @@ export function BookingStatusPanel() {
 
   return (
     <div>
-      <h2 className="text-2xl font-black tracking-[-0.04em] text-brand-navy sm:text-3xl">{t('home.navigator.status.heading')}</h2>
+      <h2 className="font-hero-serif text-3xl font-black tracking-[-0.04em] text-brand-navy sm:text-4xl">{t('home.navigator.status.heading')}</h2>
       <p className="mt-2 max-w-xl text-sm leading-6 text-text-muted">{t('home.navigator.status.intro')}</p>
 
       <form onSubmit={(e) => void handleSubmit(e)} noValidate className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-end">

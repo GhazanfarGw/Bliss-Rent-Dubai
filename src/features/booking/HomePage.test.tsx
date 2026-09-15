@@ -22,7 +22,7 @@ describe('HomePage', () => {
       </MemoryRouter>,
     )
 
-    const hero = await screen.findByRole('heading', { name: 'Drive Dubai your way' })
+    const hero = await screen.findByRole('heading', { name: 'Drive Your Journey with Bliss Rent' })
     const booking = screen.getByRole('heading', { name: 'Find your car' })
     const whyChoose = screen.getByRole('heading', { name: 'Why Dubai chooses Bliss Rent' })
     const featured = screen.getByRole('heading', { name: 'Featured vehicles' })

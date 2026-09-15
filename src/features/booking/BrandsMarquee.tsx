@@ -59,7 +59,7 @@ export function BrandsMarquee() {
             </span>
             Trusted by drivers
           </p>
-          <h2 className="mt-3 text-center text-[2rem] font-black tracking-[-0.06em] text-brand-navy sm:text-[3rem]">
+          <h2 className="font-hero-serif mt-3 text-center text-3xl font-black tracking-[-0.06em] text-brand-navy sm:text-4xl">
             {t('home.brands.title')}
           </h2>
         </div>

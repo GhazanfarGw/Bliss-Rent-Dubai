@@ -43,7 +43,7 @@ export function ConfirmationPage() {
     <div className="mx-auto max-w-2xl px-4 py-12 sm:px-6">
       <div className="rounded-none border border-success/25 bg-success-bg p-6 text-center">
         <BadgeCheck className="mx-auto h-8 w-8 text-success" aria-hidden="true" />
-        <h1 className="mt-2 text-xl font-bold text-brand-navy">
+        <h1 className="mt-2 text-xl font-semibold text-brand-navy">
           {isConfirmed ? t('checkout.confirmation.confirmed') : t('checkout.confirmation.received')}
         </h1>
         <p className="mt-1 text-sm text-text-muted">

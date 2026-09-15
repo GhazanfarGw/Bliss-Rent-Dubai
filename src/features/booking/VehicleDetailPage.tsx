@@ -208,7 +208,7 @@ export function VehicleDetailPage() {
         <section className="rounded-none border border-brand-navy/10 bg-white p-5 shadow-sm sm:p-6 lg:sticky lg:top-24">
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-3">
-              <h1 className="text-2xl font-bold text-brand-navy">
+              <h1 className="text-2xl font-semibold text-brand-navy">
                 {vehicle.make} {vehicle.model}
               </h1>
               {vehicle.vehicle_categories && (
@@ -355,7 +355,7 @@ export function VehicleDetailPage() {
 
       {similarVehicles && similarVehicles.length > 0 && (
         <section className="mt-12 border-t border-brand-navy/10 pt-10">
-          <h2 className="text-xl font-black tracking-[-0.04em] text-brand-navy sm:text-2xl">
+          <h2 className="font-hero-serif text-3xl font-black tracking-[-0.04em] text-brand-navy sm:text-4xl">
             {vehicle.vehicle_categories
               ? t('vehicleDetail.similarVehicles.title', { category: vehicle.vehicle_categories.name })
               : t('vehicleDetail.similarVehicles.titleGeneric')}

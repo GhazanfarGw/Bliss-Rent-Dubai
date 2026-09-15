@@ -28,15 +28,20 @@ describe('Hero', () => {
     fetchLocations.mockReset().mockResolvedValue([])
   })
 
-  it('renders a single static hero image with its heading and CTA', () => {
+  it('renders a single autoplaying hero video with its heading and CTA', () => {
     renderHero()
 
     const heading = screen.getByRole('heading', { level: 1 })
     expect(heading).toBeInTheDocument()
 
-    const images = screen.getAllByRole('img')
-    expect(images).toHaveLength(1)
-    expect(images[0]).toHaveAttribute('loading', 'eager')
+    // The pinned background is a muted/looping/autoplaying video (no img)
+    // unless the user prefers reduced motion — see the fallback test below.
+    expect(screen.queryAllByRole('img')).toHaveLength(0)
+    const video = document.querySelector('video')
+    expect(video).toBeInTheDocument()
+    expect(video).toHaveAttribute('autoplay')
+    expect(video).toHaveAttribute('loop')
+    expect(video).toHaveProperty('muted', true)
 
     const bookNowLink = screen.getByRole('link', { name: /book now/i })
     expect(bookNowLink).toBeInTheDocument()
@@ -63,11 +68,11 @@ describe('Hero', () => {
       vi.useRealTimers()
     })
 
-    it('auto-changes the heading text over time, while the image stays the same', () => {
+    it('auto-changes the heading text over time, while the video stays the same', () => {
       renderHero()
       const firstTitle = screen.getByRole('heading', { level: 1 }).textContent
-      const image = screen.getAllByRole('img')[0]
-      const imageSrcBefore = image.getAttribute('src')
+      const video = document.querySelector('video')
+      const posterBefore = video?.getAttribute('poster')
 
       act(() => {
         vi.advanceTimersByTime(6000)
@@ -75,8 +80,8 @@ describe('Hero', () => {
 
       const secondTitle = screen.getByRole('heading', { level: 1 }).textContent
       expect(secondTitle).not.toBe(firstTitle)
-      // The image itself never rotates — only the text does.
-      expect(screen.getAllByRole('img')[0]).toHaveAttribute('src', imageSrcBefore)
+      // The background video itself never rotates — only the text does.
+      expect(document.querySelector('video')).toHaveAttribute('poster', posterBefore)
     })
 
     it('does not auto-change the heading when the user prefers reduced motion', () => {
@@ -91,6 +96,19 @@ describe('Hero', () => {
       })
 
       expect(screen.getByRole('heading', { level: 1 }).textContent).toBe(firstTitle)
+      vi.unstubAllGlobals()
+    })
+
+    it('falls back to a still image (no video) when the user prefers reduced motion', () => {
+      const matchMediaMock = vi.fn().mockReturnValue({ matches: true })
+      vi.stubGlobal('matchMedia', matchMediaMock)
+
+      renderHero()
+
+      expect(document.querySelector('video')).not.toBeInTheDocument()
+      const images = screen.getAllByRole('img')
+      expect(images).toHaveLength(1)
+      expect(images[0]).toHaveAttribute('loading', 'eager')
       vi.unstubAllGlobals()
     })
   })

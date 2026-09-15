@@ -50,7 +50,7 @@ function ErrorFallback() {
       <div className="flex h-14 w-14 items-center justify-center rounded-none bg-error-bg">
         <AlertTriangle className="h-7 w-7 text-error" aria-hidden="true" />
       </div>
-      <h1 className="mt-6 text-2xl font-bold text-brand-navy sm:text-3xl">{t('errorBoundary.title')}</h1>
+      <h1 className="mt-6 text-2xl font-semibold text-brand-navy sm:text-3xl">{t('errorBoundary.title')}</h1>
       <p className="mt-3 max-w-md text-sm leading-6 text-text-muted">{t('errorBoundary.body')}</p>
       <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
         <button type="button" onClick={() => window.location.reload()} className={buttonClass({ variant: 'primary' })}>

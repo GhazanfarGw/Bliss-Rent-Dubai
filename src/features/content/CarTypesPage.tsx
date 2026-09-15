@@ -66,7 +66,7 @@ export function CarTypesPage() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
-      <SectionHeader title={t('pages.carTypes.title')} description={t('pages.carTypes.subtitle')} />
+      <SectionHeader title={t('pages.carTypes.title')} description={t('pages.carTypes.subtitle')} emphasis="marketing" />
 
       {vehicles === null && (
         <div className="mt-8 grid gap-6 sm:grid-cols-2" aria-hidden="true">
@@ -104,7 +104,7 @@ export function CarTypesPage() {
                   </span>
                 )}
                 <div className="mt-3 flex flex-wrap items-baseline justify-between gap-2">
-                  <h2 className="text-lg font-bold text-brand-navy">{cat.name}</h2>
+                  <h2 className="text-lg font-semibold text-brand-navy">{cat.name}</h2>
                   {cat.fromDailyRate && (
                     <p className="text-sm font-semibold text-brand-gold-dark">
                       {t('pages.carTypes.fromDaily', { currency: cat.fromDailyRate.currency, amount: cat.fromDailyRate.amount.toLocaleString() })}

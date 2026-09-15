@@ -44,7 +44,7 @@ export function HomePage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-3xl text-center">
             <p className="text-[10px] font-semibold uppercase tracking-[0.32em] text-brand-gold-dark">{t('home.premiumHighlights.eyebrow')}</p>
-            <h2 className="mt-4 text-3xl font-black tracking-[-0.06em] text-brand-navy sm:text-4xl">{t('home.premiumHighlights.title')}</h2>
+            <h2 className="font-hero-serif mt-4 text-3xl font-black tracking-[-0.06em] text-brand-navy sm:text-4xl">{t('home.premiumHighlights.title')}</h2>
             <p className="mt-3 text-sm leading-7 text-text-muted sm:text-base">{t('home.premiumHighlights.subtitle')}</p>
           </div>
 
@@ -87,7 +87,7 @@ export function HomePage() {
           />
           <div className="relative mx-auto max-w-4xl border border-[#ece7df] bg-white p-8 shadow-[0_30px_70px_rgba(17,20,29,0.08)] sm:p-12">
             <p className="text-[10px] font-semibold uppercase tracking-[0.32em] text-brand-gold-dark">Fleet choices, simplified</p>
-            <h2 className="mt-4 text-3xl font-black tracking-[-0.06em] text-brand-navy sm:text-5xl">{t('home.finalCta.title')}</h2>
+            <h2 className="font-hero-serif mt-4 text-3xl font-black tracking-[-0.06em] text-brand-navy sm:text-4xl">{t('home.finalCta.title')}</h2>
             <p className="mx-auto mt-4 max-w-2xl text-sm leading-7 text-text-muted sm:text-base">{t('home.finalCta.subtitle')}</p>
             <button
               type="button"

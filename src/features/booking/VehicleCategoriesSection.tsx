@@ -67,7 +67,7 @@ export function VehicleCategoriesSection() {
   return (
     <section className="bg-surface-warm">
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-        <SectionHeader as="h2" title={t('home.categories.title')} description={t('home.categories.subtitle')} />
+        <SectionHeader as="h2" title={t('home.categories.title')} description={t('home.categories.subtitle')} emphasis="marketing" />
 
         {vehicles === null && (
           <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5" aria-hidden="true">

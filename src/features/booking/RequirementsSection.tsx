@@ -25,7 +25,7 @@ export function RequirementsSection() {
           <p className="text-[10px] font-semibold uppercase tracking-[0.32em] text-brand-gold">
             {t('home.requirements.eyebrow')}
           </p>
-          <h2 className="mt-4 text-3xl font-black leading-[0.95] tracking-[-0.06em] text-[#000] sm:text-4xl lg:text-5xl drop-shadow-[0_8px_24px_rgba(17,22,29,0.08)]">
+          <h2 className="font-hero-serif mt-4 text-3xl font-black leading-[0.95] tracking-[-0.06em] text-[#000] sm:text-4xl drop-shadow-[0_8px_24px_rgba(17,22,29,0.08)]">
             {t('home.requirements.title')}
           </h2>
           <p className="mt-3 max-w-2xl text-sm leading-6 text-[#58616d] sm:mt-4 sm:text-base sm:leading-7">

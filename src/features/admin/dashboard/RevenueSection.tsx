@@ -70,7 +70,7 @@ export function RevenueSection() {
     <section className="rounded-2xl border border-brand-navy/10 bg-white p-4 sm:p-6">
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="text-lg font-bold text-brand-navy">{t('admin.dashboard.revenue.title')}</h2>
+          <h2 className="text-lg font-semibold text-brand-navy">{t('admin.dashboard.revenue.title')}</h2>
           <p className="text-xs text-text-muted">{t('admin.dashboard.revenue.subtitle')}</p>
         </div>
         {state.status === 'loaded' && (

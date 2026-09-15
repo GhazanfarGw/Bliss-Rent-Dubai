@@ -142,7 +142,7 @@ export function FeaturedVehicles() {
 
   return (
     <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-      <SectionHeader as="h2" title={t('home.featured.title')} description={t('home.featured.subtitle')} />
+      <SectionHeader as="h2" title={t('home.featured.title')} description={t('home.featured.subtitle')} emphasis="marketing" />
 
       <div className="mt-8">
         <FeaturedVehicleSlider

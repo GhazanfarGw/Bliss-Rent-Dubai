@@ -24,7 +24,7 @@ export function ManageBookingHero() {
       <p className="text-xs font-bold uppercase tracking-[0.24em] text-brand-champagne-dark">{t('manageBooking.title')}</p>
       <hr className="mt-3 border-brand-navy/15" />
 
-      <h1 className="mt-6 max-w-2xl text-2xl font-black leading-[1.15] tracking-[-0.04em] text-brand-gold sm:text-3xl lg:text-4xl">
+      <h1 className="font-hero-serif mt-6 max-w-2xl text-3xl font-black leading-[1.15] tracking-[-0.04em] text-brand-gold sm:text-4xl">
         {t('manageBooking.formHeading')}
       </h1>
       {/* Full context for screen readers only — sighted users get it from

@@ -31,7 +31,7 @@ export function DocumentsRequiredSection() {
   return (
     <section className="bg-surface-warm-alt">
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-        <SectionHeader as="h2" title={t('home.documents.title')} description={t('home.documents.subtitle')} />
+        <SectionHeader as="h2" title={t('home.documents.title')} description={t('home.documents.subtitle')} emphasis="marketing" />
 
         <div className="mt-10 grid gap-6 md:grid-cols-2">
           {groups.map((group) => (

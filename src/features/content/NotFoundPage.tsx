@@ -22,7 +22,7 @@ export function NotFoundPage() {
         <CarFront className="h-8 w-8 text-brand-navy" aria-hidden="true" />
       </div>
       <p className="mt-6 text-sm font-semibold uppercase tracking-[0.28em] text-brand-gold-dark">404</p>
-      <h1 className="mt-3 text-3xl font-black tracking-[-0.06em] text-brand-navy sm:text-4xl">
+      <h1 className="font-hero-serif mt-3 text-3xl font-black tracking-[-0.06em] text-brand-navy sm:text-4xl">
         {t('pages.notFound.title')}
       </h1>
       <p className="mt-3 max-w-md text-sm leading-6 text-text-muted sm:text-base">{t('pages.notFound.body')}</p>

@@ -104,7 +104,7 @@ export function ContactPage() {
         <div className="absolute inset-0 bg-gradient-to-b from-brand-navy/90 via-brand-navy/85 to-brand-navy" />
         <div className="relative mx-auto max-w-4xl px-4 py-20 text-center sm:px-6 sm:py-28">
           <p className="text-[10px] font-semibold uppercase tracking-[0.36em] text-brand-champagne">{t('nav.contact')}</p>
-          <h1 className="mt-4 text-3xl font-black tracking-[-0.04em] text-white sm:text-5xl">{t('pages.contact.title')}</h1>
+          <h1 className="font-hero-serif mt-4 text-3xl font-black tracking-[-0.04em] text-white sm:text-5xl">{t('pages.contact.title')}</h1>
           <p className="mx-auto mt-4 max-w-2xl text-sm leading-7 text-brand-lavender sm:text-base">{t('pages.contact.subtitle')}</p>
         </div>
       </section>
@@ -258,7 +258,7 @@ export function ContactPage() {
               <p className="text-[10px] font-semibold uppercase tracking-[0.32em] text-brand-gold-dark">
                 {t('pages.contact.faqShortcut.eyebrow')}
               </p>
-              <h2 className="mt-2 text-2xl font-black tracking-[-0.04em] text-brand-navy sm:text-3xl">
+              <h2 className="font-hero-serif mt-2 text-3xl font-black tracking-[-0.04em] text-brand-navy sm:text-4xl">
                 {t('pages.contact.faqShortcut.heading')}
               </h2>
               <p className="mt-2 max-w-xl text-sm leading-6 text-text-muted">{t('pages.contact.faqShortcut.subtitle')}</p>
@@ -305,7 +305,7 @@ export function ContactPage() {
               <span className="flex h-11 w-11 items-center justify-center bg-brand-navy text-white">
                 <MapPin className="h-5 w-5" aria-hidden="true" />
               </span>
-              <h2 className="mt-5 text-2xl font-black tracking-[-0.04em] text-brand-navy">{t('pages.contact.visitOffice.heading')}</h2>
+              <h2 className="font-hero-serif mt-5 text-3xl font-black tracking-[-0.04em] text-brand-navy sm:text-4xl">{t('pages.contact.visitOffice.heading')}</h2>
               <p className="mt-3 text-sm font-semibold leading-6 text-brand-navy">{OFFICE_ADDRESS}</p>
               <p className="mt-3 text-sm leading-6 text-text-muted">{t('pages.contact.visitOffice.subtitle')}</p>
               <a
@@ -334,7 +334,7 @@ export function ContactPage() {
 
       {/* Closing CTA — same pattern as the redesigned About page. */}
       <section className="bg-brand-navy px-4 py-16 text-center sm:px-6">
-        <h2 className="text-2xl font-black tracking-[-0.04em] text-white sm:text-3xl">{t('pages.contact.cta.heading')}</h2>
+        <h2 className="font-hero-serif text-3xl font-black tracking-[-0.04em] text-white sm:text-4xl">{t('pages.contact.cta.heading')}</h2>
         <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
           <LinkButton to="/book" variant="primary">
             {t('nav.searchCars')}

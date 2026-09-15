@@ -207,7 +207,7 @@ function VerifiedResult({ result, onVerifyAnother }: { result: BookingLookupResu
     <div>
       <div className="flex items-center gap-2">
         <BadgeCheck className="h-5 w-5 shrink-0 text-success" aria-hidden="true" />
-        <h2 className="text-2xl font-black tracking-[-0.04em] text-brand-navy sm:text-3xl">
+        <h2 className="font-hero-serif text-3xl font-black tracking-[-0.04em] text-brand-navy sm:text-4xl">
           {t('home.navigator.manage.result.heading')}
         </h2>
       </div>

@@ -130,7 +130,7 @@ export function SearchResultsPage() {
         <div className="flex flex-wrap items-start justify-between gap-5">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white">{t('common.dubaiOnly')}</p>
-            <h1 className="mt-2 text-2xl font-semibold tracking-[-0.04em] text-white sm:text-3xl">{t('searchResults.heroTitle')}</h1>
+            <h1 className="font-hero-serif mt-2 text-3xl font-semibold tracking-[-0.04em] text-white sm:text-4xl">{t('searchResults.heroTitle')}</h1>
           </div>
           {complete && <button type="button" onClick={() => setEditingSearch((current) => !current)} aria-expanded={editingSearch} className="inline-flex min-h-11 items-center border border-brand-gold-light/40 bg-white/5 px-4 text-sm font-semibold text-white transition-all duration-200 hover:border-brand-gold-light hover:bg-brand-gold-light/10 focus:outline-none focus:ring-2 focus:ring-brand-gold">{t('searchResults.editSearch')}</button>}
         </div>
@@ -185,7 +185,7 @@ export function SearchResultsPage() {
             <div className="flex flex-wrap items-end justify-between gap-3 border-b border-brand-gold/20 pb-4">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-gold-dark">{t('searchResults.resultsEyebrow')}</p>
-                <h2 className="mt-1 text-xl font-semibold tracking-[-0.04em] text-brand-navy sm:text-2xl">{t('searchResults.title')}</h2>
+                <h2 className="font-hero-serif mt-1 text-3xl font-semibold tracking-[-0.04em] text-brand-navy sm:text-4xl">{t('searchResults.title')}</h2>
               </div>
               <p className="text-sm font-medium text-text-muted" aria-live="polite">{t('searchResults.resultsCount', { count: groupedVehicles.length })}</p>
             </div>

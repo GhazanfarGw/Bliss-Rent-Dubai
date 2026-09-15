@@ -104,8 +104,11 @@ const en = {
         body: 'Sedans and SUVs chosen for business travel, family stays, and special occasions.',
       },
       {
-        title: 'Drive Dubai your way',
-        body: 'A mix of premium and economy vehicles for city drives, short stays, and smooth arrivals.',
+        title: 'Drive Your Journey',
+        // Second heading line, rendered italic — see Hero.tsx's slide.titleAccent
+        // handling. Only this slide has one; the other four are single-line.
+        titleAccent: 'with Bliss Rent',
+        body: 'Premium Car Rental in Dubai, UAE',
       },
     ],
     heading: 'Dubai car rental with 65% luxury and 35% economy options, arranged before you land.',
@@ -116,7 +119,7 @@ const en = {
       sedan: 'A dark blue executive sedan parked by the Dubai skyline at sunset.',
       suv: 'A white premium SUV on a desert road with the Dubai skyline on the horizon.',
       luxury: 'A black luxury sedan parked outside a five-star Dubai hotel entrance at dusk.',
-      premium: 'A premium sports coupe on a Dubai road at night, with the illuminated skyline behind it.',
+      premium: 'A dark maroon BMW 7 Series parked on a waterfront promenade at sunset, with the Burj Khalifa and Dubai skyline behind it.',
     },
     carousel: {
       label: 'Bliss Rent highlights',

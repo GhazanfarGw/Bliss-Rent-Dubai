@@ -41,7 +41,7 @@ export function CheckoutStepLayout({
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
         <div className="lg:col-span-2">
-          <h1 className="text-xl font-bold text-brand-navy">{title}</h1>
+          <h1 className="text-xl font-semibold text-brand-navy">{title}</h1>
           <div className="mt-5">{children}</div>
         </div>
         <div className="lg:col-span-1">

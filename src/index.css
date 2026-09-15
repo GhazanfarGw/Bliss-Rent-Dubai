@@ -43,6 +43,19 @@
 
   --font-sans: 'Cairo', 'Noto Kufi Arabic', ui-sans-serif, system-ui, sans-serif;
 
+  /* Sitewide heading serif — introduced for the homepage Hero's pinned
+     "Drive Your Journey / with Bliss Rent" slide, then extended to every
+     major customer-facing page/section heading (About, Contact, Home's
+     section titles, VehicleDetail, SearchResults, ManageBooking, etc.),
+     replacing the sans-serif Cairo type those headings used before, so
+     the whole site reads as one consistent brand voice instead of the
+     hero being a one-off. Deliberately NOT applied to admin dashboard
+     headings, the footer, dialogs/modals, or small functional UI labels
+     (toasts, card sub-titles) — those stay Cairo/sans, since they're
+     functional chrome, not marketing copy. Cairo stays the fallback so
+     Arabic glyphs (which Playfair Display doesn't cover) render correctly. */
+  --font-hero-serif: 'Playfair Display', 'Cairo', 'Noto Kufi Arabic', serif;
+
   /*
    * Phase 8 — semantic tokens, additive only (retuned in Phase 10 to the
    * official palette above — identifiers unchanged, only hex values and
