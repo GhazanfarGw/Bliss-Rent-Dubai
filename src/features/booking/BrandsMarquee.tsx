@@ -53,9 +53,9 @@ export function BrandsMarquee() {
           <p className="inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.32em] text-brand-gold-dark">
             <span className="relative flex h-1.5 w-1.5">
               {!reducedMotion && (
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-none bg-brand-champagne opacity-75" />
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-champagne opacity-75" />
               )}
-              <span className="relative inline-flex h-1.5 w-1.5 rounded-none bg-brand-gold" />
+              <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-brand-gold" />
             </span>
             Trusted by drivers
           </p>
@@ -85,7 +85,7 @@ export function BrandsMarquee() {
 
 function BrandCard({ name }: { name: string }) {
   return (
-    <div className="group flex h-full w-[100px] shrink-0 flex-col items-center justify-between rounded-none border border-transparent py-2 shadow-none transition-all duration-300 hover:-translate-y-1 hover:border-brand-gold/50 hover:shadow-[0_18px_36px_rgba(92,9,49,0.1)]">
+    <div className="group flex h-full w-[100px] shrink-0 flex-col items-center justify-between rounded-none border border-transparent py-2 shadow-none transition-all duration-300 hover:-translate-y-1]">
       {/* Monochrome at rest, real brand color on hover — "silver" logo
           strip per the redesign brief. grayscale/opacity apply to
           whichever mark renders (the real simple-icons SVG, or the
@@ -105,9 +105,29 @@ function BrandCard({ name }: { name: string }) {
 function renderBrandMark(name: string) {
   const logo = getBrandLogo(name)
   if (logo) {
+    if (logo.image) {
+      return <img src={logo.image} alt={name} className="h-16 w-16 object-contain sm:h-20 sm:w-20" />
+    }
+
+    const layers = (
+      <>
+        <path d={logo.path} fill={`#${logo.hex}`} fillRule={logo.fillRule} />
+        {logo.extraPaths?.map((layer, i) => (
+          <path
+            key={i}
+            d={layer.d}
+            fill={layer.fill ? `#${layer.fill}` : 'none'}
+            stroke={layer.stroke ? `#${layer.stroke}` : undefined}
+            strokeWidth={layer.strokeWidth}
+            fillRule={layer.fillRule}
+          />
+        ))}
+      </>
+    )
+
     return (
-      <svg aria-label={name} role="img" viewBox="0 0 24 24" className="h-16 w-16 sm:h-20 sm:w-20">
-        <path d={logo.path} fill={`#${logo.hex}`} />
+      <svg aria-label={name} role="img" viewBox={logo.viewBox ?? '0 0 24 24'} className="h-16 w-16 sm:h-20 sm:w-20">
+        {logo.transform ? <g transform={logo.transform}>{layers}</g> : layers}
       </svg>
     )
   }

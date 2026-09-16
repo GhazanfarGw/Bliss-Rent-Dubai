@@ -26,11 +26,36 @@ describe('BrandsMarquee', () => {
     expect(marks[0].getAttribute('viewBox')).toBe('0 0 24 24')
   })
 
-  it('falls back to an initials badge, never a fabricated logo, for a brand simple-icons does not carry', async () => {
-    vi.mocked(fetchAllAvailableVehicles).mockResolvedValue([vehicle('Land Rover', 'v1')])
+  it('falls back to an initials badge, never a fabricated logo, for a brand no library carries', async () => {
+    vi.mocked(fetchAllAvailableVehicles).mockResolvedValue([vehicle('Lexus', 'v1')])
     render(<BrandsMarquee />)
 
-    expect(await screen.findByText('LA')).toBeInTheDocument()
+    expect(await screen.findByText('LE')).toBeInTheDocument()
+  })
+
+  it('renders the Mercedes-Benz mark sourced from cardog-ai/icons on its own viewBox', async () => {
+    vi.mocked(fetchAllAvailableVehicles).mockResolvedValue([vehicle('Mercedes-Benz', 'v1'), vehicle('Toyota', 'v2')])
+    render(<BrandsMarquee />)
+
+    const marks = await screen.findAllByRole('img', { name: 'Mercedes-Benz' })
+    expect(marks[0].tagName.toLowerCase()).toBe('svg')
+    expect(marks[0].getAttribute('viewBox')).toBe('0 0 512 512')
+  })
+
+  it('renders the Brabus mark (Wikimedia Commons, PD-textlogo) with its source transform applied', async () => {
+    vi.mocked(fetchAllAvailableVehicles).mockResolvedValue([vehicle('Brabus', 'v1')])
+    render(<BrandsMarquee />)
+
+    const marks = await screen.findAllByRole('img', { name: 'Brabus' })
+    expect(marks[0].querySelector('g[transform]')).not.toBeNull()
+  })
+
+  it('renders the JAC mark as an <img>, since only a raster (PNG) source exists for it', async () => {
+    vi.mocked(fetchAllAvailableVehicles).mockResolvedValue([vehicle('JAC', 'v1')])
+    render(<BrandsMarquee />)
+
+    const marks = await screen.findAllByRole('img', { name: 'JAC' })
+    expect(marks[0].tagName.toLowerCase()).toBe('img')
   })
 
   it('renders nothing when the live fleet has no brands', async () => {

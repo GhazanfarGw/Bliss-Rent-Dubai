@@ -20,10 +20,31 @@ describe('getBrandLogo', () => {
     expect(getBrandLogo('VW')).toEqual(getBrandLogo('Volkswagen'))
   })
 
-  it('returns null for a make the library does not carry, rather than a fabricated mark', () => {
-    expect(getBrandLogo('Land Rover')).toBeNull()
+  it('returns null for a make no library carries, rather than a fabricated mark', () => {
+    expect(getBrandLogo('Lexus')).toBeNull()
     expect(getBrandLogo('GMC')).toBeNull()
-    expect(getBrandLogo('Mercedes-Benz')).toBeNull()
+    expect(getBrandLogo('Genesis')).toBeNull()
+  })
+
+  it('carries Mercedes-Benz and Land Rover from a second source (cardog-ai/icons), on their own 512x512 canvas', () => {
+    const mb = getBrandLogo('Mercedes-Benz')
+    expect(mb?.viewBox).toBe('0 0 512 512')
+    expect(mb?.extraPaths?.length).toBeGreaterThan(0)
+
+    const landRover = getBrandLogo('Land Rover')
+    expect(landRover?.viewBox).toBe('0 0 512 512')
+    expect(landRover?.extraPaths?.length).toBeGreaterThan(0)
+  })
+
+  it('carries Range Rover, Brabus, and Mansory from Wikimedia Commons as vector marks', () => {
+    expect(getBrandLogo('Range Rover')?.extraPaths?.length).toBeGreaterThan(0)
+    expect(getBrandLogo('Brabus')?.transform).toBeTruthy()
+    expect(getBrandLogo('Mansory')?.extraPaths?.length).toBeGreaterThan(0)
+  })
+
+  it('carries JAC as a raster image, since no vector source exists for it', () => {
+    const jac = getBrandLogo('JAC')
+    expect(jac?.image).toBeTruthy()
   })
 
   it('returns null for an unrecognized make', () => {
