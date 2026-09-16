@@ -33,7 +33,7 @@ export function PageHero({ imageSrc, imageAlt, badge, title, subtitle }: PageHer
           {badge}
         </div>
 
-        <h1 className="font-hero-serif mx-auto mt-5 max-w-2xl text-4xl font-black tracking-[-0.06em] text-white sm:text-5xl">{title}</h1>
+        <h1 className="font-hero-serif mx-auto mt-5 max-w-2xl text-4xl font-semibold tracking-[-0.06em] text-white sm:text-5xl">{title}</h1>
         <p className="mx-auto mt-4 max-w-xl text-sm leading-7 text-white/80 sm:text-base">{subtitle}</p>
       </div>
     </section>

@@ -31,8 +31,8 @@ export function SectionHeader({ title, description, action, as = 'h1', emphasis 
   const Heading = as
   const headingClass =
     emphasis === 'marketing'
-      ? 'font-hero-serif text-3xl font-black tracking-[-0.06em] text-brand-navy sm:text-4xl'
-      : 'text-2xl font-black tracking-[-0.06em] text-brand-navy sm:text-3xl lg:text-[3.0rem]'
+      ? 'font-hero-serif text-3xl font-semibold tracking-[-0.06em] text-brand-navy sm:text-4xl'
+      : 'text-2xl font-semibold tracking-[-0.06em] text-brand-navy sm:text-3xl lg:text-[3.0rem]'
   return (
     <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
       <div className="max-w-2xl">

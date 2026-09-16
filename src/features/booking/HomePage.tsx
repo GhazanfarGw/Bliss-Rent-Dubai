@@ -6,7 +6,6 @@ import { BrandsMarquee } from '@/features/booking/BrandsMarquee'
 import { BookingSearchSection } from '@/features/booking/BookingSearchSection'
 import { WhyChooseSection } from '@/features/booking/WhyChooseSection'
 import { RequirementsSection } from '@/features/booking/RequirementsSection'
-import { DocumentsRequiredSection } from '@/features/booking/DocumentsRequiredSection'
 import { LocationsPreviewSection } from '@/features/booking/LocationsPreviewSection'
 import { FeaturedVehicles } from '@/features/booking/FeaturedVehicles'
 import { HowItWorksSection } from '@/features/booking/HowItWorksSection'
@@ -22,9 +21,10 @@ import type { SearchCriteria } from '@/types/domain'
  * grid is now WhyChooseSection. The multi-slide HeroCarousel (Phase 4.1)
  * was replaced per the Phase 11 header/hero redesign with Hero, a single
  * static image with the header transparently overlaid on top of it.
- * DocumentsRequiredSection (also Phase 11) breaks the existing
- * Requirements checklist's driving-license line out into the full
- * resident/visitor document list.
+ * RequirementsSection also renders the resident/visitor document
+ * checklists itself now, as a 50/50 split with the numbered requirements
+ * list — the separate DocumentsRequiredSection that used to render right
+ * after it is gone, merged in (see RequirementsSection.tsx).
  */
 export function HomePage() {
   const { t } = useTranslation()
@@ -44,7 +44,7 @@ export function HomePage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-3xl text-center">
             <p className="text-[10px] font-semibold uppercase tracking-[0.32em] text-brand-gold-dark">{t('home.premiumHighlights.eyebrow')}</p>
-            <h2 className="font-hero-serif mt-4 text-3xl font-black tracking-[-0.06em] text-brand-navy sm:text-4xl">{t('home.premiumHighlights.title')}</h2>
+            <h2 className="font-hero-serif mt-4 text-3xl font-semibold tracking-[-0.06em] text-brand-navy sm:text-4xl">{t('home.premiumHighlights.title')}</h2>
             <p className="mt-3 text-sm leading-7 text-text-muted sm:text-base">{t('home.premiumHighlights.subtitle')}</p>
           </div>
 
@@ -58,7 +58,7 @@ export function HomePage() {
                   aria-hidden="true"
                   className="absolute inset-x-0 top-0 h-0.5 origin-left scale-x-0 bg-brand-champagne transition-transform duration-300 group-hover:scale-x-100"
                 />
-                <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-none bg-brand-gold text-base font-black text-white shadow-none transition-shadow duration-300 group-hover:shadow-[0_0_0_6px_rgba(212,175,55,0.18)]">
+                <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-none bg-brand-gold text-base font-semibold text-white shadow-none transition-shadow duration-300 group-hover:shadow-[0_0_0_6px_rgba(212,175,55,0.18)]">
                   {index + 1}
                 </div>
                 <h3 className="text-lg font-semibold text-brand-navy">{item.title}</h3>
@@ -75,7 +75,6 @@ export function HomePage() {
         <FeaturedVehicles />
         <WhyChooseSection />
         <RequirementsSection />
-        <DocumentsRequiredSection />
         <LocationsPreviewSection />
         <HowItWorksSection />
         <HomeFaqSection />
@@ -83,16 +82,16 @@ export function HomePage() {
         <section className="relative overflow-hidden bg-surface-warm px-4 py-16 text-center sm:px-6 lg:px-8">
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute left-1/2 top-0 h-72 w-72 -translate-x-1/2 -translate-y-1/3 rounded-none bg-brand-champagne/20 blur-3xl"
+            className="pointer-events-none rounded-none"
           />
-          <div className="relative mx-auto max-w-4xl border border-[#ece7df] bg-white p-8 shadow-[0_30px_70px_rgba(17,20,29,0.08)] sm:p-12">
+          <div className="relative mx-auto max-w-4xl border border-brand-gold-dark bg-white p-8 sm:p-12">
             <p className="text-[10px] font-semibold uppercase tracking-[0.32em] text-brand-gold-dark">Fleet choices, simplified</p>
-            <h2 className="font-hero-serif mt-4 text-3xl font-black tracking-[-0.06em] text-brand-navy sm:text-4xl">{t('home.finalCta.title')}</h2>
+            <h2 className="font-hero-serif mt-4 text-3xl font-semibold tracking-[-0.06em] text-brand-navy sm:text-4xl">{t('home.finalCta.title')}</h2>
             <p className="mx-auto mt-4 max-w-2xl text-sm leading-7 text-text-muted sm:text-base">{t('home.finalCta.subtitle')}</p>
             <button
               type="button"
               onClick={() => document.getElementById('booking-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
-              className="group mt-8 inline-flex min-h-12 items-center gap-2 bg-brand-gold px-6 py-3 text-sm font-bold text-white shadow-[0_14px_30px_rgba(92,9,49,0.28)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_18px_38px_rgba(92,9,49,0.4)] focus:outline-none focus:ring-2 focus:ring-brand-gold focus:ring-offset-2 focus:ring-offset-white"
+              className="group mt-8 inline-flex min-h-12 items-center gap-2 bg-brand-gold px-6 py-3 text-sm font-semibold text-white transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_18px_38px_rgba(92,9,49,0.4)] focus:outline-none focus:ring-2 focus:ring-brand-gold"
             >
               {t('home.finalCta.button')}
               <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1 rtl:rotate-180" aria-hidden="true" />

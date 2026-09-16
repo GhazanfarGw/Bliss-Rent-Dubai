@@ -321,10 +321,6 @@ const en = {
           title: 'Flexible self-drive',
           body: 'You or your chosen driver takes the wheel, with no driver service added by us.',
         },
-        {
-          title: 'Helpful support',
-          body: 'Responsive support from booking to collection and return.',
-        },
       ],
     },
     featured: {

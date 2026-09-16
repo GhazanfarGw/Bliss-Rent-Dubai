@@ -52,7 +52,7 @@ export function LocationsPreviewSection() {
           </span>
           {t('home.locationsPreview.eyebrow')}
         </p>
-        <h2 className="font-hero-serif mt-3 max-w-2xl text-3xl font-black tracking-[-0.06em] text-brand-navy sm:text-4xl">
+        <h2 className="font-hero-serif mt-3 max-w-2xl text-3xl font-semibold tracking-[-0.06em] text-brand-navy sm:text-4xl">
           <HighlightCities text={t('home.locationsPreview.title')} cityNames={cityNames} />
         </h2>
         <p className="mt-3 max-w-2xl text-sm leading-6 text-text-muted">{t('home.locationsPreview.subtitle')}</p>
@@ -64,23 +64,21 @@ export function LocationsPreviewSection() {
         )}
 
         {preview.length > 0 && (
-          <div className="mt-8 grid gap-3 sm:grid-cols-3 lg:grid-cols-5">
+          <div className="mt-8 flex flex-wrap gap-3">
             {preview.map((loc) => {
               // Same real, already-fetched sublabel rule LocationField's
               // picker uses — airport code + city for airport locations,
-              // just the city otherwise — surfaced here for the first
-              // time instead of the plain pin+name every card used to
-              // show regardless of type.
+              // just the city otherwise.
               const sublabel = loc.type === 'airport' && loc.airport_code ? `${loc.airport_code} · ${loc.city}` : loc.city
               return (
                 <div
                   key={loc.id}
-                  className="flex min-w-0 items-center gap-2.5 rounded-none border border-[#ece7df] bg-white px-4 py-3 text-sm font-medium text-[#1f2430] shadow-(--shadow-card) transition-all duration-300 hover:-translate-y-0.5 hover:border-brand-gold/50 hover:shadow-(--shadow-card-hover)"
+                  className="inline-flex min-w-0 items-center gap-2 rounded-full border border-brand-gold/30 bg-white px-4 py-2 text-sm font-medium text-[#1f2430] shadow-none transition-all duration-300 hover:-translate-y-0.5 hover:border-brand-gold hover:shadow-(--shadow-card)"
                 >
                   <span className="shrink-0 text-base leading-none" aria-hidden="true">{TYPE_ICON[loc.type]}</span>
-                  <span className="min-w-0">
-                    <span className="block truncate">{loc.name}</span>
-                    <span className="block truncate text-xs font-normal text-text-muted">{sublabel}</span>
+                  <span className="min-w-0 truncate">
+                    {loc.name}
+                    <span className="text-text-muted"> · {sublabel}</span>
                   </span>
                 </div>
               )

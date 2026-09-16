@@ -28,11 +28,11 @@ export function WhyChooseSection() {
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-3xl text-center">
           <p className="text-[10px] font-semibold uppercase tracking-[0.36em] text-brand-gold-dark">Why travelers choose us</p>
-          <h2 className="font-hero-serif mt-4 text-3xl font-black tracking-[-0.06em] text-brand-navy sm:text-4xl">{t('home.whyChoose.title')}</h2>
+          <h2 className="font-hero-serif mt-4 text-3xl font-semibold tracking-[-0.06em] text-brand-navy sm:text-4xl">{t('home.whyChoose.title')}</h2>
           <p className="mt-3 text-sm leading-7 text-text-muted sm:text-base">{t('home.whyChoose.subtitle')}</p>
         </div>
 
-        <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {items.map((item, i) => {
             const Icon = ITEM_ICONS[i] ?? CalendarCheck
             return (

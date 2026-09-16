@@ -136,7 +136,7 @@ export function AboutPage() {
             </span>
             {t('nav.about')}
           </div>
-          <h1 className="font-hero-serif mt-5 text-4xl font-black leading-[0.95] tracking-[-0.05em] text-white drop-shadow-[0_16px_28px_rgba(0,0,0,0.35)] sm:text-6xl">
+          <h1 className="font-hero-serif mt-5 text-4xl font-semibold leading-[0.95] tracking-[-0.05em] text-white drop-shadow-[0_16px_28px_rgba(0,0,0,0.35)] sm:text-6xl">
             {t('pages.about.title')}
           </h1>
           <p className="mx-auto mt-5 max-w-2xl text-sm leading-7 text-brand-lavender sm:text-base">{t('pages.about.subtitle')}</p>
@@ -162,7 +162,7 @@ export function AboutPage() {
       {/* Story — the first paragraph gets a bigger pull-quote treatment; the rest reads as normal body copy. */}
       <section className="mx-auto max-w-3xl px-4 py-16 sm:px-6 lg:py-20">
         <p className="text-[10px] font-semibold uppercase tracking-[0.36em] text-brand-gold">{t('pages.about.story.eyebrow')}</p>
-        <h2 className="font-hero-serif mt-3 text-3xl font-black tracking-[-0.05em] sm:text-4xl">
+        <h2 className="font-hero-serif mt-3 text-3xl font-semibold tracking-[-0.05em] sm:text-4xl">
           <span className="bg-gradient-to-r from-brand-navy via-brand-navy-light to-brand-gold-dark bg-clip-text text-transparent">
             {t('pages.about.story.heading')}
           </span>
@@ -189,7 +189,7 @@ export function AboutPage() {
         <section className="bg-surface-warm-alt">
           <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
             <p className="text-center text-[10px] font-semibold uppercase tracking-[0.36em] text-brand-gold">{t('pages.about.stats.eyebrow')}</p>
-            <h2 className="font-hero-serif mt-3 text-center text-3xl font-black tracking-[-0.04em] text-brand-navy sm:text-4xl">{t('pages.about.stats.heading')}</h2>
+            <h2 className="font-hero-serif mt-3 text-center text-3xl font-semibold tracking-[-0.04em] text-brand-navy sm:text-4xl">{t('pages.about.stats.heading')}</h2>
             <p className="mx-auto mt-2 max-w-md text-center text-sm text-text-muted">{t('pages.about.stats.subtitle')}</p>
             <div className="mt-8 grid gap-4 sm:grid-cols-3">
               <StatCard icon={Car} value={vehicleCount} label={t('pages.about.stats.vehicles', { count: vehicleCount })} />
@@ -213,7 +213,7 @@ export function AboutPage() {
           <div className="mx-auto max-w-5xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
             <div className="mx-auto max-w-2xl text-center">
               <p className="text-[10px] font-semibold uppercase tracking-[0.32em] text-brand-gold">{t('pages.about.model.eyebrow')}</p>
-              <h2 className="font-hero-serif mt-3 text-3xl font-black tracking-[-0.06em] text-brand-navy sm:text-4xl">{t('pages.about.model.heading')}</h2>
+              <h2 className="font-hero-serif mt-3 text-3xl font-semibold tracking-[-0.06em] text-brand-navy sm:text-4xl">{t('pages.about.model.heading')}</h2>
               <p className="mt-2 text-sm leading-6 text-text-muted">{t('pages.about.model.subtitle')}</p>
             </div>
             <div className="mt-12 overflow-x-auto">
@@ -236,7 +236,7 @@ export function AboutPage() {
           <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
             <div className="mx-auto max-w-2xl text-center">
               <p className="text-[10px] font-semibold uppercase tracking-[0.32em] text-brand-gold">{t('pages.about.fleet.eyebrow')}</p>
-              <h2 className="font-hero-serif mt-3 text-3xl font-black tracking-[-0.06em] text-brand-navy sm:text-4xl">{t('pages.about.fleet.heading')}</h2>
+              <h2 className="font-hero-serif mt-3 text-3xl font-semibold tracking-[-0.06em] text-brand-navy sm:text-4xl">{t('pages.about.fleet.heading')}</h2>
               <p className="mt-2 text-sm leading-6 text-text-muted">{t('pages.about.fleet.subtitle')}</p>
             </div>
             <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
@@ -278,7 +278,7 @@ export function AboutPage() {
           <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
             <div className="mx-auto max-w-2xl text-center">
               <p className="text-[10px] font-semibold uppercase tracking-[0.32em] text-brand-gold">{t('pages.about.coverage.eyebrow')}</p>
-              <h2 className="font-hero-serif mt-3 text-3xl font-black tracking-[-0.06em] text-brand-navy sm:text-4xl">{t('pages.about.coverage.heading')}</h2>
+              <h2 className="font-hero-serif mt-3 text-3xl font-semibold tracking-[-0.06em] text-brand-navy sm:text-4xl">{t('pages.about.coverage.heading')}</h2>
               <p className="mt-2 text-sm leading-6 text-text-muted">{t('pages.about.coverage.subtitle')}</p>
             </div>
             <div className="mt-10 grid gap-5 sm:grid-cols-2">
@@ -320,7 +320,7 @@ export function AboutPage() {
       <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
         <div className="mx-auto max-w-2xl text-center">
           <p className="text-[10px] font-semibold uppercase tracking-[0.32em] text-brand-gold">{t('pages.about.values.eyebrow')}</p>
-          <h2 className="font-hero-serif mt-3 text-3xl font-black tracking-[-0.06em] text-brand-navy sm:text-4xl">{t('pages.about.values.heading')}</h2>
+          <h2 className="font-hero-serif mt-3 text-3xl font-semibold tracking-[-0.06em] text-brand-navy sm:text-4xl">{t('pages.about.values.heading')}</h2>
         </div>
         <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {values.map((item, i) => {
@@ -354,7 +354,7 @@ export function AboutPage() {
         <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
           <div className="mx-auto max-w-2xl text-center">
             <p className="text-[10px] font-semibold uppercase tracking-[0.32em] text-brand-gold">{t('pages.about.connect.eyebrow')}</p>
-            <h2 className="font-hero-serif mt-3 text-3xl font-black tracking-[-0.06em] text-brand-navy sm:text-4xl">{t('pages.about.connect.heading')}</h2>
+            <h2 className="font-hero-serif mt-3 text-3xl font-semibold tracking-[-0.06em] text-brand-navy sm:text-4xl">{t('pages.about.connect.heading')}</h2>
             <p className="mt-2 text-sm leading-6 text-text-muted">{t('pages.about.connect.subtitle')}</p>
           </div>
           <div className="mt-10 grid gap-5 lg:grid-cols-2">
@@ -430,7 +430,7 @@ export function AboutPage() {
         />
         <div className="relative mx-auto max-w-4xl border border-[#ece7df] bg-white p-8 shadow-[0_30px_70px_rgba(17,20,29,0.08)] sm:p-12">
           <p className="text-[10px] font-semibold uppercase tracking-[0.32em] text-brand-gold-dark">{t('pages.about.cta.eyebrow')}</p>
-          <h2 className="font-hero-serif mt-4 text-3xl font-black tracking-[-0.06em] text-brand-navy sm:text-4xl">{t('pages.about.cta.heading')}</h2>
+          <h2 className="font-hero-serif mt-4 text-3xl font-semibold tracking-[-0.06em] text-brand-navy sm:text-4xl">{t('pages.about.cta.heading')}</h2>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
             <LinkButton to="/book" variant="primary" className="group">
               {t('nav.searchCars')}
@@ -494,7 +494,7 @@ function StatCard({ icon: Icon, value, label }: { icon: typeof Car; value: numbe
       <span className="mx-auto flex h-11 w-11 items-center justify-center bg-brand-gold text-white transition-all duration-300 group-hover:scale-105 group-hover:shadow-[0_0_0_6px_rgba(212,175,55,0.18)]">
         <Icon className="h-5 w-5" aria-hidden="true" />
       </span>
-      <p className="mt-4 text-3xl font-black text-brand-navy">{value}</p>
+      <p className="mt-4 text-3xl font-semibold text-brand-navy">{value}</p>
       <p className="mt-1 text-sm text-text-muted">{label}</p>
     </div>
   )
@@ -545,7 +545,7 @@ function BusinessModelTree({
   return (
     <div className="flex min-w-[520px] flex-col items-center">
       <div className="border-2 border-brand-navy bg-brand-navy px-6 py-3 text-center">
-        <p className="text-sm font-black uppercase tracking-[0.1em] text-white">{t('nav.brand')}</p>
+        <p className="text-sm font-semibold uppercase tracking-[0.1em] text-white">{t('nav.brand')}</p>
       </div>
       <div className="h-8 w-px bg-brand-gold" aria-hidden="true" />
       <div className="flex w-full items-start">

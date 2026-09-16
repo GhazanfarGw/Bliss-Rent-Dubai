@@ -17,12 +17,12 @@ export function HomeFaqSection() {
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <p className="text-[10px] font-semibold uppercase tracking-[0.32em] text-brand-gold-dark">{t('home.faq.eyebrow')}</p>
-            <h2 className="font-hero-serif mt-2 text-3xl font-black tracking-[-0.06em] text-brand-navy sm:text-4xl">{t('home.faq.title')}</h2>
+            <h2 className="font-hero-serif mt-2 text-3xl font-semibold tracking-[-0.06em] text-brand-navy sm:text-4xl">{t('home.faq.title')}</h2>
             <p className="mt-2 text-sm leading-6 text-text-muted">{t('home.faq.subtitle')}</p>
           </div>
           <Link to="/faqs" className="text-sm font-semibold text-brand-navy underline-offset-4 hover:underline">{t('home.faq.viewAll')}</Link>
         </div>
-        <div className="mt-8 divide-y divide-brand-navy/10 rounded-none border border-[#e7dcc7] bg-white shadow-(--shadow-card)">
+        <div className="mt-8 divide-y divide-brand-navy/10 rounded-none border border-[#e7dcc7] bg-white">
           {items.map((item, index) => {
             const expanded = open === index
             return (

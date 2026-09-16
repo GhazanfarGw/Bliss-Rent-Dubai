@@ -59,7 +59,7 @@ export function BrandsMarquee() {
             </span>
             Trusted by drivers
           </p>
-          <h2 className="font-hero-serif mt-3 text-center text-3xl font-black tracking-[-0.06em] text-brand-navy sm:text-4xl">
+          <h2 className="font-hero-serif mt-3 text-center text-3xl font-semibold tracking-[-0.06em] text-brand-navy sm:text-4xl">
             {t('home.brands.title')}
           </h2>
         </div>
@@ -85,8 +85,12 @@ export function BrandsMarquee() {
 
 function BrandCard({ name }: { name: string }) {
   return (
-    <div className="flex h-full w-[100px] shrink-0 flex-col items-center justify-between rounded-none border border-transparent py-2 shadow-none transition-all duration-300 hover:-translate-y-1 hover:border-brand-gold/50 hover:shadow-[0_18px_36px_rgba(92,9,49,0.1)]">
-      <div className="flex h-24 w-full items-center justify-center sm:h-24">
+    <div className="group flex h-full w-[100px] shrink-0 flex-col items-center justify-between rounded-none border border-transparent py-2 shadow-none transition-all duration-300 hover:-translate-y-1 hover:border-brand-gold/50 hover:shadow-[0_18px_36px_rgba(92,9,49,0.1)]">
+      {/* Monochrome at rest, real brand color on hover — "silver" logo
+          strip per the redesign brief. grayscale/opacity apply to
+          whichever mark renders (the real simple-icons SVG, or the
+          initials-badge fallback — see renderBrandMark). */}
+      <div className="flex h-24 w-full items-center justify-center opacity-60 grayscale transition-all duration-300 group-hover:opacity-100 group-hover:grayscale-0 sm:h-24">
         {renderBrandMark(name)}
       </div>
       <p className="mt-2 text-center text-xs font-semibold tracking-[0.12em] text-brand-navy">{name}</p>

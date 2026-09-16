@@ -355,7 +355,7 @@ export function VehicleDetailPage() {
 
       {similarVehicles && similarVehicles.length > 0 && (
         <section className="mt-12 border-t border-brand-navy/10 pt-10">
-          <h2 className="font-hero-serif text-3xl font-black tracking-[-0.04em] text-brand-navy sm:text-4xl">
+          <h2 className="font-hero-serif text-3xl font-semibold tracking-[-0.04em] text-brand-navy sm:text-4xl">
             {vehicle.vehicle_categories
               ? t('vehicleDetail.similarVehicles.title', { category: vehicle.vehicle_categories.name })
               : t('vehicleDetail.similarVehicles.titleGeneric')}

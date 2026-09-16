@@ -1,49 +1,40 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { ArrowRight } from 'lucide-react'
 import { fetchFeaturedVehiclesByCategory } from '@/features/booking/api'
 import { VehicleCard } from '@/features/booking/VehicleCard'
 import { SectionHeader } from '@/features/shared/ui/SectionHeader'
 import { StateMessage } from '@/features/shared/StateMessage'
 import { groupPublicVehicles } from '@/lib/vehicleGrouping'
-import { prefersReducedMotion } from '@/lib/motion'
 import type { VehicleWithDetails } from '@/types/domain'
 
-interface FeaturedVehicleSliderProps {
-  categoryName: string
-  /** Small row label ("Economy Fleet" / "Luxury Fleet") — not a heading:
-   *  the section has exactly one shared heading and description above
-   *  both rows, so each row only needs enough of a label to tell it apart
-   *  from the other. */
-  label: string
-  viewAllLabel: string
-  emptyTitle: string
-  emptyBody: string
-  /** Which way the row visually auto-scrolls — the two sliders run in
-   *  opposite directions so they read as clearly independent, never a
-   *  matched pair that could look like one mirrored row. */
-  direction: 'left' | 'right'
-}
+type Category = 'Economy' | 'Luxury'
+const CATEGORIES: Category[] = ['Economy', 'Luxury']
 
 /**
- * One category's own featured-vehicles row — Economy and Luxury each get
- * an independent instance below (own fetch, own loading/empty state, own
- * auto-scrolling row), so growing either side of the fleet never crowds
- * out or gets merged into the other's row. Each row auto-plays
- * continuously (built the same way as BrandsMarquee: the vehicle list
- * duplicated once, animated by exactly -50% for a seamless loop) and
- * pauses on hover or keyboard focus so a shopper can stop and read a
- * card.
+ * Homepage "Featured Vehicles" section. Redesign: replaces the old
+ * "both categories always visible, each its own auto-scrolling marquee
+ * row" layout with a single Economy/Luxury pill toggle above one static
+ * grid — one category's real vehicles visible at a time, refetched on
+ * toggle (`fetchFeaturedVehiclesByCategory`, unchanged). No existing
+ * Tabs/SegmentedControl primitive exists in src/features/shared/ui/, so
+ * the toggle is built inline here rather than as a new shared component,
+ * since it's a one-off.
+ *
+ * Real vehicles from the database only (no dates, so VehicleCard falls
+ * back to its headline "From <rate>" price), or an honest empty state —
+ * never invented cars, prices, or fleet counts.
  */
-function FeaturedVehicleSlider({ categoryName, label, viewAllLabel, emptyTitle, emptyBody, direction }: FeaturedVehicleSliderProps) {
+export function FeaturedVehicles() {
   const { t } = useTranslation()
+  const [category, setCategory] = useState<Category>('Economy')
   const [vehicles, setVehicles] = useState<VehicleWithDetails[] | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     let cancelled = false
-    fetchFeaturedVehiclesByCategory(categoryName)
+    setVehicles(null)
+    setError(null)
+    fetchFeaturedVehiclesByCategory(category)
       .then((data) => {
         if (!cancelled) setVehicles(data)
       })
@@ -54,40 +45,43 @@ function FeaturedVehicleSlider({ categoryName, label, viewAllLabel, emptyTitle, 
       cancelled = true
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [categoryName])
+  }, [category])
 
   const loading = vehicles === null && !error
-  // Task 1 — same Make + Model + Year master listings collapse into one
-  // featured card with a combined quantity; see SearchResultsPage for
-  // the identical rule applied to search results.
+  // Same Make + Model + Year master listings collapse into one featured
+  // card with a combined quantity; see SearchResultsPage for the
+  // identical rule applied to search results.
   const grouped = vehicles ? groupPublicVehicles(vehicles) : []
+  const copy = category === 'Economy' ? t('home.featured.economy', { returnObjects: true }) : t('home.featured.luxury', { returnObjects: true })
+  const { label, emptyTitle, emptyBody } = copy as { label: string; viewAll: string; emptyTitle: string; emptyBody: string }
 
   return (
-    <div className="mt-10 first:mt-0">
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.28em] text-brand-gold-dark">
-          <span className="relative flex h-1.5 w-1.5">
-            {!prefersReducedMotion() && (
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-none bg-brand-champagne opacity-75" />
-            )}
-            <span className="relative inline-flex h-1.5 w-1.5 rounded-none bg-brand-gold" />
-          </span>
-          {label}
-        </p>
-        {vehicles && vehicles.length > 0 && (
-          <Link
-            to="/search"
-            className="group inline-flex items-center gap-1 text-sm font-semibold text-brand-navy underline-offset-4 hover:text-brand-gold-dark hover:underline"
+    <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+      <SectionHeader as="h2" title={t('home.featured.title')} description={t('home.featured.subtitle')} emphasis="marketing" />
+
+      {/* Economy/Luxury pill toggle — a plain two-button segmented
+          control, not an extracted shared component (see doc comment
+          above). aria-pressed marks the active side for screen readers. */}
+      <div className="mt-6 inline-flex border border-brand-gold/30 p-1 rounded-full" role="group" aria-label={label}>
+        {CATEGORIES.map((cat) => (
+          <button
+            key={cat}
+            type="button"
+            aria-pressed={cat === category}
+            onClick={() => setCategory(cat)}
+            className={
+              'rounded-full px-6 py-2 text-sm font-semibold transition-colors duration-200 ' +
+              (cat === category ? 'bg-brand-gold text-white' : 'text-brand-navy hover:bg-brand-lavender')
+            }
           >
-            {viewAllLabel}
-            <ArrowRight className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-1 rtl:rotate-180" aria-hidden="true" />
-          </Link>
-        )}
+            {t(`home.featured.${cat.toLowerCase()}.label`)}
+          </button>
+        ))}
       </div>
 
-      <div>
+      <div className="mt-8">
         {loading && (
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3" aria-hidden="true">
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" aria-hidden="true">
             {[0, 1, 2, 3].map((i) => (
               <div key={i} className="h-72 animate-pulse rounded-none bg-[#efe7dc]" />
             ))}
@@ -97,71 +91,17 @@ function FeaturedVehicleSlider({ categoryName, label, viewAllLabel, emptyTitle, 
         {!loading && (error || !vehicles || grouped.length === 0) && <StateMessage title={emptyTitle} body={emptyBody} />}
 
         {!loading && !error && vehicles && grouped.length > 0 && (
-          <div className="overflow-hidden pb-2 [mask-image:linear-gradient(to_right,transparent,black_4%,black_96%,transparent)] [-webkit-mask-image:linear-gradient(to_right,transparent,black_4%,black_96%,transparent)]">
-            <div
-              className={`flex min-w-max gap-4 sm:gap-6 ${
-                direction === 'left' ? 'animate-featured-marquee-left' : 'animate-featured-marquee-right'
-              }`}
-            >
-              {[...grouped, ...grouped].map((group, index) => {
-                // The second copy exists only to make the loop seamless —
-                // hidden from screen readers and keyboard tabbing so it
-                // never doubles up reading order or focus stops.
-                const isDuplicate = index >= grouped.length
-                return (
-                  <div
-                    key={`${group.vehicle.id}-${index}`}
-                    aria-hidden={isDuplicate || undefined}
-                    inert={isDuplicate}
-                    className="w-[82vw] max-w-[320px] shrink-0 rounded-none border border-[#e6dcc7] bg-white p-1 shadow-(--shadow-card) transition-all duration-300 hover:-translate-y-1 hover:border-brand-gold/50 hover:shadow-(--shadow-card-hover) sm:w-[280px]"
-                  >
-                    <VehicleCard vehicle={group.vehicle} detailHref={`/vehicles/${group.vehicle.id}`} featured quantity={group.quantity} />
-                  </div>
-                )
-              })}
-            </div>
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {grouped.map((group) => (
+              <div
+                key={group.vehicle.id}
+                className="rounded-none border border-[#e6dcc7] bg-white p-1 shadow-(--shadow-card) transition-all duration-300 hover:-translate-y-1 hover:border-brand-gold/50 hover:shadow-(--shadow-card-hover)"
+              >
+                <VehicleCard vehicle={group.vehicle} detailHref={`/vehicles/${group.vehicle.id}`} featured quantity={group.quantity} />
+              </div>
+            ))}
           </div>
         )}
-      </div>
-    </div>
-  )
-}
-
-/**
- * Homepage "Featured Vehicles" section — one shared heading and
- * description for the whole section, above two independent auto-scrolling
- * rows (Economy, then Luxury, each labeled but never re-titled): adding
- * new vehicles to one category only ever grows that category's own row,
- * never the other's. Real vehicles from the database only (no dates, so
- * VehicleCard falls back to its headline "From <rate>" price), or an
- * honest per-category empty state — never invented cars, prices, or fleet
- * counts.
- */
-export function FeaturedVehicles() {
-  const { t } = useTranslation()
-
-  return (
-    <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-      <SectionHeader as="h2" title={t('home.featured.title')} description={t('home.featured.subtitle')} emphasis="marketing" />
-
-      <div className="mt-8">
-        <FeaturedVehicleSlider
-          categoryName="Economy"
-          label={t('home.featured.economy.label')}
-          viewAllLabel={t('home.featured.economy.viewAll')}
-          emptyTitle={t('home.featured.economy.emptyTitle')}
-          emptyBody={t('home.featured.economy.emptyBody')}
-          direction="right"
-        />
-
-        <FeaturedVehicleSlider
-          categoryName="Luxury"
-          label={t('home.featured.luxury.label')}
-          viewAllLabel={t('home.featured.luxury.viewAll')}
-          emptyTitle={t('home.featured.luxury.emptyTitle')}
-          emptyBody={t('home.featured.luxury.emptyBody')}
-          direction="left"
-        />
       </div>
     </section>
   )

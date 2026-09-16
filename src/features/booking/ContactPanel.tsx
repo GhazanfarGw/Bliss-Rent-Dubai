@@ -16,7 +16,7 @@ export function ContactPanel() {
 
   return (
     <div>
-      <h2 className="font-hero-serif text-3xl font-black tracking-[-0.04em] text-brand-navy sm:text-4xl">{t('home.navigator.contact.heading')}</h2>
+      <h2 className="font-hero-serif text-3xl font-semibold tracking-[-0.04em] text-brand-navy sm:text-4xl">{t('home.navigator.contact.heading')}</h2>
       <p className="mt-2 max-w-xl text-sm leading-6 text-text-muted">{t('home.navigator.contact.intro')}</p>
 
       <div className="mt-6 grid gap-4 sm:grid-cols-2">

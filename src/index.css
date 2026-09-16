@@ -398,6 +398,16 @@ body {
   -webkit-backdrop-filter: blur(6px);
 }
 
+/* NavBar's "scrolled" (solid) state — a frosted glass header instead of a
+   flat white one, per the glassmorphism redesign. Named class instead of
+   inline Tailwind utilities so NavBar.tsx's className ternary stays
+   readable next to its `transparent` counterpart. */
+.header-glass {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(14px) saturate(1.4);
+  -webkit-backdrop-filter: blur(14px) saturate(1.4);
+}
+
 .route-loader-panel {
   width: min(88vw, 420px);
   display: flex;
