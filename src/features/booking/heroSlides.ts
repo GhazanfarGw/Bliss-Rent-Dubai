@@ -40,16 +40,35 @@ export const HERO_SLIDE_IMAGES: HeroSlideImage[] = [
  * would bloat the JS build, and unlike the imported .webp slides above it
  * doesn't need Vite to fingerprint/optimize it.
  *
+ * Desktop and mobile intentionally use DIFFERENT clips (owner's request —
+ * the wide desktop shot doesn't crop well to a tall phone screen), picked
+ * via each `<source>`'s `media` attribute in Hero.tsx (evaluated once at
+ * load, not reactive to a later resize — fine for a hero background) at
+ * the same `min-width: 1024px` breakpoint Hero.tsx's own `lg:` layout
+ * classes already use, so the two switch together.
+ *
  * Drop the actual file(s) in public/hero/ using these exact names:
- *   - hero-video.mp4   (required — H.264, ideally <8MB, muted-loop friendly)
- *   - hero-video.webm  (optional — smaller/better-compressed fallback source)
+ *   - hero-video.mp4          (desktop, required — H.264, ideally <8MB)
+ *   - hero-video.webm         (desktop, optional smaller fallback)
+ *   - hero-video-mobile.mp4   (mobile, required — H.264, ideally <8MB)
+ *   - hero-video-mobile.webm  (mobile, optional smaller fallback)
  *
  * HERO_SLIDE_IMAGES[HERO_SLIDE_INDEX] (heroBlissJourney) is still used as
- * the <video>'s poster and as the still image shown for
- * prefers-reduced-motion, so nothing breaks before the video file exists —
- * it just won't play yet.
+ * the <video>'s poster (same still for both breakpoints) and as the image
+ * shown for prefers-reduced-motion, so nothing breaks before either video
+ * file exists — it just won't play yet.
  */
 export const HERO_VIDEO_SOURCES = {
-  webm: '/hero/hero-video.webm',
-  mp4: '/hero/hero-video.mp4',
+  desktop: {
+    webm: '/hero/hero-video.webm',
+    mp4: '/hero/hero-video.mp4',
+  },
+  mobile: {
+    webm: '/hero/hero-video-mobile.webm',
+    mp4: '/hero/hero-video-mobile.mp4',
+  },
 }
+
+/** Matches Hero.tsx's own `lg:` breakpoint — the video source list above
+ *  switches at the same width its layout does. */
+export const HERO_VIDEO_DESKTOP_MEDIA_QUERY = '(min-width: 1024px)'

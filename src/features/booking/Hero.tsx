@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { ArrowRight, Car, ChevronDown, MapPin } from 'lucide-react'
-import { HERO_SLIDE_IMAGES, HERO_VIDEO_SOURCES } from '@/features/booking/heroSlides'
+import { HERO_SLIDE_IMAGES, HERO_VIDEO_SOURCES, HERO_VIDEO_DESKTOP_MEDIA_QUERY } from '@/features/booking/heroSlides'
 import { LinkButton } from '@/features/shared/ui/LinkButton'
 import { useFleetStats } from '@/features/booking/useFleetStats'
 import { prefersReducedMotion } from '@/lib/motion'
@@ -39,6 +39,9 @@ const HERO_TEXT_ROTATE_MS = 6000
  *    animation class is no longer applied here. `prefers-reduced-motion`
  *    still gets the original still image (HERO_SLIDE_IMAGES[HERO_SLIDE_INDEX],
  *    also used as the video's `poster`) instead of the video element at all.
+ *    Desktop and mobile intentionally play different clips (owner's
+ *    request) — see the `<source media=...>` pairs below and the doc
+ *    comment on HERO_VIDEO_SOURCES for how the switch works.
  *  - A compact trust-signal row under the CTAs, fetched live from the
  *    same fleet/locations queries AboutPage's stats section and
  *    TickerBar's rate already use — never a hand-typed figure. This is
@@ -129,14 +132,26 @@ export function Hero() {
           aria-label={t(image.altKey)}
           className="absolute inset-0 h-full w-full object-cover object-center saturate-[1.1] contrast-[1.05]"
         >
-          <source src={HERO_VIDEO_SOURCES.webm} type="video/webm" />
-          <source src={HERO_VIDEO_SOURCES.mp4} type="video/mp4" />
+          {/* Desktop and mobile play different clips — `media` is checked
+              once when the browser picks a source (not live on resize),
+              at the same lg: breakpoint (1024px) Hero.tsx's own layout
+              classes use, so video and layout switch together. Desktop
+              sources listed first: a source is skipped once its `media`
+              fails to match, so mobile's plain (no-`media`) sources below
+              only get used when the desktop ones didn't. */}
+          <source media={HERO_VIDEO_DESKTOP_MEDIA_QUERY} src={HERO_VIDEO_SOURCES.desktop.webm} type="video/webm" />
+          <source media={HERO_VIDEO_DESKTOP_MEDIA_QUERY} src={HERO_VIDEO_SOURCES.desktop.mp4} type="video/mp4" />
+          <source src={HERO_VIDEO_SOURCES.mobile.webm} type="video/webm" />
+          <source src={HERO_VIDEO_SOURCES.mobile.mp4} type="video/mp4" />
         </video>
       )}
-      {/* The image itself stays bright and clearly visible — only a soft
-          bottom-up gradient for the headline/CTA to sit on, plus a light
-          band behind the transparent header so its text stays legible.
-          No flat dark wash over the whole photo. */}
+      {/* Full-frame brand-navy tint wash (owner's request) — a uniform
+          cinematic/premium color tint over the whole video, on top of
+          which the two directional gradients below still add their own
+          extra darkening at the bottom (headline/CTA legibility) and top
+          (header legibility). Sits between the video and those gradients
+          so both effects stack rather than compete. */}
+      <div className="absolute inset-0 bg-brand-navy/30" />
       <div className="absolute inset-0 bg-gradient-to-t from-[#05070d]/85 via-[#05070d]/25 via-45% to-transparent" />
       <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-[#05070d]/55 to-transparent" />
 
