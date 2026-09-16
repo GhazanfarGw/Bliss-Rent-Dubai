@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { ArrowRight, Car, ChevronDown, MapPin } from 'lucide-react'
-import { HERO_SLIDE_IMAGES, HERO_VIDEO_SOURCES, HERO_VIDEO_DESKTOP_MEDIA_QUERY } from '@/features/booking/heroSlides'
+import { HERO_VIDEO_SOURCES, HERO_VIDEO_DESKTOP_MEDIA_QUERY } from '@/features/booking/heroSlides'
 import { LinkButton } from '@/features/shared/ui/LinkButton'
 import { useFleetStats } from '@/features/booking/useFleetStats'
 import { prefersReducedMotion } from '@/lib/motion'
@@ -82,7 +82,6 @@ export function Hero() {
   const [slideIndex, setSlideIndex] = useState(HERO_SLIDE_INDEX)
   const stats = useFleetStats()
   const slide = slides[slideIndex] ?? slides[0]
-  const image = HERO_SLIDE_IMAGES[HERO_SLIDE_INDEX] ?? HERO_SLIDE_IMAGES[0]
   const reducedMotion = prefersReducedMotion()
 
   useEffect(() => {
@@ -110,26 +109,13 @@ export function Hero() {
       // the hero is meant to sit immersively under the translucent header, so
       // it negates that padding here rather than every other page doing so.
       id="home-hero"
-      className="relative isolate -mt-[var(--header-h)] overflow-hidden bg-brand-navy"
+      className="relative isolate -mt-[var(--header-h)] overflow-hidden"
     >
-      {reducedMotion ? (
-        // No autoplaying video for prefers-reduced-motion — same still
-        // frame the video would otherwise open on.
-        <img
-          src={image.src}
-          alt={t(image.altKey)}
-          loading="eager"
-          fetchPriority="high"
-          className="absolute inset-0 h-full w-full object-cover object-center saturate-[1.1] contrast-[1.05]"
-        />
-      ) : (
         <video
           autoPlay
           loop
           muted
           playsInline
-          poster={image.src}
-          aria-label={t(image.altKey)}
           className="absolute inset-0 h-full w-full object-cover object-center saturate-[1.1] contrast-[1.05]"
         >
           {/* Desktop and mobile play different clips — `media` is checked
@@ -144,7 +130,7 @@ export function Hero() {
           <source src={HERO_VIDEO_SOURCES.mobile.webm} type="video/webm" />
           <source src={HERO_VIDEO_SOURCES.mobile.mp4} type="video/mp4" />
         </video>
-      )}
+  
       {/* Full-frame brand-navy tint wash (owner's request) — a uniform
           cinematic/premium color tint over the whole video, on top of
           which the two directional gradients below still add their own
