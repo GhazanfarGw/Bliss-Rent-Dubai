@@ -13,12 +13,20 @@ const CATEGORIES: Category[] = ['Economy', 'Luxury']
 /**
  * Homepage "Featured Vehicles" section. Redesign: replaces the old
  * "both categories always visible, each its own auto-scrolling marquee
- * row" layout with a single Economy/Luxury pill toggle above one static
- * grid — one category's real vehicles visible at a time, refetched on
- * toggle (`fetchFeaturedVehiclesByCategory`, unchanged). No existing
- * Tabs/SegmentedControl primitive exists in src/features/shared/ui/, so
- * the toggle is built inline here rather than as a new shared component,
- * since it's a one-off.
+ * row" layout with a single Economy/Luxury pill toggle above ONE
+ * auto-scrolling row — one category's real vehicles visible at a time,
+ * refetched on toggle (`fetchFeaturedVehiclesByCategory`, unchanged). No
+ * existing Tabs/SegmentedControl primitive exists in
+ * src/features/shared/ui/, so the toggle is built inline here rather
+ * than as a new shared component, since it's a one-off.
+ *
+ * Per owner feedback after the first pass (toggle kept, static grid
+ * reverted): the active category's cards auto-scroll exactly like the
+ * old dual-marquee version did — same duplicate-the-list-once trick and
+ * `animate-featured-marquee-left/right` keyframes (index.css), just
+ * driven by one row instead of two. Direction still alternates by
+ * category (Economy right, Luxury left) purely so switching tabs reads
+ * as a visibly different row, not because two rows run at once anymore.
  *
  * Real vehicles from the database only (no dates, so VehicleCard falls
  * back to its headline "From <rate>" price), or an honest empty state —
@@ -81,9 +89,9 @@ export function FeaturedVehicles() {
 
       <div className="mt-8">
         {loading && (
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4" aria-hidden="true">
+          <div className="flex gap-5 overflow-hidden" aria-hidden="true">
             {[0, 1, 2, 3].map((i) => (
-              <div key={i} className="h-72 animate-pulse rounded-none bg-[#efe7dc]" />
+              <div key={i} className="h-72 w-[82vw] max-w-[320px] shrink-0 animate-pulse rounded-none bg-[#efe7dc] sm:w-[280px]" />
             ))}
           </div>
         )}
@@ -91,15 +99,31 @@ export function FeaturedVehicles() {
         {!loading && (error || !vehicles || grouped.length === 0) && <StateMessage title={emptyTitle} body={emptyBody} />}
 
         {!loading && !error && vehicles && grouped.length > 0 && (
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {grouped.map((group) => (
-              <div
-                key={group.vehicle.id}
-                className="rounded-none border border-[#e6dcc7] bg-white p-1 shadow-(--shadow-card) transition-all duration-300 hover:-translate-y-1 hover:border-brand-gold/50 hover:shadow-(--shadow-card-hover)"
-              >
-                <VehicleCard vehicle={group.vehicle} detailHref={`/vehicles/${group.vehicle.id}`} featured quantity={group.quantity} />
-              </div>
-            ))}
+          <div className="overflow-hidden pb-2 [mask-image:linear-gradient(to_right,transparent,black_4%,black_96%,transparent)] [-webkit-mask-image:linear-gradient(to_right,transparent,black_4%,black_96%,transparent)]">
+            <div
+              key={category}
+              className={
+                'flex min-w-max gap-4 sm:gap-6 ' +
+                (category === 'Economy' ? 'animate-featured-marquee-right' : 'animate-featured-marquee-left')
+              }
+            >
+              {[...grouped, ...grouped].map((group, index) => {
+                // The second copy exists only to make the loop seamless —
+                // hidden from screen readers and keyboard tabbing so it
+                // never doubles up reading order or focus stops.
+                const isDuplicate = index >= grouped.length
+                return (
+                  <div
+                    key={`${group.vehicle.id}-${index}`}
+                    aria-hidden={isDuplicate || undefined}
+                    inert={isDuplicate}
+                    className="w-[82vw] max-w-[320px] shrink-0 rounded-none border border-[#e6dcc7] bg-white p-1 shadow-(--shadow-card) transition-all duration-300 hover:-translate-y-1 hover:border-brand-gold/50 hover:shadow-(--shadow-card-hover) sm:w-[280px]"
+                  >
+                    <VehicleCard vehicle={group.vehicle} detailHref={`/vehicles/${group.vehicle.id}`} featured quantity={group.quantity} />
+                  </div>
+                )
+              })}
+            </div>
           </div>
         )}
       </div>

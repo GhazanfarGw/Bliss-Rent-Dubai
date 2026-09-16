@@ -74,12 +74,14 @@ describe('FeaturedVehicles', () => {
     expect(fetchFeaturedVehiclesByCategory).not.toHaveBeenCalledWith('Luxury')
   })
 
-  it('shows only the active category\'s real vehicles in a static grid, switching on toggle click', async () => {
+  it('shows only the active category\'s real vehicles in an auto-scrolling row, switching on toggle click', async () => {
     const user = userEvent.setup()
     mockByCategory({ Economy: [economyVehicle], Luxury: [luxuryVehicle] })
     renderIt()
 
-    expect(await screen.findByText('Toyota Camry')).toBeInTheDocument()
+    // Each real vehicle renders twice — the row is duplicated once so the
+    // auto-scroll loop is seamless (same trick the pre-toggle version used).
+    expect(await screen.findAllByText('Toyota Camry')).toHaveLength(2)
     expect(screen.queryByText('Lamborghini Huracan EVO')).not.toBeInTheDocument()
 
     // One shared heading for the whole section; the toggle itself uses
@@ -91,10 +93,39 @@ describe('FeaturedVehicles', () => {
 
     await user.click(luxuryTab)
 
-    expect(await screen.findByText('Lamborghini Huracan EVO')).toBeInTheDocument()
+    expect(await screen.findAllByText('Lamborghini Huracan EVO')).toHaveLength(2)
     expect(screen.queryByText('Toyota Camry')).not.toBeInTheDocument()
     expect(luxuryTab).toHaveAttribute('aria-pressed', 'true')
     expect(fetchFeaturedVehiclesByCategory).toHaveBeenCalledWith('Luxury')
+  })
+
+  it('auto-scrolls the active row and hides the duplicated (loop-only) copy from screen readers and keyboard tabbing', async () => {
+    mockByCategory({ Economy: [economyVehicle], Luxury: [] })
+    renderIt()
+
+    const camryCards = await screen.findAllByText('Toyota Camry')
+    expect(camryCards).toHaveLength(2)
+
+    expect(document.querySelector('.animate-featured-marquee-right')).not.toBeNull()
+
+    const wrappers = camryCards.map((card) => card.closest('[aria-hidden], .w-\\[82vw\\]'))
+    const hiddenCount = wrappers.filter((el) => el?.getAttribute('aria-hidden') === 'true').length
+    expect(hiddenCount).toBe(1)
+  })
+
+  it('scrolls the Economy row and the Luxury row in opposite directions', async () => {
+    const user = userEvent.setup()
+    mockByCategory({ Economy: [economyVehicle], Luxury: [luxuryVehicle] })
+    renderIt()
+
+    await screen.findAllByText('Toyota Camry')
+    expect(document.querySelector('.animate-featured-marquee-right')).not.toBeNull()
+
+    await user.click(screen.getByRole('button', { name: 'Luxury Fleet' }))
+
+    await screen.findAllByText('Lamborghini Huracan EVO')
+    expect(document.querySelector('.animate-featured-marquee-left')).not.toBeNull()
+    expect(document.querySelector('.animate-featured-marquee-right')).toBeNull()
   })
 
   it('shows the empty state (not a crash) if the active category\'s fetch fails', async () => {
