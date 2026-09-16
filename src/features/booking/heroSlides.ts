@@ -3,6 +3,8 @@ import heroSedan from '@/assets/hero/hero-sedan.webp'
 import heroSuv from '@/assets/hero/hero-suv.webp'
 import heroLuxury from '@/assets/hero/hero-luxury.webp'
 import heroBlissJourney from '@/assets/hero/hero-bliss-journey.webp'
+import heroVideoDesktopMp4 from '@/assets/hero/hero-video.mp4'
+import heroVideoMobileMp4 from '@/assets/hero/hero-video-mobile.mp4'
 
 /**
  * The hero's image source list — real, photorealistic vehicle photography
@@ -35,10 +37,18 @@ export const HERO_SLIDE_IMAGES: HeroSlideImage[] = [
 
 /**
  * The pinned hero background (HERO_SLIDE_INDEX in Hero.tsx) is now a video
- * instead of a static photo. It's served from /public/hero rather than
- * imported as a module asset — a video is large enough that bundling it
- * would bloat the JS build, and unlike the imported .webp slides above it
- * doesn't need Vite to fingerprint/optimize it.
+ * instead of a static photo. The .mp4 files are imported as real module
+ * assets (src/assets/hero/) exactly like the .webp slides above, NOT
+ * served as plain strings from /public/hero — that earlier approach
+ * (avoiding "bloating the JS build") was based on a mistaken worry: an
+ * imported video isn't inlined into JS either way, it's just copied to
+ * the build output as its own file. What that earlier approach actually
+ * cost was cache-busting: /public files keep the exact same URL forever,
+ * so replacing hero-video.mp4's content (as happened) left visitors'
+ * browsers serving the OLD cached clip indefinitely — a stale hero video
+ * on refresh, with no way to force an update short of a hard-refresh.
+ * Importing it lets Vite fingerprint the filename by content hash, so a
+ * changed video automatically gets a new URL and busts every cache.
  *
  * Desktop and mobile intentionally use DIFFERENT clips (owner's request —
  * the wide desktop shot doesn't crop well to a tall phone screen), picked
@@ -47,25 +57,24 @@ export const HERO_SLIDE_IMAGES: HeroSlideImage[] = [
  * the same `min-width: 1024px` breakpoint Hero.tsx's own `lg:` layout
  * classes already use, so the two switch together.
  *
- * Drop the actual file(s) in public/hero/ using these exact names:
- *   - hero-video.mp4          (desktop, required — H.264, ideally <8MB)
- *   - hero-video.webm         (desktop, optional smaller fallback)
- *   - hero-video-mobile.mp4   (mobile, required — H.264, ideally <8MB)
- *   - hero-video-mobile.webm  (mobile, optional smaller fallback)
+ * The .webm fallbacks are the one piece still NOT wired to a real file
+ * (none has been supplied) — left as plain /public/hero paths since
+ * there's nothing to import yet; harmless 404s today (the browser just
+ * skips to the next <source>), swap to a real import the same way the
+ * .mp4s above are done if a compressed .webm pair is ever added.
  *
  * HERO_SLIDE_IMAGES[HERO_SLIDE_INDEX] (heroBlissJourney) is still used as
  * the <video>'s poster (same still for both breakpoints) and as the image
- * shown for prefers-reduced-motion, so nothing breaks before either video
- * file exists — it just won't play yet.
+ * shown for prefers-reduced-motion.
  */
 export const HERO_VIDEO_SOURCES = {
   desktop: {
     webm: '/hero/hero-video.webm',
-    mp4: '/hero/hero-video.mp4',
+    mp4: heroVideoDesktopMp4,
   },
   mobile: {
     webm: '/hero/hero-video-mobile.webm',
-    mp4: '/hero/hero-video-mobile.mp4',
+    mp4: heroVideoMobileMp4,
   },
 }
 
