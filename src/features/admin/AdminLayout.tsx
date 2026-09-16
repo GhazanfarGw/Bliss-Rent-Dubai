@@ -118,8 +118,16 @@ export function AdminLayout() {
           </div>
         </header>
 
-        {/* The only scrolling region — sidebar and header stay put, this scrolls independently. */}
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6">
+        {/*
+          The only scrolling region — sidebar and header stay put, this
+          scrolls independently. `[contain:layout]` is load-bearing: without
+          it, a tall child (e.g. the fleet grid) makes the whole document
+          scroll instead of just this element — `overflow-y-auto` alone
+          doesn't stop a nested flex/grid child's layout size from leaking
+          into the page's scrollHeight, so the sidebar and header end up
+          scrolling away with the page instead of staying fixed.
+        */}
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 [contain:layout]">
           <Outlet />
         </main>
       </div>

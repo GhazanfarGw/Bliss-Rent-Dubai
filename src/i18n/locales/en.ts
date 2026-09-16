@@ -924,7 +924,8 @@ const en = {
     },
     fleet: {
       subtitle: 'Manage vehicles, categories, images, and status.',
-      tabs: { all: 'All' },
+      totalVehicles: '{{count}} vehicle total',
+      totalVehicles_other: '{{count}} vehicles total',
       addVehicle: 'Add vehicle',
       emptyTitle: 'No vehicles yet',
       emptyBody: 'Add your first vehicle to start building the fleet.',

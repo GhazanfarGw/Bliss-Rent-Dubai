@@ -921,7 +921,12 @@ const ar = {
     },
     fleet: {
       subtitle: 'إدارة السيارات والفئات والصور والحالة.',
-      tabs: { all: 'الكل' },
+      totalVehicles_zero: 'لا توجد سيارات إجمالاً',
+      totalVehicles_one: 'سيارة واحدة إجمالاً',
+      totalVehicles_two: 'سيارتان إجمالاً',
+      totalVehicles_few: '{{count}} سيارات إجمالاً',
+      totalVehicles_many: '{{count}} سيارة إجمالاً',
+      totalVehicles_other: '{{count}} سيارة إجمالاً',
       addVehicle: 'إضافة سيارة',
       emptyTitle: 'لا توجد سيارات بعد',
       emptyBody: 'أضف أول سيارة لبدء بناء الأسطول.',

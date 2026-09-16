@@ -11,7 +11,7 @@ import { VehiclePhoto } from '@/features/booking/VehiclePhoto'
 import { primaryImage } from '@/lib/vehicleImages'
 import type { AdminVehicleWithDetails } from '@/types/domain'
 
-type TabValue = 'all' | 'available' | 'reserved' | 'rented' | 'maintenance' | 'unavailable'
+type TabValue = 'available' | 'reserved' | 'rented' | 'maintenance' | 'unavailable'
 
 type LoadState =
   | { status: 'loading' }
@@ -20,7 +20,7 @@ type LoadState =
 
 export function FleetListPage() {
   const { t } = useTranslation()
-  const [tab, setTab] = useState<TabValue>('all')
+  const [tab, setTab] = useState<TabValue>('available')
   const [state, setState] = useState<LoadState>({ status: 'loading' })
 
   useEffect(() => {
@@ -41,7 +41,6 @@ export function FleetListPage() {
 
   const filtered = useMemo(() => {
     if (state.status !== 'loaded') return []
-    if (tab === 'all') return state.vehicles
     return state.vehicles.filter((v) => v.operational_status === tab)
   }, [state, tab])
 
@@ -53,7 +52,6 @@ export function FleetListPage() {
   }, [state])
 
   const tabs: AdminTab<TabValue>[] = [
-    { value: 'all', label: t('admin.fleet.tabs.all'), count: state.status === 'loaded' ? state.vehicles.length : undefined },
     { value: 'available', label: t('admin.status.available'), count: counts.available },
     { value: 'reserved', label: t('admin.status.reserved'), count: counts.reserved },
     { value: 'rented', label: t('admin.status.rented'), count: counts.rented },
@@ -67,12 +65,19 @@ export function FleetListPage() {
         title={t('admin.nav.fleet')}
         description={t('admin.fleet.subtitle')}
         action={
-          <Link
-            to="/admin/fleet/new"
-            className="inline-flex items-center bg-brand-gold px-4 py-2 text-sm font-semibold text-white hover:bg-brand-gold-light"
-          >
-            {t('admin.fleet.addVehicle')}
-          </Link>
+          <div className="flex flex-col items-end gap-1.5">
+            {state.status === 'loaded' && (
+              <span className="text-xs font-medium text-text-muted">
+                {t('admin.fleet.totalVehicles', { count: state.vehicles.length })}
+              </span>
+            )}
+            <Link
+              to="/admin/fleet/new"
+              className="inline-flex items-center bg-brand-gold px-4 py-2 text-sm font-semibold text-white hover:bg-brand-gold-light"
+            >
+              {t('admin.fleet.addVehicle')}
+            </Link>
+          </div>
         }
       />
 
