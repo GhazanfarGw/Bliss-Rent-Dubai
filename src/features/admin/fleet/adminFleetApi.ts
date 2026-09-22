@@ -53,6 +53,10 @@ export async function fetchVehicleById(id: string): Promise<AdminVehicleWithDeta
   }
 }
 
+/** A blank form field means "not entered": stored as NULL, never as an empty string or 0. */
+const textOrNull = (value: string): string | null => value.trim() || null
+const numberOrNull = (value: string): number | null => (value.trim() === '' ? null : Number(value))
+
 function draftToRow(draft: VehicleDraft): Omit<VehicleRow, 'id' | 'created_at'> {
   return {
     category_id: draft.categoryId,
@@ -63,6 +67,18 @@ function draftToRow(draft: VehicleDraft): Omit<VehicleRow, 'id' | 'created_at'> 
     seats: Number(draft.seats),
     plate_number: draft.plateNumber.trim(),
     status: draft.status,
+    engine: textOrNull(draft.engine),
+    horsepower: numberOrNull(draft.horsepower),
+    torque_nm: numberOrNull(draft.torqueNm),
+    top_speed_kmh: numberOrNull(draft.topSpeedKmh),
+    acceleration_0_100: numberOrNull(draft.acceleration0100),
+    fuel_type: textOrNull(draft.fuelType),
+    fuel_consumption_l100km: numberOrNull(draft.fuelConsumptionL100km),
+    drivetrain: textOrNull(draft.drivetrain),
+    doors: numberOrNull(draft.doors),
+    origin_country: textOrNull(draft.originCountry),
+    about: textOrNull(draft.about),
+    about_ar: textOrNull(draft.aboutAr),
     // Phase 14 — every vehicle created through this Add/Edit Vehicle admin
     // UI is a real physical car with its own real plate, i.e. a master
     // listing (is_master_listing = true, the column's own DB default and

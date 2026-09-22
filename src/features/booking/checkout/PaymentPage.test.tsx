@@ -114,6 +114,17 @@ describe('PaymentPage', () => {
     expect(await screen.findByText(/we can't find that booking in this browser/i)).toBeInTheDocument()
   })
 
+  it('keeps the dates and places in the car card on the payment step — nothing else there lists them', async () => {
+    saveBookingResult(bookingResult)
+    vi.mocked(createPaymentIntent).mockResolvedValue({ clientSecret: 'pi_1_secret', paymentIntentId: 'pi_1' })
+
+    renderPayment()
+    await screen.findByTestId('payment-element')
+
+    expect(screen.getByText('Pickup date')).toBeInTheDocument()
+    expect(screen.getByText('Drop-off date')).toBeInTheDocument()
+  })
+
   it('creates a Stripe PaymentIntent on mount and mounts the Payment Element once ready', async () => {
     saveBookingResult(bookingResult)
     vi.mocked(createPaymentIntent).mockResolvedValue({ clientSecret: 'pi_1_secret', paymentIntentId: 'pi_1' })

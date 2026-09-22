@@ -71,7 +71,7 @@ describe('BookingSearchSection', () => {
     expect(await screen.findByRole('button', { name: /select pickup point/i })).toBeInTheDocument()
   })
 
-  it('renders all four premium booking navigator tabs, Search Cars active by default', async () => {
+  it('renders the two focused booking navigator tabs, Search Cars active by default', async () => {
     render(
       <MemoryRouter>
         <BookingSearchSection onSearch={vi.fn()} />
@@ -79,13 +79,13 @@ describe('BookingSearchSection', () => {
     )
     await screen.findByRole('button', { name: /select pickup point/i })
     const nav = screen.getByRole('navigation', { name: /booking navigator/i })
-    expect(within(nav).getByRole('button', { name: /search cars/i })).toHaveAttribute('aria-current', 'page')
-    expect(within(nav).getByRole('button', { name: /manage booking/i })).toBeInTheDocument()
-    expect(within(nav).getByRole('button', { name: /booking status/i })).toBeInTheDocument()
-    expect(within(nav).getByRole('button', { name: /^contact/i })).toBeInTheDocument()
+    expect(within(nav).getAllByRole('tab')).toHaveLength(2)
+    expect(within(nav).getByRole('tab', { name: /search cars/i })).toHaveAttribute('aria-current', 'page')
+    expect(within(nav).getByRole('tab', { name: /manage booking/i })).toBeInTheDocument()
+    expect(within(nav).queryByRole('tab', { name: /get help/i })).not.toBeInTheDocument()
   })
 
-  it('switches to the Manage Booking panel (reference + last name) when that tab is selected', async () => {
+  it('switches to the Manage Booking panel (reference + last name), with no heading above it, when that tab is selected', async () => {
     const user = userEvent.setup()
     render(
       <MemoryRouter>
@@ -95,50 +95,18 @@ describe('BookingSearchSection', () => {
     await screen.findByRole('button', { name: /select pickup point/i })
 
     const nav = screen.getByRole('navigation', { name: /booking navigator/i })
-    await user.click(within(nav).getByRole('button', { name: /manage booking/i }))
+    await user.click(within(nav).getByRole('tab', { name: /manage booking/i }))
 
-    // ManageBookingVerifyPanel's idle form has no heading of its own any
-    // more — d199ef0's larger inline-verify rewrite dropped the
-    // `home.navigator.manage.heading`/`.intro` render (the translation
-    // keys are still there, just unused now) — so the two real lookup
-    // fields are what confirms the panel switched, via their current
-    // placeholders (home.navigator.manage.referencePlaceholder/
-    // lastNamePlaceholder in en.ts).
+    // The "Manage Your Booking" heading/description that used to sit above
+    // this panel (BookingNavigator's PanelIntro) was dropped per a direct
+    // follow-up request — the two real lookup fields are what confirms the
+    // panel switched, via their current placeholders
+    // (home.navigator.manage.referencePlaceholder/lastNamePlaceholder in
+    // en.ts).
+    expect(screen.queryByRole('heading', { name: /manage your booking/i })).not.toBeInTheDocument()
     expect(screen.getByPlaceholderText('BLS-XXXXXXXX')).toBeInTheDocument()
     expect(screen.getByPlaceholderText(/renter/i)).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /select pickup point/i })).not.toBeInTheDocument()
-  })
-
-  it('switches to the Booking Status panel (reference only) when that tab is selected', async () => {
-    const user = userEvent.setup()
-    render(
-      <MemoryRouter>
-        <BookingSearchSection onSearch={vi.fn()} />
-      </MemoryRouter>,
-    )
-    await screen.findByRole('button', { name: /select pickup point/i })
-
-    const nav = screen.getByRole('navigation', { name: /booking navigator/i })
-    await user.click(within(nav).getByRole('button', { name: /booking status/i }))
-
-    expect(screen.getByText(/check booking status/i)).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /check status/i })).toBeInTheDocument()
-  })
-
-  it('switches to the Contact panel (Email + WhatsApp, exactly two methods) when that tab is selected', async () => {
-    const user = userEvent.setup()
-    render(
-      <MemoryRouter>
-        <BookingSearchSection onSearch={vi.fn()} />
-      </MemoryRouter>,
-    )
-    await screen.findByRole('button', { name: /select pickup point/i })
-
-    const nav = screen.getByRole('navigation', { name: /booking navigator/i })
-    await user.click(within(nav).getByRole('button', { name: /^contact/i }))
-
-    expect(screen.getByRole('link', { name: /whatsapp/i }).getAttribute('href')).toContain('wa.me')
-    expect(screen.getByRole('link', { name: /^email/i }).getAttribute('href')).toContain('mailto:')
   })
 
   it('still calls onSearch with the entered criteria from the Search Cars panel — no duplicated booking logic', async () => {
@@ -162,7 +130,10 @@ describe('BookingSearchSection', () => {
     await user.click(screen.getByRole('button', { name: /select pickup point/i }))
     await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: /DXB Terminal 3/ }))
 
-    // "Same Return Location" is checked by default — drop-off mirrors pickup.
+    await user.click(screen.getByRole('button', { name: /select return point/i }))
+    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: /Downtown Dubai/ }))
+
+    // The default separate return picker keeps the drop-off choice explicit.
     // Scope the submit action to the SearchWidget form because the mobile
     // navigator row intentionally has the same visible label.
     await user.click(within(document.querySelector('form') as HTMLElement).getByRole('button', { name: /^search cars$/i }))
@@ -172,7 +143,7 @@ describe('BookingSearchSection', () => {
         startDate: startIso,
         endDate: endIso,
         pickupLocationId: 'loc-airport',
-        dropoffLocationId: 'loc-airport',
+        dropoffLocationId: 'loc-city',
         pickupTime: '10:00',
       }),
     )

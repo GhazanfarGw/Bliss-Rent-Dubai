@@ -1,99 +1,47 @@
-import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
-import { ArrowRight, Car, ChevronDown, MapPin } from 'lucide-react'
+import { ArrowRight, ChevronDown } from 'lucide-react'
 import { HERO_SLIDE_IMAGES, HERO_VIDEO_SOURCES, HERO_VIDEO_DESKTOP_MEDIA_QUERY } from '@/features/booking/heroSlides'
+import { HeroStats } from '@/features/shared/ui/HeroStats'
 import { LinkButton } from '@/features/shared/ui/LinkButton'
 import { useFleetStats } from '@/features/booking/useFleetStats'
 import { prefersReducedMotion } from '@/lib/motion'
 
-interface Slide {
-  title: string
-  /** Optional second heading line, rendered italic below `title` — only
-   *  the pinned slide (index 4, "Drive Your Journey" / "with Bliss Rent")
-   *  has one; the other four rotating slides are single-line titles. */
-  titleAccent?: string
-  body: string
-}
-
-// The hero IMAGE stays pinned (Phase 11 decision, unchanged) — only the
-// heading/body text auto-rotates through all 5 real slides below. Index 4
-// ("Drive Dubai your way" / "A mix of premium and economy vehicles for
-// city drives, short stays, and smooth arrivals.") is still where both
-// the image and the text rotation start, so the very first paint matches
-// what Phase 11 shipped.
-const HERO_SLIDE_INDEX = 4
-const HERO_TEXT_ROTATE_MS = 6000
+/** Which HERO_SLIDE_IMAGES still frame is the video's poster (and the prefers-reduced-motion image). */
+const HERO_POSTER_INDEX = 4
 
 /**
- * The homepage's main visual focus. Phase 11 pinned this to one static
- * image with no autoplay at all; per later feedback the heading/body text
- * auto-changes again (image and layout stay as Phase 11 left it — no
- * dots/arrows/slide counter, no image swapping, same transparent-header
- * treatment — see NavBar), and this pass adds three more premium touches
- * requested afterwards:
+ * The homepage hero: a full-bleed looping video with ONE heading, ONE
+ * supporting sentence, two calls to action and a strip of live numbers —
+ * the same editorial treatment as the About page's hero.
  *
- *  - The pinned background is now a looping muted video instead of a
- *    static photo (see HERO_VIDEO_SOURCES in heroSlides.ts) — the video's
- *    own motion replaces the old one-time "ken burns" zoom drift, so that
- *    animation class is no longer applied here. `prefers-reduced-motion`
- *    still gets the original still image (HERO_SLIDE_IMAGES[HERO_SLIDE_INDEX],
- *    also used as the video's `poster`) instead of the video element at all.
- *    Desktop and mobile intentionally play different clips (owner's
- *    request) — see the `<source media=...>` pairs below and the doc
- *    comment on HERO_VIDEO_SOURCES for how the switch works.
- *  - A compact trust-signal row under the CTAs, fetched live from the
- *    same fleet/locations queries AboutPage's stats section and
- *    TickerBar's rate already use — never a hand-typed figure. This is
- *    deliberately different data from TickerBar's scrolling strip
- *    (service policies) so the two don't repeat each other in the same
- *    viewport; best-effort only, same as TickerBar — on failure the row
- *    just doesn't render.
- *  - A small "Scroll to explore" cue under the stats row that
- *    smooth-scrolls to the booking search section, matching the same
- *    `#booking-section` anchor the header CTA and final-CTA button
- *    already use. Kept inline in the content column rather than pinned
- *    to the hero's bottom edge, since BookingSearchSection intentionally
- *    overlaps up onto that edge with its own card (see
- *    BookingSearchSection.tsx) and the fixed TickerBar sits there too.
- *    Desktop-only (`lg:` and up, where the hero is a full-viewport-height
- *    section) — see the mobile note below for why it's hidden elsewhere.
+ * Deliberately still. The video is the only thing that moves: the old
+ * auto-rotating heading/body text, its fade-in on every swap, the pulsing
+ * badge dot, the pulsing mobile CTA glow and the bouncing scroll chevron are
+ * all gone, so nothing competes with the footage for attention (and there's
+ * no auto-changing text for a visitor to chase or for assistive tech to
+ * announce — see WCAG 2.2.2). `prefers-reduced-motion` still swaps the video
+ * for its still poster frame.
  *
- * Mobile isn't just this same layout scaled down — two things are
- * deliberately different content decisions, not shrunk-in-place ones:
- *  - The CTA row: below `sm`, "Book Now" is the one full-width strong
- *    button and "View fleet" drops to a lighter underlined text link
- *    (same <Link>, responsive classes — still exactly one "View fleet"
- *    link in the DOM). Two full-width stacked blocks read heavy on a
- *    small screen; at `sm` and up both render as the original
- *    equally-weighted side-by-side buttons.
- *  - The scroll cue above is hidden below `lg` entirely: it only makes
- *    sense where the hero deliberately fills the whole viewport and
- *    "there's more below" isn't obvious. Mobile's hero is a normal,
- *    much shorter block that already previews the next section, so the
- *    cue would just be extra vertical clutter there.
- *
- * All of the above skip themselves for prefers-reduced-motion, same as
- * every other autoplay/animation in this app (see src/lib/motion.ts).
+ * - Video: desktop and mobile play different clips (`<source media=...>`
+ *   pairs, checked once at load at the `lg:` breakpoint — see
+ *   HERO_VIDEO_SOURCES in heroSlides.ts, unchanged).
+ * - Legibility: a tint wash, a start-side reading scrim (mirrored in RTL so
+ *   the dark side always sits behind the text), and top/bottom fades.
+ * - Numbers: fetched live by useFleetStats (same queries as the About page),
+ *   never hand-typed; best-effort — on failure the strip just doesn't render.
+ * - Bottom padding leaves room for BookingSearchSection's card, which
+ *   overlaps up onto this hero's lower edge (see BookingSearchSection.tsx),
+ *   so the strip and scroll cue never end up underneath it.
+ * - The scroll cue is desktop-only (`lg:`), where the hero fills the whole
+ *   viewport and "there's more below" isn't obvious; on mobile the hero is a
+ *   shorter block that already previews the next section.
  */
 export function Hero() {
   const { t } = useTranslation()
-  const slides = t('hero.slides', { returnObjects: true }) as Slide[]
-  const [slideIndex, setSlideIndex] = useState(HERO_SLIDE_INDEX)
   const stats = useFleetStats()
-  const slide = slides[slideIndex] ?? slides[0]
-  const image = HERO_SLIDE_IMAGES[HERO_SLIDE_INDEX] ?? HERO_SLIDE_IMAGES[0]
+  const image = HERO_SLIDE_IMAGES[HERO_POSTER_INDEX] ?? HERO_SLIDE_IMAGES[0]
   const reducedMotion = prefersReducedMotion()
-
-  useEffect(() => {
-    if (prefersReducedMotion()) return
-    const slideCount = slides.length
-    if (slideCount <= 1) return
-    const id = setInterval(() => {
-      setSlideIndex((current) => (current + 1) % slideCount)
-    }, HERO_TEXT_ROTATE_MS)
-    return () => clearInterval(id)
-  }, [slides.length])
 
   function handleScrollCueClick() {
     const target = document.getElementById('booking-section')
@@ -134,7 +82,7 @@ export function Hero() {
         >
           {/* Desktop and mobile play different clips — `media` is checked
               once when the browser picks a source (not live on resize),
-              at the same lg: breakpoint (1024px) Hero.tsx's own layout
+              at the same lg: breakpoint (1024px) this hero's own layout
               classes use, so video and layout switch together. Desktop
               sources listed first: a source is skipped once its `media`
               fails to match, so mobile's plain (no-`media`) sources below
@@ -145,175 +93,72 @@ export function Hero() {
           <source src={HERO_VIDEO_SOURCES.mobile.mp4} type="video/mp4" />
         </video>
       )}
-      {/* Full-frame brand-navy tint wash (owner's request) — a uniform
-          cinematic/premium color tint over the whole video, on top of
-          which the two directional gradients below still add their own
-          extra darkening at the bottom (headline/CTA legibility) and top
-          (header legibility). Sits between the video and those gradients
-          so both effects stack rather than compete. */}
+
+      {/* Full-frame brand tint (owner's request) under three legibility
+          layers: a start-side reading scrim (rtl:-scale-x-100 mirrors it so
+          it always sits behind the text), a bottom fade, and a top fade for
+          the transparent header. */}
       <div className="absolute inset-0 bg-brand-gold-dark/10" />
-      <div className="absolute inset-0 bg-gradient-to-t from-[#05070d]/85 via-[#05070d]/25 via-45% to-transparent" />
+      <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(5,7,13,0.8)_0%,rgba(5,7,13,0.52)_36%,rgba(5,7,13,0.1)_68%,rgba(5,7,13,0)_100%)] rtl:-scale-x-100" />
+      <div className="absolute inset-0 bg-gradient-to-t from-[#05070d]/75 via-transparent via-45% to-transparent" />
       <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-[#05070d]/55 to-transparent" />
 
-      {/* pt-[calc(var(--header-h)+var(--ticker-h))] guarantees the badge/
-          heading always clear BOTH the fixed header and the TickerBar
-          pinned directly beneath it (Phase 11) — the TickerBar itself is a
-          separate fixed layer rendered by HomePage, not a child of this
-          hero, so it isn't affected by this padding. Height increased
-          (owner's request, referencing airline-style full hero sections)
-          so the hero image reads as a real full-bleed visual, not a strip. */}
-      <div className="relative z-10 mx-auto flex min-h-[600px] max-w-7xl items-end px-4 pb-20 pt-[calc(var(--header-h)+var(--ticker-h))] sm:px-6 lg:min-h-[100vh] lg:pb-20 lg:px-8">
-        <div className="max-w-xl pb-40 md:pb-28 lg:pb-28">
-          <div className="mb-5 inline-flex items-center gap-2 border border-[#fff]/35 bg-[#120f0a]/55 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.33em] text-[#fff] backdrop-blur-md shadow-[0_12px_28px_rgba(17,13,8,0.32)]">
-            {/* "Live" pulsing dot — a brand-champagne ping ring behind the
-                existing static brand-gold square (both already-approved
-                brand colors, no new hue introduced). Skipped for
-                prefers-reduced-motion, leaving just the plain dot. */}
-            <span className="relative flex h-2 w-2">
-              {!reducedMotion && (
-                <span className="absolute inline-flex rounded-full h-full w-full animate-ping bg-green-300 opacity-75" />
-              )}
-              <span className="relative rounded-full inline-flex h-2 w-2 bg-green-700" />
-            </span>
-            {t('hero.badge')}
-          </div>
+      <div className="relative z-10 mx-auto flex min-h-[640px] max-w-7xl items-end px-4 pb-24 pt-[calc(var(--header-h)+2rem)] sm:px-6 lg:min-h-[100vh] lg:px-8 lg:pb-28">
+        <div className="w-full max-w-3xl">
+          <p className="flex items-center gap-3 text-[10px] font-semibold uppercase tracking-[0.34em] text-brand-champagne sm:text-[11px]">
+            <span className="h-px w-10 shrink-0 bg-brand-champagne" aria-hidden="true" />
+            {t('hero.eyebrow')}
+          </p>
 
-          {/* key={slideIndex} remounts this block on every rotation so the
-              fade-in plays each time; skipped for prefers-reduced-motion
-              by simply not applying the animation class (content still
-              updates instantly, just without the transition). */}
-          <div key={slideIndex} className={reducedMotion ? undefined : 'animate-hero-slide-fade'}>
-            {/* leading-[0.92]/tracking-[-0.065em] matches the same tight
-                "premium display heading" pair RequirementsSection already
-                uses at a similarly huge size — the old leading-[0.84] here
-                was tighter than that sitewide convention, tight enough
-                that a two-line title's descenders (a slide ending in "y",
-                "g", etc.) visually crowded the subtitle right below it on
-                every screen size. mt-6 on the subtitle (was mt-5) gives a
-                little extra breathing room on top of that.
-                Base size dropped text-4xl -> text-3xl (mobile only —
-                sm/lg unchanged): the longer titles ("Airport arrivals,
-                made easy", "Choose your right ride") at font-black
-                text-4xl plus the full-width Book Now block right below
-                made the whole top of the mobile hero feel oversized —
-                heading and button both reading "big" back to back, per
-                live feedback. One step down keeps it a bold display
-                heading without it, and every slide's title still wraps
-                to exactly the same two lines it did before. */}
-            {/* [font-family:var(--font-hero-serif)] — an elegant serif
-                treatment (Playfair Display, falling back to Cairo for
-                Arabic — see index.css) distinct from the sitewide sans
-                heading everywhere else. titleAccent (only on the pinned
-                "Drive Your Journey" slide) renders as an italic second
-                line, matching the Bliss Rent brand mockup this look is
-                taken from; the other four rotating slides have no accent
-                line and stay single-line. */}
-            <h1 className="font-hero-serif text-5xl font-medium leading-[1.05] tracking-[-0.01em] text-white md:drop-shadow-[0_16px_28px_rgba(0,0,0,0.3)] sm:text-5xl lg:text-6xl">
-              <span className="block text-white">{slide.title}</span>
-              {slide.titleAccent && (
-                <>
-                  {/* Visually a line break (both spans are `block`), but a
-                      literal space in the text so the two lines don't fuse
-                      into one run-on word ("...Journeywith...") in the
-                      accessible name / textContent. */}
-                  {' '}
-                  <span className="block italic text-white/90">{slide.titleAccent}</span>
-                </>
-              )}
-            </h1>
+          {/* The serif display heading (Playfair Display, falling back to
+              Cairo for Arabic — see index.css). The accent line is a
+              literal-space-separated block so the accessible name reads
+              "Drive Your Journey with Bliss Rent" as one phrase; it's
+              italic in Latin only — a slanted Arabic face just looks broken. */}
+          <h1 className="font-hero-serif mt-4 text-[2.125rem] font-semibold leading-none sm:mt-5 tracking-[-0.06em] text-white [text-shadow:0_2px_32px_rgba(0,0,0,0.35)] sm:text-6xl lg:text-7xl">
+            <span className="block">{t('hero.title')}</span>{' '}
+            <span className="block font-medium italic text-brand-champagne rtl:not-italic">{t('hero.titleAccent')}</span>
+          </h1>
 
-            <p className="mt-6 max-w-lg text-base leading-7 text-white/80 sm:text-lg">{slide.body}</p>
-          </div>
+          {/* text-pretty keeps a lone word from being stranded on the last line. */}
+          <p className="mt-4 max-w-xl text-pretty text-sm leading-6 text-white/85 sm:mt-6 sm:text-lg sm:leading-8">{t('hero.body')}</p>
 
-          {/* Mobile gets a deliberately different CTA arrangement, not just
-              a shrunk desktop one: two full-width stacked blocks read heavy
-              on a small screen, so below `sm` "Book Now" stays the one
-              strong full-width button (fullWidthOnMobile) and "View fleet"
-              drops to a lighter underlined text link with a small arrow —
-              same destination, less visual weight. At `sm` and up both
-              render as the original equally-weighted side-by-side buttons
-              (Tailwind classes on the SAME <Link>, not a second element, so
-              there's still exactly one "View fleet" link in the DOM). */}
-          <div className="mt-7 flex flex-col items-start gap-3 sm:flex-row sm:items-center">
-            {/* Direct navigation, not an on-page scroll: "Book Now" opens the
-                dedicated Book a Car page and "View fleet" opens the full
-                fleet listing, matching the header's own CTA/Fleet routes. */}
-            <LinkButton
-              to="/book"
-              variant="primary"
-              // A soft brand-champagne glow pulses behind the button below
-              // `sm`, where it's the single dominant CTA (see the mobile
-              // CTA note above). Desktop stays exactly shadow-none: the
-              // .animate-hero-cta-glow/.hero-cta-glow-static classes only
-              // carry any shadow/animation inside a max-width:639.98px
-              // media query in index.css (not a competing `sm:` utility
-              // here — see that file for why). Falls back to a fixed
-              // (non-pulsing) glow for prefers-reduced-motion instead of
-              // removing it outright.
-              className={
-                'group md:min-h-12 border border-brand-gold bg-brand-gold text-white shadow-none hover:brightness-105 ' +
-                (reducedMotion ? 'hero-cta-glow-static' : 'animate-hero-cta-glow')
-              }
-            >
+          {/* Direct navigation, not an on-page scroll: "Book Now" opens the
+              dedicated Book a Car page and "View fleet" the full fleet
+              listing, matching the header's own CTA/Fleet routes. */}
+          <div className="mt-8 flex flex-wrap gap-3">
+            <LinkButton to="/book" variant="primary" className="group min-w-40 sm:min-h-12">
               {t('hero.cta')}
-              <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" aria-hidden="true" />
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1 rtl:rotate-180" aria-hidden="true" />
             </LinkButton>
             <Link
               to="/search"
-              className="inline-flex items-center gap-1.5 text-sm font-semibold text-white/85 underline decoration-white/40 underline-offset-4 transition-colors hover:text-white sm:min-h-12 sm:gap-0 sm:border sm:border-white/70 sm:bg-white sm:px-5 sm:py-3 sm:text-brand-navy sm:no-underline sm:transition-all sm:hover:bg-brand-lavender"
+              className="inline-flex min-h-11 min-w-40 items-center justify-center border border-white/35 bg-white/10 px-5 py-2.5 text-sm font-semibold text-white backdrop-blur-sm transition-colors hover:border-white hover:bg-white hover:text-brand-navy sm:min-h-12"
             >
               {t('hero.viewFleetCta')}
-              <ArrowRight className="h-3.5 w-3.5 sm:hidden" aria-hidden="true" />
             </Link>
           </div>
 
-          {/* Live trust signals — only the two numbers AboutPage's own
-              stats section already treats as real (fleet size, city
-              count). Absent entirely until the fetch resolves; never a
-              placeholder/skeleton number. */}
+          {/* Live numbers — absent entirely until the fetch resolves; never
+              a placeholder/skeleton number. */}
           {stats && (
-            // Below `sm` each stat gets its own bordered/backdrop-blur
-            // chip (the same visual language as the badge above) so the
-            // numbers hold their own against the photo on a small screen;
-            // reset to the original plain inline pair at `sm` and up.
-            <div className="mt-6 flex flex-wrap items-center gap-x-3 gap-y-2 sm:gap-x-5">
-              <div className="flex items-center gap-2 border border-white/15 bg-white/10 px-3 py-1.5 backdrop-blur-sm sm:border-0 sm:bg-transparent sm:px-0 sm:py-0 sm:backdrop-blur-none">
-                <Car className="h-4 w-4 text-white" aria-hidden="true" />
-                <span className="text-xs text-white/80">{t('pages.about.stats.vehicles', { count: stats.vehicleCount })}</span>
-              </div>
-              <div className="hidden h-4 w-px bg-white/25 sm:block" aria-hidden="true" />
-              <div className="flex items-center gap-2 border border-white/15 bg-white/10 px-3 py-1.5 backdrop-blur-sm sm:border-0 sm:bg-transparent sm:px-0 sm:py-0 sm:backdrop-blur-none">
-                <MapPin className="h-4 w-4 text-white" aria-hidden="true" />
-                <span className="text-xs text-white/80">{t('pages.about.stats.cities', { count: stats.cityCount })}</span>
-              </div>
-            </div>
+            <HeroStats
+              className="mt-9"
+              items={[
+                { value: stats.vehicleCount, label: t('pages.about.stats.vehicleLabel') },
+                { value: stats.categoryCount, label: t('pages.about.stats.categoryLabel') },
+                { value: stats.cityCount, label: t('pages.about.stats.cityLabel') },
+              ]}
+            />
           )}
 
-          {/* Scroll cue — a purely navigational nudge toward the booking
-              search directly below, reusing the same #booking-section
-              anchor the header CTA and homepage's final-CTA button
-              already scroll to. Deliberately placed inline in this
-              content column (not absolutely pinned to the hero's own
-              bottom edge): BookingSearchSection overlaps up onto the
-              hero's lower portion with its own -mt/z-10 card (see
-              BookingSearchSection.tsx), so anything pinned to the hero's
-              literal bottom would sit underneath that white card, or
-              behind the fixed TickerBar strip, on shorter viewports.
-              `hidden lg:inline-flex` on purpose, not left visible
-              everywhere: it only earns its place where the hero
-              deliberately fills the whole viewport (`lg:min-h-[100vh]`
-              above) and "there's more below" isn't obvious. Below `lg`
-              the hero is a normal, much shorter block that already
-              previews the next section, and mobile users don't need a
-              hint to scroll — so this row is one more thing removed
-              from the mobile layout, not just shrunk in place. */}
           <button
             type="button"
             onClick={handleScrollCueClick}
             className="mt-8 hidden items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.28em] text-white/60 transition-colors hover:text-white/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-gold lg:inline-flex"
           >
             {t('hero.scrollCue')}
-            <ChevronDown className={'h-4 w-4' + (reducedMotion ? '' : ' animate-bounce')} aria-hidden="true" />
+            <ChevronDown className="h-4 w-4" aria-hidden="true" />
           </button>
         </div>
       </div>

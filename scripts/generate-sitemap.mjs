@@ -33,9 +33,10 @@ try {
 
 /**
  * Static marketing/content routes worth indexing. Deliberately excludes:
- *  - transactional/utility pages (/find-my-car, /manage-booking,
- *    /extend-rental, every /checkout/* step) — access-gated or
- *    single-purpose lookup tools, not content search should rank;
+ *  - transactional/utility pages (/manage-booking, /extend-rental and
+ *    /find-my-car — both redirect to /manage-booking, every
+ *    /checkout/* step) — access-gated or single-purpose lookup tools,
+ *    not content search should rank;
  *  - /search — a filterable results view, not a distinct piece of
  *    content (its query-string variants would otherwise all canonicalize
  *    to the same URL anyway, per useMetaDescription's canonical logic);
@@ -47,6 +48,41 @@ const STATIC_ROUTES = [
   { path: '/about', changefreq: 'monthly', priority: '0.6' },
   { path: '/car-types', changefreq: 'monthly', priority: '0.6' },
   { path: '/locations', changefreq: 'weekly', priority: '0.7' },
+  // One page per emirate's main city — keep in sync with CITY_GUIDES in
+  // src/features/content/cityGuides.ts (a unit test checks they match).
+  { path: '/locations/dubai', changefreq: 'monthly', priority: '0.6' },
+  { path: '/locations/abu-dhabi', changefreq: 'monthly', priority: '0.6' },
+  { path: '/locations/sharjah', changefreq: 'monthly', priority: '0.6' },
+  { path: '/locations/ajman', changefreq: 'monthly', priority: '0.6' },
+  { path: '/locations/umm-al-quwain', changefreq: 'monthly', priority: '0.6' },
+  { path: '/locations/ras-al-khaimah', changefreq: 'monthly', priority: '0.6' },
+  { path: '/locations/fujairah', changefreq: 'monthly', priority: '0.6' },
+  { path: '/locations/al-ain', changefreq: 'monthly', priority: '0.6' },
+  // The blog — keep in sync with BLOG_POSTS / BLOG_CATEGORIES in
+  // src/features/blog/blogPosts.ts (a unit test checks they match, including
+  // each article's lastmod = its updatedAt, or publishedAt if never updated).
+  { path: '/blog', changefreq: 'weekly', priority: '0.7' },
+  { path: '/blog/category/rental-guides', changefreq: 'weekly', priority: '0.5' },
+  { path: '/blog/category/city-guides', changefreq: 'weekly', priority: '0.5' },
+  { path: '/blog/category/road-trips', changefreq: 'weekly', priority: '0.5' },
+  { path: '/blog/category/travel-tips', changefreq: 'weekly', priority: '0.5' },
+  { path: '/blog/car-rental-dubai-complete-guide', changefreq: 'monthly', priority: '0.6', lastmod: '2026-09-19' },
+  { path: '/blog/dubai-airport-car-rental', changefreq: 'monthly', priority: '0.6', lastmod: '2026-09-19' },
+  { path: '/blog/documents-needed-to-rent-a-car-uae', changefreq: 'monthly', priority: '0.6', lastmod: '2026-09-19' },
+  { path: '/blog/how-to-book-a-rental-car-online-uae', changefreq: 'monthly', priority: '0.6', lastmod: '2026-09-19' },
+  { path: '/blog/economy-sedan-suv-or-luxury-rental-car', changefreq: 'monthly', priority: '0.6', lastmod: '2026-09-19' },
+  { path: '/blog/monthly-and-weekly-car-rental-uae', changefreq: 'monthly', priority: '0.6', lastmod: '2026-09-19' },
+  { path: '/blog/dubai-in-three-days-by-car', changefreq: 'monthly', priority: '0.6', lastmod: '2026-09-19' },
+  { path: '/blog/abu-dhabi-weekend-by-car', changefreq: 'monthly', priority: '0.6', lastmod: '2026-09-19' },
+  { path: '/blog/sharjah-and-ajman-by-car', changefreq: 'monthly', priority: '0.6', lastmod: '2026-09-19' },
+  { path: '/blog/umm-al-quwain-by-car', changefreq: 'monthly', priority: '0.6', lastmod: '2026-09-19' },
+  { path: '/blog/dubai-to-abu-dhabi-road-trip', changefreq: 'monthly', priority: '0.6', lastmod: '2026-09-19' },
+  { path: '/blog/dubai-to-hatta-road-trip', changefreq: 'monthly', priority: '0.6', lastmod: '2026-09-19' },
+  { path: '/blog/ras-al-khaimah-jebel-jais-road-trip', changefreq: 'monthly', priority: '0.6', lastmod: '2026-09-19' },
+  { path: '/blog/fujairah-east-coast-road-trip', changefreq: 'monthly', priority: '0.6', lastmod: '2026-09-19' },
+  { path: '/blog/al-ain-day-trip-by-car', changefreq: 'monthly', priority: '0.6', lastmod: '2026-09-19' },
+  { path: '/blog/salik-parking-and-fines-uae-rental-car', changefreq: 'monthly', priority: '0.6', lastmod: '2026-09-19' },
+  { path: '/blog/driving-in-the-uae-first-timers-checklist', changefreq: 'monthly', priority: '0.6', lastmod: '2026-09-19' },
   { path: '/faqs', changefreq: 'monthly', priority: '0.5' },
   { path: '/contact', changefreq: 'monthly', priority: '0.5' },
   { path: '/privacy-policy', changefreq: 'yearly', priority: '0.2' },

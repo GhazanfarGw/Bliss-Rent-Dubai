@@ -6,7 +6,7 @@ import { saveActiveBooking, clearActiveBooking, type ActiveBookingPointer } from
 
 // The indicator now validates its pointer against the server (see the bug
 // fix in PendingBookingIndicator.tsx) — mocked here the same way
-// BookingStatusPanel.test.tsx mocks it, so these tests exercise the
+// ManageBookingPage.test.tsx mocks it, so these tests exercise the
 // component in isolation rather than making a real network call.
 const lookupMock = vi.fn()
 
@@ -74,7 +74,7 @@ describe('PendingBookingIndicator (header reminder)', () => {
 
     expect(screen.getByText('MG 5')).toBeInTheDocument()
     expect(screen.getByText('BLS-E16F5DC3')).toBeInTheDocument()
-    expect(screen.getByText('AED 952')).toBeInTheDocument()
+    expect(screen.getByText('952')).toBeInTheDocument()
   })
 
   it('"Continue to payment" navigates straight to the Payment step for that booking', () => {

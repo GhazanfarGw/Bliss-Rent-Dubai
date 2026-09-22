@@ -17,21 +17,13 @@ export interface ManageBookingLookupCardProps {
 }
 
 /**
- * The Manage Booking page's lookup form. Rebuilt per a direct redesign
- * request modeled on an airline "manage booking" reference page: two
- * fields and a help affordance flow directly on the page — no card
- * border, no shadow, no rounded box — a rule, then a single right-aligned
- * button below it, exactly like that reference. `Button`'s own default
- * styling already gives the sharp corners and borderless brand-maroon
- * fill the redesign asked for (see buttonClasses.ts — `rounded-none`,
- * `bg-brand-gold` with no border, unchanged).
- *
- * Differs from the reference in the one place blindly copying it would
- * ship something false: this project has no customer login/account
- * system at all (see lookupApi.ts) — there is nothing to send a "log in
- * to your account" link to. The reference's secondary link is replaced
- * with a real, working one (WhatsApp — contactLinks.ts's WHATSAPP_URL)
- * in the same visual slot.
+ * The Manage Booking page's lookup form: two fields (reference/plate + last
+ * name), a WhatsApp help affordance in place of a "log in to your account"
+ * link this project has no login system to support (see lookupApi.ts), and
+ * a rule with a single right-aligned submit button — this component stays
+ * a bare `<form>` with no card chrome of its own; ManageBookingHero.tsx
+ * embeds it inside the white card it overlaps its dark band with, so the
+ * card framing lives one level up rather than here.
  *
  * Presentational only — all state, the lookupBooking() call, and the
  * last-name check live in ManageBookingPage.
@@ -49,7 +41,7 @@ export function ManageBookingLookupCard({
   const { t } = useTranslation()
 
   return (
-    <form onSubmit={onSubmit} noValidate className="mt-10 sm:mt-12">
+    <form onSubmit={onSubmit} noValidate>
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-3">
         <label className="relative block flex-1">
           <span className="sr-only">{t('manageBooking.queryLabel')}</span>

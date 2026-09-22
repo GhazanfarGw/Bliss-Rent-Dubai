@@ -1,8 +1,10 @@
+import type { ReactNode } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { BadgeCheck } from 'lucide-react'
 import { readConfirmationSnapshot } from '@/features/booking/checkout/checkoutStorage'
 import { StateMessage } from '@/features/shared/StateMessage'
+import { CurrencySymbol } from '@/features/shared/ui/CurrencySymbol'
 
 /**
  * Guest checkout has no auth session, so this page can't re-fetch the
@@ -59,7 +61,7 @@ export function ConfirmationPage() {
         <Row label={t('checkout.confirmation.dropoff')} value={snapshot.dropoffLocationName} />
         <Row label={t('checkout.confirmation.customer')} value={snapshot.customerName} />
         <Row label={t('checkout.confirmation.driver')} value={snapshot.driverName} />
-        <Row label={t('checkout.confirmation.amount')} value={`${snapshot.currency} ${snapshot.totalPrice.toLocaleString()}`} />
+        <Row label={t('checkout.confirmation.amount')} value={<><CurrencySymbol currency={snapshot.currency} /> {snapshot.totalPrice.toLocaleString()}</>} />
         <Row label={t('checkout.confirmation.paymentStatus')} value={snapshot.paymentStatus} highlight={snapshot.paymentStatus === 'paid'} />
         <Row label={t('checkout.confirmation.bookingStatus')} value={snapshot.bookingStatus} highlight={isConfirmed} />
       </div>
@@ -96,12 +98,12 @@ export function ConfirmationPage() {
   )
 }
 
-function Row({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) {
+function Row({ label, value, highlight }: { label: string; value: ReactNode; highlight?: boolean }) {
   return (
     <div className="flex items-center justify-between gap-3 text-sm">
       <span className="text-text-muted">{label}</span>
       <span className={'text-right font-medium capitalize ' + (highlight ? 'text-success' : 'text-brand-navy')}>
-        {value.replace(/_/g, ' ')}
+        {typeof value === 'string' ? value.replace(/_/g, ' ') : value}
       </span>
     </div>
   )

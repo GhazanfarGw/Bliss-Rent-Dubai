@@ -70,6 +70,15 @@ describe('DriverDetailsPage (Step 5)', () => {
     expect(screen.queryByRole('textbox', { name: /driver's first name/i })).not.toBeInTheDocument()
   })
 
+  it('keeps the car card to the car and its specs — no dates or places on steps 1–3', async () => {
+    renderDriver()
+    await screen.findByRole('button', { name: /continue to booking summary/i })
+
+    expect(screen.getByRole('heading', { name: 'MG 5' })).toBeInTheDocument()
+    expect(screen.queryByText('Pickup date')).not.toBeInTheDocument()
+    expect(screen.queryByText('Sharjah City Centre')).not.toBeInTheDocument()
+  })
+
   it('switching to "Someone else will drive" reveals First/Last/Phone fields for that person', async () => {
     seedCustomerDraft({ firstName: 'Jane', lastName: 'Renter', phone: '+971501234567' })
     renderDriver()

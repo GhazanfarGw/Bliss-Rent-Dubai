@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { Eyebrow } from '@/features/shared/ui/Eyebrow'
 
 interface FaqCategory { heading: string; items: { question: string; answer: string }[] }
 
@@ -12,17 +13,17 @@ export function HomeFaqSection() {
   const [open, setOpen] = useState<number | null>(null)
 
   return (
-    <section className="bg-[radial-gradient(circle_at_top,_rgba(212,175,106,0.08),transparent_28%),var(--color-surface-warm)]">
-      <div className="mx-auto max-w-5xl px-4 py-16 sm:px-6 lg:px-8">
+    <section className="bg-white">
+      <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8 lg:py-14">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.32em] text-brand-gold-dark">{t('home.faq.eyebrow')}</p>
-            <h2 className="font-hero-serif mt-2 text-3xl font-semibold tracking-[-0.06em] text-brand-navy sm:text-4xl">{t('home.faq.title')}</h2>
+            <Eyebrow>{t('home.faq.eyebrow')}</Eyebrow>
+            <h2 className="font-hero-serif mt-3 text-2xl font-semibold tracking-[-0.06em] text-brand-navy sm:text-3xl md:text-4xl">{t('home.faq.title')}</h2>
             <p className="mt-2 text-sm leading-6 text-text-muted">{t('home.faq.subtitle')}</p>
           </div>
           <Link to="/faqs" className="text-sm font-semibold text-brand-navy underline-offset-4 hover:underline">{t('home.faq.viewAll')}</Link>
         </div>
-        <div className="mt-8 divide-y divide-brand-navy/10 rounded-none border border-[#e7dcc7] bg-white">
+        <div className="mt-6 sm:mt-8 divide-y divide-brand-navy/10 rounded-none border border-[#e7dcc7] bg-white">
           {items.map((item, index) => {
             const expanded = open === index
             return (

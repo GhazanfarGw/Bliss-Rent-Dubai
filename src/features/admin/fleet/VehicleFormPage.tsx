@@ -34,6 +34,18 @@ function vehicleToDraft(v: AdminVehicleWithDetails): VehicleDraft {
     seats: String(v.seats),
     plateNumber: v.plate_number,
     status: v.status,
+    engine: v.engine ?? '',
+    horsepower: v.horsepower == null ? '' : String(v.horsepower),
+    torqueNm: v.torque_nm == null ? '' : String(v.torque_nm),
+    topSpeedKmh: v.top_speed_kmh == null ? '' : String(v.top_speed_kmh),
+    acceleration0100: v.acceleration_0_100 == null ? '' : String(v.acceleration_0_100),
+    fuelType: v.fuel_type ?? '',
+    fuelConsumptionL100km: v.fuel_consumption_l100km == null ? '' : String(v.fuel_consumption_l100km),
+    drivetrain: v.drivetrain ?? '',
+    doors: v.doors == null ? '' : String(v.doors),
+    originCountry: v.origin_country ?? '',
+    about: v.about ?? '',
+    aboutAr: v.about_ar ?? '',
   }
 }
 
@@ -241,6 +253,53 @@ export function VehicleFormPage() {
             </Field>
           </div>
 
+          <div className="border-t border-brand-navy/10 pt-5">
+            <h2 className="text-sm font-semibold text-brand-navy">{t('admin.fleet.fields.specsTitle')}</h2>
+            <p className="mt-1 text-xs leading-5 text-text-muted">{t('admin.fleet.fields.specsHint')}</p>
+
+            <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div className="sm:col-span-2">
+                <Field label={t('admin.fleet.fields.engine')}>
+                  <input value={draft.engine} onChange={(e) => setDraft({ ...draft, engine: e.target.value })} className={inputClass} />
+                </Field>
+              </div>
+              <NumberField label={t('admin.fleet.fields.horsepower')} field="horsepower" draft={draft} setDraft={setDraft} errors={errors} />
+              <NumberField label={t('admin.fleet.fields.torqueNm')} field="torqueNm" draft={draft} setDraft={setDraft} errors={errors} />
+              <NumberField label={t('admin.fleet.fields.topSpeedKmh')} field="topSpeedKmh" draft={draft} setDraft={setDraft} errors={errors} />
+              <NumberField label={t('admin.fleet.fields.acceleration0100')} field="acceleration0100" step="0.1" draft={draft} setDraft={setDraft} errors={errors} />
+              <Field label={t('admin.fleet.fields.fuelType')}>
+                <input value={draft.fuelType} onChange={(e) => setDraft({ ...draft, fuelType: e.target.value })} className={inputClass} />
+              </Field>
+              <NumberField label={t('admin.fleet.fields.fuelConsumptionL100km')} field="fuelConsumptionL100km" step="0.1" draft={draft} setDraft={setDraft} errors={errors} />
+              <Field label={t('admin.fleet.fields.drivetrain')}>
+                <select value={draft.drivetrain} onChange={(e) => setDraft({ ...draft, drivetrain: e.target.value })} className={inputClass}>
+                  <option value="">{t('admin.fleet.fields.drivetrainNone')}</option>
+                  {['RWD', 'FWD', 'AWD', '4WD'].map((code) => (
+                    <option key={code} value={code}>
+                      {code}
+                    </option>
+                  ))}
+                </select>
+              </Field>
+              <NumberField label={t('admin.fleet.fields.doors')} field="doors" draft={draft} setDraft={setDraft} errors={errors} />
+              <div className="sm:col-span-2">
+                <Field label={t('admin.fleet.fields.originCountry')}>
+                  <input value={draft.originCountry} onChange={(e) => setDraft({ ...draft, originCountry: e.target.value })} className={inputClass} />
+                </Field>
+              </div>
+              <div className="sm:col-span-2">
+                <Field label={t('admin.fleet.fields.about')}>
+                  <textarea rows={5} value={draft.about} onChange={(e) => setDraft({ ...draft, about: e.target.value })} className={inputClass} />
+                </Field>
+              </div>
+              <div className="sm:col-span-2">
+                <Field label={t('admin.fleet.fields.aboutAr')}>
+                  <textarea rows={5} dir="rtl" value={draft.aboutAr} onChange={(e) => setDraft({ ...draft, aboutAr: e.target.value })} className={inputClass} />
+                </Field>
+              </div>
+            </div>
+          </div>
+
           {saveError && <p className="text-sm font-medium text-error">{saveError}</p>}
 
           <button
@@ -306,6 +365,36 @@ export function VehicleFormPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+/** One optional numeric specification input; blank means "not entered". */
+function NumberField({
+  label,
+  field,
+  step,
+  draft,
+  setDraft,
+  errors,
+}: {
+  label: string
+  field: 'horsepower' | 'torqueNm' | 'topSpeedKmh' | 'acceleration0100' | 'fuelConsumptionL100km' | 'doors'
+  step?: string
+  draft: VehicleDraft
+  setDraft: (draft: VehicleDraft) => void
+  errors: VehicleFieldErrors
+}) {
+  return (
+    <Field label={label} error={errors[field]}>
+      <input
+        type="number"
+        inputMode="decimal"
+        step={step}
+        value={draft[field]}
+        onChange={(e) => setDraft({ ...draft, [field]: e.target.value })}
+        className={inputClass}
+      />
+    </Field>
   )
 }
 

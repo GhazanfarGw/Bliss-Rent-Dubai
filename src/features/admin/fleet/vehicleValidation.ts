@@ -30,5 +30,20 @@ export function validateVehicleDraft(draft: VehicleDraft): VehicleFieldErrors {
 
   if (draft.plateNumber.trim().length < 2) errors.plateNumber = 'Please enter a valid plate number.'
 
+  // Optional specifications: blank is fine ("not entered"), but anything typed
+  // must be a sensible number — the same ranges the database checks enforce.
+  const optionalNumber = (field: keyof VehicleDraft, min: number, max: number, integer: boolean, message: string) => {
+    const raw = draft[field]
+    if (typeof raw !== 'string' || raw.trim() === '') return
+    const value = Number(raw)
+    if (!Number.isFinite(value) || value < min || value > max || (integer && !Number.isInteger(value))) errors[field] = message
+  }
+  optionalNumber('horsepower', 1, 3000, true, 'Power must be a whole number between 1 and 3000 hp.')
+  optionalNumber('torqueNm', 1, 5000, true, 'Torque must be a whole number between 1 and 5000 Nm.')
+  optionalNumber('topSpeedKmh', 1, 500, true, 'Top speed must be a whole number between 1 and 500 km/h.')
+  optionalNumber('acceleration0100', 1, 60, false, '0–100 time must be between 1 and 60 seconds.')
+  optionalNumber('fuelConsumptionL100km', 1, 60, false, 'Fuel consumption must be between 1 and 60 L/100 km.')
+  optionalNumber('doors', 1, 6, true, 'Doors must be a whole number between 1 and 6.')
+
   return errors
 }

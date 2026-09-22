@@ -5,7 +5,7 @@
 // connected yet". A real Stripe integration exists (see
 // checkout/PaymentPage.tsx's Payment Element, which genuinely supports
 // these networks plus Apple Pay) — that comment predates it.
-import { siVisa, siMastercard, siAmericanexpress, siApplepay } from 'simple-icons'
+import { siVisa, siMastercard, siAmericanexpress, siApplepay, siBitcoin } from 'simple-icons'
 
 export interface PaymentLogo {
   name: string
@@ -18,4 +18,5 @@ export const PAYMENT_LOGOS: PaymentLogo[] = [
   { name: siMastercard.title, hex: siMastercard.hex, path: siMastercard.path },
   { name: siAmericanexpress.title, hex: siAmericanexpress.hex, path: siAmericanexpress.path },
   { name: siApplepay.title, hex: siApplepay.hex, path: siApplepay.path },
+  { name: siBitcoin.title, hex: siBitcoin.hex, path: siBitcoin.path },
 ]

@@ -5,6 +5,13 @@ import { X } from 'lucide-react'
 const FOCUSABLE_SELECTOR =
   'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
 
+/**
+ * Dialogs can nest (the trip editor opens the date and location pickers), so
+ * only the most recently opened one may react to the keyboard — otherwise
+ * Escape in the picker would close the editor under it as well.
+ */
+const openDialogs: symbol[] = []
+
 interface DialogProps {
   open: boolean
   onClose: () => void
@@ -48,6 +55,19 @@ export function Dialog({
   const titleId = useId()
   const panelRef = useRef<HTMLDivElement>(null)
   const previouslyFocused = useRef<HTMLElement | null>(null)
+  const stackId = useRef(Symbol('dialog'))
+
+  // Keyed on `open` alone: callers often pass a fresh `onClose` every render, and
+  // re-registering then would move this dialog to the top of the stack.
+  useEffect(() => {
+    if (!open) return
+    const id = stackId.current
+    openDialogs.push(id)
+    return () => {
+      const index = openDialogs.indexOf(id)
+      if (index >= 0) openDialogs.splice(index, 1)
+    }
+  }, [open])
 
   useEffect(() => {
     if (!open) return
@@ -58,6 +78,7 @@ export function Dialog({
     ;(firstFocusable ?? panel)?.focus()
 
     function handleKeyDown(e: KeyboardEvent) {
+      if (openDialogs[openDialogs.length - 1] !== stackId.current) return
       if (e.key === 'Escape') {
         e.stopPropagation()
         onClose()

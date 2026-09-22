@@ -34,7 +34,10 @@ export function useCheckoutContext(vehicleId: string | undefined) {
     if (!vehicleId || !criteria) return
     let cancelled = false
     setLoadState('loading')
-    Promise.all([fetchVehicleById(vehicleId), fetchLocations()])
+    // allowReservedCopy: a resumed booking (Manage Booking's "Continue to
+    // Payment") can carry a Reserved-copy vehicle id after an admin
+    // reassignment — see fetchVehicleById's own comment.
+    Promise.all([fetchVehicleById(vehicleId, { allowReservedCopy: true }), fetchLocations()])
       .then(([v, locs]) => {
         if (cancelled) return
         if (!v) {

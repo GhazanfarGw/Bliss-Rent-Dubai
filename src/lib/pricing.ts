@@ -82,3 +82,13 @@ export function cheapestHeadlineRate(pricing: PricingRow[]): PricingRow | null {
   if (daily) return daily
   return [...pricing].sort((a, b) => a.client_price / UNIT_LENGTH[a.term] - b.client_price / UNIT_LENGTH[b.term])[0]
 }
+
+/**
+ * A vehicle's headline rate expressed per day — its daily rate, or the cheapest
+ * per-day equivalent of another term (the same row `cheapestHeadlineRate` picks).
+ * Used to range-filter the fleet by price; null when the vehicle has no pricing.
+ */
+export function perDayRate(pricing: PricingRow[]): number | null {
+  const row = cheapestHeadlineRate(pricing)
+  return row ? row.client_price / UNIT_LENGTH[row.term] : null
+}

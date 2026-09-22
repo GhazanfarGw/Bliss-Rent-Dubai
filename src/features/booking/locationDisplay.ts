@@ -23,6 +23,14 @@ export const TYPE_ICON: Record<LocationType, string> = {
   delivery: '🚚',
 }
 
+/** The already-translated section heading for each `locations.type` (pages.locations.*Heading). */
+export const TYPE_HEADING_KEY: Record<LocationType, string> = {
+  airport: 'pages.locations.airportHeading',
+  city: 'pages.locations.cityHeading',
+  hotel: 'pages.locations.hotelHeading',
+  delivery: 'pages.locations.deliveryHeading',
+}
+
 export function typeOrderIndex(type: LocationType): number {
   const i = TYPE_ORDER.indexOf(type)
   return i === -1 ? TYPE_ORDER.length : i

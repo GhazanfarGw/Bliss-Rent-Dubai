@@ -2,6 +2,11 @@ import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import logoMark from '@/assets/brand/logo-full.png'
 import { PAYMENT_LOGOS } from '@/lib/paymentLogos'
+import { BLOG_POSTS, postCopy, postPath } from '@/features/blog/blogPosts'
+import { CITY_GUIDES } from '@/features/content/cityGuides'
+
+/** How many recent articles the footer's Guides column lists. */
+const FOOTER_GUIDE_COUNT = 4
 
 /**
  * Social links are placeholder "#" hrefs until real handles exist — swap
@@ -15,13 +20,14 @@ const SOCIAL_LINKS = [
 ]
 
 export function Footer() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
+  const isArabic = i18n.language === 'ar'
 
   return (
     <footer className="border-t border-[#ece7df] bg-surface-warm text-[#1f2430]">
-      <img className='w-full mx-auto justify-center' src='./footerbaner.jpg' alt="Footer Logo" />
+      <img className='w-full mx-auto justify-center' src='/footerbaner.jpg' alt="Footer Logo" />
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-5">
           <div>
             <div className="flex items-center gap-2">
               <img src={logoMark} alt="Bliss Rent Dubai" className="h-8 w-auto" />
@@ -77,6 +83,11 @@ export function Footer() {
                 </Link>
               </li>
               <li>
+                <Link to="/blog" className="text-text-muted transition-colors hover:text-brand-navy">
+                  {t('footer.blog')}
+                </Link>
+              </li>
+              <li>
                 <Link to="/contact" className="text-text-muted transition-colors hover:text-brand-navy">
                   {t('footer.contactUs')}
                 </Link>
@@ -87,6 +98,37 @@ export function Footer() {
                 </Link>
               </li>
 
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="text-sm font-semibold text-brand-gold-dark">{t('footer.rentByCity')}</h3>
+            <ul className="mt-3 space-y-2 text-sm">
+              {CITY_GUIDES.map((guide) => (
+                <li key={guide.slug}>
+                  <Link to={`/locations/${guide.slug}`} className="text-text-muted transition-colors hover:text-brand-navy">
+                    {isArabic ? guide.ar.name : guide.en.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="text-sm font-semibold text-brand-gold-dark">{t('footer.guides')}</h3>
+            <ul className="mt-3 space-y-2 text-sm">
+              {BLOG_POSTS.slice(0, FOOTER_GUIDE_COUNT).map((post) => (
+                <li key={post.slug}>
+                  <Link to={postPath(post.slug)} className="text-text-muted transition-colors hover:text-brand-navy">
+                    {postCopy(post, i18n.language).title}
+                  </Link>
+                </li>
+              ))}
+              <li>
+                <Link to="/blog" className="font-semibold text-brand-gold-dark transition-colors hover:text-brand-navy">
+                  {t('footer.allArticles')}
+                </Link>
+              </li>
             </ul>
           </div>
 
@@ -109,10 +151,8 @@ export function Footer() {
                 </Link>
               </li>
             </ul>
-          </div>
 
-          <div>
-            <h3 className="text-sm font-semibold text-brand-gold-dark">{t('footer.goodToKnow')}</h3>
+            <h3 className="mt-8 text-sm font-semibold text-brand-gold-dark">{t('footer.goodToKnow')}</h3>
             <ul className="mt-3 space-y-2 text-sm text-text-muted">
               <li>{t('footer.knowDubaiOnly')}</li>
               <li>{t('footer.knowWebsiteOnly')}</li>
@@ -127,13 +167,13 @@ export function Footer() {
           </div>
           <div className="flex items-center gap-2">
             <span className="text-[10px] font-semibold uppercase tracking-[0.22em] text-text-muted">{t('footer.weAccept')}</span>
-            <div className="flex gap-1.5">
+            <div className="flex gap-2">
               {PAYMENT_LOGOS.map((logo) => (
                 <span
                   key={logo.name}
-                  className="flex h-6 w-9 items-center justify-center rounded-none border border-[#e5dfd6] bg-white"
+                  className="flex h-9 w-13 items-center justify-center rounded-none border border-[#e5dfd6] bg-white"
                 >
-                  <svg viewBox="0 0 24 24" role="img" aria-label={logo.name} className="h-3.5 w-3.5">
+                  <svg viewBox="0 0 24 24" role="img" aria-label={logo.name} className="h-5.5 w-5.5">
                     <path d={logo.path} fill={`#${logo.hex}`} />
                   </svg>
                 </span>

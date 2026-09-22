@@ -305,9 +305,14 @@ describe('ManageBookingPage', () => {
       expect(lookupMock).not.toHaveBeenCalled()
     })
 
-    it('pre-fills the lookup field with the prefetched reference too', () => {
+    it('does not render the lookup field while a prefetched result is already showing', () => {
+      // The finder (hero + form) only renders once there's nothing to show
+      // yet; a prefetched result starts the page already 'found', so the
+      // field is absent rather than pre-filled and hidden. "Search another"
+      // clears the field on its way back to idle regardless, so a value
+      // sitting unseen behind the result would never have been visible.
       renderWithPrefetchedResult(confirmedResult)
-      expect(screen.getByPlaceholderText('Booking Reference or Vehicle Plate Number')).toHaveValue('BLS-ABCDEF12')
+      expect(screen.queryByPlaceholderText('Booking Reference or Vehicle Plate Number')).not.toBeInTheDocument()
     })
 
     it('still shows Continue to Payment for a prefetched pending_payment booking', () => {

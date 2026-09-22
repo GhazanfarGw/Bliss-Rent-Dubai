@@ -61,8 +61,14 @@ export interface SearchCriteria {
 
 export interface VehicleFilters {
   categoryId: string | null
-  brand: string | null
+  /** Selected makes — empty means every brand. */
+  brands: string[]
   transmission: string | null
+  /** At least this many seats. */
+  minSeats: number | null
+  /** Per-day price bounds (the fleet's currency); either end may be open. */
+  priceMin: number | null
+  priceMax: number | null
   /** Only meaningful once dates are chosen — see VehicleSearchResult. */
   availability: 'available' | 'reserved' | null
 }
@@ -71,8 +77,11 @@ export type SortOption = 'price_asc' | 'price_desc'
 
 export const EMPTY_FILTERS: VehicleFilters = {
   categoryId: null,
-  brand: null,
+  brands: [],
   transmission: null,
+  minSeats: null,
+  priceMin: null,
+  priceMax: null,
   availability: null,
 }
 
@@ -287,6 +296,22 @@ export interface VehicleDraft {
   seats: string
   plateNumber: string
   status: VehicleRow['status']
+  /*
+   * Optional specifications. Everything is a string in the form and blank means
+   * "not entered" (stored as NULL, and hidden on the public pages).
+   */
+  engine: string
+  horsepower: string
+  torqueNm: string
+  topSpeedKmh: string
+  acceleration0100: string
+  fuelType: string
+  fuelConsumptionL100km: string
+  drivetrain: string
+  doors: string
+  originCountry: string
+  about: string
+  aboutAr: string
 }
 
 export const EMPTY_VEHICLE_DRAFT: VehicleDraft = {
@@ -298,6 +323,18 @@ export const EMPTY_VEHICLE_DRAFT: VehicleDraft = {
   seats: '5',
   plateNumber: '',
   status: 'available',
+  engine: '',
+  horsepower: '',
+  torqueNm: '',
+  topSpeedKmh: '',
+  acceleration0100: '',
+  fuelType: '',
+  fuelConsumptionL100km: '',
+  drivetrain: '',
+  doors: '',
+  originCountry: '',
+  about: '',
+  aboutAr: '',
 }
 
 /** Draft shape for one pricing-ladder row in the admin Pricing page. */

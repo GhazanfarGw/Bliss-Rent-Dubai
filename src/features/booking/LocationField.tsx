@@ -36,11 +36,13 @@ interface CitySelectProps {
   disabled?: boolean
   /** Compact single-line variant for the flat search-bar row. */
   row?: boolean
+  /** Fill the available column in sectioned booking layouts. */
+  fluid?: boolean
 }
 
-export function CitySelect({ label, ariaLabel, value, onChange, cities, disabled = false, row = false }: CitySelectProps) {
+export function CitySelect({ label, ariaLabel, value, onChange, cities, disabled = false, row = false, fluid = false }: CitySelectProps) {
   return (
-    <div className={row ? 'flex w-full flex-col gap-1 sm:w-32 sm:shrink-0' : 'flex w-full flex-col gap-1 sm:w-64'}>
+    <div className={row ? 'flex w-full flex-col gap-1 sm:w-32 sm:shrink-0' : fluid ? 'flex w-full flex-col gap-1' : 'flex w-full flex-col gap-1 sm:w-64'}>
       <span className="block text-xs font-semibold uppercase tracking-wide text-text-muted">{label}</span>
       <select
         value={value}
@@ -71,6 +73,8 @@ interface LocationPickerButtonProps {
   sheetTitle: string
   /** Compact single-line variant for the flat search-bar row. */
   row?: boolean
+  /** Fill the available column in sectioned booking layouts. */
+  fluid?: boolean
 }
 
 export function LocationPickerButton({
@@ -83,6 +87,7 @@ export function LocationPickerButton({
   placeholder,
   sheetTitle,
   row = false,
+  fluid = false,
 }: LocationPickerButtonProps) {
   const { t } = useTranslation()
   const [sheetOpen, setSheetOpen] = useState(false)
@@ -93,7 +98,7 @@ export function LocationPickerButton({
   const selected = sorted.find((l) => l.id === locationId) ?? null
 
   return (
-    <div className={row ? 'flex w-full min-w-0 flex-col gap-1 sm:flex-1 sm:min-w-[190px]' : 'flex w-full flex-col gap-1 sm:w-64'}>
+    <div className={row ? 'flex w-full min-w-0 flex-col gap-1 sm:flex-1 sm:min-w-[190px]' : fluid ? 'flex w-full min-w-0 flex-col gap-1' : 'flex w-full flex-col gap-1 sm:w-64'}>
       <span className="block text-xs font-semibold uppercase tracking-wide text-text-muted">{label}</span>
       <button
         type="button"
@@ -204,4 +209,3 @@ function LocationOptionList({
     </div>
   )
 }
-

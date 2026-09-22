@@ -83,7 +83,7 @@ export function ExtendRentalSection({
 
   if (state.step === 'submitted') {
     return (
-      <div className="mt-4 space-y-2 rounded-xl border border-success/25 bg-success-bg p-5 text-center">
+      <div className="space-y-2 rounded-xl border border-success/25 bg-success-bg p-5 text-center">
         <BadgeCheck className="mx-auto h-6 w-6 text-success" aria-hidden="true" />
         <h3 className="text-sm font-bold text-brand-navy">{t('extendRental.result.submittedTitle')}</h3>
         <p className="text-xs text-text-muted">{t('extendRental.result.submittedBody')}</p>
@@ -93,9 +93,8 @@ export function ExtendRentalSection({
   }
 
   return (
-    <div className="mt-4 border-t border-brand-navy/10 pt-4">
-      <h3 className="text-sm font-bold text-brand-navy">{t('extendRental.sectionTitle')}</h3>
-      <p className="mt-1 text-xs text-text-muted">{t('extendRental.sectionIntro')}</p>
+    <div>
+      <p className="text-xs text-text-muted">{t('extendRental.sectionIntro')}</p>
 
       <form onSubmit={(e) => void handleSubmit(e)} noValidate className="mt-3 space-y-3">
         <label className="block">

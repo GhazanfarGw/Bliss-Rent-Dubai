@@ -45,7 +45,7 @@ describe('ConfirmationPage', () => {
     expect(screen.getByText('Toyota Camry')).toBeInTheDocument()
     expect(screen.getByText('Jane Renter')).toBeInTheDocument()
     expect(screen.getByText('John Driver')).toBeInTheDocument()
-    expect(screen.getByText('AED 900')).toBeInTheDocument()
+    expect(screen.getByText('900')).toBeInTheDocument()
     expect(screen.getByText('Booking confirmed')).toBeInTheDocument()
   })
 

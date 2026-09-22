@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { BadgePercent, Headset, Plane, ShieldCheck, Zap } from 'lucide-react'
 import { fetchAllAvailableVehicles } from '@/features/booking/api'
+import { CurrencySymbol } from '@/features/shared/ui/CurrencySymbol'
 import { prefersReducedMotion } from '@/lib/motion'
 
 /**
@@ -56,13 +57,15 @@ export function TickerBar() {
   }, [])
 
   const staticItems = t('home.ticker.items', { returnObjects: true }) as string[]
-  const rateItem = rate
-    ? `${t('home.ticker.from')} ${rate.currency} ${rate.amount.toLocaleString()} ${t('home.ticker.perDay')}`
-    : null
+  const rateItem: ReactNode = rate ? (
+    <>
+      {t('home.ticker.from')} <CurrencySymbol currency={rate.currency} /> {rate.amount.toLocaleString()} {t('home.ticker.perDay')}
+    </>
+  ) : null
 
-  const items = [
-    ...(rateItem ? [{ text: rateItem, Icon: BadgePercent }] : []),
-    ...staticItems.map((text, i) => ({ text, Icon: STATIC_ITEM_ICONS[i] ?? BadgePercent })),
+  const items: { key: string; text: ReactNode; Icon: typeof BadgePercent }[] = [
+    ...(rateItem ? [{ key: 'rate', text: rateItem, Icon: BadgePercent }] : []),
+    ...staticItems.map((text, i) => ({ key: `static-${i}`, text, Icon: STATIC_ITEM_ICONS[i] ?? BadgePercent })),
   ]
 
   const shouldLoop = !reducedMotion
@@ -77,11 +80,11 @@ export function TickerBar() {
     >
       <div className="flex h-full items-center overflow-x-hidden">
         <div className={'flex min-w-max items-center gap-8 whitespace-nowrap px-4 text-xs font-medium sm:px-6 ' + (shouldLoop ? 'animate-marquee' : 'flex-wrap justify-center gap-x-8 gap-y-1')}>
-          {loopItems.map(({ text, Icon }, index) => {
+          {loopItems.map(({ key, text, Icon }, index) => {
             const isDuplicate = shouldLoop && index >= items.length
             return (
               <span
-                key={`${text}-${index}`}
+                key={`${key}-${index}`}
                 aria-hidden={isDuplicate || undefined}
                 inert={isDuplicate}
                 className="flex items-center gap-2"

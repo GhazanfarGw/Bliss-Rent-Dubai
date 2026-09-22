@@ -9,6 +9,7 @@ import { prefersReducedMotion } from '@/lib/motion'
 
 export function Layout() {
   const location = useLocation()
+  const isCheckout = location.pathname.startsWith('/checkout/')
 
   // Smoothly scrolls to an in-page anchor (e.g. the header's About/Services
   // links to #why-choose / #how-it-works) whenever the URL hash changes,
@@ -36,8 +37,12 @@ export function Layout() {
       </main>
       <Footer />
       <CookieConsentBanner />
-      <FeedbackWidget />
-      <SupportChatWidget />
+      {/* Keep floating tabs clear of checkout fields on small screens.
+          Contact links remain available in the navigation and footer. */}
+      <div className={isCheckout ? 'hidden lg:block' : undefined}>
+        <FeedbackWidget />
+        <SupportChatWidget />
+      </div>
     </div>
   )
 }

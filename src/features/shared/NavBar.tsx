@@ -1,7 +1,8 @@
 import { Fragment, useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { Link, NavLink, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { CalendarSearch, CarFront, ChevronRight, ClipboardCheck, Home, Info, MapPin, Menu, Phone, X } from 'lucide-react'
+import { BookOpen, CarFront, ChevronRight, ClipboardCheck, Home, Info, MapPin, Menu, Phone, X } from 'lucide-react'
 import { LanguageSwitcher } from '@/features/shared/LanguageSwitcher'
 import { LinkButton } from '@/features/shared/ui/LinkButton'
 import { PendingBookingIndicator } from '@/features/shared/PendingBookingIndicator'
@@ -31,15 +32,15 @@ function BrandMark({ compact = false }: { compact?: boolean }) {
   )
 }
 
-const NAV_ICONS = [Home, Info, CarFront, CalendarSearch, ClipboardCheck, Phone]
-const NAV_DESCRIPTIONS = ['nav.homeDescription', 'nav.aboutDescription', 'nav.browseFleetDescription', 'nav.findMyCarDescription', 'nav.manageBookingDescription', 'nav.contactDescription'] as const
+const NAV_ICONS = [Home, Info, CarFront, ClipboardCheck, BookOpen, Phone]
+const NAV_DESCRIPTIONS = ['nav.homeDescription', 'nav.aboutDescription', 'nav.browseFleetDescription', 'nav.manageBookingDescription', 'nav.blogDescription', 'nav.contactDescription'] as const
 
 /**
- * Premium header. Desktop: logo, Home, About, Browse Fleet, Find My Car,
- * Manage Booking, Contact (all real pages — see src/features/content/,
- * FindMyCarPage.tsx, and ManageBookingPage.tsx), language switcher, and
- * the primary "Search Cars"/"Book Now" CTA. Mobile: hamburger drawer with
- * the same links plus the CTA.
+ * Premium header. Desktop: logo, Home, About, Browse Fleet, Manage
+ * Booking, Blog, Contact (all real pages — see src/features/content/ and
+ * ManageBookingPage.tsx), language switcher, and the primary "Search
+ * Cars"/"Book Now" CTA. Mobile: hamburger drawer with the same links plus
+ * the CTA.
  *
  * Vehicle Collection (car-types) and the Services in-page anchor
  * (homepage's "How It Works" section) used to live here too; both were
@@ -52,10 +53,11 @@ const NAV_DESCRIPTIONS = ['nav.homeDescription', 'nav.aboutDescription', 'nav.br
  * homepage navigator's own tab, or the footer — never the header itself —
  * so a guest browsing from any other page had no direct way there.
  *
- * Find My Car is a separate, dedicated header link (own icon/description
- * in NAV_ICONS/NAV_DESCRIPTIONS above) so a guest who only wants a quick
- * status check is never routed through the full Manage Booking page —
- * see FindMyCarPage.tsx / BookingStatusPanel.tsx.
+ * Find My Car (a separate, read-only "quick status" page) was briefly its
+ * own dedicated header link, then merged back into Manage Booking — see
+ * App.tsx's route history and ManageBookingPage.tsx's own JSDoc. One nav
+ * item, one URL, one page title now, instead of two links for what a
+ * guest experiences as one task.
  *
  * The CTA points at /book (BookCarPage) rather than straight at /search:
  * its whole job is "start a booking", and BookCarPage is the dedicated
@@ -65,6 +67,18 @@ const NAV_DESCRIPTIONS = ['nav.homeDescription', 'nav.aboutDescription', 'nav.br
  */
 const TRANSPARENT_SCROLL_THRESHOLD_PX = 24
 
+/**
+ * Routes whose first section is a dark hero extending under the header —
+ * the header uses its white ("on dark") colours over them until scrolled.
+ * A page joining this list must also pull its hero up under the header
+ * itself (`-mt-[var(--header-h)]` plus its own top padding): Hero.tsx (/),
+ * AboutPage (/about) and the shared PageHero (/book) do. Manage Booking's
+ * own navy band (ManageBookingHero.tsx) is deliberately NOT in this list —
+ * it renders as an ordinary section below the normal solid header, not a
+ * full-bleed hero the header sits transparently over.
+ */
+const PAGES_WITH_DARK_HERO = ['/', '/about', '/book']
+
 export function NavBar() {
   const [open, setOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
@@ -73,13 +87,15 @@ export function NavBar() {
   const reducedMotion = prefersReducedMotion()
   const isRtl = i18n.dir() === 'rtl'
 
-  // Only the homepage renders full-bleed hero art directly under the fixed
-  // header (see Hero's `-mt-[var(--header-h)]`), so the
-  // transparent-over-hero treatment is scoped to it — every other page's
-  // content starts below the header anyway, so it would just show white
-  // through a transparent bar there.
-  const isHome = location.pathname === '/'
-  const transparent = isHome && !scrolled
+  // The header is transparent on EVERY page until the visitor scrolls, then
+  // turns solid white. What differs is its colour: the pages listed in
+  // PAGES_WITH_DARK_HERO slide a dark full-bleed hero up underneath the
+  // header (Hero.tsx's and AboutPage's `-mt-[var(--header-h)]`), so there the
+  // logo, links and controls are white ("on dark"). On every other page the
+  // header sits over the light page background, so it stays transparent but
+  // keeps the normal dark logo, links and controls — white text would vanish.
+  const transparent = !scrolled
+  const onDark = transparent && PAGES_WITH_DARK_HERO.includes(location.pathname)
 
   useEffect(() => {
     function handleScroll() {
@@ -133,6 +149,16 @@ export function NavBar() {
     }
   }, [open])
 
+  // Escape closes the side menu (the tap-outside and X paths already did).
+  useEffect(() => {
+    if (!open) return
+    function handleKey(e: KeyboardEvent) {
+      if (e.key === 'Escape') setOpen(false)
+    }
+    document.addEventListener('keydown', handleKey)
+    return () => document.removeEventListener('keydown', handleKey)
+  }, [open])
+
   // Vehicle Collection (car-types) and Services (the homepage's "How It
   // Works" anchor) were removed from the header to declutter it — both
   // still real destinations, just moved to the footer's Company column
@@ -141,8 +167,8 @@ export function NavBar() {
     { to: '/', label: t('nav.home'), end: true },
     { to: '/about', label: t('nav.about'), end: false },
     { to: '/search', label: t('nav.browseFleet'), end: false },
-    { to: '/find-my-car', label: t('nav.findMyCar'), end: false },
     { to: '/manage-booking', label: t('nav.manageBooking'), end: false },
+    { to: '/blog', label: t('nav.blog'), end: false },
     { to: '/contact', label: t('nav.contact'), end: false },
   ]
 
@@ -159,7 +185,9 @@ export function NavBar() {
         // homepage. The header now stays exactly --header-h tall in both
         // states, so every fixed element anchored to it lines up correctly.
         (reducedMotion ? '' : 'transition-[background-color,border-color,box-shadow,color] duration-300 ease-out ') +
-        (transparent ? 'border-transparent bg-transparent text-white ' : 'border-[#ece7df] bg-white text-brand-navy shadow-[0_8px_24px_rgba(11,19,43,0.07)]')
+        (transparent
+          ? 'border-transparent bg-transparent ' + (onDark ? 'text-white' : 'text-brand-navy')
+          : 'border-[#ece7df] bg-white text-brand-navy shadow-[0_8px_24px_rgba(11,19,43,0.07)]')
       }
     >
       <div className="mx-auto flex h-full max-w-7xl items-center justify-between gap-3 px-4 sm:px-6 lg:px-8">
@@ -167,7 +195,7 @@ export function NavBar() {
           to="/"
           className={
             'flex items-center rounded-none transition-colors duration-300 ' +
-            (transparent ? 'px-3 py-1.5' : '')
+            (onDark ? 'px-3 py-1.5' : '')
           }
           onClick={() => setOpen(false)}
         >
@@ -175,12 +203,12 @@ export function NavBar() {
             <img
               src={logoFull}
               alt="Bliss Rent Dubai"
-              className={'hidden w-auto transition-[height,filter] duration-300 ease-out lg:block ' + (transparent ? 'h-11 brightness-0 invert' : 'h-9')}
+              className={'hidden w-auto transition-[height,filter] duration-300 ease-out lg:block ' + (onDark ? 'h-11 brightness-0 invert' : 'h-9')}
             />
             <img
-              src={transparent ? logoMark : logoFull}
+              src={onDark ? logoMark : logoFull}
               alt="Bliss Rent Dubai"
-              className={'w-auto transition-[height,filter] duration-300 ease-out lg:hidden ' + (transparent ? 'h-11 brightness-0 invert' : 'h-9')}
+              className={'w-auto transition-[height,filter] duration-300 ease-out lg:hidden ' + (onDark ? 'h-11 brightness-0 invert' : 'h-9')}
             />
           </picture>
         </Link>
@@ -199,10 +227,10 @@ export function NavBar() {
                 className={({ isActive }) =>
                   'relative rounded-none px-3 py-2 text-sm font-medium transition-all ' +
                   (isActive
-                    ? (transparent
+                    ? (onDark
                         ? 'text-white after:absolute after:inset-x-3 after:-bottom-1 after:h-0.5 after:bg-brand-champagne'
                         : 'text-brand-gold after:absolute after:inset-x-3 after:-bottom-1 after:h-0.5 after:bg-brand-champagne')
-                      : transparent
+                      : onDark
                       ? 'text-white/90 hover:text-white'
                       : 'text-[#4a5360] hover:text-brand-gold')
                 }
@@ -214,9 +242,9 @@ export function NavBar() {
         </nav>
 
         <div className="hidden items-center gap-4 lg:flex">
-          <PendingBookingIndicator tone={transparent ? 'light' : 'dark'} />
-          <SiteSearch tone={transparent ? 'light' : 'dark'} />
-          <LanguageSwitcher tone={transparent ? 'light' : 'dark'} />
+          <PendingBookingIndicator tone={onDark ? 'light' : 'dark'} />
+          <SiteSearch tone={onDark ? 'light' : 'dark'} />
+          <LanguageSwitcher tone={onDark ? 'light' : 'dark'} />
           {/* Cities selector sits right next to the primary CTA — the
               same "compact city-switcher beside the main action" pattern
               the reference layout used. */}
@@ -231,12 +259,12 @@ export function NavBar() {
         </div>
 
         <div className="flex items-center gap-2 lg:hidden">
-          <PendingBookingIndicator tone={transparent ? 'light' : 'dark'} />
-          <SiteSearch tone={transparent ? 'light' : 'dark'} />
-          <LanguageSwitcher tone={transparent ? 'light' : 'dark'} />
+          <PendingBookingIndicator tone={onDark ? 'light' : 'dark'} />
+          <SiteSearch tone={onDark ? 'light' : 'dark'} compact />
+          <LanguageSwitcher tone={onDark ? 'light' : 'dark'} />
           <button
             type="button"
-            className={'inline-flex h-11 w-11 items-center justify-center rounded-none bg-transparent transition-colors ' + (transparent ? 'text-white hover:bg-white/10' : 'text-brand-gold hover:bg-brand-gold/10')}
+            className={'inline-flex h-11 w-11 items-center justify-center rounded-none bg-transparent transition-colors ' + (onDark ? 'text-white hover:bg-white/10' : 'text-brand-gold hover:bg-brand-gold/10')}
             aria-label={t('nav.toggleMenu')}
             aria-expanded={open}
             onClick={() => setOpen((v) => !v)}
@@ -246,6 +274,14 @@ export function NavBar() {
         </div>
       </div>
 
+      {/* The mobile menu is a SIDE drawer: a panel (82% of the screen, at most
+          20rem wide) that slides in from the inline-end edge — right in LTR,
+          left in RTL, under the hamburger that opens it — over a dimmed,
+          blurred page that closes it when tapped. It's portalled to <body>
+          rather than rendered inside the header: the header is a `z-40`
+          stacking context, so the chat and feedback widgets (also z-40,
+          later in the page) would otherwise float on top of the panel. */}
+      {createPortal(
       <div
         className={
           // BUG FIX: both `pointer-events-none` and `pointer-events-auto`
@@ -264,18 +300,21 @@ export function NavBar() {
         }
         aria-hidden={!open}
       >
-        <div className="absolute inset-0 bg-white backdrop-blur-[2px]" onClick={() => setOpen(false)} />
+        <div
+          className={'absolute inset-0 bg-[#05070d]/60 backdrop-blur-sm ' + (reducedMotion ? '' : 'animate-site-search-backdrop')}
+          onClick={() => setOpen(false)}
+        />
 
         <nav
           className={
-            'absolute end-0 top-0 flex h-dvh max-h-dvh w-full max-w-[100vw] flex-col gap-2 overflow-y-auto border-s border-brand-gold/10 bg-white/85 p-4 ' +
+            'absolute end-0 top-0 flex h-dvh max-h-dvh w-[82%] max-w-xs flex-col gap-2 overflow-y-auto border-s border-brand-gold/15 bg-white p-4 shadow-[-24px_0_60px_rgba(5,7,13,0.35)] rtl:shadow-[24px_0_60px_rgba(5,7,13,0.35)] ' +
             (reducedMotion ? '' : isRtl ? 'animate-[slide-in-left_0.28s_ease-out]' : 'animate-[slide-in-right_0.28s_ease-out]')
           }
         >
-          <div className="mb-2 flex items-center justify-between border-b border-brand-gold/10 bg-white/10 pb-3">
+          <div className="mb-2 flex items-center justify-between border-b border-brand-gold/10 pb-3">
             <div className="flex items-center gap-3">
               <BrandMark compact />
-              <span className="text-sm font-semibold uppercase tracking-[0.18em] text-brand-gold">Menu</span>
+              <span className="text-sm font-semibold uppercase tracking-[0.18em] text-brand-gold">{t('nav.menu')}</span>
             </div>
             <button
               type="button"
@@ -384,7 +423,9 @@ export function NavBar() {
             </div>
           </div>
         </nav>
-      </div>
+      </div>,
+      document.body,
+      )}
     </header>
   )
 }

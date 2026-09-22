@@ -83,21 +83,20 @@ describe('SearchWidget', () => {
     expect(within(pickupDialog).getByRole('button', { name: /Downtown Dubai/ })).toBeInTheDocument()
   })
 
-  it('defaults to "Same Return Location" checked, hiding the Return Location field entirely', async () => {
+  it('defaults to a separate return location so the full trip is explicit', async () => {
     render(<SearchWidget onSearch={vi.fn()} />)
     await screen.findByRole('button', { name: /select pickup point/i })
 
-    expect(screen.getByRole('checkbox', { name: /same return location/i })).toBeChecked()
-    expect(screen.queryByRole('button', { name: /select return point/i })).not.toBeInTheDocument()
+    expect(screen.getByRole('checkbox', { name: /same return location/i })).not.toBeChecked()
+    expect(screen.getByRole('button', { name: /select return point/i })).toBeInTheDocument()
   })
 
-  it('unchecking "Same Return Location" reveals a Return Location field spanning every UAE location, not just the pickup city', async () => {
+  it('offers every UAE location in the default Return Location field, not just the pickup city', async () => {
     const user = userEvent.setup()
     render(<SearchWidget onSearch={vi.fn()} />)
     await screen.findByRole('button', { name: /select pickup point/i })
 
-    // Pickup stays in Dubai; unchecking should still offer the Abu Dhabi point as a return option.
-    await user.click(screen.getByRole('checkbox', { name: /same return location/i }))
+    // Pickup stays in Dubai; the separate return picker still offers Abu Dhabi.
     await user.click(screen.getByRole('button', { name: /select return point/i }))
     const dialog = screen.getByRole('dialog')
     expect(within(dialog).getByRole('button', { name: /Abu Dhabi International Airport \(AUH\)/ })).toBeInTheDocument()
@@ -139,6 +138,7 @@ describe('SearchWidget', () => {
     const user = userEvent.setup()
     render(<SearchWidget onSearch={onSearch} />)
     await screen.findByRole('button', { name: /select pickup point/i })
+    await user.click(screen.getByRole('checkbox', { name: /same return location/i }))
 
     const startIso = futureIso(2)
     const endIso = futureIso(5)
@@ -163,7 +163,7 @@ describe('SearchWidget', () => {
     )
   })
 
-  it('calls onSearch with an independent drop-off location once "Same Return Location" is unchecked', async () => {
+  it('calls onSearch with an independent drop-off location by default', async () => {
     const onSearch = vi.fn()
     const user = userEvent.setup()
     render(<SearchWidget onSearch={onSearch} />)
@@ -179,7 +179,6 @@ describe('SearchWidget', () => {
 
     await pickLocation(user, /select pickup point/i, /DXB Terminal 3/)
 
-    await user.click(screen.getByRole('checkbox', { name: /same return location/i }))
     await pickLocation(user, /select return point/i, /Abu Dhabi International Airport \(AUH\)/)
 
     await user.click(screen.getByRole('button', { name: /search cars/i }))
@@ -214,6 +213,7 @@ describe('SearchWidget', () => {
       const user = userEvent.setup()
       render(<SearchWidget onSearch={onSearch} layout="card" />)
       await screen.findByRole('button', { name: /select pickup point/i })
+      await user.click(screen.getByRole('checkbox', { name: /same return location/i }))
 
       const startIso = futureIso(2)
       const endIso = futureIso(5)
@@ -235,6 +235,18 @@ describe('SearchWidget', () => {
           pickupTime: '10:00',
         }),
       )
+    })
+  })
+
+  describe('layout="navigator" (homepage)', () => {
+    it('uses the guided two-section layout and keeps the return point visible by default', async () => {
+      render(<SearchWidget onSearch={vi.fn()} layout="navigator" />)
+      await screen.findByRole('button', { name: /select pickup point/i })
+
+      expect(screen.getByText('Pickup & return')).toBeInTheDocument()
+      expect(screen.getByText('Dates & time')).toBeInTheDocument()
+      expect(screen.getByText(/choose exactly where your car journey starts and ends/i)).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: /select return point/i })).toBeInTheDocument()
     })
   })
 })

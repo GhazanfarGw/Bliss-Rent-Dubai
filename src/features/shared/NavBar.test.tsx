@@ -34,7 +34,6 @@ describe('NavBar', () => {
     expect(screen.getAllByRole('link', { name: 'Home' }).length).toBeGreaterThan(0)
     expect(screen.getAllByRole('link', { name: 'About' }).length).toBeGreaterThan(0)
     expect(screen.getAllByRole('link', { name: 'Fleet' }).length).toBeGreaterThan(0)
-    expect(screen.getAllByRole('link', { name: 'Booking Status' }).length).toBeGreaterThan(0)
     expect(screen.getAllByRole('link', { name: 'Manage Booking' }).length).toBeGreaterThan(0)
     expect(screen.getAllByRole('link', { name: 'Contact' }).length).toBeGreaterThan(0)
     expect(screen.getAllByRole('link', { name: 'Book Now' }).length).toBeGreaterThan(0)
@@ -45,19 +44,27 @@ describe('NavBar', () => {
     expect(screen.queryByRole('link', { name: 'Services' })).not.toBeInTheDocument()
   })
 
-  it('About/Find My Car/Manage Booking/Contact are real, separate pages', () => {
+  it('has a Blog link in the desktop navigation, and in the mobile menu once it is opened', () => {
+    renderNavBar()
+
+    const desktopBlog = within(screen.getByRole('navigation', { name: /primary navigation/i })).getByRole('link', { name: 'Blog' })
+    expect(desktopBlog).toHaveAttribute('href', '/blog')
+
+    fireEvent.click(screen.getByRole('button', { name: /toggle menu/i }))
+    const drawer = screen.getAllByRole('navigation').find((nav) => nav.className.includes('h-dvh')) as HTMLElement
+    expect(within(drawer).getByRole('link', { name: /Blog.*Guides and travel tips/i })).toHaveAttribute('href', '/blog')
+  })
+
+  it('About/Manage Booking/Contact are real, separate pages — no leftover Booking Status link', () => {
     renderNavBar()
     const aboutLinks = screen.getAllByRole('link', { name: 'About' })
-    const findMyCarLinks = screen.getAllByRole('link', { name: 'Booking Status' })
     const manageBookingLinks = screen.getAllByRole('link', { name: 'Manage Booking' })
     const contactLinks = screen.getAllByRole('link', { name: 'Contact' })
     expect(aboutLinks[0]).toHaveAttribute('href', '/about')
-    expect(findMyCarLinks[0]).toHaveAttribute('href', '/find-my-car')
     expect(manageBookingLinks[0]).toHaveAttribute('href', '/manage-booking')
     expect(contactLinks[0]).toHaveAttribute('href', '/contact')
-    // Find My Car and Manage Booking must be two distinct destinations,
-    // never the same page under two labels.
-    expect(findMyCarLinks[0]).not.toHaveAttribute('href', manageBookingLinks[0].getAttribute('href'))
+    // Booking Status was merged into Manage Booking — one nav item now.
+    expect(screen.queryByRole('link', { name: 'Booking Status' })).not.toBeInTheDocument()
   })
 
   it('mobile menu is closed by default and opens/closes via the hamburger button', () => {
@@ -114,6 +121,119 @@ describe('NavBar', () => {
     Object.defineProperty(window, 'scrollY', { configurable: true, value: 120 })
     fireEvent.scroll(window)
     expect(header.className).not.toContain('-translate-y-full')
+  })
+
+  describe('transparent header on every page, until scrolled', () => {
+    function setScroll(y: number) {
+      Object.defineProperty(window, 'scrollY', { configurable: true, value: y })
+    }
+    function renderAt(path: string) {
+      setScroll(0)
+      return render(
+        <MemoryRouter initialEntries={[path]}>
+          <NavBar />
+        </MemoryRouter>,
+      )
+    }
+
+    it.each(['/', '/about', '/contact', '/search', '/blog', '/locations'])('is transparent on %s before scrolling', (path) => {
+      renderAt(path)
+      const header = screen.getByRole('banner')
+      expect(header.className).toContain('bg-transparent')
+      expect(header.className).toContain('border-transparent')
+      expect(header.className).not.toContain('bg-white')
+      expect(header.className).not.toContain('shadow-')
+    })
+
+    it.each(['/', '/about', '/book'])('uses white logo, links and controls on %s, whose dark hero sits under the header', (path) => {
+      renderAt(path)
+      expect(screen.getByRole('banner').className).toContain('text-white')
+      const desktopLogo = screen.getAllByRole('img', { name: 'Bliss Rent Dubai' })[0]
+      expect(desktopLogo.className).toContain('invert')
+    })
+
+    it.each(['/contact', '/search', '/blog', '/locations', '/faqs', '/car-types', '/manage-booking'])(
+      'keeps the normal dark logo, links and controls on %s — a light page, where white text would disappear',
+      (path) => {
+        renderAt(path)
+        const header = screen.getByRole('banner')
+        expect(header.className).toContain('text-brand-navy')
+        expect(header.className).not.toContain('text-white')
+        for (const logo of screen.getAllByRole('img', { name: 'Bliss Rent Dubai' })) {
+          expect(logo.className).not.toContain('invert')
+        }
+      },
+    )
+
+    it.each(['/', '/about', '/contact', '/blog'])('turns solid white once %s is scrolled, and back to transparent at the top', (path) => {
+      renderAt(path)
+      const header = screen.getByRole('banner')
+
+      setScroll(240)
+      fireEvent.scroll(window)
+      expect(header.className).toContain('bg-white')
+      expect(header.className).toContain('text-brand-navy')
+      expect(header.className).not.toContain('bg-transparent')
+
+      setScroll(0)
+      fireEvent.scroll(window)
+      expect(header.className).toContain('bg-transparent')
+    })
+  })
+
+  describe('mobile menu as a side drawer', () => {
+    // The hamburger is the first "toggle menu" button in the page; once open, the
+    // drawer's own close button carries the same name. Named differently in Arabic.
+    const TOGGLE = /toggle menu|فتح\/إغلاق القائمة/i
+    const hamburger = () => screen.getAllByRole('button', { name: TOGGLE })[0]
+
+    function openMenu() {
+      Object.defineProperty(window, 'scrollY', { configurable: true, value: 0 })
+      renderNavBar()
+      fireEvent.click(hamburger())
+      const panel = screen.getAllByRole('navigation').find((nav) => nav.className.includes('h-dvh')) as HTMLElement
+      return { panel, overlay: panel.closest('.fixed.inset-0.z-50') as HTMLElement }
+    }
+
+    it('is a partial-width panel docked to the inline-end edge — not a full-screen sheet', () => {
+      const { panel } = openMenu()
+      expect(panel.className).toContain('w-[82%]')
+      expect(panel.className).toContain('max-w-xs')
+      expect(panel.className).toContain('end-0')
+      expect(panel.className).not.toMatch(/(^|s)w-full(s|$)/)
+    })
+
+    it('sits over a dimmed, blurred backdrop rather than a solid white one, and tapping it closes the menu', () => {
+      const { overlay } = openMenu()
+      const backdrop = overlay.firstElementChild as HTMLElement
+      expect(backdrop.className).toContain('bg-[#05070d]/60')
+      expect(backdrop.className).toContain('backdrop-blur-sm')
+      expect(backdrop.className).not.toContain('bg-white')
+
+      fireEvent.click(backdrop)
+      expect(hamburger()).toHaveAttribute('aria-expanded', 'false')
+    })
+
+    it('closes on Escape', () => {
+      openMenu()
+      expect(hamburger()).toHaveAttribute('aria-expanded', 'true')
+      fireEvent.keyDown(document, { key: 'Escape' })
+      expect(hamburger()).toHaveAttribute('aria-expanded', 'false')
+    })
+
+    it('is rendered outside the header, so the floating chat and feedback widgets can never sit on top of it', () => {
+      const { overlay } = openMenu()
+      expect(screen.getByRole('banner').contains(overlay)).toBe(false)
+      expect(overlay.parentElement).toBe(document.body)
+    })
+
+    it('titles the panel in the current language', async () => {
+      await act(async () => {
+        await i18n.changeLanguage('ar')
+      })
+      const { panel } = openMenu()
+      expect(within(panel).getByText('القائمة')).toBeInTheDocument()
+    })
   })
 
   it('switches the interface language, which also flips the document to RTL', async () => {

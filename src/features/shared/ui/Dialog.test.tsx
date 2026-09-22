@@ -49,6 +49,35 @@ describe('Dialog', () => {
     expect(onClose).toHaveBeenCalledOnce()
   })
 
+  it('closes only the topmost dialog on Escape when dialogs are nested', () => {
+    const onCloseOuter = vi.fn()
+    // Like the trip editor: a picker opened from inside an already-open dialog.
+    function NestedHarness() {
+      const [pickerOpen, setPickerOpen] = useState(false)
+      return (
+        <Dialog open onClose={onCloseOuter} title="Outer" closeLabel="Close outer">
+          <button type="button" onClick={() => setPickerOpen(true)}>
+            Pick a date
+          </button>
+          <Dialog open={pickerOpen} onClose={() => setPickerOpen(false)} title="Inner" closeLabel="Close inner">
+            <p>Picker</p>
+          </Dialog>
+        </Dialog>
+      )
+    }
+    render(<NestedHarness />)
+
+    fireEvent.click(screen.getByRole('button', { name: 'Pick a date' }))
+    expect(screen.getByRole('dialog', { name: 'Inner' })).toBeInTheDocument()
+
+    fireEvent.keyDown(document, { key: 'Escape' })
+    expect(screen.queryByRole('dialog', { name: 'Inner' })).not.toBeInTheDocument()
+    expect(onCloseOuter).not.toHaveBeenCalled()
+
+    fireEvent.keyDown(document, { key: 'Escape' })
+    expect(onCloseOuter).toHaveBeenCalledOnce()
+  })
+
   it('closes when the backdrop is clicked', () => {
     const onClose = vi.fn()
     render(

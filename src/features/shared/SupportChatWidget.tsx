@@ -344,7 +344,12 @@ export function SupportChatWidget() {
   }
 
   return (
-    <div className="pointer-events-none fixed bottom-5 inset-e-5 z-40 flex flex-col items-end gap-3">
+    // --checkout-bar-h is set only while a checkout page's sticky action bar is
+    // on screen; the bottom offset lifts this above it (0px everywhere else).
+    <div
+      className="pointer-events-none fixed inset-e-5 z-40 flex flex-col items-end gap-3"
+      style={{ bottom: 'calc(1.25rem + var(--checkout-bar-h, 0px))' }}
+    >
       {open && (
         <div
           ref={panelRef}

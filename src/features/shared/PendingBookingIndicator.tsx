@@ -10,6 +10,7 @@ import {
 import { lookupBooking } from '@/features/booking/lookupApi'
 import { criteriaToSearchParams } from '@/features/booking/searchParams'
 import { Button } from '@/features/shared/ui'
+import { CurrencySymbol } from '@/features/shared/ui/CurrencySymbol'
 
 /**
  * Header "My Booking" reminder (brief items 12-13). Deliberately scoped
@@ -183,7 +184,7 @@ export function PendingBookingIndicator({ tone = 'dark' }: { tone?: 'light' | 'd
           <div className="mt-1 flex items-center justify-between text-sm">
             <span className="text-text-muted">{t('checkout.payment.amountDue')}</span>
             <span className="font-semibold text-brand-navy">
-              {pending.currency} {pending.totalPrice.toLocaleString()}
+              <CurrencySymbol currency={pending.currency} /> {pending.totalPrice.toLocaleString()}
             </span>
           </div>
           <Button onClick={handleContinue} fullWidthOnMobile className="mt-4 w-full">

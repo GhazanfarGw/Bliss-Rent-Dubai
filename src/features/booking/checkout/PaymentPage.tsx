@@ -1,9 +1,11 @@
-import { useEffect, useState, type FormEvent } from 'react'
+import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Elements, PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js'
+import { LockKeyhole } from 'lucide-react'
 import { useCheckoutContext } from '@/features/booking/checkout/useCheckoutContext'
 import { CheckoutLoadGate } from '@/features/booking/checkout/CheckoutLoadGate'
+import { ACTION_BUTTON_CLASS, CheckoutActions } from '@/features/booking/checkout/CheckoutActions'
 import { CheckoutStepLayout } from '@/features/booking/checkout/CheckoutStepLayout'
 import {
   createPaymentIntent,
@@ -15,6 +17,7 @@ import { readBookingResult, saveConfirmationSnapshot, clearActiveBooking } from 
 import { criteriaToSearchParams } from '@/features/booking/searchParams'
 import { StateMessage } from '@/features/shared/StateMessage'
 import { Button, Card, LoadingState, StatusBadge } from '@/features/shared/ui'
+import { CurrencySymbol } from '@/features/shared/ui/CurrencySymbol'
 import { getStripe } from '@/lib/stripeClient'
 import { effectiveDriverIdentity } from '@/types/domain'
 import type { BookingCreationResult, CheckoutDraft, Location, VehicleWithDetails } from '@/types/domain'
@@ -78,6 +81,11 @@ export function PaymentPage() {
       endDate={criteria.endDate}
       pickup={pickup}
       dropoff={dropoff}
+      total={{
+        label: t('checkout.payment.amountDue'),
+        amount: bookingResult.totalPrice,
+        currency: bookingResult.currency,
+      }}
     >
       <PaymentStepBody
         vehicleId={vehicleId!}
@@ -187,16 +195,14 @@ function PaymentStepBody({ vehicleId, vehicle, criteria, pickup, dropoff, draft,
 
   if (initError || !clientSecret) {
     return (
-      <Card>
-        <div className="space-y-4">
-          <div className="rounded-none border border-error/25 bg-error-bg px-4 py-3 text-sm text-error">
+      <>
+        <Card>
+          <div className="rounded-none border border-error/25 bg-error-bg px-4 py-3 text-sm text-error" role="alert">
             {initError ?? t('checkout.payment.genericError')}
           </div>
-          <Link to={`/checkout/${vehicleId}/summary?${qs}`} className="text-sm font-semibold text-text-muted underline hover:text-brand-navy">
-            {t('checkout.payment.backToSummary')}
-          </Link>
-        </div>
-      </Card>
+        </Card>
+        <CheckoutActions backTo={`/checkout/${vehicleId}/summary?${qs}`} backLabel={t('checkout.payment.backToSummary')} />
+      </>
     )
   }
 
@@ -220,6 +226,11 @@ function StripePaymentForm({ vehicleId, qs, bookingResult, onSuccess }: StripePa
   const elements = useElements()
   const [submitting, setSubmitting] = useState(false)
   const [payError, setPayError] = useState<string | null>(null)
+  // Pay is in the sticky bar at the bottom of the screen; a problem shown above must be brought into view.
+  const payErrorRef = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    if (payError) payErrorRef.current?.scrollIntoView?.({ block: 'center', behavior: 'smooth' })
+  }, [payError])
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
@@ -252,42 +263,59 @@ function StripePaymentForm({ vehicleId, qs, bookingResult, onSuccess }: StripePa
   }
 
   return (
-    <Card>
-      <form onSubmit={(e) => void handleSubmit(e)} className="space-y-4">
-        <div className="bg-brand-lavender/40 px-4 py-3 text-sm text-brand-navy">
-          <div className="flex items-center justify-between">
-            <span>{t('checkout.payment.bookingReference')}</span>
-            <span className="font-mono font-semibold">{bookingResult.bookingReference}</span>
+    <>
+    <Card className="overflow-hidden p-0">
+      <form id="stripe-payment-form" onSubmit={(e) => void handleSubmit(e)}>
+        <div className="grid border-b border-brand-gold/15 bg-white sm:grid-cols-2">
+          <div className="p-5 text-brand-navy sm:p-6">
+            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-gold">
+              {t('checkout.payment.bookingReference')}
+            </p>
+            <p className="mt-2 font-mono text-lg font-semibold tracking-[0.08em]">{bookingResult.bookingReference}</p>
           </div>
-          <div className="mt-1 flex items-center justify-between">
-            <span>{t('checkout.payment.amountDue')}</span>
-            <span className="font-semibold">
-              {bookingResult.currency} {bookingResult.totalPrice.toLocaleString()}
+          <div className="border-t border-brand-gold/15 p-5 text-brand-navy sm:border-s sm:border-t-0 sm:p-6 sm:text-end">
+            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-gold">
+              {t('checkout.payment.amountDue')}
+            </p>
+            <p className="mt-2 font-hero-serif text-3xl font-semibold tracking-[-0.03em]">
+              <CurrencySymbol currency={bookingResult.currency} /> {bookingResult.totalPrice.toLocaleString()}
+            </p>
+          </div>
+        </div>
+
+        <div className="space-y-5 p-5 sm:p-7">
+          <div className="flex items-center justify-between gap-3 border-b border-brand-navy/10 pb-4 text-sm text-brand-navy">
+            <span className="flex items-center gap-2 font-semibold">
+              <LockKeyhole className="h-4 w-4 text-brand-gold-dark" aria-hidden="true" />
+              {t('checkout.payment.securedByStripe')}
             </span>
-          </div>
-          <div className="mt-2 flex items-center justify-between border-t border-brand-navy/10 pt-2">
-            <span>{t('checkout.summary.paymentStatus')}</span>
             <StatusBadge status="pending" translationPrefix="admin.status" />
           </div>
+
+          <div className="border border-brand-navy/10 bg-white p-4 sm:p-5">
+            <PaymentElement />
+          </div>
+
+          {payError && (
+            <div ref={payErrorRef} role="alert" className="border border-error/25 bg-error-bg px-4 py-3 text-sm text-error">
+              {payError}
+            </div>
+          )}
         </div>
-
-        <PaymentElement />
-
-        {payError && <div className="rounded-none border border-error/25 bg-error-bg px-4 py-3 text-sm text-error">{payError}</div>}
-
-        <div className="flex flex-wrap items-center gap-4">
-          <Button type="submit" loading={submitting} disabled={!stripe || !elements} fullWidthOnMobile>
-            {submitting
-              ? t('checkout.payment.processing')
-              : `${t('checkout.payment.pay')} ${bookingResult.currency} ${bookingResult.totalPrice.toLocaleString()}`}
-          </Button>
-          <Link to={`/checkout/${vehicleId}/summary?${qs}`} className="text-sm font-semibold text-text-muted underline hover:text-brand-navy">
-            {t('checkout.payment.backToSummary')}
-          </Link>
-        </div>
-
-        <p className="text-center text-xs text-text-muted">{t('checkout.payment.securedByStripe')}</p>
       </form>
     </Card>
+
+    <CheckoutActions backTo={`/checkout/${vehicleId}/summary?${qs}`} backLabel={t('checkout.payment.backToSummary')}>
+      <Button type="submit" form="stripe-payment-form" size="compact" className={ACTION_BUTTON_CLASS} loading={submitting} disabled={!stripe || !elements}>
+        {submitting ? (
+          t('checkout.payment.processing')
+        ) : (
+          <>
+            {t('checkout.payment.pay')} <CurrencySymbol currency={bookingResult.currency} /> {bookingResult.totalPrice.toLocaleString()}
+          </>
+        )}
+      </Button>
+    </CheckoutActions>
+    </>
   )
 }

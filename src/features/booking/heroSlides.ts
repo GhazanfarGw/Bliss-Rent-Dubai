@@ -18,8 +18,8 @@ import heroVideoMobileMp4 from '@/assets/hero/hero-video-mobile.mp4'
  * `hero.slides` array (en.ts/ar.ts) exactly as it already existed, so this
  * file only adds the image (and alt text key) each translated slide pairs
  * with, by index. Since the Phase 11 redesign, Hero.tsx renders only one
- * pinned index instead of rotating through all five (see HERO_SLIDE_INDEX
- * in Hero.tsx); this list itself is unchanged.
+ * pinned index (see HERO_POSTER_INDEX in Hero.tsx) as the video's poster;
+ * this list itself is unchanged.
  */
 export interface HeroSlideImage {
   src: string
@@ -36,7 +36,7 @@ export const HERO_SLIDE_IMAGES: HeroSlideImage[] = [
 ]
 
 /**
- * The pinned hero background (HERO_SLIDE_INDEX in Hero.tsx) is now a video
+ * The pinned hero background (HERO_POSTER_INDEX in Hero.tsx) is now a video
  * instead of a static photo. The .mp4 files are imported as real module
  * assets (src/assets/hero/) exactly like the .webp slides above, NOT
  * served as plain strings from /public/hero — that earlier approach
@@ -63,7 +63,7 @@ export const HERO_SLIDE_IMAGES: HeroSlideImage[] = [
  * skips to the next <source>), swap to a real import the same way the
  * .mp4s above are done if a compressed .webm pair is ever added.
  *
- * HERO_SLIDE_IMAGES[HERO_SLIDE_INDEX] (heroBlissJourney) is still used as
+ * HERO_SLIDE_IMAGES[HERO_POSTER_INDEX] (heroBlissJourney) is still used as
  * the <video>'s poster (same still for both breakpoints) and as the image
  * shown for prefers-reduced-motion.
  */

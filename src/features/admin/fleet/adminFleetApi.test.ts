@@ -46,6 +46,43 @@ describe('adminFleetApi', () => {
     expect(fromMock).toHaveBeenCalledWith('vehicles')
   })
 
+  it('stores blank specification fields as NULL and entered ones as real numbers / trimmed text', async () => {
+    let inserted: Record<string, unknown> | undefined
+    fromMock.mockReturnValue({
+      insert: (row: Record<string, unknown>) => {
+        inserted = row
+        return chainable({ data: { id: 'new-vehicle-id' } })
+      },
+    })
+    await createVehicle({
+      ...EMPTY_VEHICLE_DRAFT,
+      categoryId: 'cat-1',
+      make: 'Nissan',
+      model: 'Altima',
+      plateNumber: 'B99999',
+      engine: '  2.5L 4-cylinder  ',
+      horsepower: '188',
+      acceleration0100: '',
+      fuelConsumptionL100km: '7.4',
+      about: '   ',
+    })
+
+    expect(inserted).toMatchObject({
+      engine: '2.5L 4-cylinder',
+      horsepower: 188,
+      fuel_consumption_l100km: 7.4,
+      // Left blank: NULL, never 0 or an empty string.
+      torque_nm: null,
+      top_speed_kmh: null,
+      acceleration_0_100: null,
+      doors: null,
+      drivetrain: null,
+      origin_country: null,
+      about: null,
+      about_ar: null,
+    })
+  })
+
   it('updates an existing vehicle (Edit Vehicle)', async () => {
     fromMock.mockReturnValue(chainable({ data: null, error: null }))
     await expect(

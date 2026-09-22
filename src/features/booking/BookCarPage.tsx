@@ -33,7 +33,7 @@ export function BookCarPage() {
   }
 
   return (
-    <div className="bg-surface-warm">
+    <div className="bg-white">
       <PageHero
         imageSrc={image.src}
         imageAlt={t(image.altKey)}

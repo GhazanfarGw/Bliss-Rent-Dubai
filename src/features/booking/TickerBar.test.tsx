@@ -40,7 +40,7 @@ describe('TickerBar', () => {
   it('computes and shows the lowest real daily rate across the fleet — never a hardcoded figure', async () => {
     fetchAllAvailableVehicles.mockResolvedValue([vehicleWithDailyRate(140), vehicleWithDailyRate(95), vehicleWithDailyRate(220)])
     render(<TickerBar />)
-    expect((await screen.findAllByText(/From AED 95 per day/i)).length).toBeGreaterThan(0)
+    expect((await screen.findAllByText(/From 95 per day/i)).length).toBeGreaterThan(0)
   })
 
   it('gives every item (rate + static highlights) its own icon, not a repeated bullet', async () => {

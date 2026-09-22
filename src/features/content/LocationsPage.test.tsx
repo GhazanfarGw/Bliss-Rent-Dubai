@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { LocationsPage } from '@/features/content/LocationsPage'
 import { fetchLocations } from '@/features/booking/api'
@@ -55,5 +55,32 @@ describe('LocationsPage', () => {
     expect(screen.getByText('Hotel / accommodation delivery')).toBeInTheDocument()
     expect(screen.queryByText('Delivery')).not.toBeInTheDocument()
     expect(screen.getByText('2 pickup points')).toBeInTheDocument()
+  })
+  it("opens each city's own page from its card, with a real photo of that city (never a stock image of somewhere else)", async () => {
+    vi.mocked(fetchLocations).mockResolvedValue([
+      location({ id: 'l1', city: 'Dubai', type: 'airport' }),
+      location({ id: 'l2', city: 'Abu Dhabi', type: 'airport' }),
+    ])
+    const { container } = renderIt()
+
+    await screen.findByText('Dubai')
+    const dubaiCard = screen.getByText('Dubai').closest('a') as HTMLAnchorElement
+    expect(dubaiCard).toHaveAttribute('href', '/locations/dubai')
+    expect(screen.getByText('Abu Dhabi').closest('a')).toHaveAttribute('href', '/locations/abu-dhabi')
+
+    // The old page hotlinked Unsplash images (a desk globe for Abu Dhabi, a
+    // lake in Canada as the fallback for everything else).
+    expect(container.innerHTML).not.toContain('unsplash')
+    expect(within(dubaiCard).getByRole('img', { name: 'Dubai' })).toBeInTheDocument()
+    expect(within(dubaiCard).getByText(/Photo: imran shahabuddin/)).toBeInTheDocument()
+  })
+
+  it('a city with no page of its own still opens the fleet search, with no photo rather than a wrong one', async () => {
+    vi.mocked(fetchLocations).mockResolvedValue([location({ id: 'l1', city: 'Al Reef Village', type: 'city' })])
+    const { container } = renderIt()
+
+    await screen.findByText('Al Reef Village')
+    expect(screen.getByText('Al Reef Village').closest('a')).toHaveAttribute('href', '/search')
+    expect(container.querySelector('img')).toBeNull()
   })
 })

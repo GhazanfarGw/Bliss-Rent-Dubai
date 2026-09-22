@@ -1,8 +1,10 @@
-import { useState, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { Car, ContactRound, IdCard, ReceiptText, type LucideIcon } from 'lucide-react'
 import { useCheckoutContext } from '@/features/booking/checkout/useCheckoutContext'
 import { CheckoutLoadGate } from '@/features/booking/checkout/CheckoutLoadGate'
+import { ACTION_BUTTON_CLASS, CheckoutActions } from '@/features/booking/checkout/CheckoutActions'
 import { CheckoutStepLayout } from '@/features/booking/checkout/CheckoutStepLayout'
 import { createBooking, CheckoutApiError } from '@/features/booking/checkout/checkoutApi'
 import { saveBookingResult, saveActiveBooking, readActiveBooking, type ActiveBookingPointer } from '@/features/booking/checkout/checkoutStorage'
@@ -11,6 +13,7 @@ import { criteriaToSearchParams } from '@/features/booking/searchParams'
 import { rentalDays } from '@/lib/dateRange'
 import { quoteForDays, TERM_LABELS } from '@/lib/pricing'
 import { Button, StatusBadge } from '@/features/shared/ui'
+import { CurrencySymbol } from '@/features/shared/ui/CurrencySymbol'
 import { effectiveDriverIdentity } from '@/types/domain'
 
 export function BookingSummaryPage() {
@@ -24,6 +27,11 @@ export function BookingSummaryPage() {
   // customer who deliberately wants a fresh attempt for THIS vehicle can
   // bypass the resume panel without waiting for dates/locations to change.
   const [ignoreResumable, setIgnoreResumable] = useState(false)
+  // Bring a submission problem into view even when Confirm is in the mobile bar.
+  const alertRef = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    if (submitError) alertRef.current?.scrollIntoView?.({ block: 'center', behavior: 'smooth' })
+  }, [submitError])
 
   if (loadState !== 'ready' || !vehicle || !criteria) {
     return <CheckoutLoadGate loadState={loadState} vehicleId={vehicleId} errorMessage={errorMessage} />
@@ -127,44 +135,11 @@ export function BookingSummaryPage() {
     }
   }
 
-  if (resumable) {
-    return (
-      <CheckoutStepLayout
-        stepIndex={2}
-        title={t('checkout.summary.title')}
-        vehicle={vehicle}
-        startDate={criteria.startDate}
-        endDate={criteria.endDate}
-        pickup={pickup}
-        dropoff={dropoff}
-      >
-        <div className="space-y-4">
-          <div className="rounded-none border border-brand-champagne/40 bg-brand-champagne/10 p-5">
-            <p className="text-sm font-semibold text-brand-navy">{t('checkout.summary.resumeTitle')}</p>
-            <p className="mt-1 text-sm text-text-muted">{t('checkout.summary.resumeBody')}</p>
-          </div>
-
-          <Section title={t('checkout.summary.vehicleSection')}>
-            <Row label={t('checkout.summary.vehicle')} value={`${vehicle.make} ${vehicle.model} (${vehicle.model_year})`} />
-            <Row label={t('checkout.summary.rentalDates')} value={`${criteria.startDate} → ${criteria.endDate}`} />
-            <Row label={t('checkout.payment.bookingReference')} value={resumable.bookingReference} />
-            <Row label={t('checkout.payment.amountDue')} value={`${resumable.currency} ${resumable.totalPrice.toLocaleString()}`} />
-            <Row label={t('checkout.summary.paymentStatus')} value={<StatusBadge status="pending" translationPrefix="admin.status" />} />
-          </Section>
-
-          <div className="flex flex-wrap items-center gap-4">
-            <Button onClick={() => goToPayment(resumable.bookingId)} fullWidthOnMobile>
-              {t('checkout.summary.resumeContinue')}
-            </Button>
-            <Button variant="ghost" onClick={() => setIgnoreResumable(true)}>
-              {t('checkout.summary.resumeStartOver')}
-            </Button>
-          </div>
-        </div>
-      </CheckoutStepLayout>
-    )
-  }
-
+  // One page for both cases: the full summary is always shown. When a pending
+  // booking already exists for this exact trip (`resumable`), a banner on top
+  // says so and offers "This isn't right — start a new booking"; the pricing
+  // panel then shows that booking's reference and amount due, and the button
+  // continues to payment instead of creating a booking again.
   return (
     <CheckoutStepLayout
       stepIndex={2}
@@ -174,9 +149,29 @@ export function BookingSummaryPage() {
       endDate={criteria.endDate}
       pickup={pickup}
       dropoff={dropoff}
+      // Steps 1–3 keep the trip card to the car and its specs; the dates and
+      // both places are in the Vehicle section below.
+      showTripInCard={false}
+      total={
+        resumable
+          ? { label: t('checkout.payment.amountDue'), amount: resumable.totalPrice, currency: resumable.currency }
+          : undefined
+      }
     >
-      <div className="space-y-4">
-        <Section title={t('checkout.summary.vehicleSection')}>
+      <div className="grid min-w-0 gap-3 xl:grid-cols-2">
+        {resumable && (
+          <div className="border-s-4 border-brand-gold bg-brand-gold/5 p-4 xl:col-span-2">
+            <p className="font-hero-serif text-xl font-semibold tracking-[-0.03em] text-brand-navy sm:text-2xl">
+              {t('checkout.summary.resumeTitle')}
+            </p>
+            <p className="mt-1.5 max-w-2xl text-sm leading-5 text-text-muted">{t('checkout.summary.resumeBody')}</p>
+            <Button variant="ghost" size="compact" className="-ms-4 mt-2" onClick={() => setIgnoreResumable(true)}>
+              {t('checkout.summary.resumeStartOver')}
+            </Button>
+          </div>
+        )}
+
+        <Section title={t('checkout.summary.vehicleSection')} icon={Car} columns className="xl:order-1">
           <Row label={t('checkout.summary.vehicle')} value={`${vehicle.make} ${vehicle.model} (${vehicle.model_year})`} />
           <Row label={t('checkout.summary.rentalDates')} value={`${criteria.startDate} → ${criteria.endDate}`} />
           <Row label={t('checkout.summary.duration')} value={`${days} ${t(days === 1 ? 'common.day' : 'common.days')}`} />
@@ -184,96 +179,178 @@ export function BookingSummaryPage() {
           <Row label={t('checkout.summary.dropoff')} value={dropoff?.name ?? '—'} />
         </Section>
 
-        <Section title={t('checkout.summary.customerSection')}>
-          <Row label={t('checkout.summary.name')} value={`${draft.customer.firstName} ${draft.customer.lastName}`.trim() || '—'} />
-          <Row label={t('checkout.summary.email')} value={draft.customer.email || '—'} />
-          <Row label={t('checkout.summary.phone')} value={draft.customer.phone || '—'} />
-        </Section>
+        <section className="min-w-0 border border-brand-navy/10 bg-white xl:order-3 xl:col-span-2">
+          <div className="grid sm:grid-cols-2">
+            <Block title={t('checkout.summary.customerSection')} icon={ContactRound}>
+              <Row label={t('checkout.summary.name')} value={`${draft.customer.firstName} ${draft.customer.lastName}`.trim() || '—'} />
+              <Row label={t('checkout.summary.email')} value={draft.customer.email || '—'} />
+              <Row label={t('checkout.summary.phone')} value={draft.customer.phone || '—'} />
+            </Block>
 
-        <Section title={t('checkout.summary.driverSection')}>
-          <Row label={t('checkout.summary.name')} value={`${driverIdentity.firstName} ${driverIdentity.lastName}`.trim() || '—'} />
-          <Row label={t('checkout.summary.phone')} value={driverIdentity.phone || '—'} />
-          <Row label={t('checkout.summary.licenseNumber')} value={draft.driver.licenseNumber || '—'} />
-          <Row label={t('checkout.summary.licenseCountry')} value={draft.driver.licenseCountry || '—'} />
-          <Row label={t('checkout.summary.licenseExpiry')} value={draft.driver.licenseExpiry || '—'} />
-        </Section>
-
-        <Section title={t('checkout.summary.pricingSection')}>
-          {estimatedQuote ? (
-            <>
-              <Row
-                label={`${t('checkout.summary.rate')} (${TERM_LABELS[estimatedQuote.term]})`}
-                value={`${estimatedQuote.currency} ${estimatedQuote.unitPrice.toLocaleString()}`}
-              />
-              <Row label={t('checkout.summary.totalEstimated')} value={`${estimatedQuote.currency} ${estimatedQuote.totalPrice.toLocaleString()}`} />
-              <p className="pt-1 text-xs text-text-muted">{t('checkout.summary.estimateNote')}</p>
-            </>
-          ) : (
-            <p className="text-sm text-error">{t('checkout.summary.pricingUnavailable')}</p>
-          )}
-          <Row label={t('checkout.summary.paymentStatus')} value={t('checkout.summary.notYetPaid')} />
-        </Section>
-
-        {incompleteStep && (
-          <div className="rounded-none border border-error/25 bg-error-bg px-4 py-3 text-sm text-error">
-            <p className="font-medium">
-              {incompleteStep === 'customer' ? t('checkout.summary.incompleteCustomer') : t('checkout.summary.incompleteDriver')}
-            </p>
-            <Link
-              to={`/checkout/${vehicleId}/${incompleteStep}?${qs}`}
-              className="mt-2 inline-block font-semibold underline"
+            <Block
+              title={t('checkout.summary.driverSection')}
+              icon={IdCard}
+              className="border-t border-brand-navy/10 sm:border-s sm:border-t-0"
             >
-              {incompleteStep === 'customer' ? t('checkout.customer.title') : t('checkout.driver.title')}
-            </Link>
+              <Row label={t('checkout.summary.name')} value={`${driverIdentity.firstName} ${driverIdentity.lastName}`.trim() || '—'} />
+              <Row label={t('checkout.summary.phone')} value={driverIdentity.phone || '—'} />
+              <Row label={t('checkout.summary.licenseNumber')} value={draft.driver.licenseNumber || '—'} />
+              <Row label={t('checkout.summary.licenseCountry')} value={draft.driver.licenseCountry || '—'} />
+              <Row label={t('checkout.summary.licenseExpiry')} value={draft.driver.licenseExpiry || '—'} />
+            </Block>
           </div>
-        )}
+        </section>
 
-        {submitError && (
-          <div className="rounded-none border border-error/25 bg-error-bg px-4 py-3 text-sm text-error">
-            <p className="font-medium">{submitError.message}</p>
-            {submitError.unavailable && (
-              <Link to="/search" className="mt-2 inline-block font-semibold underline">
-                {t('checkout.summary.backToAnotherVehicle')}
+        {/* Keep pricing beside the trip on wide screens, and after the
+            personal details on phones so the full review reads naturally. */}
+        <section className="min-w-0 border border-t-4 border-brand-gold bg-white p-4 xl:order-2">
+          {incompleteStep && (
+            <div ref={alertRef} role="alert" className="mb-4 border border-error/25 bg-error-bg px-4 py-3 text-sm text-error">
+              <p className="font-medium">
+                {incompleteStep === 'customer' ? t('checkout.summary.incompleteCustomer') : t('checkout.summary.incompleteDriver')}
+              </p>
+              <Link
+                to={`/checkout/${vehicleId}/${incompleteStep}?${qs}`}
+                className="mt-2 inline-block font-semibold underline"
+              >
+                {incompleteStep === 'customer' ? t('checkout.customer.title') : t('checkout.driver.title')}
               </Link>
-            )}
-          </div>
-        )}
+            </div>
+          )}
 
-        <div className="flex flex-wrap items-center gap-4">
+          {submitError && (
+            <div ref={alertRef} role="alert" className="mb-4 border border-error/25 bg-error-bg px-4 py-3 text-sm text-error">
+              <p className="font-medium">{submitError.message}</p>
+              {submitError.unavailable && (
+                <Link to="/search" className="mt-2 inline-block font-semibold underline">
+                  {t('checkout.summary.backToAnotherVehicle')}
+                </Link>
+              )}
+            </div>
+          )}
+
+          <SectionTitle title={t('checkout.summary.pricingSection')} icon={ReceiptText} />
+          {resumable ? (
+            <dl className="mt-2.5 space-y-2 text-sm">
+              <Row label={t('checkout.payment.bookingReference')} value={resumable.bookingReference} />
+              <Row
+                label={t('checkout.payment.amountDue')}
+                value={<><CurrencySymbol currency={resumable.currency} /> {resumable.totalPrice.toLocaleString()}</>}
+                strong
+              />
+              <Row label={t('checkout.summary.paymentStatus')} value={<StatusBadge status="pending" translationPrefix="admin.status" />} />
+            </dl>
+          ) : (
+            <>
+              <dl className="mt-2.5 space-y-2 text-sm">
+                {estimatedQuote ? (
+                  <>
+                    <Row
+                      label={`${t('checkout.summary.rate')} (${TERM_LABELS[estimatedQuote.term]})`}
+                      value={<><CurrencySymbol currency={estimatedQuote.currency} /> {estimatedQuote.unitPrice.toLocaleString()}</>}
+                    />
+                    <Row
+                      label={t('checkout.summary.totalEstimated')}
+                      value={<><CurrencySymbol currency={estimatedQuote.currency} /> {estimatedQuote.totalPrice.toLocaleString()}</>}
+                      strong
+                    />
+                  </>
+                ) : (
+                  <p className="text-sm text-error">{t('checkout.summary.pricingUnavailable')}</p>
+                )}
+                <Row label={t('checkout.summary.paymentStatus')} value={t('checkout.summary.notYetPaid')} />
+              </dl>
+              {estimatedQuote && <p className="mt-2 text-xs leading-4 text-text-muted">{t('checkout.summary.estimateNote')}</p>}
+            </>
+          )}
+        </section>
+      </div>
+
+      <CheckoutActions backTo={`/checkout/${vehicleId}/driver?${qs}`}>
+        {resumable ? (
+          <Button size="compact" className={ACTION_BUTTON_CLASS} onClick={() => goToPayment(resumable.bookingId)}>
+            {t('checkout.summary.resumeContinue')}
+          </Button>
+        ) : (
           <Button
             type="button"
+            size="compact"
+            className={ACTION_BUTTON_CLASS}
             onClick={() => void handleConfirm()}
             loading={submitting}
             disabled={!estimatedQuote || !!incompleteStep}
           >
             {submitting ? t('checkout.summary.confirming') : t('checkout.summary.confirm')}
           </Button>
-          <Link
-            to={`/checkout/${vehicleId}/driver?${qs}`}
-            className="text-sm font-semibold text-text-muted underline hover:text-brand-navy"
-          >
-            {t('common.back')}
-          </Link>
-        </div>
-      </div>
+        )}
+      </CheckoutActions>
     </CheckoutStepLayout>
   )
 }
 
-function Section({ title, children }: { title: string; children: ReactNode }) {
+/** A titled group of rows, tight enough that a review page needs little scrolling. */
+function Block({
+  title,
+  icon,
+  className = '',
+  columns = false,
+  children,
+}: {
+  title: string
+  icon: LucideIcon
+  className?: string
+  /** Pair trip rows while the panel is full width; use single rows beside pricing. */
+  columns?: boolean
+  children: ReactNode
+}) {
   return (
-    <div className="rounded-none border border-brand-navy/10 bg-white p-5">
-      <h2 className="text-sm font-semibold text-brand-navy">{title}</h2>
-      <dl className="mt-3 space-y-2 text-sm">{children}</dl>
+    <div className={`min-w-0 p-4 ${className}`}>
+      <SectionTitle title={title} icon={icon} />
+      <dl className={columns ? 'mt-2.5 grid gap-x-6 gap-y-2 text-sm sm:grid-cols-2 xl:grid-cols-1' : 'mt-2.5 space-y-2 text-sm'}>{children}</dl>
     </div>
   )
 }
 
-function Row({ label, value }: { label: string; value: ReactNode }) {
+function Section({
+  title,
+  icon,
+  emphasis = false,
+  columns = false,
+  className = '',
+  children,
+}: {
+  title: string
+  icon: LucideIcon
+  emphasis?: boolean
+  columns?: boolean
+  className?: string
+  children: ReactNode
+}) {
   return (
-    <div className="flex items-center justify-between gap-3">
-      <dt className="text-text-muted">{label}</dt>
-      <dd className="text-right font-medium text-brand-navy">{value}</dd>
+    <section className={`min-w-0 border bg-white ${emphasis ? 'border-brand-gold border-t-4' : 'border-brand-navy/10'} ${className}`}>
+      <Block title={title} icon={icon} columns={columns}>
+        {children}
+      </Block>
+    </section>
+  )
+}
+
+function SectionTitle({ title, icon: Icon }: { title: string; icon: LucideIcon }) {
+  return (
+    <div className="flex items-center gap-2 border-b border-brand-navy/10 pb-2">
+      <span className="grid h-6 w-6 shrink-0 place-items-center bg-brand-navy text-white">
+        <Icon className="h-3.5 w-3.5" aria-hidden="true" />
+      </span>
+      <h2 className="text-xs font-bold uppercase tracking-[0.1em] text-brand-navy">{title}</h2>
+    </div>
+  )
+}
+
+function Row({ label, value, strong = false }: { label: string; value: ReactNode; strong?: boolean }) {
+  return (
+    <div className="grid min-w-0 grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] items-start gap-2">
+      <dt className="leading-5 text-text-muted">{label}</dt>
+      <dd className={`min-w-0 break-words text-end leading-5 text-brand-navy ${strong ? 'text-base font-bold sm:text-lg' : 'font-medium'}`}>{value}</dd>
     </div>
   )
 }

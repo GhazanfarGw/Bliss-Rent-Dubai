@@ -51,6 +51,10 @@ describe('BookCarPage', () => {
     const dialog = screen.getByRole('dialog')
     await user.click(within(dialog).getByRole('button', { name: /DXB Terminal 3/ }))
 
+    // A new search defaults to a separate return location — check "same
+    // return location" so picking only a pickup point is enough to submit.
+    await user.click(screen.getByRole('checkbox', { name: /same return location/i }))
+
     await user.click(document.querySelector('button[aria-haspopup="dialog"]') as HTMLElement)
     const dateDialog = screen.getByRole('dialog')
     const dayButtons = within(dateDialog).getAllByRole('button')

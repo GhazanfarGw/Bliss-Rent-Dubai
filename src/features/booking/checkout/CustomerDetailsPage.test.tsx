@@ -57,6 +57,15 @@ describe('CustomerDetailsPage (Step 4)', () => {
     expect(screen.getByRole('textbox', { name: /phone/i })).toBeInTheDocument()
   })
 
+  it('keeps the car card to the car and its specs — no dates or places on steps 1–3', async () => {
+    renderCustomer()
+    await screen.findByRole('textbox', { name: /first name/i })
+
+    expect(screen.getByRole('heading', { name: 'MG 5' })).toBeInTheDocument()
+    expect(screen.queryByText('Pickup date')).not.toBeInTheDocument()
+    expect(screen.queryByText('Sharjah City Centre')).not.toBeInTheDocument()
+  })
+
   it('blocks Continue and shows field errors on an empty submit', async () => {
     renderCustomer()
     fireEvent.click(await screen.findByRole('button', { name: /continue to driver details/i }))

@@ -15,10 +15,12 @@ import { BookingSummaryPage } from '@/features/booking/checkout/BookingSummaryPa
 import { PaymentPendingPage } from '@/features/booking/checkout/PaymentPendingPage'
 import { ConfirmationPage } from '@/features/booking/checkout/ConfirmationPage'
 import { ManageBookingPage } from '@/features/booking/ManageBookingPage'
-import { FindMyCarPage } from '@/features/booking/FindMyCarPage'
 import { AboutPage } from '@/features/content/AboutPage'
 import { CarTypesPage } from '@/features/content/CarTypesPage'
 import { LocationsPage } from '@/features/content/LocationsPage'
+import { CityPage } from '@/features/content/CityPage'
+import { BlogIndexPage } from '@/features/blog/BlogIndexPage'
+import { BlogPostPage } from '@/features/blog/BlogPostPage'
 import { FaqPage } from '@/features/content/FaqPage'
 import { ContactPage } from '@/features/content/ContactPage'
 import { PrivacyPolicyPage } from '@/features/content/PrivacyPolicyPage'
@@ -108,6 +110,17 @@ import { AdminSettingsPage } from '@/features/admin/settings/AdminSettingsPage'
  * its full lookup, ExtendRentalSection, and Continue-to-Payment flow
  * exactly as before. Both are now separate header links (NavBar.tsx).
  *
+ * Re-merge follow-up (direct request, "commercial-grade" redesign): the
+ * split above is undone. /find-my-car (FindMyCarPage, BookingStatusPanel)
+ * is deleted and now redirects to /manage-booking, the same way
+ * /extend-rental already does above — one lookup, one URL, one header
+ * link, instead of two pages showing the same booking two different ways.
+ * /manage-booking's rebuilt result screen leads with a status strip +
+ * progress timeline before the detailed cards, so the "quick status"
+ * need the split was originally solving is answered on the one page
+ * instead of a second route. See ManageBookingPage.tsx's own JSDoc for
+ * the full redesign.
+ *
  * Frontend redesign follow-up (same requests as the header/hero/Manage
  * Booking page rework): /book (BookCarPage) adds a standalone "start a
  * booking" destination, separate from the homepage's embedded search and
@@ -154,12 +167,16 @@ function App() {
                   <PaymentPage /> and remove the import above. */}
               <Route path="/checkout/:id/payment/:bookingId" element={<PaymentPendingPage />} />
               <Route path="/checkout/:id/confirmation/:bookingId" element={<ConfirmationPage />} />
-              <Route path="/find-my-car" element={<FindMyCarPage />} />
               <Route path="/manage-booking" element={<ManageBookingPage />} />
               <Route path="/extend-rental" element={<Navigate to="/manage-booking" replace />} />
+              <Route path="/find-my-car" element={<Navigate to="/manage-booking" replace />} />
               <Route path="/about" element={<AboutPage />} />
               <Route path="/car-types" element={<CarTypesPage />} />
               <Route path="/locations" element={<LocationsPage />} />
+              <Route path="/locations/:slug" element={<CityPage />} />
+              <Route path="/blog" element={<BlogIndexPage />} />
+              <Route path="/blog/category/:category" element={<BlogIndexPage />} />
+              <Route path="/blog/:slug" element={<BlogPostPage />} />
               <Route path="/faqs" element={<FaqPage />} />
               <Route path="/contact" element={<ContactPage />} />
               <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />

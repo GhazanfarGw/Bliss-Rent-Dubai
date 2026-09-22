@@ -9,6 +9,8 @@ interface TimeSelectProps {
   onChange: (value: string) => void
   /** Compact single-line variant for the flat search-bar row. */
   row?: boolean
+  /** Fill the available column in sectioned booking layouts. */
+  fluid?: boolean
 }
 
 /**
@@ -19,10 +21,10 @@ interface TimeSelectProps {
  * It does not feed `dateRange.ts`, pricing, or availability — see
  * `src/lib/timeOptions.ts`.
  */
-export function TimeSelect({ label, ariaLabel, value, onChange, row = false }: TimeSelectProps) {
+export function TimeSelect({ label, ariaLabel, value, onChange, row = false, fluid = false }: TimeSelectProps) {
   const { i18n } = useTranslation()
   return (
-    <div className={row ? 'flex w-full flex-col gap-1 sm:w-28 sm:shrink-0' : 'flex w-full flex-col gap-1 sm:w-32'}>
+    <div className={row ? 'flex w-full flex-col gap-1 sm:w-28 sm:shrink-0' : fluid ? 'flex w-full flex-col gap-1' : 'flex w-full flex-col gap-1 sm:w-32'}>
       <span className="block text-xs font-semibold uppercase tracking-wide text-text-muted">{label}</span>
       <select value={value} onChange={(e) => onChange(e.target.value)} aria-label={ariaLabel} className={inputClass() + ' ltr-nums'}>
         {TIME_OPTIONS.map((t) => (

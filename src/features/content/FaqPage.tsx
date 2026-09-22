@@ -5,6 +5,7 @@ import { ChevronDown, Search } from 'lucide-react'
 import { SectionHeader } from '@/features/shared/ui/SectionHeader'
 import { StateMessage } from '@/features/shared/StateMessage'
 import { useDocumentTitle, useMetaDescription } from '@/lib/useDocumentTitle'
+import { GuidesFooter } from '@/features/blog/GuidesFooter'
 
 interface FaqItem {
   question: string
@@ -28,7 +29,17 @@ interface FaqCategory {
  * fixed, real content — it narrows what's shown, it never generates or
  * looks up new answers.
  */
+/** Page content plus a row of hand-picked blog guides underneath it. */
 export function FaqPage() {
+  return (
+    <>
+      <FaqPageContent />
+      <GuidesFooter slugs={['documents-needed-to-rent-a-car-uae', 'how-to-book-a-rental-car-online-uae', 'car-rental-dubai-complete-guide']} />
+    </>
+  )
+}
+
+function FaqPageContent() {
   const { t } = useTranslation()
   useDocumentTitle(t('pages.faqs.title'))
   useMetaDescription(t('pages.faqs.subtitle'))

@@ -7,6 +7,7 @@
     "dev": "vite",
     "build": "node scripts/generate-sitemap.mjs && tsc -b && vite build",
     "sitemap": "node scripts/generate-sitemap.mjs",
+    "map:path": "node scripts/generate-coverage-map-path.mjs",
     "lint": "oxlint",
     "preview": "vite preview",
     "test": "vitest run",
@@ -16,6 +17,7 @@
     "@stripe/react-stripe-js": "^6.9.0",
     "@stripe/stripe-js": "^9.15.0",
     "@supabase/supabase-js": "^2.112.4",
+    "dirham": "^1.5.3",
     "i18next": "^26.4.0",
     "lucide-react": "^1.39.0",
     "react": "^19.2.8",
@@ -33,11 +35,14 @@
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.4",
     "@vitejs/plugin-react": "^6.1.0",
+    "d3-geo": "^3.1.1",
     "jsdom": "^30.0.1",
     "oxlint": "^1.79.0",
     "tailwindcss": "^4.3.3",
+    "topojson-client": "^3.1.0",
     "typescript": "~6.0.2",
     "vite": "^8.2.2",
-    "vitest": "^4.1.11"
+    "vitest": "^4.1.11",
+    "world-atlas": "^2.0.2"
   }
 }

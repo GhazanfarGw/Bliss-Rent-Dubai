@@ -1,16 +1,21 @@
-import { useEffect, useRef, useState, type FormEvent, type ReactNode, type RefObject } from 'react'
+import { useEffect, useRef, useState, type FormEvent, type RefObject } from 'react'
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { Car, CalendarRange, CreditCard } from 'lucide-react'
 import { lookupBooking, BookingLookupError } from '@/features/booking/lookupApi'
 import { lastNameMatches } from '@/features/booking/manageBookingVerify'
 import { ExtendRentalSection } from '@/features/booking/ExtendRentalSection'
 import { resumePendingBookingFromLookup, clearActiveBooking } from '@/features/booking/checkout/checkoutStorage'
 import { criteriaToSearchParams } from '@/features/booking/searchParams'
 import { ManageBookingHero } from '@/features/booking/ManageBookingHero'
-import { ManageBookingLookupCard } from '@/features/booking/ManageBookingLookupCard'
+import { BookingStatusTimeline } from '@/features/booking/BookingStatusTimeline'
+import { ResultCard, ResultRow } from '@/features/booking/BookingResultCard'
 import { Button, StatusBadge } from '@/features/shared/ui'
+import { CurrencySymbol } from '@/features/shared/ui/CurrencySymbol'
 import { useDocumentTitle, useMetaDescription } from '@/lib/useDocumentTitle'
 import { prefersReducedMotion } from '@/lib/motion'
+import { daysRemaining } from '@/lib/dateRange'
+import { PAYMENT_LOGOS } from '@/lib/paymentLogos'
 import type { BookingLookupResult } from '@/types/domain'
 
 type ViewState =
@@ -97,6 +102,38 @@ const EXTENDABLE_STATUSES = new Set(['confirmed', 'active'])
  * (wired to the new "Search another booking" action in ResultCard) just
  * resets the same view state back to `'idle'` and clears the query field
  * — it does not re-implement or bypass the existing lookup flow.
+ *
+ * Merge (direct follow-up request, "commercial-grade" redesign): the
+ * separate read-only /find-my-car page (BookingStatusPanel — a single-
+ * field, reference-only lookup limited to Client Name / Car / Car Number
+ * / Days Left) is retired. /find-my-car now redirects here (App.tsx),
+ * the same way /extend-rental already redirects here. This page's own
+ * two-field, last-name-verified lookup was already the safer, more
+ * complete one — and it's the one every transactional email already
+ * deep-links to (manageBookingLink.ts) — so there is now exactly one
+ * lookup, one URL, one nav link, answering the "title says one thing, the
+ * URL opens another" complaint directly. The old split existed to solve
+ * "a guest who only wants a quick status check shouldn't be shown extend/
+ * payment actions"; this rebuild answers that differently — the found
+ * result now leads with a status strip (reference, badge, days left) and
+ * a visual progress timeline (BookingStatusTimeline.tsx, modeled on
+ * checkout's own CheckoutStepper) before the detailed Vehicle/Trip/
+ * Actions cards, so the quick answer is still the first thing on screen,
+ * on the one page. ManageBookingHero.tsx also drops its flat text-only
+ * header for a proper heading + trust bullets, no stock photo, per the
+ * same request — and, since a found result replaces it entirely below
+ * (see the render), the visitor is never left scrolling past a still-full
+ * finder to reach the answer they already have.
+ *
+ * Direct follow-up (the first pass here used a full solid navy band for
+ * the hero, and always kept the hero mounted above the result): both
+ * corrected. The site's own rule is no solid navy box fills (see
+ * index.css's `.white-box` note) — the hero is plain white with a
+ * `.white-box` card around the form, no navy, no gradient. And the hero
+ * now only renders for `status !== 'found'` (below) — it used to stay
+ * mounted underneath a `scrollIntoView` to the result, which meant
+ * scrolling back up from the result surfaced the entire finder again,
+ * reported as "the page above it is showing again."
  */
 export function ManageBookingPage() {
   const { t } = useTranslation()
@@ -173,8 +210,9 @@ export function ManageBookingPage() {
     setQuery('')
     setLastName('')
     const behavior = prefersReducedMotion() ? 'auto' : 'smooth'
-    // Wait a tick so the lookup card (always mounted, but scrolled past
-    // once a result is showing) is back in normal flow before scrolling.
+    // The hero/lookup card unmounts while a result is showing (see the
+    // render below) and remounts the instant status flips back to 'idle'
+    // above — wait a tick so it's back in the DOM before scrolling to it.
     requestAnimationFrame(() => {
       if (typeof lookupSectionRef.current?.scrollIntoView === 'function') {
         lookupSectionRef.current.scrollIntoView({ behavior, block: 'start' })
@@ -184,11 +222,13 @@ export function ManageBookingPage() {
 
   return (
     <div className="bg-white">
-      <div className="mx-auto max-w-3xl px-4 py-14 sm:px-6 sm:py-20 lg:px-8">
-        <ManageBookingHero />
-
+      {/* The finder only shows while there's nothing to show yet — once a
+          booking is found, it gets out of the way (handleSearchAnother
+          below brings it back) instead of sitting there as a wall of
+          content the visitor has to scroll past to reach their result. */}
+      {state.status !== 'found' && (
         <div ref={lookupSectionRef} className="scroll-mt-24">
-          <ManageBookingLookupCard
+          <ManageBookingHero
             query={query}
             onQueryChange={setQuery}
             lastName={lastName}
@@ -199,14 +239,16 @@ export function ManageBookingPage() {
             errorMessage={state.status === 'error' ? state.message : null}
           />
         </div>
+      )}
 
+      <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
         {state.status === 'found' && (
-          <div className="mt-10">
-            <ResultCard result={state.result} sectionRef={resultSectionRef} onSearchAnother={handleSearchAnother} />
+          <div className="pt-10 sm:pt-14">
+            <BookingResult result={state.result} sectionRef={resultSectionRef} onSearchAnother={handleSearchAnother} />
           </div>
         )}
 
-        <div className="mt-10 text-center">
+        <div className="mt-10 pb-14 text-center sm:pb-20">
           <Link to="/" className="text-sm font-semibold text-brand-navy underline decoration-brand-gold decoration-2 underline-offset-4">
             {t('checkout.confirmation.backToHome')}
           </Link>
@@ -216,7 +258,7 @@ export function ManageBookingPage() {
   )
 }
 
-function ResultCard({
+function BookingResult({
   result,
   sectionRef,
   onSearchAnother,
@@ -229,6 +271,7 @@ function ResultCard({
   const navigate = useNavigate()
   const canExtend = EXTENDABLE_STATUSES.has(result.bookingStatus)
   const canResumePayment = result.bookingStatus === 'pending_payment'
+  const hasActions = canExtend || canResumePayment
 
   function handleContinueToPayment() {
     // Resume the EXISTING booking found above — never re-run
@@ -245,67 +288,98 @@ function ResultCard({
   }
 
   return (
-    <div
-      ref={sectionRef}
-      tabIndex={-1}
-      role="region"
-      aria-label={t('manageBooking.resultLabel')}
-      className="scroll-mt-24 space-y-4 border border-[#ece7df] bg-white p-6 shadow-[0_20px_38px_rgba(18,20,23,0.06)] outline-none sm:p-8"
-    >
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-brand-navy/8 pb-4">
+    <div ref={sectionRef} tabIndex={-1} role="region" aria-label={t('manageBooking.resultLabel')} className="scroll-mt-24 outline-none">
+      {/* The quick answer, unmissable and first on screen — this is what
+          used to be a whole separate page (Booking Status). */}
+      <div className="flex flex-wrap items-center justify-between gap-4 border border-brand-navy/10 bg-[linear-gradient(180deg,#ffffff_0%,#f9f5f1_100%)] p-5 shadow-sm sm:p-6">
         <div>
           <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-brand-gold-dark">{t('manageBooking.resultLabel')}</p>
           <span className="mt-2 block font-mono text-base font-semibold text-brand-navy">{result.bookingReference}</span>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-4">
+          {canExtend && (
+            <div className="text-end">
+              <p className="text-[10px] font-semibold uppercase tracking-wide text-text-muted">{t('home.navigator.status.result.daysLeft')}</p>
+              <p className="font-hero-serif text-3xl font-semibold tracking-[-0.03em] text-brand-navy">
+                {t('home.navigator.status.result.daysLeftValue', { count: daysRemaining(result.endDate) })}
+              </p>
+            </div>
+          )}
           <StatusBadge status={result.bookingStatus} translationPrefix="admin.status" />
         </div>
       </div>
-      <Row label={t('checkout.confirmation.vehicle')} value={`${result.vehicleMake} ${result.vehicleModel}`} />
-      <Row label={t('extendRental.vehicleNumberLabel')} value={result.vehiclePlate} />
-      <Row label={t('checkout.confirmation.rentalDates')} value={`${result.startDate} → ${result.endDate}`} />
-      <Row label={t('checkout.confirmation.pickup')} value={result.pickupLocationName} />
-      <Row label={t('checkout.confirmation.dropoff')} value={result.dropoffLocationName} />
-      <Row label={t('checkout.confirmation.customer')} value={result.customerName} />
-      <Row label={t('checkout.confirmation.amount')} value={`${result.currency} ${result.totalPrice.toLocaleString()}`} />
-      <Row label={t('checkout.confirmation.paymentStatus')} value={<StatusBadge status={result.paymentStatus} translationPrefix="admin.status" />} />
 
-      {canResumePayment && (
-        <div className="border-t border-brand-navy/8 pt-4">
-          <Button onClick={handleContinueToPayment} fullWidthOnMobile>
-            {t('manageBooking.continueToPayment')}
-          </Button>
-        </div>
-      )}
+      <div className="mt-5 border border-brand-navy/10 p-5 sm:p-6">
+        <BookingStatusTimeline status={result.bookingStatus} />
+      </div>
 
-      {canExtend && (
-        <ExtendRentalSection
-          bookingReference={result.bookingReference}
-          vehicleNumber={result.vehiclePlate}
-          currentReturnDate={result.endDate}
-          vehicleId={result.vehicleId}
-          originalStartDate={result.startDate}
-          currentTotalPrice={result.totalPrice}
-          currency={result.currency}
-        />
-      )}
+      <div className={'mt-5 grid gap-4 ' + (hasActions ? 'lg:grid-cols-3' : 'lg:grid-cols-2')}>
+        <ResultCard icon={Car} title={t('checkout.confirmation.vehicle')}>
+          <div className="border-b border-brand-navy/10 pb-4">
+            <p className="font-hero-serif text-2xl font-semibold tracking-[-0.03em] text-brand-navy">
+              {result.vehicleMake} {result.vehicleModel}
+            </p>
+            <p className="mt-1 font-mono text-xs font-semibold uppercase tracking-[0.14em] text-text-muted">{result.vehiclePlate}</p>
+          </div>
+          <ResultRow label={t('checkout.confirmation.customer')} value={result.customerName} />
+        </ResultCard>
 
-      <div className="border-t border-brand-navy/8 pt-4">
+        <ResultCard icon={CalendarRange} title={t('home.navigator.manage.result.tripHeading')}>
+          <ResultRow label={t('checkout.confirmation.rentalDates')} value={`${result.startDate} → ${result.endDate}`} />
+          <ResultRow label={t('checkout.confirmation.pickup')} value={result.pickupLocationName} />
+          <ResultRow label={t('checkout.confirmation.dropoff')} value={result.dropoffLocationName} />
+          <div className="mt-1 border-t border-brand-navy/10 pt-4">
+            <ResultRow
+              label={t('checkout.confirmation.amount')}
+              value={<><CurrencySymbol currency={result.currency} /> {result.totalPrice.toLocaleString()}</>}
+              strong
+            />
+            <ResultRow label={t('checkout.confirmation.paymentStatus')} value={<StatusBadge status={result.paymentStatus} translationPrefix="admin.status" />} />
+          </div>
+        </ResultCard>
+
+        {hasActions && (
+          <ResultCard icon={CreditCard} title={canExtend ? t('extendRental.sectionTitle') : t('manageBooking.result.paymentCardTitle')} emphasis>
+            {canResumePayment && (
+              <div className="space-y-4">
+                <p className="text-sm leading-6 text-text-muted">{t('manageBooking.result.paymentCardBody')}</p>
+                <div>
+                  <p className="text-[10px] font-semibold uppercase tracking-wide text-text-muted">{t('footer.weAccept')}</p>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {PAYMENT_LOGOS.map((logo) => (
+                      <span key={logo.name} className="flex h-9 w-13 items-center justify-center rounded-none border border-brand-navy/10 bg-white">
+                        <svg viewBox="0 0 24 24" role="img" aria-label={logo.name} className="h-5.5 w-5.5">
+                          <path d={logo.path} fill={`#${logo.hex}`} />
+                        </svg>
+                      </span>
+                    ))}
+                  </div>
+                </div>
+                <Button onClick={handleContinueToPayment} fullWidthOnMobile>
+                  {t('manageBooking.continueToPayment')}
+                </Button>
+              </div>
+            )}
+            {canExtend && (
+              <ExtendRentalSection
+                bookingReference={result.bookingReference}
+                vehicleNumber={result.vehiclePlate}
+                currentReturnDate={result.endDate}
+                vehicleId={result.vehicleId}
+                originalStartDate={result.startDate}
+                currentTotalPrice={result.totalPrice}
+                currency={result.currency}
+              />
+            )}
+          </ResultCard>
+        )}
+      </div>
+
+      <div className="mt-6 border-t border-brand-navy/10 pt-6">
         <Button variant="outline" onClick={onSearchAnother} fullWidthOnMobile>
           {t('manageBooking.searchAnother')}
         </Button>
       </div>
-    </div>
-  )
-}
-
-function Row({ label, value }: { label: string; value: ReactNode }) {
-  return (
-    <div className="flex items-center justify-between gap-3 text-sm">
-      <span className="text-text-muted">{label}</span>
-      <span className="text-right font-medium capitalize text-brand-navy">
-        {typeof value === 'string' ? value.replace(/_/g, ' ') : value}
-      </span>
     </div>
   )
 }

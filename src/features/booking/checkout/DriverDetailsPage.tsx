@@ -1,8 +1,9 @@
 import { useState, type FormEvent } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useCheckoutContext } from '@/features/booking/checkout/useCheckoutContext'
 import { CheckoutLoadGate } from '@/features/booking/checkout/CheckoutLoadGate'
+import { ACTION_BUTTON_CLASS, CheckoutActions, revealFirstError } from '@/features/booking/checkout/CheckoutActions'
 import { CheckoutStepLayout } from '@/features/booking/checkout/CheckoutStepLayout'
 import { validateDriverDraft, type DriverFieldErrors } from '@/features/booking/checkout/validation'
 import { criteriaToSearchParams } from '@/features/booking/searchParams'
@@ -45,7 +46,10 @@ export function DriverDetailsPage() {
     setTouched(true)
     const fieldErrors = validateDriverDraft(draft.customer, draft.driver, criteria!.endDate)
     setErrors(fieldErrors)
-    if (Object.keys(fieldErrors).length > 0) return
+    if (Object.keys(fieldErrors).length > 0) {
+      revealFirstError()
+      return
+    }
     navigate(`/checkout/${vehicleId}/summary?${qs}`)
   }
 
@@ -63,16 +67,17 @@ export function DriverDetailsPage() {
       endDate={criteria.endDate}
       pickup={pickup}
       dropoff={dropoff}
+      showTripInCard={false}
     >
-      <Card>
-        <p className="mb-5 text-sm text-text-muted">{t('checkout.driver.intro')}</p>
+      <Card className="p-4! sm:p-5!">
+        <p className="mb-4 text-sm text-text-muted">{t('checkout.driver.intro')}</p>
 
-        <form onSubmit={handleSubmit} noValidate className="space-y-5">
+        <form id="driver-details-form" onSubmit={handleSubmit} noValidate className="space-y-4">
           <fieldset>
             <legend className="mb-2 text-xs font-semibold uppercase tracking-wide text-text-muted">
               {t('checkout.driver.whoDrives')}
             </legend>
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div className="grid grid-cols-2 gap-2 sm:gap-3">
               <DriverToggleOption
                 selected={draft.driver.isSameAsCustomer}
                 onSelect={() => handleChange({ isSameAsCustomer: true })}
@@ -87,19 +92,19 @@ export function DriverDetailsPage() {
           </fieldset>
 
           {draft.driver.isSameAsCustomer ? (
-            <div className="rounded-none bg-brand-lavender/40 px-4 py-3 text-sm text-brand-navy">
+            <div className="rounded-none bg-brand-lavender/40 px-3 py-2.5 text-sm text-brand-navy">
               <p className="font-semibold">{t('checkout.driver.sameAsCustomerTitle')}</p>
-              <p className="mt-1 text-text-muted">
+              <p className="mt-1 break-words text-text-muted">
                 {draft.customer.firstName || draft.customer.lastName
                   ? `${draft.customer.firstName} ${draft.customer.lastName}`.trim()
                   : t('checkout.driver.sameAsCustomerNoName')}
                 {draft.customer.phone ? ` · ${draft.customer.phone}` : ''}
               </p>
-              <p className="mt-2 text-xs text-text-muted">{t('checkout.driver.sameAsCustomerHint')}</p>
+              <p className="mt-1 text-xs text-text-muted">{t('checkout.driver.sameAsCustomerHint')}</p>
             </div>
           ) : (
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div className="space-y-3 sm:space-y-4">
+              <div className="grid grid-cols-2 gap-3 sm:gap-4">
                 <TextField
                   label={t('checkout.driver.firstName')}
                   value={draft.driver.firstName}
@@ -129,14 +134,16 @@ export function DriverDetailsPage() {
             </div>
           )}
 
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <TextField
-              label={t('checkout.driver.licenseNumber')}
-              value={draft.driver.licenseNumber}
-              onChange={(e) => handleChange({ licenseNumber: e.target.value })}
-              error={translatedError(errors, 'licenseNumber')}
-              required
-            />
+          <div className="grid grid-cols-2 gap-3 border-t border-border pt-4 sm:gap-4">
+            <div className="col-span-2 lg:col-span-1">
+              <TextField
+                label={t('checkout.driver.licenseNumber')}
+                value={draft.driver.licenseNumber}
+                onChange={(e) => handleChange({ licenseNumber: e.target.value })}
+                error={translatedError(errors, 'licenseNumber')}
+                required
+              />
+            </div>
             <TextField
               label={t('checkout.driver.licenseCountry')}
               value={draft.driver.licenseCountry}
@@ -145,30 +152,27 @@ export function DriverDetailsPage() {
               error={translatedError(errors, 'licenseCountry')}
               required
             />
+            <div className="lg:col-span-2">
+              <DateField
+                label={t('checkout.driver.licenseExpiry')}
+                value={draft.driver.licenseExpiry}
+                onChange={(e) => handleChange({ licenseExpiry: e.target.value })}
+                error={translatedError(errors, 'licenseExpiry')}
+                className="min-w-0"
+                required
+              />
+            </div>
           </div>
-          <DateField
-            label={t('checkout.driver.licenseExpiry')}
-            value={draft.driver.licenseExpiry}
-            onChange={(e) => handleChange({ licenseExpiry: e.target.value })}
-            error={translatedError(errors, 'licenseExpiry')}
-            required
-          />
 
           <p className="text-xs text-text-muted">{t('checkout.driver.note')}</p>
-
-          <div className="flex flex-wrap items-center gap-4 pt-2">
-            <Button type="submit" fullWidthOnMobile>
-              {t('checkout.driver.continue')}
-            </Button>
-            <Link
-              to={`/checkout/${vehicleId}/customer?${qs}`}
-              className="text-sm font-semibold text-text-muted underline hover:text-brand-navy"
-            >
-              {t('common.back')}
-            </Link>
-          </div>
         </form>
       </Card>
+
+      <CheckoutActions backTo={`/checkout/${vehicleId}/customer?${qs}`}>
+        <Button type="submit" form="driver-details-form" size="compact" className={ACTION_BUTTON_CLASS}>
+          {t('checkout.driver.continue')}
+        </Button>
+      </CheckoutActions>
     </CheckoutStepLayout>
   )
 }
@@ -188,7 +192,7 @@ function DriverToggleOption({ selected, onSelect, label }: { selected: boolean; 
       aria-pressed={selected}
       onClick={onSelect}
       className={
-        'flex items-center gap-3 rounded-none border px-4 py-3 text-start text-sm font-semibold transition-colors ' +
+        'flex min-h-12 items-center gap-2 rounded-none border px-3 py-2.5 text-start text-xs font-semibold transition-colors sm:gap-3 sm:text-sm ' +
         (selected
           ? 'border-brand-navy bg-brand-navy text-white'
           : 'border-border bg-white text-brand-navy hover:border-brand-navy/40')

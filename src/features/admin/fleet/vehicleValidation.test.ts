@@ -34,4 +34,40 @@ describe('validateVehicleDraft', () => {
     const draft = { ...EMPTY_VEHICLE_DRAFT, categoryId: 'cat-1', make: 'Toyota', model: 'Camry', plateNumber: 'A' }
     expect(validateVehicleDraft(draft).plateNumber).toBeTruthy()
   })
+
+  it('accepts blank optional specifications ("not entered")', () => {
+    const draft = { ...EMPTY_VEHICLE_DRAFT, categoryId: 'cat-1', make: 'Toyota', model: 'Camry', plateNumber: 'A12345' }
+    expect(validateVehicleDraft(draft)).toEqual({})
+  })
+
+  it('accepts sensible optional specifications', () => {
+    const draft = {
+      ...EMPTY_VEHICLE_DRAFT,
+      categoryId: 'cat-1',
+      make: 'Toyota',
+      model: 'Camry',
+      plateNumber: 'A12345',
+      horsepower: '203',
+      torqueNm: '250',
+      topSpeedKmh: '210',
+      acceleration0100: '7.9',
+      fuelConsumptionL100km: '6.8',
+      doors: '4',
+    }
+    expect(validateVehicleDraft(draft)).toEqual({})
+  })
+
+  it.each([
+    ['horsepower', '0'],
+    ['horsepower', '12.5'],
+    ['horsepower', 'abc'],
+    ['torqueNm', '99999'],
+    ['topSpeedKmh', '900'],
+    ['acceleration0100', '0'],
+    ['fuelConsumptionL100km', '100'],
+    ['doors', '9'],
+  ] as const)('rejects an out-of-range or non-numeric %s of "%s"', (field, value) => {
+    const draft = { ...EMPTY_VEHICLE_DRAFT, categoryId: 'cat-1', make: 'Toyota', model: 'Camry', plateNumber: 'A12345', [field]: value }
+    expect(validateVehicleDraft(draft)[field]).toBeTruthy()
+  })
 })

@@ -1,14 +1,16 @@
 import { Link, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { MessageCircle } from 'lucide-react'
+import { BadgeCheck, MessageCircle } from 'lucide-react'
 import { useCheckoutContext } from '@/features/booking/checkout/useCheckoutContext'
 import { CheckoutLoadGate } from '@/features/booking/checkout/CheckoutLoadGate'
+import { ACTION_BUTTON_CLASS, CheckoutActions } from '@/features/booking/checkout/CheckoutActions'
 import { CheckoutStepLayout } from '@/features/booking/checkout/CheckoutStepLayout'
 import { readBookingResult } from '@/features/booking/checkout/checkoutStorage'
 import { criteriaToSearchParams } from '@/features/booking/searchParams'
 import { whatsappUrlForVehicle } from '@/features/booking/contactLinks'
 import { StateMessage } from '@/features/shared/StateMessage'
 import { Card, buttonClass } from '@/features/shared/ui'
+import { CurrencySymbol } from '@/features/shared/ui/CurrencySymbol'
 import type { VehicleWithDetails } from '@/types/domain'
 
 /**
@@ -66,6 +68,11 @@ export function PaymentPendingPage() {
       endDate={criteria.endDate}
       pickup={pickup}
       dropoff={dropoff}
+      total={{
+        label: t('checkout.payment.amountDue'),
+        amount: bookingResult.totalPrice,
+        currency: bookingResult.currency,
+      }}
     >
       <PaymentPendingBody
         vehicle={vehicle}
@@ -93,38 +100,48 @@ function PaymentPendingBody({ vehicle, vehicleId, qs, bookingReference, currency
   const waUrl = whatsappUrlForVehicle(`${vehicle.make} ${vehicle.model} — booking ${bookingReference}`)
 
   return (
-    <Card>
-      <div className="space-y-5">
-        <div className="bg-brand-lavender/40 px-4 py-3 text-sm text-brand-navy">
-          <div className="flex items-center justify-between">
-            <span>{t('checkout.payment.bookingReference')}</span>
-            <span className="font-mono font-semibold">{bookingReference}</span>
-          </div>
-          <div className="mt-1 flex items-center justify-between">
-            <span>{t('checkout.payment.amountDue')}</span>
-            <span className="font-semibold">
-              {currency} {totalPrice.toLocaleString()}
-            </span>
+    <>
+    <Card className="overflow-hidden p-0">
+      <div className="grid grid-cols-2 border-b border-brand-gold/15 bg-white">
+        <div className="min-w-0 p-4 text-brand-navy sm:p-5">
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-gold">
+            {t('checkout.payment.bookingReference')}
+          </p>
+          <p className="mt-1 break-all font-mono text-sm font-semibold sm:text-base">{bookingReference}</p>
+        </div>
+        <div className="min-w-0 border-s border-brand-gold/15 p-4 text-end text-brand-navy sm:p-5">
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-gold">
+            {t('checkout.payment.amountDue')}
+          </p>
+          <p className="mt-1 font-hero-serif text-xl font-semibold tracking-[-0.03em] sm:text-2xl">
+            <CurrencySymbol currency={currency} /> {totalPrice.toLocaleString()}
+          </p>
+        </div>
+      </div>
+
+      <div className="p-4 sm:p-5">
+        <div className="flex items-start gap-3 border-s-2 border-brand-gold bg-brand-gold/5 p-3 sm:p-4">
+          <BadgeCheck className="mt-0.5 h-5 w-5 shrink-0 text-brand-gold-dark" aria-hidden="true" />
+          <div className="min-w-0">
+            <p className="font-semibold text-brand-navy">{t('checkout.paymentPending.heading')}</p>
+            <p className="mt-1 text-sm leading-5 text-text-muted">{t('checkout.paymentPending.body')}</p>
           </div>
         </div>
 
-        <div className="rounded-none border border-brand-gold/30 bg-brand-gold/5 px-4 py-4 text-sm">
-          <p className="font-semibold text-brand-navy">{t('checkout.paymentPending.heading')}</p>
-          <p className="mt-1 text-text-muted">{t('checkout.paymentPending.body')}</p>
-        </div>
-
-        <a href={waUrl} target="_blank" rel="noreferrer" className={buttonClass({ variant: 'success', fullWidthOnMobile: true })}>
-          <MessageCircle className="h-4 w-4" aria-hidden="true" />
-          {t('checkout.paymentPending.whatsappCta')}
-        </a>
-
-        <Link
-          to={`/checkout/${vehicleId}/summary?${qs}`}
-          className="block text-center text-sm font-semibold text-text-muted underline hover:text-brand-navy"
-        >
-          {t('checkout.payment.backToSummary')}
-        </Link>
       </div>
     </Card>
+
+    <CheckoutActions backTo={`/checkout/${vehicleId}/summary?${qs}`} backLabel={t('checkout.payment.backToSummary')}>
+        <a
+          href={waUrl}
+          target="_blank"
+          rel="noreferrer"
+          className={`${buttonClass({ variant: 'success', size: 'compact' })} ${ACTION_BUTTON_CLASS}`}
+        >
+          <MessageCircle className="hidden h-5 w-5 shrink-0 sm:block" aria-hidden="true" />
+          {t('checkout.paymentPending.whatsappCta')}
+        </a>
+    </CheckoutActions>
+    </>
   )
 }

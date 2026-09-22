@@ -11,8 +11,8 @@ the migration file wins.
 | `admin_profiles` | Staff/admin accounts (1:1 with `auth.users`). A row here — not just an auth account — is what grants dashboard access. |
 | `customers` | Renters. `auth_user_id` is nullable to allow a future guest-checkout flow. |
 | `drivers` | Customer-supplied driver details **per booking**. Never a company-assigned driver. |
-| `vehicle_categories` | Economy / Luxury (currently ~35% / ~65% of the fleet). |
-| `vehicles` | The fleet. |
+| `vehicle_categories` | The fleet's categories — today Economy, Sports & Supercars, SUV and Luxury (migration `20260919155811_split_fleet_into_four_categories.sql`; before it there were only Economy and Luxury, with every sports car and SUV under Luxury). Free-text `name`, managed from the admin dashboard — the site reads whatever categories exist, so a new one is a data row, not a code change (`src/lib/categoryName.ts` gives it a translated display name when one is defined, and falls back to the stored name). |
+| `vehicles` | The fleet. Since migration `20260921175100_vehicle_specifications.sql` each car also carries optional, admin-editable specification columns — `engine`, `horsepower`, `torque_nm`, `top_speed_kmh`, `acceleration_0_100`, `fuel_type`, `fuel_consumption_l100km`, `drivetrain`, `doors`, `origin_country`, `about`, `about_ar` — shown on the car card (engine) and the vehicle detail page (key figures, "about this car", full spec table; helpers in `src/lib/vehicleSpecs.ts`). All are nullable and a blank one is simply not shown: the site never guesses a missing figure. Undo: `supabase/rollback/vehicle_specifications.rollback.sql`. |
 | `vehicle_images` | Public vehicle photos, stored in the `vehicle-images` bucket. |
 | `pricing` | List price vs. client price per vehicle, per rental term (daily/weekly/monthly/3-month). |
 | `locations` | Pickup/drop-off points — airport or city type, tagged with a `city` column (Dubai, Abu Dhabi — see `docs/ARCHITECTURE.md`'s "Multi-emirate locations" section). |

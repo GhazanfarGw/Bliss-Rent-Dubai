@@ -4,13 +4,18 @@ import { useTranslation } from 'react-i18next'
 import { SectionHeader } from '@/features/shared/ui/SectionHeader'
 import { StateMessage } from '@/features/shared/StateMessage'
 import { VehiclePhoto } from '@/features/booking/VehiclePhoto'
+import { CurrencySymbol } from '@/features/shared/ui/CurrencySymbol'
 import { fetchAllAvailableVehicles } from '@/features/booking/api'
+import { categoryKey, categoryLabel } from '@/lib/categoryName'
+import { sortCategoriesPremiumFirst } from '@/lib/vehicleFilters'
 import { primaryImage } from '@/lib/vehicleImages'
 import { useDocumentTitle, useMetaDescription } from '@/lib/useDocumentTitle'
 import type { VehicleWithDetails } from '@/types/domain'
+import { GuidesFooter } from '@/features/blog/GuidesFooter'
 
 interface CategoryBlurb {
-  name: string
+  /** categoryKey of the live category this copy belongs to (see src/lib/categoryName.ts). */
+  key: string
   tagline: string
   description: string
   idealFor: string
@@ -36,12 +41,24 @@ interface LiveCategory {
  * representative photo, and a real live "from AED X/day" rate. The
  * longer descriptive copy (tagline/description/idealFor) still comes
  * from pages.carTypes.categories in en.ts/ar.ts — matched to the live
- * category by name — since that's real marketing content, not data; a
- * live category with no matching static entry (e.g. a newly added
- * category name) still renders honestly with just its real name/photo/
- * price and no invented blurb.
+ * category by `key` (categoryKey of its stored name, NOT by a translated
+ * name, so it matches in Arabic too) — since that's real marketing
+ * content, not data; a live category with no matching static entry (e.g.
+ * a newly added category name) still renders honestly with just its real
+ * name/photo/price and no invented blurb. Categories are listed
+ * premium-first, the same order the search results use.
  */
+/** Page content plus a row of hand-picked blog guides underneath it. */
 export function CarTypesPage() {
+  return (
+    <>
+      <CarTypesPageContent />
+      <GuidesFooter slugs={['economy-sedan-suv-or-luxury-rental-car', 'monthly-and-weekly-car-rental-uae', 'how-to-book-a-rental-car-online-uae']} />
+    </>
+  )
+}
+
+function CarTypesPageContent() {
   const { t } = useTranslation()
   useDocumentTitle(t('pages.carTypes.title'))
   useMetaDescription(t('pages.carTypes.subtitle'))
@@ -70,7 +87,7 @@ export function CarTypesPage() {
 
       {vehicles === null && (
         <div className="mt-8 grid gap-6 sm:grid-cols-2" aria-hidden="true">
-          {[1, 2].map((item) => (
+          {[1, 2, 3, 4].map((item) => (
             <div key={item} className="h-80 animate-pulse rounded-none bg-brand-lavender/40" />
           ))}
         </div>
@@ -93,7 +110,7 @@ export function CarTypesPage() {
               <div className="aspect-[16/9] overflow-hidden bg-brand-lavender/60">
                 <VehiclePhoto
                   storagePath={cat.photoStoragePath}
-                  alt={cat.name}
+                  alt={categoryLabel(t, cat.name)}
                   className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
                 />
               </div>
@@ -104,10 +121,12 @@ export function CarTypesPage() {
                   </span>
                 )}
                 <div className="mt-3 flex flex-wrap items-baseline justify-between gap-2">
-                  <h2 className="text-lg font-semibold text-brand-navy">{cat.name}</h2>
+                  <h2 className="text-lg font-semibold text-brand-navy">{categoryLabel(t, cat.name)}</h2>
                   {cat.fromDailyRate && (
                     <p className="text-sm font-semibold text-brand-gold-dark">
-                      {t('pages.carTypes.fromDaily', { currency: cat.fromDailyRate.currency, amount: cat.fromDailyRate.amount.toLocaleString() })}
+                      {t('pages.carTypes.fromDailyPrefix')} <CurrencySymbol currency={cat.fromDailyRate.currency} />{' '}
+                      {cat.fromDailyRate.amount.toLocaleString()}
+                      {t('pages.carTypes.fromDailySuffix')}
                     </p>
                   )}
                 </div>
@@ -134,7 +153,7 @@ export function CarTypesPage() {
 }
 
 function summarizeLiveCategories(vehicles: VehicleWithDetails[], blurbs: CategoryBlurb[]): LiveCategory[] {
-  const blurbByName = new Map(blurbs.map((b) => [normalizeName(b.name), b]))
+  const blurbByKey = new Map(blurbs.map((b) => [b.key, b]))
   const byId = new Map<string, { name: string; photoStoragePath: string | null; dailyRates: number[]; currency: string | null }>()
 
   for (const vehicle of vehicles) {
@@ -159,18 +178,16 @@ function summarizeLiveCategories(vehicles: VehicleWithDetails[], blurbs: Categor
     }
   }
 
-  return Array.from(byId.entries()).map(([id, summary]) => ({
-    id,
-    name: summary.name,
-    photoStoragePath: summary.photoStoragePath,
-    fromDailyRate:
-      summary.dailyRates.length > 0 && summary.currency
-        ? { amount: Math.min(...summary.dailyRates), currency: summary.currency }
-        : null,
-    blurb: blurbByName.get(normalizeName(summary.name)) ?? null,
-  }))
-}
-
-function normalizeName(name: string): string {
-  return name.trim().toLowerCase()
+  return sortCategoriesPremiumFirst(
+    Array.from(byId.entries()).map(([id, summary]) => ({
+      id,
+      name: summary.name,
+      photoStoragePath: summary.photoStoragePath,
+      fromDailyRate:
+        summary.dailyRates.length > 0 && summary.currency
+          ? { amount: Math.min(...summary.dailyRates), currency: summary.currency }
+          : null,
+      blurb: blurbByKey.get(categoryKey(summary.name)) ?? null,
+    })),
+  )
 }

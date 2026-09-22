@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useCheckoutContext } from '@/features/booking/checkout/useCheckoutContext'
 import { CheckoutLoadGate } from '@/features/booking/checkout/CheckoutLoadGate'
+import { ACTION_BUTTON_CLASS, CheckoutActions, revealFirstError } from '@/features/booking/checkout/CheckoutActions'
 import { CheckoutStepLayout } from '@/features/booking/checkout/CheckoutStepLayout'
 import { validateCustomerDraft, type CustomerFieldErrors } from '@/features/booking/checkout/validation'
 import { criteriaToSearchParams } from '@/features/booking/searchParams'
@@ -42,7 +43,10 @@ export function CustomerDetailsPage() {
     setTouched(true)
     const fieldErrors = validateCustomerDraft(draft.customer)
     setErrors(fieldErrors)
-    if (Object.keys(fieldErrors).length > 0) return
+    if (Object.keys(fieldErrors).length > 0) {
+      revealFirstError()
+      return
+    }
     navigate(`/checkout/${vehicleId}/driver?${criteriaToSearchParams(criteria!).toString()}`)
   }
 
@@ -60,11 +64,12 @@ export function CustomerDetailsPage() {
       endDate={criteria.endDate}
       pickup={pickup}
       dropoff={dropoff}
+      showTripInCard={false}
     >
-      <Card>
-        <p className="mb-5 text-sm text-text-muted">{t('checkout.customer.note')}</p>
-        <form onSubmit={handleSubmit} noValidate className="space-y-4">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <Card className="p-4! sm:p-5!">
+        <p className="mb-4 text-sm text-text-muted">{t('checkout.customer.note')}</p>
+        <form id="customer-details-form" onSubmit={handleSubmit} noValidate className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
+          <div className="grid grid-cols-2 gap-3 sm:col-span-2 sm:gap-4">
             <TextField
               label={t('checkout.customer.firstName')}
               value={draft.customer.firstName}
@@ -85,36 +90,41 @@ export function CustomerDetailsPage() {
             />
           </div>
 
-          <TextField
-            label={t('checkout.customer.email')}
-            type="email"
-            value={draft.customer.email}
-            onChange={(e) => handleChange({ email: e.target.value })}
-            placeholder="you@example.com"
-            autoComplete="email"
-            error={translatedError(errors, 'email')}
-            required
-          />
-
-          <TextField
-            label={t('checkout.customer.phone')}
-            type="tel"
-            value={draft.customer.phone}
-            onChange={(e) => handleChange({ phone: e.target.value })}
-            placeholder="+971 5X XXX XXXX"
-            autoComplete="tel"
-            error={translatedError(errors, 'phone')}
-            hint={t('checkout.customer.phoneHint')}
-            required
-          />
-
-          <div className="pt-2">
-            <Button type="submit" fullWidthOnMobile>
-              {t('checkout.customer.continue')}
-            </Button>
+          <div className="sm:col-span-2">
+            <TextField
+              label={t('checkout.customer.email')}
+              type="email"
+              value={draft.customer.email}
+              onChange={(e) => handleChange({ email: e.target.value })}
+              placeholder="you@example.com"
+              autoComplete="email"
+              error={translatedError(errors, 'email')}
+              required
+            />
           </div>
+
+          <div className="sm:col-span-2">
+            <TextField
+              label={t('checkout.customer.phone')}
+              type="tel"
+              value={draft.customer.phone}
+              onChange={(e) => handleChange({ phone: e.target.value })}
+              placeholder="+971 5X XXX XXXX"
+              autoComplete="tel"
+              error={translatedError(errors, 'phone')}
+              hint={t('checkout.customer.phoneHint')}
+              required
+            />
+          </div>
+
         </form>
       </Card>
+
+      <CheckoutActions>
+        <Button type="submit" form="customer-details-form" size="compact" className={ACTION_BUTTON_CLASS}>
+          {t('checkout.customer.continue')}
+        </Button>
+      </CheckoutActions>
     </CheckoutStepLayout>
   )
 }

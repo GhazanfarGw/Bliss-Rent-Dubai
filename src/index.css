@@ -82,11 +82,14 @@
   --color-text-muted: #5c5a6b;
 
   /*
-   * Sharp & Editorial redesign (Phase 12) — two consolidated warm-off-white
-   * section backgrounds, replacing six near-identical bespoke hexes
-   * (#f8f5f0/#f6f3ee/#f5f1ea/#f1eee9/#f7f4ef/#f7f3ee) that had drifted
-   * across ~19 files. Use -warm for the general section-alternation
-   * background, -warm-alt for a slightly deeper "next shade down" band.
+   * The site's main theme is WHITE: every page and section background is
+   * plain `bg-white`, with the navy hero/CTA bands as the only deliberate
+   * dark breaks. These two warm off-whites are NOT section backgrounds —
+   * -warm (#f7f4ef) is the footer's colour and the tint for small inset
+   * panels/chips (search-widget rows, spec tiles, hover states); -warm-alt
+   * is its slightly deeper sibling for the few inset elements that need
+   * one. Do not put either behind a whole section or page unless the owner
+   * asks for it on that specific section.
    */
   --color-surface-warm: #f7f4ef;
   --color-surface-warm-alt: #f1eee9;
@@ -162,6 +165,19 @@ body {
   box-sizing: border-box;
 }
 
+/*
+ * Playfair Display's default digits are old-style ("text") figures: they sit at
+ * different heights and a 0 looks like a small "o", so "Mercedes-Benz S580"
+ * reads as "S5 8o". Lining figures are all cap height, like the letters and the
+ * sans-serif prices, so every serif heading shows its numbers properly. In the
+ * base layer so an explicit utility such as `tabular-nums` still wins.
+ */
+@layer base {
+  .font-hero-serif {
+    font-variant-numeric: lining-nums;
+  }
+}
+
 .overflow-x-auto {
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -205,6 +221,22 @@ body {
   display: inline-block;
 }
 
+/* White "box" surface for content that used to sit on solid navy: a plain
+   white fill, a hairline berry (#5C0931) border and a soft neutral shadow.
+   NO gradient or colour tint — the owner explicitly asked for that to be
+   removed, so don't add one back (or a coloured shadow). In the components
+   layer so a plain utility (e.g. `border-t-4`) can still override it.
+   Don't put a `bg-*` utility on the same element. */
+@layer components {
+  .white-box {
+    background-color: #fff;
+    border: 1px solid rgb(92 9 49 / 0.16);
+    box-shadow:
+      0 18px 40px rgb(16 20 29 / 0.08),
+      0 2px 6px rgb(16 20 29 / 0.04);
+  }
+}
+
 /* BrandsMarquee — an infinite horizontal scroll built from two identical
    copies of the brand list placed side by side; animating the wrapper by
    exactly -50% loops seamlessly since the second copy is a perfect mirror
@@ -212,31 +244,12 @@ body {
    decorative motion, not reading order. Paused on hover/focus and skipped
    entirely for prefers-reduced-motion (BrandsMarquee.tsx renders a static
    row instead of applying this class in that case). */
-/* Hero heading/body text rotation (Task: bring back auto-changing hero
-   copy after the Phase 11 single-slide simplification, while keeping the
-   image itself fixed — see Hero.tsx). A short fade+rise on each text
-   swap, skipped entirely for prefers-reduced-motion (Hero.tsx doesn't
-   apply this class in that case, same pattern as BrandsMarquee below). */
-@keyframes hero-slide-fade {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.animate-hero-slide-fade {
-  animation: hero-slide-fade 500ms ease-out;
-}
-
-/* Hero background image — a slow, one-time "ken burns" style drift so the
-   pinned hero photo (still a single fixed image — see Hero.tsx) feels
-   alive rather than a flat static poster. Runs once on mount and holds at
-   its final scale (`forwards`), skipped entirely for
-   prefers-reduced-motion, same pattern as every other animation here. */
+/* Hero background image — a slow, one-time "ken burns" style drift so a
+   still hero photo (the About page's — the homepage hero is a video and
+   deliberately has no animation of its own, see Hero.tsx) feels alive
+   rather than a flat static poster. Runs once on mount and holds at its
+   final scale (`forwards`), skipped entirely for prefers-reduced-motion,
+   same pattern as every other animation here. */
 @keyframes hero-image-drift {
   from {
     transform: scale(1);
@@ -250,49 +263,36 @@ body {
   animation: hero-image-drift 20s ease-out forwards;
 }
 
-/* Mobile-only warm glow pulse behind the hero's single dominant CTA
-   ("Book Now" — the sole full-width button below `sm`, see Hero.tsx).
-   Uses --color-brand-champagne, the one approved "gold" accent in the
-   brand system (index.css palette comment above), layered as a soft
-   pulsing halo around the Luxury-Berry button itself — no new hue.
-   Scoped inside `max-width: 639.98px` (matching Tailwind's `sm`
-   breakpoint) INSTEAD OF being cancelled by a `sm:` utility class in
-   Hero.tsx's className: this file's own custom classes are inserted
-   after Tailwind's generated utilities in the compiled stylesheet, so
-   a `sm:shadow-none`/`sm:[animation:none]` utility of equal specificity
-   would lose that cascade-order tie and never actually turn the glow
-   off on desktop (a repeat of the same Tailwind cascade-order pitfall
-   documented elsewhere in this app — see NavBar's mobile-menu history).
-   Doing the responsive scoping in the media query itself sidesteps that
-   entirely: above 640px these classes carry no animation or shadow at
-   all, nothing to override. */
-@media (max-width: 639.98px) {
-  @keyframes hero-cta-glow {
-    0%,
-    100% {
-      box-shadow:
-        0 0 0 0 rgba(212, 175, 55, 0.45),
-        0 10px 24px rgba(5, 7, 13, 0.35);
-    }
-    50% {
-      box-shadow:
-        0 0 0 10px rgba(212, 175, 55, 0),
-        0 10px 24px rgba(5, 7, 13, 0.35);
-    }
+/* Site search overlay (SiteSearch.tsx) — a quick 160ms fade for the dimmed
+   backdrop (also used by the mobile side menu's backdrop in NavBar.tsx) and
+   a fade+settle for the search panel as it opens. Not applied for
+   prefers-reduced-motion (the components leave the classes off). */
+@keyframes site-search-backdrop-in {
+  from {
+    opacity: 0;
   }
+  to {
+    opacity: 1;
+  }
+}
 
-  .animate-hero-cta-glow {
-    animation: hero-cta-glow 2.4s ease-out infinite;
+@keyframes site-search-panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.985);
   }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
 
-  /* prefers-reduced-motion fallback for the glow above — a fixed halo
-     instead of removing it outright, same "still a bit of polish, just
-     not moving" approach as the rest of this file. */
-  .hero-cta-glow-static {
-    box-shadow:
-      0 0 0 4px rgba(212, 175, 55, 0.25),
-      0 10px 24px rgba(5, 7, 13, 0.35);
-  }
+.animate-site-search-backdrop {
+  animation: site-search-backdrop-in 160ms ease-out;
+}
+
+.animate-site-search-panel {
+  animation: site-search-panel-in 180ms ease-out;
 }
 
 @keyframes marquee-scroll {
@@ -452,4 +452,37 @@ body {
 }
 .animate-faq-answer-in {
   animation: faq-answer-in 0.2s ease-out;
+}
+
+/* Homepage "coverage map" (LocationsPreviewSection) — the dashed line
+   "flowing" from the hub city to every other live city, over a decorative
+   dotted-world-map backdrop the component renders itself (SVG circles,
+   not CSS — see WORLD_DOTS there). Applied by the component only when
+   !prefersReducedMotion(), same convention as every other continuous
+   animation in this file (hero drift/glow, marquees, ping dots). */
+@keyframes coverage-route-dash {
+  to {
+    stroke-dashoffset: -16;
+  }
+}
+.animate-coverage-route {
+  animation: coverage-route-dash 1.6s linear infinite;
+}
+
+/* Only the mobile checkout bar reserves space; desktop actions are in flow. */
+body {
+  padding-bottom: var(--checkout-bar-h, 0px);
+}
+
+/* Keep focused fields clear of the mobile progress and action bars. */
+.checkout-layout :is(input, select, textarea) {
+  scroll-margin-top: calc(var(--header-h) + 4rem);
+  scroll-margin-bottom: calc(var(--checkout-bar-h, 0px) + 1rem);
+}
+
+@media (min-width: 1024px) and (min-height: 760px) {
+  .checkout-card-sticky {
+    position: sticky;
+    top: calc(var(--header-h) + 1rem);
+  }
 }

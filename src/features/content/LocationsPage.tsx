@@ -1,20 +1,17 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { MapPin } from 'lucide-react'
 import { fetchLocations } from '@/features/booking/api'
+import { CITY_PHOTOS } from '@/features/booking/cityPhotos'
+import { cityPagePath } from '@/features/content/cityGuides'
 import { sortByOrder, TYPE_ICON, TYPE_ORDER } from '@/features/booking/locationDisplay'
 import { useDocumentTitle, useMetaDescription } from '@/lib/useDocumentTitle'
 import type { Location } from '@/types/domain'
 import type { LocationType } from '@/types/database'
+import { GuidesFooter } from '@/features/blog/GuidesFooter'
 
 type ViewState = { status: 'loading' } | { status: 'error' } | { status: 'loaded'; locations: Location[] }
-
-const CITY_IMAGE_MAP: Record<string, string> = {
-  Dubai:
-    'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=1200&q=80&fm=jpg',
-  'Abu Dhabi':
-    'https://images.unsplash.com/photo-1521295121783-8a321d551ad2?auto=format&fit=crop&w=1200&q=80&fm=jpg',
-}
 
 /**
  * Live "where can I pick up / drop off" page — pulls real, active rows
@@ -44,7 +41,17 @@ const TYPE_HEADING_KEY: Record<LocationType, string> = {
   delivery: 'pages.locations.deliveryHeading',
 }
 
+/** Page content plus a row of hand-picked blog guides underneath it. */
 export function LocationsPage() {
+  return (
+    <>
+      <LocationsPageContent />
+      <GuidesFooter slugs={['dubai-airport-car-rental', 'dubai-to-abu-dhabi-road-trip', 'sharjah-and-ajman-by-car']} />
+    </>
+  )
+}
+
+function LocationsPageContent() {
   const { t } = useTranslation()
   useDocumentTitle(t('pages.locations.title'))
   useMetaDescription(t('pages.locations.subtitle'))
@@ -71,7 +78,11 @@ export function LocationsPage() {
   const cityCards = cityNames.map((city) => {
     const cityLocations = locations.filter((location) => location.city === city)
     const country = cityLocations[0]?.country ?? city
-    const image = CITY_IMAGE_MAP[city] ?? 'https://images.unsplash.com/photo-1493246507139-91e8fad9978e?auto=format&fit=crop&w=1200&q=80'
+    // A real photo of the city itself (see cityPhotos.ts), or none — never
+    // a stock image of somewhere else. (This used to be a hardcoded Unsplash
+    // map whose "Abu Dhabi" entry was a desk globe and whose fallback for
+    // every other city was a lake in Canada.)
+    const photo = CITY_PHOTOS[city]
     // Real, live types actually present in this city today — never a
     // fixed list — in the same fixed display order the search widget's
     // pickers use.
@@ -81,7 +92,8 @@ export function LocationsPage() {
       id: city,
       city,
       country,
-      image,
+      photo,
+      href: cityPagePath(city) ?? '/search',
       types,
       pointCount: cityLocations.length,
     }
@@ -105,18 +117,29 @@ export function LocationsPage() {
 
       {state.status === 'loaded' && !isEmpty && (
         <div className="mt-8 grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
-          {cityCards.map(({ id, city, country, image, types, pointCount }) => (
+          {cityCards.map(({ id, city, country, photo, href, types, pointCount }) => (
             <Link
               key={id}
-              to="/search"
+              to={href}
               className="group overflow-hidden rounded-none border border-border bg-white shadow-[0_8px_24px_rgba(32,28,59,0.06)] transition-transform duration-200 hover:-translate-y-1 hover:shadow-[0_16px_32px_rgba(32,28,59,0.12)]"
             >
-              <div
-                className="h-64 bg-cover bg-center bg-no-repeat"
-                style={{
-                  backgroundImage: `linear-gradient(180deg, rgba(255,255,255,0.06), rgba(0,0,0,0.08)), url(${image})`,
-                }}
-              />
+              <div className="relative h-64 bg-brand-lavender">
+                {photo ? (
+                  <>
+                    <img src={photo.largeSrc} alt={city} loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
+                    {/* The photo's author/license credit (CC BY / CC BY-SA
+                        require it) — the linked source is on the city page
+                        this card opens. */}
+                    <span className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/55 to-transparent px-3 pb-1.5 pt-5 text-[9px] text-white/85">
+                      {t('pages.cityGuide.photoBy', { author: photo.author, license: photo.license })}
+                    </span>
+                  </>
+                ) : (
+                  <div className="absolute inset-0 flex items-center justify-center text-brand-gold/40">
+                    <MapPin className="h-12 w-12" aria-hidden="true" />
+                  </div>
+                )}
+              </div>
 
               <div className="px-6 pb-7 pt-5 text-brand-navy">
                 <p className="text-[11px] font-medium uppercase tracking-[0.25em] text-text-muted">{country.toUpperCase()}</p>

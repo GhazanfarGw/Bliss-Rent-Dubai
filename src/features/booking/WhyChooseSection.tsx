@@ -1,53 +1,50 @@
 import { useTranslation } from 'react-i18next'
-import { CalendarCheck, CalendarRange, KeyRound, LifeBuoy, MapPinned } from 'lucide-react'
+import { CalendarCheck, CalendarRange, KeyRound, MapPinned } from 'lucide-react'
 
 interface WhyChooseItem {
   title: string
   body: string
 }
 
-/**
- * Real business advantages only — easy online booking, Dubai focus,
- * flexible rental periods, customer-provided driver, customer support.
- * No invented awards, fleet-size claims, or statistics (see home.whyChoose
- * in en.ts/ar.ts). Doubles as the header's "About" anchor target.
- *
- * One icon per item, matched to its real meaning (booking / city /
- * calendar flexibility / self-drive / support) — purely visual, so this
- * section reads differently from HowItWorksSection right below it
- * instead of repeating the same plain numbered badge twice on one page.
- */
-const ITEM_ICONS = [CalendarCheck, MapPinned, CalendarRange, KeyRound, LifeBuoy]
+const ITEM_ICONS = [CalendarCheck, MapPinned, CalendarRange, KeyRound]
 
 export function WhyChooseSection() {
   const { t } = useTranslation()
   const items = t('home.whyChoose.items', { returnObjects: true }) as WhyChooseItem[]
 
   return (
-    <section id="why-choose" className="scroll-mt-20 bg-surface-warm-alt">
-      <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-3xl text-center">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.36em] text-brand-gold-dark">Why travelers choose us</p>
-          <h2 className="font-hero-serif mt-4 text-3xl font-semibold tracking-[-0.06em] text-brand-navy sm:text-4xl">{t('home.whyChoose.title')}</h2>
-          <p className="mt-3 text-sm leading-7 text-text-muted sm:text-base">{t('home.whyChoose.subtitle')}</p>
+    <section id="why-choose" className="relative isolate scroll-mt-20 overflow-hidden bg-white text-brand-navy">
+      <div className="relative mx-auto grid max-w-7xl gap-12 px-4 py-20 sm:px-6 lg:grid-cols-[0.78fr_1.22fr] lg:gap-20 lg:px-8 lg:py-28">
+        <div className="lg:sticky lg:top-28 lg:self-start">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.34em] text-brand-gold-dark">
+            {t('home.whyChoose.eyebrow')}
+          </p>
+          <h2 className="font-hero-serif mt-5 max-w-xl text-4xl font-semibold leading-[1.02] tracking-[-0.06em] text-brand-navy sm:text-5xl">
+            {t('home.whyChoose.title')}
+          </h2>
+          <p className="mt-5 max-w-lg text-sm leading-7 text-text-muted sm:text-base">
+            {t('home.whyChoose.subtitle')}
+          </p>
+          <div className="mt-8 flex items-center gap-3 text-[10px] font-semibold uppercase tracking-[0.22em] text-brand-navy/50">
+            <span className="h-px w-12 bg-brand-gold" aria-hidden="true" />
+            {t('home.whyChoose.note')}
+          </div>
         </div>
 
-        <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {items.map((item, i) => {
-            const Icon = ITEM_ICONS[i] ?? CalendarCheck
+        <div className="grid gap-4 sm:grid-cols-2">
+          {items.map((item, index) => {
+            const Icon = ITEM_ICONS[index] ?? CalendarCheck
             return (
-              <div
-                key={item.title}
-                className="group border border-[#ece7df] bg-white p-5 shadow-none backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-brand-gold/40 hover:shadow-[0_24px_48px_rgba(92,9,49,0.1)]"
-              >
-                <div className="flex items-center gap-4">
-                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-none bg-brand-gold text-white shadow-none transition-all duration-300 group-hover:scale-105 group-hover:shadow-[0_0_0_6px_rgba(212,175,55,0.18)]">
+              <article key={item.title} className="white-box group min-h-64 p-6 sm:p-8">
+                <div className="flex items-start justify-between gap-4">
+                  <span className="flex h-11 w-11 items-center justify-center border border-brand-gold/30 bg-brand-gold/5 text-brand-gold transition-colors group-hover:bg-brand-gold group-hover:text-white">
                     <Icon className="h-5 w-5" aria-hidden="true" />
                   </span>
-                  <h3 className="text-base font-semibold text-brand-navy">{item.title}</h3>
+                  <span className="text-xs font-semibold tracking-[0.18em] text-brand-navy/30">0{index + 1}</span>
                 </div>
-                <p className="mt-4 text-sm leading-7 text-text-muted">{item.body}</p>
-              </div>
+                <h3 className="mt-10 text-lg font-semibold tracking-[-0.015em] text-brand-navy">{item.title}</h3>
+                <p className="mt-3 text-sm leading-7 text-text-muted">{item.body}</p>
+              </article>
             )
           })}
         </div>

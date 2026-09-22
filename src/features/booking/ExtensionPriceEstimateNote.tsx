@@ -1,8 +1,14 @@
+import type { ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
+import { CurrencySymbol } from '@/features/shared/ui/CurrencySymbol'
 import type { ExtensionPriceEstimate } from '@/features/booking/useExtensionPriceEstimate'
 
-function formatMoney(currency: string, amount: number): string {
-  return `${currency} ${amount.toLocaleString()}`
+function formatMoney(currency: string, amount: number): ReactNode {
+  return (
+    <>
+      <CurrencySymbol currency={currency} /> {amount.toLocaleString()}
+    </>
+  )
 }
 
 /**
@@ -47,7 +53,7 @@ export function ExtensionPriceEstimateNote({
   )
 }
 
-function Line({ label, value }: { label: string; value: string }) {
+function Line({ label, value }: { label: string; value: ReactNode }) {
   return (
     <div className="flex items-center justify-between gap-3 text-text-muted">
       <span>{label}</span>

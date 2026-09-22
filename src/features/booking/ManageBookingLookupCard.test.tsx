@@ -23,9 +23,9 @@ function renderCard(overrides: Partial<Parameters<typeof ManageBookingLookupCard
 }
 
 describe('ManageBookingLookupCard', () => {
-  it('renders no card border/box — a plain form flowing on the page', () => {
+  it('renders no card chrome of its own — the outermost element is the bare form', () => {
     const { container } = renderCard()
-    // The outermost element is the <form> itself, not a bordered/shadowed wrapper div.
+    // ManageBookingHero supplies the bordered/shadowed card wrapper; this component stays a bare <form>.
     expect(container.firstElementChild?.tagName).toBe('FORM')
   })
 

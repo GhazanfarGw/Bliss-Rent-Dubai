@@ -164,6 +164,31 @@ export interface Database {
           is_master_listing: boolean
           /** Set only when is_master_listing = false: the master listing this Reserved copy was cloned from. */
           master_vehicle_id: string | null
+          /*
+           * Specifications (20260921175100_vehicle_specifications.sql). Every one
+           * is optional: the site shows a field only when it is filled and never
+           * guesses a missing figure.
+           */
+          /** Engine description, e.g. "4.0L twin-turbo V8". */
+          engine: string | null
+          /** Manufacturer headline power in hp (PS). */
+          horsepower: number | null
+          torque_nm: number | null
+          top_speed_kmh: number | null
+          /** 0-100 km/h in seconds. */
+          acceleration_0_100: number | null
+          fuel_type: string | null
+          /** Combined L/100 km — the site also derives km/L from it. */
+          fuel_consumption_l100km: number | null
+          /** RWD, FWD, AWD or 4WD. */
+          drivetrain: string | null
+          doors: number | null
+          /** Country of the manufacturer / where the car is made. */
+          origin_country: string | null
+          /** "About this car" — what it is and its history (English). */
+          about: string | null
+          /** Arabic "about"; the site falls back to `about` when empty. */
+          about_ar: string | null
         }
         Insert: {
           id?: string
@@ -178,6 +203,18 @@ export interface Database {
           created_at?: string
           is_master_listing?: boolean
           master_vehicle_id?: string | null
+          engine?: string | null
+          horsepower?: number | null
+          torque_nm?: number | null
+          top_speed_kmh?: number | null
+          acceleration_0_100?: number | null
+          fuel_type?: string | null
+          fuel_consumption_l100km?: number | null
+          drivetrain?: string | null
+          doors?: number | null
+          origin_country?: string | null
+          about?: string | null
+          about_ar?: string | null
         }
         Update: Partial<Database['public']['Tables']['vehicles']['Insert']>
         Relationships: []
