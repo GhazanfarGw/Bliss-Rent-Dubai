@@ -10,6 +10,7 @@ import {
   uploadVehicleImage,
   setPrimaryImage,
   deleteVehicleImage,
+  deleteVehicle,
 } from '@/features/admin/fleet/adminFleetApi'
 import { validateVehicleDraft, type VehicleFieldErrors } from '@/features/admin/fleet/vehicleValidation'
 import { AdminApiError } from '@/features/admin/adminApi'
@@ -66,6 +67,9 @@ export function VehicleFormPage() {
   const [imageBusy, setImageBusy] = useState(false)
   const [imageError, setImageError] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const [confirmingDelete, setConfirmingDelete] = useState(false)
+  const [deleting, setDeleting] = useState(false)
+  const [deleteError, setDeleteError] = useState<string | null>(null)
 
   async function load() {
     setLoading(true)
@@ -146,6 +150,24 @@ export function VehicleFormPage() {
       setImageError(err instanceof AdminApiError || err instanceof Error ? err.message : t('admin.errorGeneric'))
     } finally {
       setImageBusy(false)
+    }
+  }
+
+  async function handleDeleteVehicle() {
+    if (!id || !vehicle) return
+    setDeleting(true)
+    setDeleteError(null)
+    try {
+      await deleteVehicle(
+        id,
+        vehicle.vehicle_images.map((img) => img.storage_path),
+      )
+      navigate('/admin/fleet')
+    } catch (err) {
+      setDeleteError(err instanceof AdminApiError || err instanceof Error ? err.message : t('admin.errorGeneric'))
+      setConfirmingDelete(false)
+    } finally {
+      setDeleting(false)
     }
   }
 
@@ -309,6 +331,43 @@ export function VehicleFormPage() {
           >
             {saving ? t('common.loading') : isEdit ? t('admin.fleet.save') : t('admin.fleet.create')}
           </button>
+
+          {isEdit && (
+            <div className="border-t border-error/20 pt-4">
+              {!confirmingDelete ? (
+                <button
+                  type="button"
+                  onClick={() => setConfirmingDelete(true)}
+                  className="rounded-lg border border-error/25 px-4 py-2 text-sm font-semibold text-error transition-colors hover:bg-error-bg"
+                >
+                  {t('admin.fleet.deleteVehicle')}
+                </button>
+              ) : (
+                <div className="space-y-3 rounded-lg border border-error/25 bg-error-bg/50 p-4">
+                  <p className="text-sm text-error">{t('admin.fleet.deleteConfirmPrompt', { make: draft.make, model: draft.model })}</p>
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      disabled={deleting}
+                      onClick={() => void handleDeleteVehicle()}
+                      className="rounded-lg bg-error px-4 py-2 text-sm font-semibold text-white transition-colors hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      {deleting ? t('admin.fleet.deleting') : t('admin.fleet.deleteConfirmButton')}
+                    </button>
+                    <button
+                      type="button"
+                      disabled={deleting}
+                      onClick={() => setConfirmingDelete(false)}
+                      className="rounded-lg border border-border px-4 py-2 text-sm font-semibold text-text-muted hover:bg-surface-muted"
+                    >
+                      {t('admin.fleet.deleteCancel')}
+                    </button>
+                  </div>
+                </div>
+              )}
+              {deleteError && <p className="mt-2 text-sm font-medium text-error">{deleteError}</p>}
+            </div>
+          )}
         </form>
 
         <div className="rounded-2xl border border-brand-navy/10 bg-white p-5">

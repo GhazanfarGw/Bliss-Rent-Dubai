@@ -1141,6 +1141,11 @@ const en = {
       remove: 'Remove',
       addPhoto: 'Add photo',
       uploading: 'Uploading…',
+      deleteVehicle: 'Delete vehicle',
+      deleteConfirmPrompt: 'Delete {{make}} {{model}}? This removes it from the fleet permanently and cannot be undone.',
+      deleteConfirmButton: 'Yes, delete',
+      deleteCancel: 'Cancel',
+      deleting: 'Deleting…',
     },
     availability: {
       subtitle: 'See bookings, reservations, and maintenance periods for each vehicle.',
@@ -1555,9 +1560,9 @@ const en = {
       dangerZone: {
         title: 'Danger zone — testing only',
         subtitle:
-          'Wipes every booking, payment, complaint, vehicle, customer, and activity log entry so the dashboard is empty for go-live. Cannot be undone. This section will be removed once testing is complete.',
+          'Wipes every booking, payment, complaint, customer, and activity log entry so the dashboard is empty for go-live. Your fleet vehicles are kept. Cannot be undone. This section will be removed once testing is complete.',
         button: 'Reset all test data',
-        confirmPrompt: 'Type RESET to permanently delete all bookings, payments, complaints, vehicles, customers, and activity logs.',
+        confirmPrompt: 'Type RESET to permanently delete all bookings, payments, complaints, customers, and activity logs. Fleet vehicles will NOT be deleted.',
         confirmButton: 'Yes, delete everything',
         cancel: 'Cancel',
         resetting: 'Resetting…',

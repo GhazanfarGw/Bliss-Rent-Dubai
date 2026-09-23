@@ -3,16 +3,22 @@ import { chainable } from '@/test/supabaseMock'
 import { EMPTY_VEHICLE_DRAFT } from '@/types/domain'
 
 const fromMock = vi.fn()
+const storageRemoveMock = vi.fn()
 
 vi.mock('@/lib/supabaseClient', () => ({
-  supabase: { from: (...args: unknown[]) => fromMock(...args) },
+  supabase: {
+    from: (...args: unknown[]) => fromMock(...args),
+    storage: { from: () => ({ remove: (...args: unknown[]) => storageRemoveMock(...args) }) },
+  },
 }))
 
-const { fetchVehicles, createVehicle, updateVehicle, updateVehicleStatus } = await import('./adminFleetApi')
+const { fetchVehicles, createVehicle, updateVehicle, updateVehicleStatus, deleteVehicle } = await import('./adminFleetApi')
 
 describe('adminFleetApi', () => {
   beforeEach(() => {
     fromMock.mockReset()
+    storageRemoveMock.mockReset()
+    storageRemoveMock.mockResolvedValue({ data: null, error: null })
   })
 
   it('merges vehicles with their operational status, without re-deriving the classification (Fleet Management)', async () => {
@@ -94,6 +100,26 @@ describe('adminFleetApi', () => {
     fromMock.mockReturnValue(chainable({ data: null, error: null }))
     await expect(updateVehicleStatus('v1', 'maintenance')).resolves.toBeUndefined()
     expect(fromMock).toHaveBeenCalledWith('vehicles')
+  })
+
+  it('deletes a vehicle and its photos from storage (Delete Vehicle)', async () => {
+    fromMock.mockReturnValue(chainable({ data: null, error: null }))
+    await expect(deleteVehicle('v1', ['v1/photo-a.jpg', 'v1/photo-b.jpg'])).resolves.toBeUndefined()
+    expect(storageRemoveMock).toHaveBeenCalledWith(['v1/photo-a.jpg', 'v1/photo-b.jpg'])
+    expect(fromMock).toHaveBeenCalledWith('vehicles')
+  })
+
+  it('skips the storage call when the vehicle has no photos', async () => {
+    fromMock.mockReturnValue(chainable({ data: null, error: null }))
+    await expect(deleteVehicle('v1', [])).resolves.toBeUndefined()
+    expect(storageRemoveMock).not.toHaveBeenCalled()
+  })
+
+  it('surfaces a delete failure (e.g. the vehicle still has booking history) as AdminApiError', async () => {
+    fromMock.mockReturnValue(
+      chainable({ data: null, error: { message: 'update or delete on table "vehicles" violates foreign key constraint' } }),
+    )
+    await expect(deleteVehicle('v1', [])).rejects.toThrow('violates foreign key constraint')
   })
 
   it('surfaces a database error as AdminApiError', async () => {

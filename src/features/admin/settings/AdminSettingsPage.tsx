@@ -460,9 +460,10 @@ export function AdminSettingsPage() {
 
       {/*
         TEMPORARY — testing-phase only. Remove this whole section (and
-        resetAllTestData() in adminSettingsApi.ts, and the migration at
-        supabase/migrations/20260830000000_admin_reset_test_data.sql) once
-        testing is done and the team goes live with real data.
+        resetAllTestData() in adminSettingsApi.ts, and the migrations at
+        supabase/migrations/20260830000000_admin_reset_test_data.sql and
+        supabase/migrations/20260923000000_admin_reset_test_data_keep_vehicles.sql)
+        once testing is done and the team goes live with real data.
       */}
       {isSuperAdmin && (
         <div className="mt-5 rounded-2xl border-2 border-error/25 bg-error-bg/50 p-5">

@@ -848,11 +848,13 @@ export interface Database {
       }
       /**
        * TEMPORARY testing-phase helper. SECURITY DEFINER — see
-       * supabase/migrations/20260830000000_admin_reset_test_data.sql.
+       * supabase/migrations/20260923000000_admin_reset_test_data_keep_vehicles.sql.
        * super_admin only (checked inside the function). Wipes all
-       * bookings/payments/complaints/vehicles/customers/audit_logs and
-       * returns the row counts that were deleted. Remove this entry along
-       * with the migration and its UI once testing is done.
+       * bookings/payments/complaints/extensions/reassignments/email-log/
+       * customers/audit_logs, plus booking-specific Reserved-copy vehicle
+       * rows, and returns the row counts that were deleted. Real fleet
+       * vehicles (is_master_listing = true) are never touched. Remove this
+       * entry along with the migration and its UI once testing is done.
        */
       admin_reset_all_test_data: {
         Args: Record<string, never>
@@ -861,7 +863,7 @@ export interface Database {
           complaints: number
           bookings: number
           drivers: number
-          vehicles: number
+          reserved_vehicle_copies: number
           customers: number
           audit_logs: number
         }

@@ -134,3 +134,19 @@ export async function deleteVehicleImage(imageId: string, storagePath: string): 
   const { error: rowError } = await supabase.from('vehicle_images').delete().eq('id', imageId)
   if (rowError) throw new AdminApiError(rowError.message)
 }
+
+/**
+ * Removes the vehicle's photos from storage (vehicle_images/pricing rows
+ * cascade from the DB delete itself) then deletes the vehicle row. Blocked
+ * by "on delete restrict" if any booking still references this vehicle
+ * directly — the resulting Postgres error message is surfaced as-is, same
+ * as every other admin*Api.ts call site.
+ */
+export async function deleteVehicle(id: string, imageStoragePaths: string[]): Promise<void> {
+  if (imageStoragePaths.length > 0) {
+    const { error: storageError } = await supabase.storage.from('vehicle-images').remove(imageStoragePaths)
+    if (storageError) throw new AdminApiError(storageError.message)
+  }
+  const { error } = await supabase.from('vehicles').delete().eq('id', id)
+  if (error) throw new AdminApiError(error.message)
+}

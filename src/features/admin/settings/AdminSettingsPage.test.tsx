@@ -68,7 +68,7 @@ describe('AdminSettingsPage — Danger Zone', () => {
       complaints: 1,
       bookings: 3,
       drivers: 3,
-      vehicles: 4,
+      reserved_vehicle_copies: 4,
       customers: 3,
       audit_logs: 10,
     })
