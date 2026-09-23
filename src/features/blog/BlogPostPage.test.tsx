@@ -103,7 +103,7 @@ describe('BlogPostPage', () => {
     renderAt(`/blog/${POST.slug}`)
 
     const cta = screen.getByRole('heading', { name: 'Ready to hit the road?' }).closest('aside') as HTMLElement
-    expect(within(cta).getByRole('link', { name: 'Book a car' })).toHaveAttribute('href', '/book')
+    expect(within(cta).getByRole('link', { name: 'Book a car' })).toHaveAttribute('href', '/search?mode=book')
     expect(within(cta).getByRole('link', { name: 'Car rental in Dubai' })).toHaveAttribute('href', '/locations/dubai')
     expect(within(cta).getByRole('link', { name: 'Talk to us' })).toHaveAttribute('href', '/contact')
   })

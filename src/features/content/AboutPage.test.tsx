@@ -104,7 +104,7 @@ describe('AboutPage', () => {
 
   it('links the closing CTA to real booking/browse routes', () => {
     renderIt()
-    expect(screen.getAllByRole('link', { name: /book now/i }).every((link) => link.getAttribute('href') === '/book')).toBe(true)
+    expect(screen.getAllByRole('link', { name: /book now/i }).every((link) => link.getAttribute('href') === '/search?mode=book')).toBe(true)
     expect(screen.getAllByRole('link', { name: /view fleet/i }).every((link) => link.getAttribute('href') === '/search')).toBe(true)
   })
 

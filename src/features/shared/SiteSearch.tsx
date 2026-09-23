@@ -52,7 +52,7 @@ interface PageEntry {
  */
 const PAGE_INDEX: PageEntry[] = [
   { path: '/', titleKey: 'nav.home', descriptionKey: 'nav.homeDescription', keywords: ['home', 'homepage'] },
-  { path: '/book', titleKey: 'bookCar.title', descriptionKey: 'bookCar.subtitle', keywords: ['book', 'reserve', 'rent a car'] },
+  { path: '/search?mode=book', titleKey: 'bookCar.title', descriptionKey: 'bookCar.subtitle', keywords: ['book', 'reserve', 'rent a car'] },
   { path: '/search', titleKey: 'nav.browseFleet', descriptionKey: 'nav.browseFleetDescription', keywords: ['fleet', 'cars', 'vehicles', 'browse'] },
   { path: '/car-types', titleKey: 'nav.carTypes', descriptionKey: 'nav.carTypesDescription', keywords: ['suv', 'luxury', 'economy', 'sedan', 'sports', 'supercar', 'categories'] },
   { path: '/locations', titleKey: 'nav.cities', descriptionKey: 'nav.citiesDescription', keywords: ['pickup', 'drop-off', 'airport', 'dubai', 'abu dhabi', 'cities'] },
@@ -72,7 +72,7 @@ const PAGE_INDEX: PageEntry[] = [
  * already uses.
  */
 const QUICK_LINKS: { path: string; icon: LucideIcon }[] = [
-  { path: '/book', icon: CalendarCheck },
+  { path: '/search?mode=book', icon: CalendarCheck },
   { path: '/search', icon: Car },
   { path: '/car-types', icon: LayoutGrid },
   { path: '/locations', icon: MapPin },

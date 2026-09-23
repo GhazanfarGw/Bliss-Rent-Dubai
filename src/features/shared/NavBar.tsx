@@ -59,11 +59,10 @@ const NAV_DESCRIPTIONS = ['nav.homeDescription', 'nav.aboutDescription', 'nav.br
  * item, one URL, one page title now, instead of two links for what a
  * guest experiences as one task.
  *
- * The CTA points at /book (BookCarPage) rather than straight at /search:
- * its whole job is "start a booking", and BookCarPage is the dedicated
- * page built for exactly that — the same SearchWidget fields and
- * `onSearch` → /search flow, just presented as its own destination
- * instead of only living inside the homepage hero.
+ * The CTA points straight at /search?mode=book: Fleet is the single search/
+ * booking entry point for the whole site now (see SearchResultsPage's
+ * `mode=book` handling), so "start a booking" opens Fleet's own search
+ * dialog directly instead of a separate /book page with the same form.
  */
 const TRANSPARENT_SCROLL_THRESHOLD_PX = 24
 
@@ -71,13 +70,15 @@ const TRANSPARENT_SCROLL_THRESHOLD_PX = 24
  * Routes whose first section is a dark hero extending under the header —
  * the header uses its white ("on dark") colours over them until scrolled.
  * A page joining this list must also pull its hero up under the header
- * itself (`-mt-[var(--header-h)]` plus its own top padding): Hero.tsx (/),
- * AboutPage (/about) and the shared PageHero (/book) do. Manage Booking's
- * own navy band (ManageBookingHero.tsx) is deliberately NOT in this list —
- * it renders as an ordinary section below the normal solid header, not a
- * full-bleed hero the header sits transparently over.
+ * itself (`-mt-[var(--header-h)]` plus its own top padding): Hero.tsx (/)
+ * and AboutPage (/about) do. Manage Booking's own navy band
+ * (ManageBookingHero.tsx) is deliberately NOT in this list — it renders as
+ * an ordinary section below the normal solid header, not a full-bleed hero
+ * the header sits transparently over. /book isn't in this list either: it
+ * only ever redirects (to /search), so it never actually renders a hero
+ * for the header to sit over.
  */
-const PAGES_WITH_DARK_HERO = ['/', '/about', '/book']
+const PAGES_WITH_DARK_HERO = ['/', '/about']
 
 export function NavBar() {
   const [open, setOpen] = useState(false)
@@ -249,7 +250,7 @@ export function NavBar() {
               same "compact city-switcher beside the main action" pattern
               the reference layout used. */}
           <LinkButton
-            to="/book"
+            to="/search?mode=book"
             variant="primary"
             size="compact"
             className="border border-brand-gold text-white shadow-none"
@@ -373,7 +374,7 @@ export function NavBar() {
           })}
           <div className="mt-auto space-y-3 pt-5">
             <LinkButton
-              to="/book"
+              to="/search?mode=book"
               variant="secondary"
               onClick={() => setOpen(false)}
               className="w-full text-center shadow-[0_10px_24px_rgba(180,155,108,0.2)]"

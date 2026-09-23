@@ -119,7 +119,7 @@ function CityGuideView({ guide }: { guide: CityGuide }) {
             </h1>
             <p className="mt-4 max-w-xl text-base leading-7 text-text-muted">{copy.tagline}</p>
             <div className="mt-7 flex flex-wrap gap-3">
-              <LinkButton to="/book" variant="primary">
+              <LinkButton to="/search?mode=book" variant="primary">
                 {t('pages.cityGuide.bookCta')}
               </LinkButton>
               <LinkButton to="/locations" variant="outline">
@@ -171,7 +171,7 @@ function CityGuideView({ guide }: { guide: CityGuide }) {
               <p className="text-sm font-semibold text-brand-navy">{t('pages.cityGuide.noPointsTitle', { city: copy.name })}</p>
               <p className="mt-1 text-sm leading-6 text-text-muted">{t('pages.cityGuide.noPointsBody')}</p>
               <div className="mt-4 flex flex-wrap gap-3">
-                <LinkButton to="/book" variant="primary" size="compact">
+                <LinkButton to="/search?mode=book" variant="primary" size="compact">
                   {t('pages.cityGuide.bookCta')}
                 </LinkButton>
                 <a
@@ -282,7 +282,7 @@ function CityGuideView({ guide }: { guide: CityGuide }) {
           </h2>
           <p className="mx-auto mt-3 max-w-xl text-sm leading-7 text-text-muted sm:text-base">{t('pages.cityGuide.ctaBody')}</p>
           <div className="mt-7 flex flex-wrap justify-center gap-3">
-            <LinkButton to="/book" variant="primary">
+            <LinkButton to="/search?mode=book" variant="primary">
               {t('pages.cityGuide.bookCta')}
             </LinkButton>
             <LinkButton to="/contact" variant="outline">

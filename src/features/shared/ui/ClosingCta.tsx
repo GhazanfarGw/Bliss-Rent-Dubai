@@ -18,7 +18,7 @@ export function ClosingCta({ eyebrow, heading }: { eyebrow: string; heading: str
         {/* Side by side even on a phone: each button takes half the row
             (flex-1), then goes back to its natural width from `sm` up. */}
         <div className="mt-5 flex justify-center gap-3 sm:mt-7">
-          <LinkButton to="/book" variant="primary" className="flex-1 sm:flex-none">
+          <LinkButton to="/search?mode=book" variant="primary" className="flex-1 sm:flex-none">
             {t('nav.searchCars')}
           </LinkButton>
           <LinkButton to="/search" variant="outline" className="flex-1 sm:flex-none">

@@ -45,7 +45,7 @@ describe('Hero', () => {
 
     const bookNowLink = screen.getByRole('link', { name: /book now/i })
     expect(bookNowLink).toBeInTheDocument()
-    expect(bookNowLink).toHaveAttribute('href', '/book')
+    expect(bookNowLink).toHaveAttribute('href', '/search?mode=book')
 
     const viewFleetLink = screen.getByRole('link', { name: /view fleet/i })
     expect(viewFleetLink).toHaveAttribute('href', '/search')

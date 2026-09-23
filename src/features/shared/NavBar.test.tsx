@@ -145,14 +145,14 @@ describe('NavBar', () => {
       expect(header.className).not.toContain('shadow-')
     })
 
-    it.each(['/', '/about', '/book'])('uses white logo, links and controls on %s, whose dark hero sits under the header', (path) => {
+    it.each(['/', '/about'])('uses white logo, links and controls on %s, whose dark hero sits under the header', (path) => {
       renderAt(path)
       expect(screen.getByRole('banner').className).toContain('text-white')
       const desktopLogo = screen.getAllByRole('img', { name: 'Bliss Rent Dubai' })[0]
       expect(desktopLogo.className).toContain('invert')
     })
 
-    it.each(['/contact', '/search', '/blog', '/locations', '/faqs', '/car-types', '/manage-booking'])(
+    it.each(['/contact', '/search', '/blog', '/locations', '/faqs', '/car-types', '/manage-booking', '/book'])(
       'keeps the normal dark logo, links and controls on %s — a light page, where white text would disappear',
       (path) => {
         renderAt(path)

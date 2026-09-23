@@ -141,7 +141,7 @@ function BlogIndexView({ category }: { category?: BlogCategory }) {
           <h2 className="font-hero-serif text-3xl font-semibold tracking-[-0.06em] text-brand-navy sm:text-4xl">{t('pages.blog.ctaHeading')}</h2>
           <p className="mx-auto mt-3 max-w-xl text-sm leading-7 text-text-muted sm:text-base">{t('pages.blog.ctaBody')}</p>
           <div className="mt-7 flex flex-wrap justify-center gap-3">
-            <LinkButton to="/book" variant="primary">
+            <LinkButton to="/search?mode=book" variant="primary">
               {t('pages.blog.bookCta')}
             </LinkButton>
             <LinkButton to="/search" variant="outline">

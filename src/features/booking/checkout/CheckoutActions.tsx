@@ -8,11 +8,14 @@ import { ChevronLeft } from 'lucide-react'
 export const ActionsSlotContext = createContext<HTMLElement | null>(null)
 
 /**
- * Classes for a step's main button so it fits the sticky bar: compact, allowed
- * to wrap onto two lines on a phone (the labels are long — "Confirm & continue
- * to payment"), natural width from `sm` up. Pair with `size="compact"`.
+ * Classes for a step's main button so it fits the sticky bar: compact and
+ * kept on one line (the sticky bar is narrow on a phone, and the full labels
+ * — "Confirm & continue to payment" — don't fit at a legible size; see
+ * `CtaLabel` in CheckoutFlowPage for the short-label-on-mobile swap that
+ * makes single-line copy possible), natural width from `sm` up. Pair with
+ * `size="compact"`.
  */
-export const ACTION_BUTTON_CLASS = 'min-w-0 flex-1 text-center leading-snug lg:flex-none lg:px-6'
+export const ACTION_BUTTON_CLASS = 'min-w-0 flex-1 text-center leading-snug whitespace-nowrap lg:flex-none lg:px-6'
 
 /**
  * A step's buttons. Declared here, next to the form or payment logic they

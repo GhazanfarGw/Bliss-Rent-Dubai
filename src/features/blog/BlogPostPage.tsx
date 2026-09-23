@@ -225,7 +225,7 @@ function PostView({ post }: { post: BlogPost }) {
             <h2 className="font-hero-serif text-2xl font-semibold tracking-[-0.05em] text-brand-navy sm:text-3xl">{t('pages.blog.ctaHeading')}</h2>
             <p className="mx-auto mt-2 max-w-md text-sm leading-7 text-text-muted">{t('pages.blog.ctaBody')}</p>
             <div className="mt-6 flex flex-wrap justify-center gap-3">
-              <LinkButton to="/book" variant="primary">
+              <LinkButton to="/search?mode=book" variant="primary">
                 {t('pages.blog.bookCta')}
               </LinkButton>
               {cities.map((entry) => (

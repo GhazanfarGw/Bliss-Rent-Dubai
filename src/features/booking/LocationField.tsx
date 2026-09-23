@@ -75,6 +75,16 @@ interface LocationPickerButtonProps {
   row?: boolean
   /** Fill the available column in sectioned booking layouts. */
   fluid?: boolean
+  /**
+   * Controlled open state. When provided (together with `onOpenChange`), the
+   * parent drives when this field's sheet is open — used by the row-layout
+   * guided search flow so that finishing one field automatically opens the
+   * next one, instead of the visitor having to tap each trigger in turn.
+   * Omit both to keep this field's default, independently-managed behavior
+   * (unchanged, still used by the card/navigator layouts).
+   */
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
 }
 
 export function LocationPickerButton({
@@ -88,9 +98,17 @@ export function LocationPickerButton({
   sheetTitle,
   row = false,
   fluid = false,
+  open: controlledOpen,
+  onOpenChange,
 }: LocationPickerButtonProps) {
   const { t } = useTranslation()
-  const [sheetOpen, setSheetOpen] = useState(false)
+  const [internalOpen, setInternalOpen] = useState(false)
+  const isControlled = controlledOpen !== undefined
+  const sheetOpen = isControlled ? controlledOpen : internalOpen
+  function setSheetOpen(next: boolean) {
+    if (isControlled) onOpenChange?.(next)
+    else setInternalOpen(next)
+  }
   const disabled = loading || !!error
   const sorted = options
     .slice()
@@ -105,7 +123,10 @@ export function LocationPickerButton({
         onClick={() => setSheetOpen(true)}
         disabled={disabled}
         aria-expanded={sheetOpen}
-        className="flex w-full items-center justify-between gap-2 rounded-lg border border-border bg-white px-3 py-2.5 text-start text-sm text-brand-navy outline-none transition-colors focus:border-brand-navy focus:ring-1 focus:ring-brand-navy disabled:cursor-not-allowed disabled:bg-surface-muted disabled:text-text-muted"
+        className={
+          'flex w-full items-center justify-between gap-2 rounded-lg border bg-white px-3 py-2.5 text-start text-sm text-brand-navy outline-none transition-colors focus:border-brand-navy focus:ring-1 focus:ring-brand-navy disabled:cursor-not-allowed disabled:bg-surface-muted disabled:text-text-muted ' +
+          (sheetOpen ? 'border-brand-gold ring-1 ring-brand-gold' : 'border-border')
+        }
       >
         <span className="min-w-0 truncate font-medium">
           {loading ? t('searchWidget.loadingLocations') : selected ? `${TYPE_ICON[selected.type]} ${selected.name}` : placeholder}

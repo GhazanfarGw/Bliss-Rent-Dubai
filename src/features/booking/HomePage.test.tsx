@@ -108,7 +108,7 @@ describe('HomePage', () => {
     )
     const heading = await screen.findByRole('heading', { name: 'Ready for your next UAE drive?' })
     const section = heading.closest('section') as HTMLElement
-    expect(within(section).getByRole('link', { name: 'Book Now' })).toHaveAttribute('href', '/book')
+    expect(within(section).getByRole('link', { name: 'Book Now' })).toHaveAttribute('href', '/search?mode=book')
     expect(within(section).getByRole('link', { name: 'View fleet' })).toHaveAttribute('href', '/search')
   })
 

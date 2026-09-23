@@ -42,12 +42,16 @@ const WITH_RAIL = 'lg:grid lg:grid-cols-[264px_minmax(0,1fr)] lg:items-start lg:
 const EMPTY_FACETS: FacetCounts = { category: {}, brand: {}, transmission: {}, seats: {} }
 
 /**
- * The fleet catalogue. Deliberately light on chrome: a one-line title with the
- * sort order beside it, then the cars next to a sticky column that holds the
- * customer's trip (where and when — or a prompt to add dates) above the
- * filters, so the trip never scrolls out of sight. On phones the trip rides in
- * the sticky chips-and-sheet toolbar instead. The date/location form opens in a
- * dialog only when the customer asks to edit.
+ * The fleet catalogue — and, since the booking architecture simplification,
+ * the site's single search/booking entry point (every global "Book Now" CTA
+ * lands here, via `?mode=book`; see BookCarPage's /book redirect). Deliberately
+ * light on chrome: a one-line title with the sort order beside it, then the
+ * cars next to a sticky column that holds the customer's trip (where and when
+ * — or a prompt to add dates) above the filters, so the trip never scrolls out
+ * of sight. On phones the trip rides in the sticky chips-and-sheet toolbar
+ * instead. The date/location form (the same SearchWidget used everywhere else
+ * on the site) opens in a dialog when the customer asks to edit, or
+ * automatically on arrival with `?mode=book` — never a second, separate form.
  */
 export function SearchResultsPage() {
   const { t, i18n } = useTranslation()
@@ -55,7 +59,7 @@ export function SearchResultsPage() {
   useMetaDescription(
     'Browse available cars for rent in Dubai — filter by category and dates to find the right vehicle, with transparent pricing and fast airport pickup.',
   )
-  const [searchParams] = useSearchParams()
+  const [searchParams, setSearchParams] = useSearchParams()
   const navigate = useNavigate()
 
   const criteria = searchParamsToCriteria(searchParams)
@@ -66,8 +70,23 @@ export function SearchResultsPage() {
   const [filters, setFilters] = useState<VehicleFilters>(EMPTY_FILTERS)
   const [sort, setSort] = useState<SortOption>('price_asc')
   const [locations, setLocations] = useState<Location[]>([])
-  const [editingSearch, setEditingSearch] = useState(false)
+  // `?mode=book` is Fleet's one entry point for every global "Book Now"
+  // CTA (see NavBar, Hero, ClosingCta, etc.) — it opens the same search
+  // dialog a visitor would otherwise have to click "Add your dates"/"Edit
+  // search" for, so a generic "start a booking" click lands straight on
+  // the search form instead of the results grid. Read once at mount; the
+  // effect below strips it from the URL right after so it doesn't linger
+  // (e.g. reappearing on a browser-back visit after the dialog was closed).
+  const [editingSearch, setEditingSearch] = useState(() => searchParams.get('mode') === 'book')
   const initialCategoryId = useRef(searchParams.get('category'))
+
+  useEffect(() => {
+    if (searchParams.get('mode') !== 'book') return
+    const next = new URLSearchParams(searchParams)
+    next.delete('mode')
+    setSearchParams(next, { replace: true })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   useEffect(() => {
     fetchLocations().then(setLocations).catch(() => setLocations([]))

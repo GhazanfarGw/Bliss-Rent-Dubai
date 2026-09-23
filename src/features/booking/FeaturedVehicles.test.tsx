@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { fireEvent, render, screen } from '@testing-library/react'
+import { createEvent, fireEvent, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { MemoryRouter } from 'react-router-dom'
+import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { FeaturedVehicles } from '@/features/booking/FeaturedVehicles'
 import { fetchAllAvailableVehicles } from '@/features/booking/api'
 import type { VehicleWithDetails } from '@/types/domain'
@@ -414,6 +414,179 @@ describe('FeaturedVehicles', () => {
 
       fireEvent.click(screen.getByRole('button', { name: 'Previous vehicles' }))
       expect(scrollBy).toHaveBeenLastCalledWith({ left: -300, behavior: 'smooth' })
+    })
+  })
+
+  describe('drag / swipe', () => {
+    /** A stand-in for the CSS marquee animation the browser runs on the row. */
+    function fakeMarquee(currentTime = 0) {
+      return {
+        currentTime,
+        pause: vi.fn(),
+        play: vi.fn(),
+        effect: { getComputedTiming: () => ({ duration: 36000 }) },
+      }
+    }
+
+    /** Same 2400px row / 300px card layout the arrow tests use — see layOutRow above. */
+    function layOutRow() {
+      vi.spyOn(HTMLElement.prototype, 'scrollWidth', 'get').mockReturnValue(2400)
+    }
+
+    function withMarquee(marquee: ReturnType<typeof fakeMarquee>) {
+      Element.prototype.getAnimations = (() => [marquee]) as unknown as typeof Element.prototype.getAnimations
+    }
+
+    function track(): HTMLElement {
+      return document.querySelector('.animate-featured-marquee-left, .animate-featured-marquee-right') as HTMLElement
+    }
+
+    afterEach(() => {
+      // @ts-expect-error — jsdom has no Element.getAnimations by default; see the arrow tests above.
+      delete Element.prototype.getAnimations
+      vi.useRealTimers()
+      vi.restoreAllMocks()
+    })
+
+    it('a real drag moves the marquee clock and pauses the row, without ever calling Animation.pause/play', async () => {
+      const marquee = fakeMarquee(0)
+      layOutRow()
+      withMarquee(marquee)
+      mockFleet([cullinan])
+      renderIt()
+      await screen.findAllByText('Rolls-Royce Cullinan')
+
+      const row = track()
+      fireEvent.pointerDown(row, { pointerId: 1, clientX: 100 })
+      fireEvent.pointerMove(row, { pointerId: 1, clientX: 80 })
+
+      expect(row.style.animationPlayState).toBe('paused')
+
+      fireEvent.pointerUp(row, { pointerId: 1, clientX: 80 })
+
+      expect(marquee.currentTime).toBeCloseTo(600, 3)
+      expect(marquee.pause).not.toHaveBeenCalled()
+      expect(marquee.play).not.toHaveBeenCalled()
+    })
+
+    /**
+     * react-router's Link calls preventDefault() on every click, drag or not
+     * (that's how it swaps in client-side navigation for the real one), so
+     * `defaultPrevented` can't tell our suppression apart from Link's own
+     * normal behaviour. Mounting a real destination route and checking
+     * whether it actually rendered is the only way to prove navigation was
+     * (or wasn't) swallowed.
+     */
+    function renderWithRoutes() {
+      return render(
+        <MemoryRouter initialEntries={['/']}>
+          <Routes>
+            <Route path="/" element={<FeaturedVehicles />} />
+            <Route path="/vehicles/:id" element={<div>Vehicle detail page</div>} />
+          </Routes>
+        </MemoryRouter>,
+      )
+    }
+
+    it('swallows the click a drag leaves behind, so Book now does not navigate after dragging across a card', async () => {
+      const marquee = fakeMarquee(0)
+      layOutRow()
+      withMarquee(marquee)
+      mockFleet([cullinan])
+      renderWithRoutes()
+      await screen.findAllByText('Rolls-Royce Cullinan')
+
+      const row = track()
+      fireEvent.pointerDown(row, { pointerId: 1, clientX: 100 })
+      fireEvent.pointerMove(row, { pointerId: 1, clientX: 80 })
+      fireEvent.pointerUp(row, { pointerId: 1, clientX: 80 })
+      fireEvent.click(screen.getByRole('link', { name: /book now/i }))
+
+      expect(screen.queryByText('Vehicle detail page')).not.toBeInTheDocument()
+      expect(screen.getAllByText('Rolls-Royce Cullinan').length).toBeGreaterThan(0)
+    })
+
+    it('the WhatsApp button is likewise protected from a drag that ends over it', async () => {
+      const marquee = fakeMarquee(0)
+      layOutRow()
+      withMarquee(marquee)
+      mockFleet([cullinan])
+      renderIt()
+      await screen.findAllByText('Rolls-Royce Cullinan')
+
+      const row = track()
+      fireEvent.pointerDown(row, { pointerId: 1, clientX: 100 })
+      fireEvent.pointerMove(row, { pointerId: 1, clientX: 80 })
+      fireEvent.pointerUp(row, { pointerId: 1, clientX: 80 })
+
+      const whatsapp = screen.getByRole('link', { name: /whatsapp/i })
+      const clickEvent = createEvent.click(whatsapp)
+      fireEvent(whatsapp, clickEvent)
+
+      expect(clickEvent.defaultPrevented).toBe(true)
+    })
+
+    it('a movement below the drag threshold is still a plain tap — Book now navigates normally and the clock does not move', async () => {
+      const marquee = fakeMarquee(0)
+      layOutRow()
+      withMarquee(marquee)
+      mockFleet([cullinan])
+      renderWithRoutes()
+      await screen.findAllByText('Rolls-Royce Cullinan')
+
+      const row = track()
+      fireEvent.pointerDown(row, { pointerId: 1, clientX: 100 })
+      fireEvent.pointerMove(row, { pointerId: 1, clientX: 103 })
+      fireEvent.pointerUp(row, { pointerId: 1, clientX: 103 })
+
+      expect(marquee.currentTime).toBe(0)
+
+      fireEvent.click(screen.getByRole('link', { name: /book now/i }))
+
+      expect(await screen.findByText('Vehicle detail page')).toBeInTheDocument()
+    })
+
+    it('resumes auto-play a short beat after the drag ends, not the instant it does', async () => {
+      const marquee = fakeMarquee(0)
+      layOutRow()
+      withMarquee(marquee)
+      mockFleet([cullinan])
+      renderIt()
+      await screen.findAllByText('Rolls-Royce Cullinan')
+
+      vi.useFakeTimers()
+      const row = track()
+      fireEvent.pointerDown(row, { pointerId: 1, clientX: 100 })
+      fireEvent.pointerMove(row, { pointerId: 1, clientX: 80 })
+      fireEvent.pointerUp(row, { pointerId: 1, clientX: 80 })
+
+      expect(row.style.animationPlayState).toBe('paused')
+      vi.advanceTimersByTime(300)
+      expect(row.style.animationPlayState).toBe('paused')
+      vi.advanceTimersByTime(400)
+      expect(row.style.animationPlayState).toBe('')
+    })
+
+    it('drags the same physical direction under RTL — a raw pixel delta is never mirrored by text direction', async () => {
+      const marquee = fakeMarquee(0)
+      layOutRow()
+      withMarquee(marquee)
+      mockFleet([cullinan])
+      render(
+        <MemoryRouter>
+          <div dir="rtl">
+            <FeaturedVehicles />
+          </div>
+        </MemoryRouter>,
+      )
+      await screen.findAllByText('Rolls-Royce Cullinan')
+
+      const row = track()
+      fireEvent.pointerDown(row, { pointerId: 1, clientX: 100 })
+      fireEvent.pointerMove(row, { pointerId: 1, clientX: 80 })
+      fireEvent.pointerUp(row, { pointerId: 1, clientX: 80 })
+
+      expect(marquee.currentTime).toBeCloseTo(600, 3)
     })
   })
 })

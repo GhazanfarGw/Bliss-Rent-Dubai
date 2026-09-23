@@ -96,6 +96,13 @@ export function SearchWidget({
   )
   const [pickupTime, setPickupTime] = useState(initialValues?.pickupTime ?? DEFAULT_TIME)
   const [touched, setTouched] = useState(false)
+  // Guided auto-advance for `layout="row"` (the homepage/sticky-bar
+  // navigator) only: at most one field sheet is open at a time, and
+  // finishing one automatically opens the next, so the visitor doesn't
+  // have to tap each trigger in turn. Every other layout leaves this
+  // unset and each field keeps managing its own open state independently.
+  const [activeStep, setActiveStep] = useState<'pickupLocation' | 'returnLocation' | 'dates' | null>(null)
+  const guided = layout === 'row'
 
   useEffect(() => {
     let cancelled = false
@@ -132,6 +139,8 @@ export function SearchWidget({
     setPickupCity(city)
     // A previously-chosen point may not exist in the new city.
     setPickupLocationId('')
+    // Guided flow: choosing a city immediately opens Pickup Location next.
+    if (guided) setActiveStep('pickupLocation')
   }
 
   const dropoffLocationId = sameReturnLocation ? pickupLocationId : returnLocationId
@@ -379,26 +388,44 @@ export function SearchWidget({
         <LocationPickerButton
           label={t('searchWidget.pickupLocation')}
           locationId={pickupLocationId}
-          onLocationChange={setPickupLocationId}
+          onLocationChange={(id) => {
+            setPickupLocationId(id)
+            if (guided) setActiveStep(sameReturnLocation ? 'dates' : 'returnLocation')
+          }}
           options={pickupCityLocations}
           loading={locationsLoading}
           error={locationsError}
           placeholder={t('searchWidget.selectPickup')}
           sheetTitle={t('searchWidget.choosePickupLocation')}
           row={fieldRow}
+          open={guided ? activeStep === 'pickupLocation' : undefined}
+          onOpenChange={
+            guided
+              ? (next) => setActiveStep((prev) => (next ? 'pickupLocation' : prev === 'pickupLocation' ? null : prev))
+              : undefined
+          }
         />
 
         {!sameReturnLocation && (
           <LocationPickerButton
             label={t('searchWidget.returnLocation')}
             locationId={returnLocationId}
-            onLocationChange={setReturnLocationId}
+            onLocationChange={(id) => {
+              setReturnLocationId(id)
+              if (guided) setActiveStep('dates')
+            }}
             options={uaeLocations}
             loading={locationsLoading}
             error={locationsError}
             placeholder={t('searchWidget.selectReturnLocation')}
             sheetTitle={t('searchWidget.chooseReturnLocation')}
             row={fieldRow}
+            open={guided ? activeStep === 'returnLocation' : undefined}
+            onOpenChange={
+              guided
+                ? (next) => setActiveStep((prev) => (next ? 'returnLocation' : prev === 'returnLocation' ? null : prev))
+                : undefined
+            }
           />
         )}
 
@@ -412,6 +439,13 @@ export function SearchWidget({
               setEndDate(next.endDate)
             }}
             todayIso={todayIso}
+            open={guided ? activeStep === 'dates' : undefined}
+            onOpenChange={
+              guided
+                ? (next) => setActiveStep((prev) => (next ? 'dates' : prev === 'dates' ? null : prev))
+                : undefined
+            }
+            closeOnComplete={guided}
           />
         </div>
 
@@ -429,7 +463,14 @@ export function SearchWidget({
       </div>
 
       <div className={fieldRow ? 'mt-3' : 'mt-4'}>
-        <SameReturnToggle checked={sameReturnLocation} onChange={setSameReturnLocation} compact />
+        <SameReturnToggle
+          checked={sameReturnLocation}
+          onChange={(checked) => {
+            setSameReturnLocation(checked)
+            if (guided && checked && activeStep === 'returnLocation') setActiveStep('dates')
+          }}
+          compact
+        />
       </div>
 
       {touched && dateValidation.error && (

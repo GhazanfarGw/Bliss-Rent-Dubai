@@ -28,6 +28,23 @@ interface DateRangePickerProps {
    *  `layout="row"` search bar, instead of the two-column stacked
    *  Pickup/Return trigger used everywhere else. Same calendar either way. */
   row?: boolean
+  /**
+   * Controlled open state. When provided (together with `onOpenChange`), the
+   * parent drives when the calendar sheet is open — used by the row-layout
+   * guided search flow so the calendar opens automatically once pickup and
+   * return locations are chosen. Omit both to keep the default,
+   * independently-managed behavior (unchanged, still used elsewhere).
+   */
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
+  /**
+   * Close the sheet automatically as soon as a full range is picked,
+   * instead of waiting for the "Done" button — used by the guided row-layout
+   * flow, where there is no further field to advance to and an extra tap
+   * would just be to dismiss the calendar. Other callers keep the explicit
+   * "Done" confirmation (default false).
+   */
+  closeOnComplete?: boolean
 }
 
 type Phase = 'start' | 'end' | 'complete'
@@ -45,10 +62,25 @@ type Phase = 'start' | 'end' | 'complete'
  * `@/lib/dateRange` — this component only decides what's clickable and
  * how to draw the range; it introduces no new date rules of its own.
  */
-export function DateRangePicker({ startDate, endDate, onChange, todayIso, row = false }: DateRangePickerProps) {
+export function DateRangePicker({
+  startDate,
+  endDate,
+  onChange,
+  todayIso,
+  row = false,
+  open: controlledOpen,
+  onOpenChange,
+  closeOnComplete = false,
+}: DateRangePickerProps) {
   const { t, i18n } = useTranslation()
   const rtl = isRtl(i18n.language)
-  const [open, setOpen] = useState(false)
+  const [internalOpen, setInternalOpen] = useState(false)
+  const isControlled = controlledOpen !== undefined
+  const open = isControlled ? controlledOpen : internalOpen
+  function setOpen(next: boolean) {
+    if (isControlled) onOpenChange?.(next)
+    else setInternalOpen(next)
+  }
   const [hoverIso, setHoverIso] = useState<string | null>(null)
   const today = parseIso(todayIso)
   const [viewYear, setViewYear] = useState(today.year)
@@ -74,6 +106,7 @@ export function DateRangePicker({ startDate, endDate, onChange, todayIso, row = 
     if (phase === 'end') {
       if (compareIso(iso, startDate) < 0) return // return can't be before pickup
       onChange({ startDate, endDate: iso })
+      if (closeOnComplete) setOpen(false)
       return
     }
     // Fresh pickup, or restarting a completed range from a new date.
@@ -227,7 +260,8 @@ export function DateRangePicker({ startDate, endDate, onChange, todayIso, row = 
         aria-expanded={open}
         onClick={() => setOpen(true)}
         className={
-          'flex w-full items-center justify-between gap-2 rounded-lg border border-border bg-white text-start text-sm text-brand-navy outline-none transition-colors focus:border-brand-navy focus:ring-1 focus:ring-brand-navy ' +
+          'flex w-full items-center justify-between gap-2 rounded-lg border bg-white text-start text-sm text-brand-navy outline-none transition-colors focus:border-brand-navy focus:ring-1 focus:ring-brand-navy ' +
+          (open ? 'border-brand-gold ring-1 ring-brand-gold' : 'border-border') + ' ' +
           (row ? 'max-w-full divide-x divide-brand-navy/10 px-3 py-2.5 sm:whitespace-nowrap' : 'divide-x divide-brand-navy/10')
         }
       >

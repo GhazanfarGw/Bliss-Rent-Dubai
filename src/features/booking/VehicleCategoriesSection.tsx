@@ -6,6 +6,7 @@ import { fetchAllAvailableVehicles } from '@/features/booking/api'
 import { SectionHeader } from '@/features/shared/ui/SectionHeader'
 import { StateMessage } from '@/features/shared/StateMessage'
 import { VehiclePhoto } from '@/features/booking/VehiclePhoto'
+import { categoryLabel } from '@/lib/categoryName'
 import { primaryImage } from '@/lib/vehicleImages'
 import type { VehicleWithDetails } from '@/types/domain'
 
@@ -93,12 +94,12 @@ export function VehicleCategoriesSection() {
                   <div className="aspect-[4/3] overflow-hidden bg-brand-lavender/60">
                     <VehiclePhoto
                       storagePath={category.photoStoragePath}
-                      alt={category.name}
+                      alt={categoryLabel(t, category.name)}
                       className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.05]"
                     />
                   </div>
                   <div className="p-4">
-                    <h3 className="text-sm font-bold tracking-tight text-brand-navy sm:text-base">{category.name}</h3>
+                    <h3 className="text-sm font-bold tracking-tight text-brand-navy sm:text-base">{categoryLabel(t, category.name)}</h3>
                     <p className="mt-1 text-sm text-text-muted">{t('home.categories.carsCount', { count: category.availableCount })}</p>
                     {category.description && (
                       <p className="mt-1.5 line-clamp-2 text-xs leading-5 text-text-muted/80">{category.description}</p>

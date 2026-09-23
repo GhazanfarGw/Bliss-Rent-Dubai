@@ -55,7 +55,7 @@ describe('PaymentPendingPage', () => {
     expect(whatsapp).toHaveAttribute('target', '_blank')
     expect(screen.queryByText('Estimated total')).not.toBeInTheDocument()
     expect(screen.queryByText('300')).not.toBeInTheDocument()
-    expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '80')
+    expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '100')
   })
 
   it('requires a saved booking before offering the WhatsApp handoff', async () => {

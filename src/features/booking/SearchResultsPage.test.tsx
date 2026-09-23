@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { MemoryRouter, Route, Routes } from 'react-router-dom'
+import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom'
 import { SearchResultsPage } from '@/features/booking/SearchResultsPage'
 import { fetchAllAvailableVehicles, fetchLocations, searchVehiclesWithAvailability } from '@/features/booking/api'
 import type { VehicleWithDetails } from '@/types/domain'
@@ -171,6 +171,35 @@ describe('SearchResultsPage', () => {
 
     await user.click(dialog.getByRole('button', { name: 'Close' }))
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+  })
+
+  it('auto-opens the search dialog for ?mode=book — the single entry point every global Book Now CTA lands on', async () => {
+    renderAt('/search?mode=book')
+
+    await waitFor(() => expect(screen.getByText('Toyota Yaris')).toBeInTheDocument())
+    expect(screen.getByRole('dialog', { name: 'Add your dates' })).toBeInTheDocument()
+  })
+
+  it('drops mode=book from the URL once it has opened the dialog, so a later back-navigation does not reopen it', async () => {
+    function SearchWithLocationMarker() {
+      const location = useLocation()
+      return (
+        <>
+          <SearchResultsPage />
+          <p data-testid="location-search">{location.search}</p>
+        </>
+      )
+    }
+    render(
+      <MemoryRouter initialEntries={['/search?mode=book']}>
+        <Routes>
+          <Route path="/search" element={<SearchWithLocationMarker />} />
+        </Routes>
+      </MemoryRouter>,
+    )
+
+    await waitFor(() => expect(screen.getByRole('dialog')).toBeInTheDocument())
+    await waitFor(() => expect(screen.getByTestId('location-search')).toHaveTextContent(''))
   })
 
   describe('with a dated search', () => {

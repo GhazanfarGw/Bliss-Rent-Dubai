@@ -22,6 +22,12 @@ const FEATURED_PER_CATEGORY = 6
  */
 const SLIDE_STIFFNESS = 14
 
+/** How far a press has to travel before it counts as a drag rather than a tap on a card. */
+const DRAG_THRESHOLD_PX = 6
+
+/** How long the row stays paused after a drag/swipe/wheel-nudge ends before auto-play resumes. */
+const AUTOPLAY_RESUME_DELAY_MS = 600
+
 /** The CSS marquee running on the row — absent when the visitor prefers reduced motion. */
 function marqueeOf(track: HTMLElement | null): Animation | undefined {
   return track?.getAnimations?.()[0]
@@ -34,6 +40,29 @@ function marqueeDuration(marquee: Animation): number {
 /** `value` folded into [0, length) — the marquee's clock must never go negative. */
 function wrap(value: number, length: number): number {
   return ((value % length) + length) % length
+}
+
+/**
+ * Turns a raw pointer/wheel movement (physical screen pixels — the same in
+ * RTL and LTR, since `transform: translateX` is never mirrored by
+ * `direction`, only certain layout properties are) into the matching nudge
+ * of the marquee's own clock, so the row tracks the pointer 1:1 instead of
+ * jumping. `goesLeft` picks which keyframe pair is running (see
+ * `featured-marquee-move-left/right` in index.css): the two run the
+ * animation clock in opposite directions for the same on-screen motion, so
+ * the same screen-space delta needs an opposite `currentTime` nudge on each.
+ * No-ops when reduced motion leaves the row with no animation to nudge.
+ */
+function applyDragDelta(track: HTMLElement, screenDeltaX: number, goesLeft: boolean): void {
+  const marquee = marqueeOf(track)
+  if (!marquee || screenDeltaX === 0) return
+  const half = track.scrollWidth / 2
+  if (half <= 0) return
+  const duration = marqueeDuration(marquee)
+  const pxPerMs = half / duration
+  if (pxPerMs <= 0) return
+  const deltaTime = (screenDeltaX / pxPerMs) * (goesLeft ? -1 : 1)
+  marquee.currentTime = wrap((Number(marquee.currentTime) || 0) + deltaTime, duration)
 }
 
 interface FeaturedVehiclesProps {
@@ -136,14 +165,109 @@ export function FeaturedVehicles({ vehicles: providedVehicles, failed: providedF
     return () => window.removeEventListener('resize', measure)
   }, [total, activeTab?.id])
 
-  // A slide in flight belongs to the row it started on.
+  /** A drag/swipe in flight on the track: which pointer owns it, and whether it has crossed the tap-vs-drag threshold yet. */
+  const dragRef = useRef<{ pointerId: number; startX: number; lastX: number; dragging: boolean } | null>(null)
+  // Set the instant a real drag ends, so the click the browser fires right after pointerup can be swallowed —
+  // read and cleared by `handleTrackClickCapture`, which runs before it reaches a card's Book now / WhatsApp link.
+  const suppressClickRef = useRef(false)
+  const resumeTimeoutRef = useRef<number | null>(null)
+
+  // A slide, drag, or pending auto-play resume in flight belongs to the row it started on.
   useEffect(
     () => () => {
       if (slideRef.current) cancelAnimationFrame(slideRef.current.frame)
       slideRef.current = null
+      dragRef.current = null
+      if (resumeTimeoutRef.current != null) window.clearTimeout(resumeTimeoutRef.current)
+      resumeTimeoutRef.current = null
     },
     [activeTab?.id],
   )
+
+  /** Pauses the row immediately (a real drag or wheel-nudge just started) and cancels any resume already pending. */
+  function pauseAutoplay(track: HTMLElement) {
+    track.style.animationPlayState = 'paused'
+    if (resumeTimeoutRef.current != null) {
+      window.clearTimeout(resumeTimeoutRef.current)
+      resumeTimeoutRef.current = null
+    }
+  }
+
+  /** Lets the row resume a short beat after the interaction actually stops, rather than the instant it does. */
+  function scheduleResume(track: HTMLElement) {
+    if (resumeTimeoutRef.current != null) window.clearTimeout(resumeTimeoutRef.current)
+    resumeTimeoutRef.current = window.setTimeout(() => {
+      track.style.removeProperty('animation-play-state')
+      resumeTimeoutRef.current = null
+    }, AUTOPLAY_RESUME_DELAY_MS)
+  }
+
+  function handleTrackPointerDown(event: React.PointerEvent<HTMLDivElement>) {
+    if (event.pointerType === 'mouse' && event.button !== 0) return
+    const track = trackRef.current
+    // No marquee running (reduced motion) — nothing to drag, and cards must keep behaving like plain links.
+    if (!track || !marqueeOf(track)) return
+    dragRef.current = { pointerId: event.pointerId, startX: event.clientX, lastX: event.clientX, dragging: false }
+  }
+
+  function handleTrackPointerMove(event: React.PointerEvent<HTMLDivElement>) {
+    const drag = dragRef.current
+    const track = trackRef.current
+    if (!drag || !track || drag.pointerId !== event.pointerId) return
+
+    if (!drag.dragging) {
+      if (Math.abs(event.clientX - drag.startX) < DRAG_THRESHOLD_PX) return
+      drag.dragging = true
+      track.setPointerCapture?.(event.pointerId)
+      pauseAutoplay(track)
+    }
+
+    // Once it is a real drag, stop the browser selecting text/images or trying to scroll instead.
+    event.preventDefault()
+    applyDragDelta(track, event.clientX - drag.lastX, goesLeft)
+    drag.lastX = event.clientX
+  }
+
+  function handleTrackPointerEnd(event: React.PointerEvent<HTMLDivElement>) {
+    const drag = dragRef.current
+    if (!drag || drag.pointerId !== event.pointerId) return
+    dragRef.current = null
+    const track = trackRef.current
+    if (!drag.dragging || !track) return
+    track.releasePointerCapture?.(event.pointerId)
+    // A tap that never crossed the threshold must still open Book now / WhatsApp — only swallow real drags.
+    suppressClickRef.current = true
+    scheduleResume(track)
+  }
+
+  /** Runs in the capture phase, ahead of a card's own Book now / WhatsApp link, so a drag can never fire one. */
+  function handleTrackClickCapture(event: React.MouseEvent<HTMLDivElement>) {
+    if (!suppressClickRef.current) return
+    suppressClickRef.current = false
+    event.preventDefault()
+    event.stopPropagation()
+  }
+
+  // Trackpad / mouse-wheel horizontal scroll ("natural" two-finger swipe). A native, non-passive
+  // listener is required — React's onWheel is registered passive at the root, so preventDefault
+  // there is silently ignored and the page would scroll instead of the row.
+  useEffect(() => {
+    const track = trackRef.current
+    if (!track) return
+    const onWheel = (event: WheelEvent) => {
+      if (!marqueeOf(track)) return
+      // Mostly vertical (or diagonal-ish) — leave it alone so the page still scrolls normally.
+      if (Math.abs(event.deltaX) <= Math.abs(event.deltaY)) return
+      event.preventDefault()
+      // Wheel deltaX follows scroll convention (positive = content shifts left), the opposite of
+      // applyDragDelta's "content follows the finger" convention — hence the flipped sign.
+      applyDragDelta(track, -event.deltaX, goesLeft)
+      pauseAutoplay(track)
+      scheduleResume(track)
+    }
+    track.addEventListener('wheel', onWheel, { passive: false })
+    return () => track.removeEventListener('wheel', onWheel)
+  }, [activeTab?.id, goesLeft])
 
   /**
    * Moves the row one card: +1 brings later cards in from the edge, -1 brings
@@ -299,8 +423,16 @@ export function FeaturedVehicles({ vehicles: providedVehicles, failed: providedF
             <div
               key={activeTab?.id}
               ref={trackRef}
+              onPointerDown={handleTrackPointerDown}
+              onPointerMove={handleTrackPointerMove}
+              onPointerUp={handleTrackPointerEnd}
+              onPointerCancel={handleTrackPointerEnd}
+              onClickCapture={handleTrackClickCapture}
+              // pan-y: the browser keeps handling vertical page scroll natively; horizontal
+              // movement is ours to interpret as a drag (see handleTrackPointerMove).
+              style={{ touchAction: 'pan-y' }}
               className={
-                'flex min-w-max gap-4 pe-4 sm:gap-6 sm:pe-6 ' +
+                'flex min-w-max cursor-grab select-none gap-4 pe-4 active:cursor-grabbing sm:gap-6 sm:pe-6 ' +
                 (goesLeft ? 'animate-featured-marquee-left' : 'animate-featured-marquee-right')
               }
             >

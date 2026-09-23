@@ -669,9 +669,10 @@ const en = {
     },
   },
   checkout: {
-    steps: ['Customer', 'Driver', 'Summary', 'Payment', 'Confirmation'],
+    steps: ['Customer', 'Driver', 'Review', 'Payment'],
     stepperLabel: 'Checkout progress',
     stepOfTotal: 'Step {{current}} of {{total}}',
+    editStep: 'Edit',
     missingCriteriaTitle: 'We need your dates and locations first',
     missingCriteriaBody: 'Please choose your rental dates and pickup/drop-off points before continuing to booking.',
     backToVehicle: 'Back to vehicle details',
@@ -701,6 +702,7 @@ const en = {
       phoneHint: 'We may contact you here about your rental, including on WhatsApp.',
       note: 'Enter your contact details for this rental. No account is needed.',
       continue: 'Continue to driver details',
+      continueShort: 'Continue',
       errors: {
         firstName: "Please enter the customer's first name.",
         lastName: "Please enter the customer's last name.",
@@ -728,6 +730,7 @@ const en = {
       licenseCountryPlaceholder: 'e.g. United Arab Emirates',
       note: 'The license must still be valid through the end of the rental. Physical license/ID can be shown at handover — no document upload is required to complete this booking.',
       continue: 'Continue to booking summary',
+      continueShort: 'Continue',
       errors: {
         firstName: "Please enter the driver's first name.",
         lastName: "Please enter the driver's last name.",
@@ -763,12 +766,15 @@ const en = {
       incompleteCustomer: 'Please complete your customer details before confirming this booking.',
       incompleteDriver: 'Please complete your driver details before confirming this booking.',
       confirm: 'Confirm & continue to payment',
+      confirmShort: 'Confirm',
       confirming: 'Creating your booking…',
+      confirmingShort: 'Creating…',
       backToAnotherVehicle: 'Back to search for another vehicle',
       genericError: 'Something went wrong while creating your booking. Please try again.',
       resumeTitle: 'You already have a booking in progress',
       resumeBody: "We found a pending booking for this vehicle and these exact dates from earlier in this session — no need to book it again, just continue to payment.",
       resumeContinue: 'Continue to payment',
+      resumeContinueShort: 'Continue',
       resumeStartOver: "This isn't right — start a new booking",
     },
     payment: {
@@ -853,6 +859,11 @@ const en = {
     heroBadge: 'Reserve online in minutes',
     title: 'Book Your Car',
     subtitle: 'Pick your pickup and return points, choose your dates, and see available vehicles for your trip — no account needed.',
+    support: {
+      eyebrow: 'Need a hand?',
+      title: 'Talk to a real person, not a bot',
+      subtitle: 'Have a question before you book? Reach the Bliss Rent team directly on WhatsApp, by phone, or by email.',
+    },
   },
   extendRental: {
     vehicleNumberLabel: 'Vehicle number (plate)',

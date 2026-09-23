@@ -1,4 +1,5 @@
 import { ShieldCheck } from 'lucide-react'
+import { HeroStats, type HeroStat } from '@/features/shared/ui/HeroStats'
 
 export interface PageHeroProps {
   imageSrc: string
@@ -6,6 +7,11 @@ export interface PageHeroProps {
   badge: string
   title: string
   subtitle: string
+  /** Optional strip of live numbers under the subtitle — same treatment as
+   *  the homepage Hero's. Omitted entirely (not a skeleton) while the
+   *  caller's own data is still loading, same "never a placeholder number"
+   *  rule as HeroStats itself. */
+  stats?: HeroStat[]
 }
 
 /**
@@ -16,13 +22,13 @@ export interface PageHeroProps {
  * transparent header (`-mt-[var(--header-h)]` cancels Layout's top padding,
  * and the content adds the height back), so the photo reaches the very top
  * of the screen. Every route that renders this must be listed in NavBar's
- * PAGES_WITH_DARK_HERO so the header is white over it (currently /book).
+ * PAGES_WITH_DARK_HERO so the header is white over it.
  *
- * Purely presentational — takes its image and copy as props, so each
- * page (ManageBookingHero, BookCarPage, …) supplies its own real asset
- * and translated text rather than this component inventing either.
+ * Purely presentational — takes its image and copy as props, so each page
+ * supplies its own real asset and translated text rather than this
+ * component inventing either.
  */
-export function PageHero({ imageSrc, imageAlt, badge, title, subtitle }: PageHeroProps) {
+export function PageHero({ imageSrc, imageAlt, badge, title, subtitle, stats }: PageHeroProps) {
   return (
     <section className="relative isolate -mt-[var(--header-h)] overflow-hidden bg-brand-navy">
       <img src={imageSrc} alt={imageAlt} loading="eager" className="absolute inset-0 h-full w-full object-cover object-center saturate-[1.05]" />
@@ -38,6 +44,8 @@ export function PageHero({ imageSrc, imageAlt, badge, title, subtitle }: PageHer
 
         <h1 className="font-hero-serif mx-auto mt-5 max-w-2xl text-4xl font-semibold tracking-[-0.06em] text-white sm:text-5xl">{title}</h1>
         <p className="mx-auto mt-4 max-w-xl text-sm leading-7 text-white/80 sm:text-base">{subtitle}</p>
+
+        {stats && stats.length > 0 && <HeroStats className="mx-auto mt-8 max-w-xl" items={stats} />}
       </div>
     </section>
   )

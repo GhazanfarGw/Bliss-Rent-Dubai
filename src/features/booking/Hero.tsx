@@ -123,11 +123,11 @@ export function Hero() {
           {/* text-pretty keeps a lone word from being stranded on the last line. */}
           <p className="mt-4 max-w-xl text-pretty text-sm leading-6 text-white/85 sm:mt-6 sm:text-lg sm:leading-8">{t('hero.body')}</p>
 
-          {/* Direct navigation, not an on-page scroll: "Book Now" opens the
-              dedicated Book a Car page and "View fleet" the full fleet
-              listing, matching the header's own CTA/Fleet routes. */}
+          {/* Direct navigation, not an on-page scroll: "Book Now" opens
+              Fleet's own search dialog directly and "View fleet" the plain
+              fleet listing, matching the header's own CTA/Fleet routes. */}
           <div className="mt-8 flex flex-wrap gap-3">
-            <LinkButton to="/book" variant="primary" className="group min-w-40 sm:min-h-12">
+            <LinkButton to="/search?mode=book" variant="primary" className="group min-w-40 sm:min-h-12">
               {t('hero.cta')}
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1 rtl:rotate-180" aria-hidden="true" />
             </LinkButton>

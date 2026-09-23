@@ -133,7 +133,7 @@ function AboutPageContent() {
               {t('pages.about.hero.body')}
             </p>
             <div className="mt-5 flex flex-wrap gap-3 sm:mt-6">
-              <LinkButton to="/book" variant="primary" className="group min-w-40">
+              <LinkButton to="/search?mode=book" variant="primary" className="group min-w-40">
                 {t('nav.searchCars')}
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1 rtl:rotate-180" aria-hidden="true" />
               </LinkButton>

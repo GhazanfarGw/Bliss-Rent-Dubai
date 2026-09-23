@@ -5,9 +5,7 @@ import { HomePage } from '@/features/booking/HomePage'
 import { SearchResultsPage } from '@/features/booking/SearchResultsPage'
 import { BookCarPage } from '@/features/booking/BookCarPage'
 import { VehicleDetailPage } from '@/features/booking/VehicleDetailPage'
-import { CustomerDetailsPage } from '@/features/booking/checkout/CustomerDetailsPage'
-import { DriverDetailsPage } from '@/features/booking/checkout/DriverDetailsPage'
-import { BookingSummaryPage } from '@/features/booking/checkout/BookingSummaryPage'
+import { CheckoutFlowPage } from '@/features/booking/checkout/CheckoutFlowPage'
 // TEMPORARY (2026-09-11): PaymentPage import removed (route below uses
 // PaymentPendingPage instead) so it isn't flagged as unused. Revert: restore
 // `import { PaymentPage } from '@/features/booking/checkout/PaymentPage'` here
@@ -121,12 +119,16 @@ import { AdminSettingsPage } from '@/features/admin/settings/AdminSettingsPage'
  * instead of a second route. See ManageBookingPage.tsx's own JSDoc for
  * the full redesign.
  *
- * Frontend redesign follow-up (same requests as the header/hero/Manage
- * Booking page rework): /book (BookCarPage) adds a standalone "start a
- * booking" destination, separate from the homepage's embedded search and
- * from /search's own compact edit bar — reusing SearchWidget's exact
- * state, validation, and `onSearch` → /search flow via a new `card`
- * layout variant, no new booking logic anywhere.
+ * Booking architecture simplification (direct request, "one clear rental
+ * journey"): Fleet (/search, SearchResultsPage) is now the single search/
+ * booking entry point site-wide, instead of visitors filling in a search
+ * form on /book and then meeting the same fields again on /search. Every
+ * global "Book Now" CTA now points straight at `/search?mode=book`, which
+ * auto-opens Fleet's own existing search dialog (SearchResultsPage's
+ * `editingSearch` state) — no second form. /book (BookCarPage) is kept
+ * only as a redirect for backward compatibility (old bookmarks/links):
+ * it forwards to /search, preserving any search criteria already in its
+ * URL, or opening the same `?mode=book` dialog when there are none.
  *
  * Proactive gap fix (no prior route existed for this at all): a
  * `path="*"` catch-all inside the public Layout group renders
@@ -156,9 +158,12 @@ function App() {
               <Route path="/book" element={<BookCarPage />} />
               <Route path="/search" element={<SearchResultsPage />} />
               <Route path="/vehicles/:id" element={<VehicleDetailPage />} />
-              <Route path="/checkout/:id/customer" element={<CustomerDetailsPage />} />
-              <Route path="/checkout/:id/driver" element={<DriverDetailsPage />} />
-              <Route path="/checkout/:id/summary" element={<BookingSummaryPage />} />
+              {/* One route/component for all three checkout steps (see
+                  CheckoutFlowPage's own header comment): navigating between
+                  /customer, /driver and /summary re-renders the same
+                  element in place instead of mounting a new page, so the
+                  flow feels continuous rather than like separate pages. */}
+              <Route path="/checkout/:id/:step" element={<CheckoutFlowPage />} />
               {/* TEMPORARY (2026-09-11): real Stripe payment UI (PaymentPage) is
                   swapped for PaymentPendingPage — a WhatsApp "payment pending" screen —
                   while live checkout is paused for testing. Nothing about Stripe, the
