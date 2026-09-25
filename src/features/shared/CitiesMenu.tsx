@@ -82,7 +82,7 @@ export function CitiesMenu({ tone }: { tone: 'light' | 'dark' }) {
         aria-expanded={open}
         aria-haspopup="menu"
         className={
-          'flex items-center gap-1.5 rounded-none border px-3 py-2 text-sm font-medium transition-colors ' +
+          'flex items-center gap-1.5 rounded-full border px-3 py-2 text-sm font-medium transition-colors ' +
           (tone === 'light'
             ? 'border-white/35 text-white/90 hover:text-white'
             : 'border-[#e6e1d9] text-[#4a5360] hover:text-brand-gold')

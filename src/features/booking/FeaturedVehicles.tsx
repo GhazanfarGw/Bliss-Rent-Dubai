@@ -373,7 +373,7 @@ export function FeaturedVehicles({ vehicles: providedVehicles, failed: providedF
               type="button"
               onClick={() => slide(-1)}
               aria-label={t('home.featured.previous')}
-              className="flex h-11 w-11 items-center justify-center border border-brand-gold/30 bg-white text-brand-navy transition-colors hover:bg-brand-gold hover:text-white"
+              className="flex h-11 w-11 items-center justify-center rounded-full border border-brand-gold/30 bg-white text-brand-navy transition-colors hover:bg-brand-gold hover:text-white"
             >
               <ChevronLeft className="h-5 w-5 rtl:rotate-180" aria-hidden="true" />
             </button>
@@ -381,7 +381,7 @@ export function FeaturedVehicles({ vehicles: providedVehicles, failed: providedF
               type="button"
               onClick={() => slide(1)}
               aria-label={t('home.featured.next')}
-              className="flex h-11 w-11 items-center justify-center bg-brand-gold text-white transition-colors hover:bg-brand-gold-dark"
+              className="flex h-11 w-11 items-center justify-center rounded-full bg-brand-gold text-white transition-colors hover:bg-brand-gold-dark"
             >
               <ChevronRight className="h-5 w-5 rtl:rotate-180" aria-hidden="true" />
             </button>
@@ -393,13 +393,13 @@ export function FeaturedVehicles({ vehicles: providedVehicles, failed: providedF
         {loading && (
           <div className="flex gap-4 overflow-hidden pb-4 pt-2 sm:gap-6" aria-hidden="true">
             {[0, 1, 2, 3].map((i) => (
-              <div key={i} className="w-[82vw] max-w-[320px] shrink-0 animate-pulse border border-brand-navy/10 bg-white sm:w-70">
-                <div className="aspect-16/10 bg-[#efe7dc]" />
+              <div key={i} className="w-[82vw] max-w-[320px] shrink-0 animate-pulse overflow-hidden rounded-2xl bg-white shadow-(--shadow-card) sm:w-70">
+                <div className="aspect-16/10 bg-brand-lavender" />
                 <div className="space-y-3 p-4">
-                  <div className="h-3 w-1/3 bg-[#efe7dc]" />
-                  <div className="h-6 w-2/3 bg-[#efe7dc]" />
-                  <div className="h-3 w-1/2 bg-[#efe7dc]" />
-                  <div className="h-11 bg-[#efe7dc]" />
+                  <div className="h-3 w-1/3 rounded bg-brand-lavender" />
+                  <div className="h-6 w-2/3 rounded bg-brand-lavender" />
+                  <div className="h-3 w-1/2 rounded bg-brand-lavender" />
+                  <div className="h-11 rounded-full bg-brand-lavender" />
                 </div>
               </div>
             ))}

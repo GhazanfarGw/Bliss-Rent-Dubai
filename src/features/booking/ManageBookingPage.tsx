@@ -221,7 +221,7 @@ export function ManageBookingPage() {
   }
 
   return (
-    <div className="bg-white">
+    <div>
       {/* The finder only shows while there's nothing to show yet — once a
           booking is found, it gets out of the way (handleSearchAnother
           below brings it back) instead of sitting there as a wall of
@@ -347,7 +347,7 @@ function BookingResult({
                   <p className="text-[10px] font-semibold uppercase tracking-wide text-text-muted">{t('footer.weAccept')}</p>
                   <div className="mt-2 flex flex-wrap gap-2">
                     {PAYMENT_LOGOS.map((logo) => (
-                      <span key={logo.name} className="flex h-9 w-13 items-center justify-center rounded-none border border-brand-navy/10 bg-white">
+                      <span key={logo.name} className="flex h-9 w-13 items-center justify-center rounded-md border border-brand-navy/10 bg-white">
                         <svg viewBox="0 0 24 24" role="img" aria-label={logo.name} className="h-5.5 w-5.5">
                           <path d={logo.path} fill={`#${logo.hex}`} />
                         </svg>

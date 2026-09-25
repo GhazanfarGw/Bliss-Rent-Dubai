@@ -37,7 +37,7 @@ export function BrandMark({ name }: { name: string }) {
   }
 
   return (
-    <div className="flex h-16 w-32 items-center justify-center rounded-none border border-brand-lavender-dark text-lg font-semibold tracking-[0.12em] text-brand-navy">
+    <div className="flex h-16 w-32 items-center justify-center rounded-lg border border-brand-lavender-dark text-lg font-semibold tracking-[0.12em] text-brand-navy">
       {name.slice(0, 2).toUpperCase()}
     </div>
   )

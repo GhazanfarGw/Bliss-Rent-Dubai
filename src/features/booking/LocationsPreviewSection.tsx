@@ -237,7 +237,7 @@ export function LocationsPreviewSection() {
   const showReveal = reducedMotion || revealed
 
   return (
-    <section className="relative isolate overflow-hidden bg-white">
+    <section className="relative isolate overflow-hidden">
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8 lg:py-14">
         <Eyebrow>{t('home.locationsPreview.eyebrow')}</Eyebrow>
         <h2 className="font-hero-serif mt-3 max-w-2xl text-2xl font-semibold tracking-[-0.06em] text-brand-navy sm:text-3xl md:text-4xl">
@@ -252,7 +252,7 @@ export function LocationsPreviewSection() {
         )}
 
         {placedCities.length > 0 && (
-          <div ref={mapRef} className="relative mt-6 sm:mt-8 h-[360px] w-full border border-brand-gold/15 bg-transparent sm:h-[420px] lg:h-[560px]">
+          <div ref={mapRef} className="relative mt-6 sm:mt-8 h-[360px] w-full rounded-2xl bg-white shadow-(--shadow-card) sm:h-[420px] lg:h-[560px]">
             {/* Real, whole-world map (see worldMapPath.ts for how it's
                 generated) — transparent panel background, so this sits
                 directly on the section's own warm surface color rather than
@@ -390,13 +390,13 @@ export function LocationsPreviewSection() {
                   >
                     <Link
                       to={cityPagePath(pin.city) ?? '/locations'}
-                      className="group flex min-w-[7.5rem] flex-col items-start gap-0.5 border border-brand-gold/25 bg-white px-2.5 py-1.5 text-start shadow-(--shadow-card) transition-all duration-200 hover:border-brand-gold hover:shadow-(--shadow-card-hover)"
+                      className="group flex min-w-[7.5rem] flex-col items-start gap-0.5 rounded-lg border border-border bg-white px-2.5 py-1.5 text-start shadow-(--shadow-card) transition-all duration-200 hover:border-brand-gold hover:shadow-(--shadow-card-hover)"
                     >
                       <span className="flex items-center gap-1.5 text-sm font-semibold text-brand-navy">
                         <MapPin className="h-3.5 w-3.5 shrink-0 text-brand-gold" aria-hidden="true" />
                         {pin.city}
                         {pin === hub && (
-                          <span className="border border-brand-gold/40 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-[0.14em] text-brand-gold-dark">
+                          <span className="rounded-full border border-brand-gold/40 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[0.14em] text-brand-gold-dark">
                             {t('home.locationsPreview.hubBadge')}
                           </span>
                         )}
@@ -424,7 +424,7 @@ export function LocationsPreviewSection() {
 
         <Link
           to="/locations"
-          className="group mt-10 inline-flex items-center gap-2 border border-brand-gold/60 bg-brand-gold px-5 py-2.5 text-sm font-semibold text-white shadow-[0_8px_16px_rgba(186,142,92,0.18)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_16px_30px_rgba(186,142,92,0.32)]"
+          className="group mt-10 inline-flex min-h-11 items-center gap-2 rounded-full bg-brand-gold px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-gold-dark"
         >
           {t('home.locationsPreview.viewAll')}
           <ArrowRight className="h-4 w-4 rtl:rotate-180 transition-transform duration-200 group-hover:translate-x-1" aria-hidden="true" />
@@ -458,7 +458,7 @@ function CityPreview({ pin, above, shiftPx, isHub }: { pin: CityPin; above: bool
       }
       style={{ transform: `translateX(calc(-50% + ${shiftPx}px))` }}
     >
-      <div className="flex overflow-hidden border border-brand-gold/25 bg-white shadow-(--shadow-card-hover)">
+      <div className="flex overflow-hidden rounded-xl bg-white shadow-(--shadow-card-hover)">
         <div className="relative w-28 shrink-0 bg-brand-lavender">
           {photo ? (
             <img src={photo.src} alt="" decoding="async" className="absolute inset-0 h-full w-full object-cover" />
@@ -472,7 +472,7 @@ function CityPreview({ pin, above, shiftPx, isHub }: { pin: CityPin; above: bool
           <p className="flex items-center gap-1.5 text-sm font-semibold text-brand-navy">
             <span className="truncate">{pin.city}</span>
             {isHub && (
-              <span className="shrink-0 border border-brand-gold/40 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-[0.14em] text-brand-gold-dark">
+              <span className="shrink-0 rounded-full border border-brand-gold/40 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[0.14em] text-brand-gold-dark">
                 {t('home.locationsPreview.hubBadge')}
               </span>
             )}
@@ -500,7 +500,7 @@ function CityChip({ city, pointCount }: { city: string; pointCount: number }) {
   return (
     <Link
       to="/locations"
-      className="inline-flex items-center gap-1.5 border border-brand-gold/25 bg-white px-3 py-1.5 text-xs font-medium text-brand-navy shadow-none transition-colors hover:border-brand-gold"
+      className="inline-flex items-center gap-1.5 rounded-full border border-border bg-white px-3.5 py-1.5 text-xs font-medium text-brand-navy shadow-none transition-colors hover:border-brand-gold"
     >
       <MapPin className="h-3.5 w-3.5 shrink-0 text-brand-gold" aria-hidden="true" />
       {city} · {t('pages.locations.pointCount', { count: pointCount })}

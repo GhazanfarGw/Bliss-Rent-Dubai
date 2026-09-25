@@ -51,11 +51,6 @@ vi.mock('@/features/booking/api', () => ({
   ]),
 }))
 
-vi.mock('@/features/booking/lookupApi', () => ({
-  lookupBooking: vi.fn(),
-  BookingLookupError: class BookingLookupError extends Error {},
-}))
-
 describe('BookingSearchSection', () => {
   beforeEach(() => {
     vi.clearAllMocks()
@@ -71,22 +66,7 @@ describe('BookingSearchSection', () => {
     expect(await screen.findByRole('button', { name: /select pickup point/i })).toBeInTheDocument()
   })
 
-  it('renders the two focused booking navigator tabs, Search Cars active by default', async () => {
-    render(
-      <MemoryRouter>
-        <BookingSearchSection onSearch={vi.fn()} />
-      </MemoryRouter>,
-    )
-    await screen.findByRole('button', { name: /select pickup point/i })
-    const nav = screen.getByRole('navigation', { name: /booking navigator/i })
-    expect(within(nav).getAllByRole('tab')).toHaveLength(2)
-    expect(within(nav).getByRole('tab', { name: /search cars/i })).toHaveAttribute('aria-current', 'page')
-    expect(within(nav).getByRole('tab', { name: /manage booking/i })).toBeInTheDocument()
-    expect(within(nav).queryByRole('tab', { name: /get help/i })).not.toBeInTheDocument()
-  })
-
-  it('switches to the Manage Booking panel (reference + last name), with no heading above it, when that tab is selected', async () => {
-    const user = userEvent.setup()
+  it('shows only the search form — no heading and no Search Cars / Manage Booking tab row (removed at the owner\'s request)', async () => {
     render(
       <MemoryRouter>
         <BookingSearchSection onSearch={vi.fn()} />
@@ -94,22 +74,14 @@ describe('BookingSearchSection', () => {
     )
     await screen.findByRole('button', { name: /select pickup point/i })
 
-    const nav = screen.getByRole('navigation', { name: /booking navigator/i })
-    await user.click(within(nav).getByRole('tab', { name: /manage booking/i }))
-
-    // The "Manage Your Booking" heading/description that used to sit above
-    // this panel (BookingNavigator's PanelIntro) was dropped per a direct
-    // follow-up request — the two real lookup fields are what confirms the
-    // panel switched, via their current placeholders
-    // (home.navigator.manage.referencePlaceholder/lastNamePlaceholder in
-    // en.ts).
-    expect(screen.queryByRole('heading', { name: /manage your booking/i })).not.toBeInTheDocument()
-    expect(screen.getByPlaceholderText('BLS-XXXXXXXX')).toBeInTheDocument()
-    expect(screen.getByPlaceholderText(/renter/i)).toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: /select pickup point/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: /what would you like to do/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('tablist')).not.toBeInTheDocument()
+    expect(screen.queryByRole('tab')).not.toBeInTheDocument()
   })
 
-  it('still calls onSearch with the entered criteria from the Search Cars panel — no duplicated booking logic', async () => {
+  // Longer timeout: this clicks through the whole bar, including the phone
+  // calendar sheet (several months of day buttons), which is slow in jsdom.
+  it('still calls onSearch with the entered criteria from the Search Cars panel — no duplicated booking logic', { timeout: 15000 }, async () => {
     const onSearch = vi.fn()
     const user = userEvent.setup()
     render(
@@ -134,8 +106,6 @@ describe('BookingSearchSection', () => {
     await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: /Downtown Dubai/ }))
 
     // The default separate return picker keeps the drop-off choice explicit.
-    // Scope the submit action to the SearchWidget form because the mobile
-    // navigator row intentionally has the same visible label.
     await user.click(within(document.querySelector('form') as HTMLElement).getByRole('button', { name: /^search cars$/i }))
 
     await waitFor(() =>

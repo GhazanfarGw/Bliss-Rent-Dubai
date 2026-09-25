@@ -13,7 +13,7 @@ export function WhyChooseSection() {
   const items = t('home.whyChoose.items', { returnObjects: true }) as WhyChooseItem[]
 
   return (
-    <section id="why-choose" className="relative isolate scroll-mt-20 overflow-hidden bg-white text-brand-navy">
+    <section id="why-choose" className="relative isolate scroll-mt-20 overflow-hidden text-brand-navy">
       <div className="relative mx-auto grid max-w-7xl gap-12 px-4 py-20 sm:px-6 lg:grid-cols-[0.78fr_1.22fr] lg:gap-20 lg:px-8 lg:py-28">
         <div className="lg:sticky lg:top-28 lg:self-start">
           <p className="text-[10px] font-semibold uppercase tracking-[0.34em] text-brand-gold-dark">

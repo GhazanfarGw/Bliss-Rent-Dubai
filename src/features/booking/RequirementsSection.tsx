@@ -30,7 +30,7 @@ export function RequirementsSection() {
   const groups = t('home.documents.groups', { returnObjects: true }) as DocumentsGroup[]
 
   return (
-    <section className="bg-white">
+    <section>
       <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
         <div className="grid gap-10 lg:grid-cols-[0.92fr_1.08fr] lg:items-stretch lg:gap-0">
           {/* Left: requirements, as a plain numbered list (was a 3-card

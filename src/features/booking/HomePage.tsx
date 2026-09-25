@@ -52,12 +52,12 @@ export function HomePage() {
   }
 
   return (
-    <div className="bg-white text-brand-navy">
+    <div className="text-brand-navy">
       <Hero />
       <BookingSearchSection onSearch={handleSearch} />
       <BrandsMarquee />
 
-      <main className="bg-white">
+      <main>
         <FeaturedVehicles vehicles={vehicles} failed={fleetFailed} />
         <HomeJournalSection />
         <SportsCollectionSection vehicles={vehicles} failed={fleetFailed} />

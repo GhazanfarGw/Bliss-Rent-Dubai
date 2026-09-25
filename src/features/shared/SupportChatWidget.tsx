@@ -42,7 +42,7 @@ const CHAT_POLL_INTERVAL_MS = 8000
 const fieldClass =
   'w-full border border-border bg-white px-3 py-2.5 text-sm text-brand-navy outline-none transition-colors focus:border-brand-navy focus:ring-1 focus:ring-brand-navy'
 const chipClass =
-  'min-h-9 border border-brand-gold/60 px-3 py-1.5 text-start text-xs font-semibold text-brand-gold-dark transition-colors hover:bg-brand-gold hover:text-white'
+  'min-h-9 rounded-full border border-brand-gold/60 px-3 py-1.5 text-start text-xs font-semibold text-brand-gold-dark transition-colors hover:bg-brand-gold hover:text-white'
 const backChipClass =
   'inline-flex min-h-9 items-center gap-1 border border-brand-navy/30 px-3 py-1.5 text-xs font-semibold text-brand-navy transition-colors hover:bg-brand-lavender'
 

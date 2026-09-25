@@ -172,7 +172,7 @@ function FilterSection({ title, badge = 0, children }: { title: string; badge?: 
     <details open className="group border-b border-brand-navy/10 last:border-b-0">
       <summary className="flex cursor-pointer list-none items-center gap-2 py-4 text-[11px] font-bold uppercase tracking-[0.16em] text-brand-navy focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold [&::-webkit-details-marker]:hidden">
         <span className="flex-1">{title}</span>
-        {badge > 0 && <span className="grid h-5 min-w-5 place-items-center bg-brand-gold px-1 text-[10px] font-bold text-white">{badge}</span>}
+        {badge > 0 && <span className="grid h-5 min-w-5 place-items-center rounded-full bg-brand-gold px-1 text-[10px] font-bold text-white">{badge}</span>}
         <ChevronDown className="h-4 w-4 shrink-0 text-brand-navy/45 transition-transform group-open:rotate-180" aria-hidden="true" />
       </summary>
       <div className="pb-5">{children}</div>
@@ -190,7 +190,7 @@ function OptionRow({ active, label, count, onClick }: { active: boolean; label: 
       disabled={empty}
       onClick={onClick}
       className={
-        'flex w-full items-center justify-between gap-3 border px-3 py-2 text-start text-[13px] font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold disabled:cursor-not-allowed disabled:opacity-40 ' +
+        'flex w-full items-center justify-between gap-3 rounded-lg border px-3 py-2 text-start text-[13px] font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold disabled:cursor-not-allowed disabled:opacity-40 ' +
         (active
           ? 'border-brand-gold bg-brand-gold/8 text-brand-gold'
           : 'border-transparent text-brand-navy hover:border-brand-navy/15 hover:bg-[#f5f3ef]')
@@ -226,7 +226,7 @@ function Segmented({
             disabled={option.disabled && !active}
             onClick={() => onChange(option.value)}
             className={
-              'min-h-10 min-w-12 flex-1 basis-auto border px-2.5 text-[13px] font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold disabled:cursor-not-allowed disabled:opacity-40 ' +
+              'min-h-10 min-w-12 flex-1 basis-auto rounded-full border px-2.5 text-[13px] font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold disabled:cursor-not-allowed disabled:opacity-40 ' +
               (active
                 ? 'border-brand-gold bg-brand-gold/8 text-brand-gold'
                 : 'border-brand-navy/12 bg-white text-brand-navy hover:border-brand-gold')
@@ -271,7 +271,7 @@ function BrandList({
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             placeholder={t('searchResults.filters.searchBrands')}
-            className="h-10 w-full border border-brand-navy/12 bg-[#f8f6f2] ps-9 pe-3 text-[13px] text-brand-navy outline-none placeholder:text-text-muted focus:border-brand-gold focus:ring-2 focus:ring-brand-gold/20"
+            className="h-10 w-full rounded-lg border border-brand-navy/12 bg-white ps-9 pe-3 text-[13px] text-brand-navy outline-none placeholder:text-text-muted focus:border-brand-gold focus:ring-2 focus:ring-brand-gold/20"
           />
         </label>
       )}
@@ -285,7 +285,7 @@ function BrandList({
             <li key={brand}>
               <label
                 className={
-                  'flex cursor-pointer items-center gap-3 px-1 py-2 text-[13px] font-medium text-brand-navy transition-colors hover:bg-[#f5f3ef] ' +
+                  'flex cursor-pointer items-center gap-3 rounded-lg px-1 py-2 text-[13px] font-medium text-brand-navy transition-colors hover:bg-[#f5f3ef] ' +
                   (empty ? 'cursor-not-allowed opacity-40' : '')
                 }
               >
@@ -298,7 +298,7 @@ function BrandList({
                 />
                 <span
                   aria-hidden="true"
-                  className="grid h-[18px] w-[18px] shrink-0 place-items-center border border-brand-navy/25 bg-white text-transparent transition-colors peer-checked:border-brand-gold peer-checked:bg-brand-gold peer-checked:text-white peer-focus-visible:ring-2 peer-focus-visible:ring-brand-gold peer-focus-visible:ring-offset-1"
+                  className="grid h-[18px] w-[18px] shrink-0 place-items-center rounded border border-brand-navy/25 bg-white text-transparent transition-colors peer-checked:border-brand-gold peer-checked:bg-brand-gold peer-checked:text-white peer-focus-visible:ring-2 peer-focus-visible:ring-brand-gold peer-focus-visible:ring-offset-1"
                 >
                   <Check className="h-3 w-3" strokeWidth={3} />
                 </span>
@@ -384,7 +384,7 @@ function PriceInput({
           value={value ?? ''}
           placeholder={placeholder.toLocaleString()}
           onChange={(event) => onChange(event.target.value)}
-          className="h-10 w-full border border-brand-navy/12 bg-[#f8f6f2] ps-11 pe-2 text-[13px] font-semibold text-brand-navy outline-none [appearance:textfield] placeholder:font-normal placeholder:text-text-muted/70 focus:border-brand-gold focus:ring-2 focus:ring-brand-gold/20 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+          className="h-10 w-full rounded-lg border border-brand-navy/12 bg-white ps-11 pe-2 text-[13px] font-semibold text-brand-navy outline-none [appearance:textfield] placeholder:font-normal placeholder:text-text-muted/70 focus:border-brand-gold focus:ring-2 focus:ring-brand-gold/20 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
         />
       </span>
     </label>

@@ -103,22 +103,50 @@ describe('SearchWidget', () => {
     expect(within(dialog).getByRole('button', { name: /DXB Terminal 3/ })).toBeInTheDocument()
   })
 
-  it('uses a mobile-friendly stacked layout for compact booking rows', async () => {
-    const user = userEvent.setup()
-    render(<SearchWidget onSearch={vi.fn()} compact layout="row" />)
-    await screen.findByRole('button', { name: /select pickup point/i })
+  describe('layout="row" (homepage search bar)', () => {
+    it('stacks the fields on small screens and joins them into one bar from lg up', async () => {
+      const user = userEvent.setup()
+      render(<SearchWidget onSearch={vi.fn()} compact layout="row" />)
+      await screen.findByRole('button', { name: /select pickup point/i })
 
-    const form = screen.getByRole('button', { name: /search cars/i }).closest('form') as HTMLFormElement
-    const row = form.firstElementChild as HTMLElement
-    const searchButton = screen.getByRole('button', { name: /search cars/i })
+      const form = screen.getByRole('button', { name: /search cars/i }).closest('form') as HTMLFormElement
+      const bar = form.firstElementChild as HTMLElement
+      const searchButton = screen.getByRole('button', { name: /search cars/i })
 
-    expect(row).toHaveClass('flex-col')
-    expect(row).toHaveClass('sm:flex-row')
-    expect(searchButton).toHaveClass('w-full')
-    expect(searchButton).toHaveClass('sm:w-auto')
+      expect(bar).toHaveClass('flex-col')
+      expect(bar).toHaveClass('lg:flex-row')
+      expect(searchButton).toHaveClass('w-full')
+      expect(searchButton).toHaveClass('sm:w-auto')
 
-    await user.click(screen.getByRole('button', { name: /search cars/i }))
-    expect(await screen.findByText('Please choose a pickup date.')).toBeInTheDocument()
+      await user.click(screen.getByRole('button', { name: /search cars/i }))
+      expect(await screen.findByText('Please choose a pickup date.')).toBeInTheDocument()
+    })
+
+    it('uses custom dropdowns (not native selects) for pickup city and time', async () => {
+      const user = userEvent.setup()
+      render(<SearchWidget onSearch={vi.fn()} layout="row" />)
+      await screen.findByRole('button', { name: /select pickup point/i })
+
+      expect(screen.queryByRole('combobox')).not.toBeInTheDocument()
+      await user.click(screen.getByRole('button', { name: /pickup time/i }))
+      const list = screen.getByRole('listbox', { name: /pickup time/i })
+      expect(within(list).getByRole('option', { name: '10:00 AM' })).toHaveAttribute('aria-selected', 'true')
+    })
+
+    it('groups locations under type headings and guides on to the next field after a choice', async () => {
+      const user = userEvent.setup()
+      render(<SearchWidget onSearch={vi.fn()} layout="row" />)
+      await screen.findByRole('button', { name: /select pickup point/i })
+
+      await user.click(screen.getByRole('button', { name: /select pickup point/i }))
+      const pickup = screen.getByRole('dialog')
+      expect(within(pickup).getByText('Airport')).toBeInTheDocument()
+      expect(within(pickup).getByText('City / Area')).toBeInTheDocument()
+      await user.click(within(pickup).getByRole('button', { name: /DXB Terminal 3/ }))
+
+      // Return location opens by itself next.
+      expect(within(screen.getByRole('dialog')).getByRole('button', { name: /Abu Dhabi International Airport \(AUH\)/ })).toBeInTheDocument()
+    })
   })
 
   it('shows a validation message and does not call onSearch when submitted empty', async () => {

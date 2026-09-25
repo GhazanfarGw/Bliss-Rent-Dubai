@@ -91,7 +91,7 @@ function CityGuideView({ guide }: { guide: CityGuide }) {
   const guidePosts = postsForCity(guide.slug).slice(0, 3)
 
   return (
-    <div className="bg-white text-brand-navy">
+    <div className="text-brand-navy">
       {/* Hero: breadcrumb, headline and CTAs beside the city's photo. */}
       <section className="mx-auto max-w-6xl px-4 pb-10 pt-8 sm:px-6 lg:px-8 lg:pb-14 lg:pt-10">
         <nav aria-label={t('pages.cityGuide.breadcrumbLabel')} className="mb-6 flex flex-wrap items-center gap-1.5 text-xs text-text-muted">
@@ -153,7 +153,7 @@ function CityGuideView({ guide }: { guide: CityGuide }) {
       </section>
 
       {/* Live pickup points */}
-      <section className="bg-white py-12">
+      <section className="py-12">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <h2 className="font-hero-serif text-3xl font-semibold tracking-[-0.06em] text-brand-navy sm:text-4xl">
             {t('pages.cityGuide.pickupHeading', { city: copy.name })}
@@ -229,7 +229,7 @@ function CityGuideView({ guide }: { guide: CityGuide }) {
       </section>
 
       {/* Driving tips */}
-      <section className="bg-white py-12">
+      <section className="py-12">
         <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
           <h2 className="flex items-center gap-3 font-hero-serif text-3xl font-semibold tracking-[-0.06em] text-brand-navy sm:text-4xl">
             <Lightbulb className="h-6 w-6 shrink-0 text-brand-gold" aria-hidden="true" />

@@ -45,7 +45,7 @@ export function LegalPage({ title, updated, draftNotice, intro, sections }: Lega
     <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6">
       <SectionHeader title={title} description={updated} emphasis="marketing" />
 
-      <div className="mt-6 rounded-none border border-warning/30 bg-warning-bg px-5 py-4 text-sm text-warning">
+      <div className="mt-6 rounded-xl border border-warning/30 bg-warning-bg px-5 py-4 text-sm text-warning">
         <p className="font-semibold">{t('pages.draftBannerTitle')}</p>
         <p className="mt-1">{draftNotice}</p>
       </div>

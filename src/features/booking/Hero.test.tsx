@@ -1,15 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { render, screen, act, waitFor } from '@testing-library/react'
+import { render, screen, act } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { Hero } from '@/features/booking/Hero'
-
-const fetchAllAvailableVehicles = vi.fn()
-const fetchLocations = vi.fn()
-
-vi.mock('@/features/booking/api', () => ({
-  fetchAllAvailableVehicles: (...args: unknown[]) => fetchAllAvailableVehicles(...args),
-  fetchLocations: (...args: unknown[]) => fetchLocations(...args),
-}))
 
 // Hero renders a real <Link to="/search"> (the "View fleet" CTA), which
 // needs a Router context to exist at all — same MemoryRouter-wrapping
@@ -23,11 +15,6 @@ function renderHero() {
 }
 
 describe('Hero', () => {
-  beforeEach(() => {
-    fetchAllAvailableVehicles.mockReset().mockResolvedValue([])
-    fetchLocations.mockReset().mockResolvedValue([])
-  })
-
   it('renders a single autoplaying hero video with its heading and CTAs', () => {
     renderHero()
 
@@ -108,34 +95,12 @@ describe('Hero', () => {
     })
   })
 
-  describe('live numbers strip', () => {
-    it('shows the real fetched vehicle, category and city counts once loaded', async () => {
-      fetchAllAvailableVehicles.mockResolvedValue([
-        { id: '1', vehicle_categories: { id: 'c1', name: 'Economy' } },
-        { id: '2', vehicle_categories: { id: 'c2', name: 'Luxury' } },
-        { id: '3', vehicle_categories: { id: 'c2', name: 'Luxury' } },
-      ])
-      fetchLocations.mockResolvedValue([{ city: 'Dubai' }, { city: 'Dubai' }, { city: 'Abu Dhabi' }])
+  it('has no numbers strip (vehicles / categories / cities) — removed at the owner\'s request', () => {
+    renderHero()
 
-      renderHero()
-
-      // Each stat is a number cell with its label beneath it.
-      const valueFor = async (label: string) => (await screen.findByText(label)).previousElementSibling?.textContent
-      await waitFor(async () => expect(await valueFor('Vehicles ready to book')).toBe('3'))
-      expect(await valueFor('Vehicle categories')).toBe('2')
-      expect(await valueFor('Cities served')).toBe('2')
-    })
-
-    it('renders no numbers at all when the fetch fails — no fake fallback', async () => {
-      fetchAllAvailableVehicles.mockRejectedValue(new Error('network error'))
-      fetchLocations.mockResolvedValue([])
-
-      renderHero()
-
-      await waitFor(() => expect(fetchAllAvailableVehicles).toHaveBeenCalled())
-      expect(screen.queryByText('Vehicles ready to book')).not.toBeInTheDocument()
-      expect(screen.queryByText('Cities served')).not.toBeInTheDocument()
-    })
+    expect(screen.queryByText('Vehicles ready to book')).not.toBeInTheDocument()
+    expect(screen.queryByText('Vehicle categories')).not.toBeInTheDocument()
+    expect(screen.queryByText('Cities served')).not.toBeInTheDocument()
   })
 
   describe('scroll cue', () => {

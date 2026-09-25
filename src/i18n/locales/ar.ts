@@ -472,6 +472,7 @@ const ar = {
       selectReturnDate: 'اختر تاريخ التسليم',
       selectDates: 'اختر التواريخ',
       done: 'تم',
+      clear: 'مسح',
       days_zero: '0 أيام',
       days_one: 'يوم واحد',
       days_two: 'يومان',

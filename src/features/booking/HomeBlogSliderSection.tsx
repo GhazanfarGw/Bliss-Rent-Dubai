@@ -57,7 +57,7 @@ export function HomeBlogSliderSection() {
   }, [])
 
   return (
-    <section className="bg-white py-8 sm:py-12 lg:py-14">
+    <section className="py-8 sm:py-12 lg:py-14">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-end">
           <div className="max-w-3xl">
@@ -80,7 +80,7 @@ export function HomeBlogSliderSection() {
               type="button"
               onClick={() => scrollTrack(trackRef.current, -1)}
               aria-label={t('home.blogSlider.previous')}
-              className="flex h-11 w-11 items-center justify-center border border-brand-gold/30 bg-white text-brand-navy transition-colors hover:bg-brand-gold hover:text-white"
+              className="flex h-11 w-11 items-center justify-center rounded-full border border-brand-gold/30 bg-white text-brand-navy transition-colors hover:bg-brand-gold hover:text-white"
             >
               <ChevronLeft className="h-5 w-5 rtl:rotate-180" aria-hidden="true" />
             </button>
@@ -88,7 +88,7 @@ export function HomeBlogSliderSection() {
               type="button"
               onClick={() => scrollTrack(trackRef.current, 1)}
               aria-label={t('home.blogSlider.next')}
-              className="flex h-11 w-11 items-center justify-center bg-brand-gold text-white transition-colors hover:bg-brand-gold-dark"
+              className="flex h-11 w-11 items-center justify-center rounded-full bg-brand-gold text-white transition-colors hover:bg-brand-gold-dark"
             >
               <ChevronRight className="h-5 w-5 rtl:rotate-180" aria-hidden="true" />
             </button>
@@ -132,9 +132,9 @@ function BlogSlide({ post, position, total }: { post: BlogPost; position: number
       role="group"
       aria-roledescription="slide"
       aria-label={`${position} / ${total}`}
-      className="white-box group relative flex w-[82%] shrink-0 snap-start flex-col overflow-hidden transition-colors hover:border-brand-gold/50 sm:w-[calc(50%-0.5rem)] lg:w-[calc(25%-0.75rem)]"
+      className="white-box group relative flex w-[82%] shrink-0 snap-start flex-col overflow-hidden transition-shadow hover:shadow-(--shadow-card-hover) sm:w-[calc(50%-0.5rem)] lg:w-[calc(25%-0.75rem)]"
     >
-      <div className="relative aspect-16/10 overflow-hidden bg-surface-warm">
+      <div className="relative aspect-16/10 overflow-hidden bg-brand-lavender">
         <img
           src={image.src}
           alt=""
@@ -142,12 +142,12 @@ function BlogSlide({ post, position, total }: { post: BlogPost; position: number
           className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
         />
         {category && (
-          <span className="absolute start-3 top-3 bg-white/95 px-2.5 py-1.5 text-[9px] font-bold uppercase tracking-[0.18em] text-brand-gold-dark">
+          <span className="absolute start-3 top-3 rounded-full bg-white/95 px-2.5 py-1.5 text-[9px] font-bold uppercase tracking-[0.18em] text-brand-gold-dark">
             {categoryCopy(category, i18n.language).name}
           </span>
         )}
         {image.credit && (
-          <span className="absolute bottom-2 end-2 max-w-[calc(100%-1rem)] truncate bg-white/90 px-2 py-0.5 text-[9px] font-medium text-text-muted">
+          <span className="absolute bottom-2 end-2 max-w-[calc(100%-1rem)] truncate rounded-full bg-white/90 px-2 py-0.5 text-[9px] font-medium text-text-muted">
             {t('pages.cityGuide.photoBy', { author: image.credit.author, license: image.credit.license })}
           </span>
         )}

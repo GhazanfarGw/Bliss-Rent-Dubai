@@ -66,14 +66,14 @@ export function VehicleCategoriesSection() {
   const hasMore = !expanded && categories.length > INITIAL_VISIBLE_COUNT
 
   return (
-    <section className="bg-white">
+    <section>
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <SectionHeader as="h2" title={t('home.categories.title')} description={t('home.categories.subtitle')} emphasis="marketing" />
 
         {vehicles === null && (
           <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5" aria-hidden="true">
             {[1, 2, 3, 4, 5].map((item) => (
-              <div key={item} className="aspect-[4/3] animate-pulse rounded-none bg-[#efe7dc]" />
+              <div key={item} className="aspect-[4/3] animate-pulse rounded-2xl bg-[#efe7dc]" />
             ))}
           </div>
         )}
@@ -89,7 +89,7 @@ export function VehicleCategoriesSection() {
                 <Link
                   key={category.id}
                   to="/search"
-                  className="group overflow-hidden rounded-none border border-[#e7dcc7] bg-white shadow-(--shadow-card) transition-all duration-300 hover:-translate-y-1 hover:border-brand-gold hover:shadow-(--shadow-card-hover) focus:outline-none focus:ring-2 focus:ring-brand-gold focus:ring-offset-2"
+                  className="group overflow-hidden rounded-2xl border border-[#e7dcc7] bg-white shadow-(--shadow-card) transition-all duration-300 hover:-translate-y-1 hover:border-brand-gold hover:shadow-(--shadow-card-hover) focus:outline-none focus:ring-2 focus:ring-brand-gold focus:ring-offset-2"
                 >
                   <div className="aspect-[4/3] overflow-hidden bg-brand-lavender/60">
                     <VehiclePhoto
@@ -114,7 +114,7 @@ export function VehicleCategoriesSection() {
                 <button
                   type="button"
                   onClick={() => setExpanded(true)}
-                  className="inline-flex items-center gap-2 rounded-none border border-brand-navy/15 bg-white px-6 py-3 text-sm font-semibold text-brand-navy shadow-sm transition-colors hover:border-brand-gold hover:text-brand-gold-dark"
+                  className="inline-flex items-center gap-2 rounded-full border border-brand-navy/15 bg-white px-6 py-3 text-sm font-semibold text-brand-navy shadow-sm transition-colors hover:border-brand-gold hover:text-brand-gold-dark"
                 >
                   {t('home.categories.seeMore')}
                   <ChevronDown className="h-4 w-4" aria-hidden="true" />

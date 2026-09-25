@@ -109,7 +109,7 @@ function LocationsPageContent() {
       {state.status === 'loading' && <p className="mt-8 text-sm text-text-muted">{t('pages.locations.loading')}</p>}
 
       {(state.status === 'error' || isEmpty) && (
-        <div className="mt-8 rounded-none border border-brand-navy/10 bg-brand-lavender/30 px-5 py-6 text-center">
+        <div className="mt-8 rounded-2xl border border-brand-navy/10 bg-brand-lavender/30 px-5 py-6 text-center">
           <p className="text-sm font-semibold text-brand-navy">{t('pages.locations.emptyTitle')}</p>
           <p className="mt-1 text-sm text-text-muted">{t('pages.locations.emptyBody')}</p>
         </div>
@@ -121,7 +121,7 @@ function LocationsPageContent() {
             <Link
               key={id}
               to={href}
-              className="group overflow-hidden rounded-none border border-border bg-white shadow-[0_8px_24px_rgba(32,28,59,0.06)] transition-transform duration-200 hover:-translate-y-1 hover:shadow-[0_16px_32px_rgba(32,28,59,0.12)]"
+              className="group overflow-hidden rounded-2xl border border-border bg-white shadow-[0_8px_24px_rgba(32,28,59,0.06)] transition-transform duration-200 hover:-translate-y-1 hover:shadow-[0_16px_32px_rgba(32,28,59,0.12)]"
             >
               <div className="relative h-64 bg-brand-lavender">
                 {photo ? (
@@ -175,7 +175,7 @@ function LocationsPageContent() {
       <div className="mt-8 flex justify-center">
         <Link
           to="/search"
-          className="rounded-none bg-brand-gold px-6 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-brand-gold-light"
+          className="rounded-full bg-brand-gold px-6 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-brand-gold-light"
         >
           {t('pages.locations.cta')}
         </Link>

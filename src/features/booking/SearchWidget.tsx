@@ -3,10 +3,12 @@ import { useTranslation } from 'react-i18next'
 import { ArrowRight, CalendarDays, MapPinned } from 'lucide-react'
 import { fetchLocations } from '@/features/booking/api'
 import { validateDateRange } from '@/lib/dateRange'
-import { DEFAULT_TIME } from '@/lib/timeOptions'
+import { DEFAULT_TIME, TIME_OPTIONS, formatTimeLabel } from '@/lib/timeOptions'
 import { Button } from '@/features/shared/ui/Button'
 import { DateRangePicker } from '@/features/booking/DateRangePicker'
 import { CitySelect, LocationPickerButton } from '@/features/booking/LocationField'
+import { BarSelect } from '@/features/booking/SearchBarField'
+import { BAR_BORDER } from '@/features/booking/searchBarStyles'
 import { TimeSelect } from '@/features/booking/TimeSelect'
 import { sortByOrder } from '@/features/booking/locationDisplay'
 import type { Location, SearchCriteria } from '@/types/domain'
@@ -45,11 +47,12 @@ interface SearchWidgetProps {
   /** Compact layout for the "edit search" bar on the results page. */
   compact?: boolean
   /**
-   * 'grid' (default): the main booking-section widget.
-   * 'row': the same flat-row field set at more compact widths (see the
-   * `row` prop each field takes) — used by StickySearchBar so the sticky
-   * bar stays visually tighter. Both wrap (flex-wrap) onto further lines
-   * on narrow screens; neither ever scrolls horizontally.
+   * 'grid' (default): a plain flat row of fields that wraps on narrow screens.
+   * 'row': the homepage search bar, modelled on the Qatar Airways booking
+   * box — one bordered bar of labelled segments (stacked into grouped boxes
+   * below lg), dropdown panels under each field (FieldPopover), a checkbox
+   * for "same return location" and a pill Search button. Also guides the
+   * visitor: finishing one field opens the next.
    * 'card': a sectioned, vertical layout (Pickup & Return grouped, then
    * Dates & Time, then a full-width submit) for BookCarPage — a
    * standalone page deserves a more editorial presentation than either
@@ -75,7 +78,7 @@ export function SearchWidget({
   submitLabel,
   submitBusy = false,
 }: SearchWidgetProps) {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const [locations, setLocations] = useState<Location[]>([])
   const [locationsError, setLocationsError] = useState<string | null>(null)
   const [locationsLoading, setLocationsLoading] = useState(true)
@@ -102,7 +105,7 @@ export function SearchWidget({
   // have to tap each trigger in turn. Every other layout leaves this
   // unset and each field keeps managing its own open state independently.
   const [activeStep, setActiveStep] = useState<'pickupLocation' | 'returnLocation' | 'dates' | null>(null)
-  const guided = layout === 'row'
+  const guided = layout === 'row' || layout === 'card'
 
   useEffect(() => {
     let cancelled = false
@@ -156,7 +159,119 @@ export function SearchWidget({
   }
 
   const todayIso = new Date().toISOString().slice(0, 10)
-  const fieldRow = layout === 'row'
+
+  // Qatar-style fields shared by the homepage bar (`row`) and the booking
+  // popups (`card`); each layout only decides where they sit. Choosing a
+  // value opens the next field (guided flow).
+  const cityField = (className: string) => (
+    <BarSelect
+      label={t('searchWidget.pickupCity')}
+      title={t('searchWidget.chooseCity')}
+      value={pickupCity}
+      options={cities.map((c) => ({ value: c, label: c }))}
+      onChange={handlePickupCityChange}
+      disabled={locationsLoading || !!locationsError}
+      widthClassName="w-56"
+      className={className}
+    />
+  )
+  const pickupField = (className: string) => (
+    <LocationPickerButton
+      bar
+      className={className}
+      label={t('searchWidget.pickupLocation')}
+      locationId={pickupLocationId}
+      onLocationChange={(id) => {
+        setPickupLocationId(id)
+        setActiveStep(sameReturnLocation ? 'dates' : 'returnLocation')
+      }}
+      options={pickupCityLocations}
+      loading={locationsLoading}
+      error={locationsError}
+      placeholder={t('searchWidget.selectPickup')}
+      sheetTitle={t('searchWidget.choosePickupLocation')}
+      open={activeStep === 'pickupLocation'}
+      onOpenChange={(next) => setActiveStep((prev) => (next ? 'pickupLocation' : prev === 'pickupLocation' ? null : prev))}
+    />
+  )
+  const returnField = (className: string) =>
+    sameReturnLocation ? null : (
+      <LocationPickerButton
+        bar
+        className={className}
+        label={t('searchWidget.returnLocation')}
+        locationId={returnLocationId}
+        onLocationChange={(id) => {
+          setReturnLocationId(id)
+          setActiveStep('dates')
+        }}
+        options={uaeLocations}
+        loading={locationsLoading}
+        error={locationsError}
+        placeholder={t('searchWidget.selectReturnLocation')}
+        sheetTitle={t('searchWidget.chooseReturnLocation')}
+        open={activeStep === 'returnLocation'}
+        onOpenChange={(next) => setActiveStep((prev) => (next ? 'returnLocation' : prev === 'returnLocation' ? null : prev))}
+      />
+    )
+  const datesField = (className: string) => (
+    <DateRangePicker
+      bar
+      className={className}
+      startDate={startDate}
+      endDate={endDate}
+      onChange={(next) => {
+        setStartDate(next.startDate)
+        setEndDate(next.endDate)
+      }}
+      todayIso={todayIso}
+      open={activeStep === 'dates'}
+      onOpenChange={(next) => setActiveStep((prev) => (next ? 'dates' : prev === 'dates' ? null : prev))}
+      closeOnComplete
+    />
+  )
+  const timeField = (className: string) => (
+    <BarSelect
+      label={t('searchWidget.pickupTime')}
+      title={t('searchWidget.pickupTime')}
+      value={pickupTime}
+      options={TIME_OPTIONS.map((v) => ({ value: v, label: formatTimeLabel(v, i18n.language) }))}
+      onChange={setPickupTime}
+      align="end"
+      widthClassName="w-52"
+      className={className}
+      numeric
+    />
+  )
+  const sameReturnCheckbox = (
+    <label className="inline-flex cursor-pointer items-center gap-3 text-sm text-brand-navy">
+      <input
+        type="checkbox"
+        checked={sameReturnLocation}
+        onChange={(e) => {
+          setSameReturnLocation(e.target.checked)
+          if (e.target.checked && activeStep === 'returnLocation') setActiveStep('dates')
+        }}
+        className="h-5 w-5 shrink-0 cursor-pointer accent-brand-gold"
+      />
+      {t('searchWidget.sameReturnLocation')}
+    </label>
+  )
+  const formErrors = (
+    <>
+      {touched && dateValidation.error && (
+        <p className="mt-3 text-sm font-medium text-error">{t('errors.dateRange.' + dateValidation.error)}</p>
+      )}
+      {touched && !dateValidation.error && missingLocation && (
+        <p className="mt-3 text-sm font-medium text-error">{t('searchWidget.bothLocationsRequired')}</p>
+      )}
+      {locationsError && (
+        <p className="mt-3 text-sm font-medium text-error">
+          {t('searchWidget.couldNotLoadLocations')} {locationsError}
+        </p>
+      )}
+    </>
+  )
 
   if (layout === 'navigator') {
     return (
@@ -272,95 +387,78 @@ export function SearchWidget({
   }
 
   if (layout === 'card') {
+    // The booking popups (fleet "Add your dates", vehicle "Book now"): the
+    // same Qatar-style fields as the homepage bar, grouped into rounded
+    // boxes — locations, then dates + time — with the "same return"
+    // checkbox and a pill submit button.
+    const box = 'rounded-lg border ' + BAR_BORDER
+    const eyebrow = 'text-[10px] font-semibold uppercase tracking-[0.28em] text-brand-gold-dark'
     return (
       <form
         onSubmit={handleSubmit}
         noValidate
-        className={'w-full space-y-8 ' + (chromeless ? '' : 'border border-[#ece7df] bg-white p-6 shadow-[0_20px_45px_rgba(15,18,22,0.08)] sm:p-8')}
+        className={'w-full ' + (chromeless ? '' : 'rounded-2xl bg-white p-6 shadow-(--shadow-card) sm:p-8')}
       >
-        <div>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-brand-gold-dark">{t('searchWidget.sectionPickupReturn')}</p>
-          <div className="mt-4 grid gap-4 sm:grid-cols-2">
-            <CitySelect
-              label={t('searchWidget.pickupCity')}
-              ariaLabel={t('searchWidget.pickupCity')}
-              value={pickupCity}
-              onChange={handlePickupCityChange}
-              cities={cities}
-              disabled={locationsLoading || !!locationsError}
-              fluid
-            />
-            <LocationPickerButton
-              label={t('searchWidget.pickupLocation')}
-              locationId={pickupLocationId}
-              onLocationChange={setPickupLocationId}
-              options={pickupCityLocations}
-              loading={locationsLoading}
-              error={locationsError}
-              placeholder={t('searchWidget.selectPickup')}
-              sheetTitle={t('searchWidget.choosePickupLocation')}
-              fluid
-            />
-          </div>
+        <p className={eyebrow}>{t('searchWidget.sectionPickupReturn')}</p>
+        <div className={'mt-3 grid sm:grid-cols-[11rem_minmax(0,1fr)] ' + box}>
+          {cityField('')}
+          {pickupField('border-t border-[#e6e3de] sm:border-s sm:border-t-0')}
+          {returnField('border-t border-[#e6e3de] sm:col-span-2')}
+        </div>
+        <div className="mt-3">{sameReturnCheckbox}</div>
 
-          <div className="mt-4">
-            <SameReturnToggle checked={sameReturnLocation} onChange={setSameReturnLocation} />
-          </div>
-
-          {!sameReturnLocation && (
-            <div className="mt-4">
-              <LocationPickerButton
-                label={t('searchWidget.returnLocation')}
-                locationId={returnLocationId}
-                onLocationChange={setReturnLocationId}
-                options={uaeLocations}
-                loading={locationsLoading}
-                error={locationsError}
-                placeholder={t('searchWidget.selectReturnLocation')}
-                sheetTitle={t('searchWidget.chooseReturnLocation')}
-                fluid
-              />
-            </div>
-          )}
+        <p className={eyebrow + ' mt-7'}>{t('searchWidget.sectionDatesTime')}</p>
+        <div className="mt-3 grid gap-3 sm:grid-cols-[minmax(0,1fr)_12rem]">
+          <div className={box}>{datesField('')}</div>
+          <div className={box}>{timeField('')}</div>
         </div>
 
-        <div className="border-t border-[#ece7df] pt-8">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-brand-gold-dark">{t('searchWidget.sectionDatesTime')}</p>
-          <div className="mt-4 grid gap-4 sm:grid-cols-2">
-            <DateRangePicker
-              startDate={startDate}
-              endDate={endDate}
-              onChange={(next) => {
-                setStartDate(next.startDate)
-                setEndDate(next.endDate)
-              }}
-              todayIso={todayIso}
-            />
-            <TimeSelect
-              label={t('searchWidget.pickupTime')}
-              ariaLabel={t('searchWidget.pickupTime')}
-              value={pickupTime}
-              onChange={setPickupTime}
-              fluid
-            />
+        {formErrors}
+
+        <div className="mt-7 flex sm:justify-end">
+          <Button type="submit" loading={submitBusy} fullWidthOnMobile className="min-h-12 w-full sm:w-auto sm:px-12">
+            {submitLabel ?? t('searchWidget.searchCars')}
+          </Button>
+        </div>
+      </form>
+    )
+  }
+
+  if (layout === 'row') {
+    // Qatar-Airways-style search bar (homepage). Desktop: every field is a
+    // segment of ONE bordered bar, split by short dividers. Below lg the
+    // same segments stack into three rounded boxes (locations / dates /
+    // time), like Qatar's mobile form. The three group wrappers turn into
+    // `display: contents` at lg so their segments join the single bar.
+    const group = 'flex flex-col rounded-lg border lg:contents ' + BAR_BORDER
+    const divider = 'lg:before:absolute lg:before:inset-y-3 lg:before:start-0 lg:before:w-px lg:before:bg-[#e6e3de]'
+    const stacked = 'border-t border-[#e6e3de] lg:border-t-0 ' + divider
+
+    return (
+      <form onSubmit={handleSubmit} noValidate className="w-full">
+        <div className={'flex flex-col gap-3 lg:flex-row lg:items-stretch lg:gap-0 lg:rounded-lg lg:border ' + BAR_BORDER}>
+          <div className={group}>
+            {cityField('lg:w-40 lg:shrink-0')}
+            {pickupField(stacked + ' lg:min-w-0 lg:flex-1')}
+            {returnField(stacked + ' lg:min-w-0 lg:flex-1')}
           </div>
+
+          <div className={group}>{datesField(divider + ' lg:w-[17rem] lg:shrink-0')}</div>
+
+          <div className={group}>{timeField(divider + ' lg:w-40 lg:shrink-0')}</div>
         </div>
 
-        {touched && dateValidation.error && (
-          <p className="text-sm font-medium text-error">{t('errors.dateRange.' + dateValidation.error)}</p>
-        )}
-        {touched && !dateValidation.error && missingLocation && (
-          <p className="text-sm font-medium text-error">{t('searchWidget.bothLocationsRequired')}</p>
-        )}
-        {locationsError && (
-          <p className="text-sm font-medium text-error">
-            {t('searchWidget.couldNotLoadLocations')} {locationsError}
-          </p>
-        )}
+        <div className="mt-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          {sameReturnCheckbox}
+          <button
+            type="submit"
+            className="inline-flex min-h-12 w-full items-center justify-center rounded-full bg-brand-gold px-12 text-[0.9375rem] font-semibold text-white transition-colors hover:bg-brand-gold-dark focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-brand-navy sm:w-auto"
+          >
+            {t('searchWidget.searchCars')}
+          </button>
+        </div>
 
-        <Button type="submit" loading={submitBusy} fullWidthOnMobile className="w-full sm:w-auto sm:px-10">
-          {submitLabel ?? t('searchWidget.searchCars')}
-        </Button>
+        {formErrors}
       </form>
     )
   }
@@ -374,7 +472,7 @@ export function SearchWidget({
         (compact ? 'p-3 sm:p-4' : 'p-5 sm:p-6')
       }
     >
-      <div className={fieldRow ? 'flex w-full flex-col items-stretch gap-3 sm:flex-row sm:flex-wrap sm:items-end lg:flex-nowrap' : 'flex flex-wrap items-end gap-3'}>
+      <div className="flex flex-wrap items-end gap-3">
         <CitySelect
           label={t('searchWidget.pickupCity')}
           ariaLabel={t('searchWidget.pickupCity')}
@@ -382,54 +480,33 @@ export function SearchWidget({
           onChange={handlePickupCityChange}
           cities={cities}
           disabled={locationsLoading || !!locationsError}
-          row={fieldRow}
         />
 
         <LocationPickerButton
           label={t('searchWidget.pickupLocation')}
           locationId={pickupLocationId}
-          onLocationChange={(id) => {
-            setPickupLocationId(id)
-            if (guided) setActiveStep(sameReturnLocation ? 'dates' : 'returnLocation')
-          }}
+          onLocationChange={setPickupLocationId}
           options={pickupCityLocations}
           loading={locationsLoading}
           error={locationsError}
           placeholder={t('searchWidget.selectPickup')}
           sheetTitle={t('searchWidget.choosePickupLocation')}
-          row={fieldRow}
-          open={guided ? activeStep === 'pickupLocation' : undefined}
-          onOpenChange={
-            guided
-              ? (next) => setActiveStep((prev) => (next ? 'pickupLocation' : prev === 'pickupLocation' ? null : prev))
-              : undefined
-          }
         />
 
         {!sameReturnLocation && (
           <LocationPickerButton
             label={t('searchWidget.returnLocation')}
             locationId={returnLocationId}
-            onLocationChange={(id) => {
-              setReturnLocationId(id)
-              if (guided) setActiveStep('dates')
-            }}
+            onLocationChange={setReturnLocationId}
             options={uaeLocations}
             loading={locationsLoading}
             error={locationsError}
             placeholder={t('searchWidget.selectReturnLocation')}
             sheetTitle={t('searchWidget.chooseReturnLocation')}
-            row={fieldRow}
-            open={guided ? activeStep === 'returnLocation' : undefined}
-            onOpenChange={
-              guided
-                ? (next) => setActiveStep((prev) => (next ? 'returnLocation' : prev === 'returnLocation' ? null : prev))
-                : undefined
-            }
           />
         )}
 
-        <div className={fieldRow ? 'min-w-0 flex-1 sm:min-w-[220px]' : 'w-full sm:w-64'}>
+        <div className="w-full sm:w-64">
           <DateRangePicker
             row
             startDate={startDate}
@@ -439,13 +516,6 @@ export function SearchWidget({
               setEndDate(next.endDate)
             }}
             todayIso={todayIso}
-            open={guided ? activeStep === 'dates' : undefined}
-            onOpenChange={
-              guided
-                ? (next) => setActiveStep((prev) => (next ? 'dates' : prev === 'dates' ? null : prev))
-                : undefined
-            }
-            closeOnComplete={guided}
           />
         </div>
 
@@ -454,23 +524,13 @@ export function SearchWidget({
           ariaLabel={t('searchWidget.pickupTime')}
           value={pickupTime}
           onChange={setPickupTime}
-          row={fieldRow}
         />
 
-        <Button type="submit" fullWidthOnMobile={fieldRow} className={fieldRow ? 'mb-px shrink-0' : undefined}>
-          {t('searchWidget.searchCars')}
-        </Button>
+        <Button type="submit">{t('searchWidget.searchCars')}</Button>
       </div>
 
-      <div className={fieldRow ? 'mt-3' : 'mt-4'}>
-        <SameReturnToggle
-          checked={sameReturnLocation}
-          onChange={(checked) => {
-            setSameReturnLocation(checked)
-            if (guided && checked && activeStep === 'returnLocation') setActiveStep('dates')
-          }}
-          compact
-        />
+      <div className="mt-4">
+        <SameReturnToggle checked={sameReturnLocation} onChange={setSameReturnLocation} compact />
       </div>
 
       {touched && dateValidation.error && (

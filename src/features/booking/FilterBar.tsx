@@ -41,13 +41,13 @@ export function FilterRail(props: FilterControlProps) {
   return (
     <aside
       aria-label={t('searchResults.filters.title')}
-      className="flex min-h-0 flex-1 flex-col overflow-hidden border border-brand-navy/10 bg-white shadow-[0_18px_45px_rgba(7,10,26,0.06)]"
+      className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-brand-navy/10 bg-white shadow-(--shadow-card)"
     >
       <div className="flex shrink-0 items-center justify-between gap-3 border-b border-brand-navy/10 bg-white px-5 py-4 text-brand-navy">
         <h2 className="flex items-center gap-2 text-sm font-semibold">
           <SlidersHorizontal className="h-4 w-4 shrink-0 text-brand-gold" aria-hidden="true" />
           {t('searchResults.filters.title')}
-          {active > 0 && <span className="grid h-5 min-w-5 place-items-center bg-brand-gold px-1 text-[10px] font-bold text-white">{active}</span>}
+          {active > 0 && <span className="grid h-5 min-w-5 place-items-center rounded-full bg-brand-gold px-1 text-[10px] font-bold text-white">{active}</span>}
         </h2>
         {active > 0 && (
           <button
@@ -116,11 +116,11 @@ export function FilterToolbar({ tripSlot, ...props }: FilterControlProps & { tri
             type="button"
             onClick={() => setOpen(true)}
             aria-expanded={open}
-            className="inline-flex h-10 shrink-0 items-center gap-2 border border-brand-navy/12 bg-white px-3 text-xs font-semibold text-brand-navy transition-colors hover:border-brand-gold focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold"
+            className="inline-flex h-10 shrink-0 items-center gap-2 rounded-full border border-brand-navy/12 bg-white px-3.5 text-xs font-semibold text-brand-navy transition-colors hover:border-brand-gold focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold"
           >
             <SlidersHorizontal className="h-4 w-4 shrink-0 text-brand-gold-dark" aria-hidden="true" />
             {t('searchResults.filters.button')}
-            {active > 0 && <span className="grid h-5 min-w-5 place-items-center bg-brand-gold px-1 text-[10px] font-bold text-white">{active}</span>}
+            {active > 0 && <span className="grid h-5 min-w-5 place-items-center rounded-full bg-brand-gold px-1 text-[10px] font-bold text-white">{active}</span>}
           </button>
         </div>
       </div>
@@ -143,7 +143,7 @@ export function FilterToolbar({ tripSlot, ...props }: FilterControlProps & { tri
           <button
             type="button"
             onClick={() => onFiltersChange(clearedKeepingCategory(filters))}
-            className="inline-flex min-h-12 items-center justify-center gap-2 border border-brand-navy/15 bg-white px-4 text-sm font-semibold text-brand-navy"
+            className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-brand-navy/15 bg-white px-4 text-sm font-semibold text-brand-navy"
           >
             <X className="h-4 w-4" aria-hidden="true" />
             {t('searchResults.filters.clear')}
@@ -151,7 +151,7 @@ export function FilterToolbar({ tripSlot, ...props }: FilterControlProps & { tri
           <button
             type="button"
             onClick={() => setOpen(false)}
-            className="min-h-12 bg-brand-gold px-4 text-sm font-semibold text-white shadow-[0_12px_24px_rgba(92,9,49,0.2)]"
+            className="min-h-12 rounded-full bg-brand-gold px-4 text-sm font-semibold text-white shadow-[0_12px_24px_rgba(92,9,49,0.2)]"
           >
             {t('searchResults.filters.apply')}
           </button>
@@ -239,7 +239,7 @@ export function ResultsBar({
           onClick={chip.onRemove}
           aria-label={t('searchResults.filters.remove', { label: chip.label })}
           className={
-            'items-center gap-1.5 border border-brand-navy/15 bg-white px-3 py-1.5 text-xs font-semibold text-brand-navy transition-colors hover:border-brand-gold focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold ' +
+            'items-center gap-1.5 rounded-full border border-brand-navy/15 bg-white px-3 py-1.5 text-xs font-semibold text-brand-navy transition-colors hover:border-brand-gold focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold ' +
             (chip.desktopOnly ? 'hidden lg:inline-flex' : 'inline-flex')
           }
         >
@@ -271,7 +271,7 @@ export function SortField({ sort, onChange, disabled = false }: { sort: SortOpti
   return (
     <label
       className={
-        'relative hidden min-h-14 min-w-56 border border-brand-navy/15 bg-white transition-colors focus-within:ring-2 focus-within:ring-brand-gold lg:block ' +
+        'relative hidden min-h-14 min-w-56 rounded-xl border border-brand-navy/15 bg-white transition-colors focus-within:ring-2 focus-within:ring-brand-gold lg:block ' +
         (disabled ? 'opacity-60' : 'hover:border-brand-gold')
       }
     >
@@ -297,7 +297,7 @@ function CategoryChip({ active, label, count, onClick }: { active: boolean; labe
       aria-pressed={active}
       onClick={onClick}
       className={
-        'inline-flex h-10 shrink-0 items-center gap-2 border px-4 text-[13px] font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold ' +
+        'inline-flex h-10 shrink-0 items-center gap-2 rounded-full border px-4 text-[13px] font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold ' +
         (active
           ? 'border-brand-gold bg-brand-gold/8 text-brand-gold'
           : 'border-brand-navy/12 bg-white text-brand-navy hover:border-brand-gold')
@@ -317,7 +317,7 @@ function SortSelect({ sort, onChange, className = '' }: { sort: SortOption; onCh
       <select
         value={sort}
         onChange={(event) => onChange(event.target.value as SortOption)}
-        className="h-10 w-full appearance-none border border-brand-navy/12 bg-white ps-3 pe-9 text-[13px] font-semibold text-brand-navy outline-none transition hover:border-brand-navy/30 focus:border-brand-gold focus:ring-2 focus:ring-brand-gold/20"
+        className="h-10 w-full appearance-none rounded-lg border border-brand-navy/12 bg-white ps-3 pe-9 text-[13px] font-semibold text-brand-navy outline-none transition hover:border-brand-navy/30 focus:border-brand-gold focus:ring-2 focus:ring-brand-gold/20"
       >
         <option value="price_asc">{t('searchResults.filters.priceLowHigh')}</option>
         <option value="price_desc">{t('searchResults.filters.priceHighLow')}</option>

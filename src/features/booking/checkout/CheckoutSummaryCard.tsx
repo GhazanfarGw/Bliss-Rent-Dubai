@@ -38,13 +38,13 @@ export function CheckoutSummaryCard({ vehicle, startDate, endDate, pickup, dropo
   const currency = total?.currency ?? quote?.currency
 
   return (
-    <aside aria-label={t('checkout.summaryCard.vehicleLabel')} className="overflow-hidden border border-brand-navy/10 bg-white shadow-[0_12px_35px_rgba(7,10,26,0.07)]">
+    <aside aria-label={t('checkout.summaryCard.vehicleLabel')} className="overflow-hidden rounded-2xl bg-white shadow-(--shadow-card)">
       <div className="grid grid-cols-[6.5rem_minmax(0,1fr)] sm:grid-cols-[8rem_minmax(0,1fr)] lg:grid-cols-1">
         <div className="relative min-h-24 bg-surface-muted lg:aspect-16/10 lg:min-h-0">
           <VehiclePhoto
             storagePath={image?.storage_path ?? null}
             alt={`${vehicle.make} ${vehicle.model}`}
-            className="absolute inset-0 h-full w-full rounded-none"
+            className="absolute inset-0 h-full w-full"
           />
         </div>
 

@@ -1,9 +1,13 @@
-import { useState } from 'react'
+import { useRef, useState, type ComponentType } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Check, ChevronRight } from 'lucide-react'
+import { Building2, Check, ChevronRight, Hotel, Plane, Search, Truck } from 'lucide-react'
 import { Dialog } from '@/features/shared/ui/Dialog'
+import { FieldPopover } from '@/features/shared/ui/FieldPopover'
 import { inputClass } from '@/features/shared/ui/inputClasses'
-import { TYPE_ICON, typeOrderIndex } from '@/features/booking/locationDisplay'
+import { BarTrigger } from '@/features/booking/SearchBarField'
+import { BAR_BORDER } from '@/features/booking/searchBarStyles'
+import { TYPE_ICON, TYPE_ORDER, typeOrderIndex } from '@/features/booking/locationDisplay'
+import type { LocationType } from '@/types/database'
 import type { Location } from '@/types/domain'
 
 /**
@@ -85,6 +89,10 @@ interface LocationPickerButtonProps {
    */
   open?: boolean
   onOpenChange?: (open: boolean) => void
+  /** Homepage search-bar segment (Qatar-style) — dropdown panel under the field instead of a modal sheet. */
+  bar?: boolean
+  /** `bar` only: segment wrapper classes (width, dividers) from the bar layout. */
+  className?: string
 }
 
 export function LocationPickerButton({
@@ -100,8 +108,11 @@ export function LocationPickerButton({
   fluid = false,
   open: controlledOpen,
   onOpenChange,
+  bar = false,
+  className = '',
 }: LocationPickerButtonProps) {
   const { t } = useTranslation()
+  const anchorRef = useRef<HTMLDivElement>(null)
   const [internalOpen, setInternalOpen] = useState(false)
   const isControlled = controlledOpen !== undefined
   const sheetOpen = isControlled ? controlledOpen : internalOpen
@@ -114,6 +125,39 @@ export function LocationPickerButton({
     .slice()
     .sort((a, b) => typeOrderIndex(a.type) - typeOrderIndex(b.type) || a.name.localeCompare(b.name))
   const selected = sorted.find((l) => l.id === locationId) ?? null
+
+  if (bar) {
+    return (
+      <div ref={anchorRef} className={'relative ' + className}>
+        <BarTrigger
+          label={label}
+          value={loading ? t('searchWidget.loadingLocations') : selected ? selected.name : placeholder}
+          placeholder={!selected}
+          open={sheetOpen}
+          onClick={() => setSheetOpen(true)}
+          disabled={disabled}
+          wrap
+        />
+        <FieldPopover
+          open={sheetOpen}
+          onClose={() => setSheetOpen(false)}
+          title={sheetTitle}
+          closeLabel={t('common.close')}
+          anchorRef={anchorRef}
+          widthClassName="w-[26rem]"
+        >
+          <BarLocationList
+            options={sorted}
+            selectedId={locationId}
+            onSelect={(id) => {
+              onLocationChange(id)
+              setSheetOpen(false)
+            }}
+          />
+        </FieldPopover>
+      </div>
+    )
+  }
 
   return (
     <div className={row ? 'flex w-full min-w-0 flex-col gap-1 sm:flex-1 sm:min-w-[190px]' : fluid ? 'flex w-full min-w-0 flex-col gap-1' : 'flex w-full flex-col gap-1 sm:w-64'}>
@@ -147,6 +191,86 @@ export function LocationPickerButton({
           }}
         />
       </Dialog>
+    </div>
+  )
+}
+
+const TYPE_LINE_ICON: Record<LocationType, ComponentType<{ className?: string; 'aria-hidden'?: boolean }>> = {
+  airport: Plane,
+  city: Building2,
+  hotel: Hotel,
+  delivery: Truck,
+}
+
+/**
+ * The search bar's location dropdown, after Qatar Airways' airport list: a
+ * search box, then the points grouped under small type headings (Airport,
+ * City / Area, …), each row a line icon, the name in bold with its city
+ * underneath, and the airport code on the far side.
+ */
+function BarLocationList({ options, selectedId, onSelect }: { options: Location[]; selectedId: string; onSelect: (id: string) => void }) {
+  const { t } = useTranslation()
+  const [query, setQuery] = useState('')
+  const q = query.trim().toLowerCase()
+  const filtered = q
+    ? options.filter((l) => [l.name, l.city, l.airport_code ?? ''].some((s) => s.toLowerCase().includes(q)))
+    : options
+  const groups = TYPE_ORDER.map((type) => ({ type, items: filtered.filter((l) => l.type === type) })).filter((g) => g.items.length > 0)
+
+  return (
+    <div className="lg:p-2">
+      {/* Phone sheet: the search box stays pinned while the list scrolls under it. */}
+      <div className="sticky top-0 z-10 bg-white pb-2 lg:relative lg:pb-0">
+        <Search className="pointer-events-none absolute start-3 top-[1.3rem] h-4 w-4 -translate-y-1/2 text-text-muted" aria-hidden="true" />
+        <input
+          data-autofocus
+          type="text"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder={t('searchWidget.searchLocations')}
+          aria-label={t('searchWidget.searchLocations')}
+          className={'w-full rounded-lg border bg-white py-2.5 pe-3 ps-9 text-sm text-brand-navy outline-none placeholder:text-text-muted focus:border-brand-navy focus:ring-1 focus:ring-brand-navy ' + BAR_BORDER}
+        />
+      </div>
+
+      <div className="lg:mt-1 lg:max-h-80 lg:overflow-y-auto">
+        {groups.map((group) => (
+          <div key={group.type}>
+            <p className="px-3 pb-1 pt-3 text-xs text-text-muted">{t(`searchWidget.type.${group.type}`)}</p>
+            <ul>
+              {group.items.map((loc) => {
+                const Icon = TYPE_LINE_ICON[loc.type]
+                const isSelected = loc.id === selectedId
+                return (
+                  <li key={loc.id} className="border-b border-[#efece7] last:border-b-0">
+                    <button
+                      type="button"
+                      data-option
+                      data-selected={isSelected || undefined}
+                      aria-current={isSelected || undefined}
+                      onClick={() => onSelect(loc.id)}
+                      className={
+                        'my-0.5 flex min-h-14 w-full items-center gap-3 rounded-lg px-3 py-2.5 text-start outline-none transition-colors hover:bg-brand-lavender focus-visible:bg-brand-lavender focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-navy ' +
+                        (isSelected ? 'bg-brand-lavender' : '')
+                      }
+                    >
+                      <Icon className="h-5 w-5 shrink-0 text-text-muted" aria-hidden={true} />
+                      <span className="min-w-0 flex-1">
+                        {/* Wraps rather than truncates: names like "…(DXB) — Terminal 1/3" only differ at the end. */}
+                        <span className="block text-sm font-semibold text-brand-navy">{loc.name}</span>
+                        <span className="block truncate text-xs text-text-muted">{loc.city}</span>
+                      </span>
+                      {loc.airport_code && <span className="shrink-0 text-sm font-semibold text-brand-navy">{loc.airport_code}</span>}
+                      {isSelected && <Check className="h-4 w-4 shrink-0 text-brand-gold" aria-hidden="true" />}
+                    </button>
+                  </li>
+                )
+              })}
+            </ul>
+          </div>
+        ))}
+        {groups.length === 0 && <p className="px-3 py-6 text-center text-sm text-text-muted">{t('searchWidget.noMatches')}</p>}
+      </div>
     </div>
   )
 }

@@ -5,7 +5,7 @@ export function DubaiOnlyBadge({ className = '' }: { className?: string }) {
   return (
     <span
       className={
-        'inline-flex items-center gap-1.5 rounded-none border border-brand-gold/50 bg-brand-gold/10 px-3 py-1 text-xs font-semibold tracking-wide text-brand-gold-dark ' +
+        'inline-flex items-center gap-1.5 rounded-full border border-brand-gold/50 bg-brand-gold/10 px-3 py-1 text-xs font-semibold tracking-wide text-brand-gold-dark ' +
         className
       }
     >

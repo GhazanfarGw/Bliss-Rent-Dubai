@@ -139,7 +139,7 @@ export function PendingBookingIndicator({ tone = 'dark' }: { tone?: 'light' | 'd
         aria-haspopup="dialog"
         aria-expanded={open}
         aria-label={t('nav.pendingBooking.label')}
-        className={'relative inline-flex h-10 w-10 items-center justify-center rounded-none bg-transparent transition-colors ' + triggerToneClass}
+        className={'relative inline-flex h-10 w-10 items-center justify-center rounded-full bg-transparent transition-colors ' + triggerToneClass}
       >
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-5 w-5" aria-hidden="true">
           <path strokeLinecap="round" strokeLinejoin="round" d="M3 11l1.5-5A2 2 0 0 1 6.4 4.5h11.2a2 2 0 0 1 1.9 1.5L21 11" />
@@ -147,7 +147,7 @@ export function PendingBookingIndicator({ tone = 'dark' }: { tone?: 'light' | 'd
           <circle cx="7.5" cy="15" r="1.25" fill="currentColor" stroke="none" />
           <circle cx="16.5" cy="15" r="1.25" fill="currentColor" stroke="none" />
         </svg>
-        <span className="absolute -end-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-none bg-brand-champagne px-1 text-[10px] font-bold text-brand-navy">
+        <span className="absolute -end-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-brand-champagne px-1 text-[10px] font-bold text-brand-navy">
           1
         </span>
       </button>
@@ -166,7 +166,7 @@ export function PendingBookingIndicator({ tone = 'dark' }: { tone?: 'light' | 'd
           // both the 4rem and 4.5rem/transparent header heights). From `lg`
           // up the button is part of the right-aligned desktop nav cluster,
           // where anchoring to the button itself is safe again.
-          className="fixed inset-x-4 top-20 z-50 rounded-none border border-brand-navy/10 bg-white p-4 text-start shadow-[0_20px_38px_rgba(18,20,23,0.14)] lg:absolute lg:inset-x-auto lg:end-0 lg:top-12 lg:w-80 lg:max-w-[calc(100vw-2rem)]"
+          className="fixed inset-x-4 top-20 z-50 rounded-2xl border border-brand-navy/10 bg-white p-4 text-start shadow-[0_20px_38px_rgba(18,20,23,0.14)] lg:absolute lg:inset-x-auto lg:end-0 lg:top-12 lg:w-80 lg:max-w-[calc(100vw-2rem)]"
         >
           <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-brand-gold-dark">
             {t('nav.pendingBooking.title')}

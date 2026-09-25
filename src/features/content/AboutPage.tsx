@@ -139,7 +139,7 @@ function AboutPageContent() {
               </LinkButton>
               <Link
                 to="/search"
-                className="inline-flex min-h-11 min-w-40 items-center justify-center border border-white/35 bg-white/10 px-5 py-2.5 text-sm font-semibold text-white backdrop-blur-sm transition-colors hover:border-white hover:bg-white hover:text-brand-navy"
+                className="inline-flex min-h-11 min-w-40 items-center justify-center rounded-full border border-white/35 bg-white/10 px-5 py-2.5 text-sm font-semibold text-white backdrop-blur-sm transition-colors hover:border-white hover:bg-white hover:text-brand-navy"
               >
                 {t('hero.viewFleetCta')}
               </Link>
@@ -184,7 +184,7 @@ function AboutPageContent() {
       <HowWeWork />
 
       {fleetCategories && fleetCategories.length > 0 && (
-        <section className="bg-white">
+        <section>
           <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
             <div className="flex flex-wrap items-end justify-between gap-6">
               <div className="max-w-2xl">
@@ -239,7 +239,9 @@ function AboutPageContent() {
       <LocationsPreviewSection />
       {coverage && <CoverageDetails coverage={coverage} />}
 
-      <section className="mx-auto grid max-w-7xl gap-0 px-4 py-20 sm:px-6 lg:grid-cols-2 lg:px-8 lg:py-28">
+      <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
+        {/* One white rounded card (photo + contact options), like the rest of the theme. */}
+        <div className="grid overflow-hidden rounded-2xl bg-white shadow-(--shadow-card) lg:grid-cols-2">
         <div className="relative min-h-[430px] overflow-hidden bg-brand-navy">
           <img src={heroPremium} alt="" aria-hidden="true" loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-brand-navy/80 via-brand-navy/15 to-transparent" />
@@ -262,6 +264,7 @@ function AboutPageContent() {
             <ContactLink href={OFFICE_MAPS_URL} label={t('pages.contact.getDirections')} icon={MapPin} external />
             <ContactLink href="/contact" label={t('pages.about.connect.contactPageCta')} icon={ArrowRight} internal />
           </div>
+        </div>
         </div>
       </section>
 

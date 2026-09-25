@@ -59,7 +59,7 @@ export function SportsCollectionSection({ vehicles, failed = false }: SportsColl
   const categoryId = sportsCars[0]?.vehicle.category_id
 
   return (
-    <section className="overflow-hidden bg-white py-8 sm:py-12 lg:py-14">
+    <section className="overflow-hidden py-8 sm:py-12 lg:py-14">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-end">
           <div className="max-w-3xl">
@@ -80,7 +80,7 @@ export function SportsCollectionSection({ vehicles, failed = false }: SportsColl
                 onClick={() => goTo(activeIndex - 1)}
                 disabled={sportsCars.length < 2}
                 aria-label={t('home.sportsShowcase.previous')}
-                className="flex h-11 w-11 items-center justify-center border border-brand-gold/30 bg-white text-brand-navy transition-colors hover:bg-brand-gold hover:text-white disabled:cursor-not-allowed disabled:opacity-35"
+                className="flex h-11 w-11 items-center justify-center rounded-full border border-brand-gold/30 bg-white text-brand-navy transition-colors hover:bg-brand-gold hover:text-white disabled:cursor-not-allowed disabled:opacity-35"
               >
                 <ChevronLeft className="h-5 w-5 rtl:rotate-180" aria-hidden="true" />
               </button>
@@ -89,7 +89,7 @@ export function SportsCollectionSection({ vehicles, failed = false }: SportsColl
                 onClick={() => goTo(activeIndex + 1)}
                 disabled={sportsCars.length < 2}
                 aria-label={t('home.sportsShowcase.next')}
-                className="flex h-11 w-11 items-center justify-center bg-brand-gold text-white transition-colors hover:bg-brand-gold-dark disabled:cursor-not-allowed disabled:opacity-35"
+                className="flex h-11 w-11 items-center justify-center rounded-full bg-brand-gold text-white transition-colors hover:bg-brand-gold-dark disabled:cursor-not-allowed disabled:opacity-35"
               >
                 <ChevronRight className="h-5 w-5 rtl:rotate-180" aria-hidden="true" />
               </button>
@@ -98,7 +98,7 @@ export function SportsCollectionSection({ vehicles, failed = false }: SportsColl
         </div>
 
         {vehicles === null ? (
-          <div className="mt-9 grid min-h-[34rem] animate-pulse overflow-hidden bg-white lg:grid-cols-[1.15fr_0.85fr]" aria-hidden="true">
+          <div className="mt-9 grid min-h-[34rem] animate-pulse overflow-hidden rounded-2xl bg-white shadow-(--shadow-card) lg:grid-cols-[1.15fr_0.85fr]" aria-hidden="true">
             <div className="bg-[#ddd2c6]" />
             <div className="bg-[#4d0a2b] p-8">
               <div className="h-3 w-32 bg-white/20" />
@@ -111,7 +111,7 @@ export function SportsCollectionSection({ vehicles, failed = false }: SportsColl
             ref={trackRef}
             onScroll={updateFromScroll}
             aria-label={t('home.sportsShowcase.carouselLabel')}
-            className="mt-9 flex snap-x snap-mandatory overflow-x-auto scroll-smooth border border-brand-gold/20 bg-white shadow-[0_30px_80px_rgba(73,42,31,0.14)] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            className="mt-9 flex snap-x snap-mandatory overflow-x-auto scroll-smooth rounded-2xl bg-white shadow-(--shadow-card) [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           >
             {sportsCars.map((group, index) => (
               <SportsSlide
@@ -179,18 +179,18 @@ function SportsSlide({
       aria-current={active ? 'true' : undefined}
     >
       <div className="grid min-h-[34rem] lg:grid-cols-[1.15fr_0.85fr]">
-        <div className="group relative min-h-72 overflow-hidden bg-[#e7dfd7] sm:min-h-[25rem] lg:min-h-[38rem]">
+        <div className="group relative min-h-72 overflow-hidden bg-brand-lavender sm:min-h-[25rem] lg:min-h-[38rem]">
           <VehiclePhoto
             storagePath={image?.storage_path ?? null}
             alt={`${vehicle.make} ${vehicle.model}`}
             className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.025]"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-[#210311]/60 via-transparent to-transparent lg:bg-gradient-to-r lg:from-transparent lg:to-[#260414]/22" />
-          <span className="absolute start-5 top-5 bg-white/94 px-3 py-2 text-[9px] font-bold uppercase tracking-[0.2em] text-brand-gold-dark backdrop-blur-sm sm:start-7 sm:top-7">
+          <span className="absolute start-5 top-5 rounded-full bg-white/94 px-3 py-2 text-[9px] font-bold uppercase tracking-[0.2em] text-brand-gold-dark backdrop-blur-sm sm:start-7 sm:top-7">
             {t('home.sportsShowcase.liveLabel')}
           </span>
           {quantity > 1 && (
-            <span className="absolute bottom-5 start-5 bg-brand-gold px-3 py-2 text-xs font-semibold text-white sm:bottom-7 sm:start-7">
+            <span className="absolute bottom-5 start-5 rounded-full bg-brand-gold px-3 py-2 text-xs font-semibold text-white sm:bottom-7 sm:start-7">
               {t('vehicleCard.quantityAvailable', { count: quantity })}
             </span>
           )}
@@ -232,7 +232,7 @@ function SportsSlide({
             <Link
               to={`/vehicles/${vehicle.id}`}
               tabIndex={active ? undefined : -1}
-              className="group inline-flex min-h-12 items-center gap-2 bg-white px-5 py-3 text-sm font-semibold text-brand-gold transition-colors hover:bg-brand-champagne hover:text-brand-navy"
+              className="group inline-flex min-h-12 items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-brand-gold transition-colors hover:bg-brand-champagne hover:text-brand-navy"
             >
               {t('home.sportsShowcase.viewCar')}
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1 rtl:rotate-180 rtl:group-hover:-translate-x-1" aria-hidden="true" />

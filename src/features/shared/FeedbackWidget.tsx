@@ -190,7 +190,7 @@ export function FeedbackWidget() {
                     onChange={(e) => setMessage(e.target.value)}
                     rows={4}
                     placeholder={t('feedback.messagePlaceholder')}
-                    className="w-full rounded-none border border-border bg-white px-3 py-2.5 text-sm text-brand-navy outline-none transition-colors focus:border-brand-navy focus:ring-1 focus:ring-brand-navy"
+                    className="w-full rounded-lg border border-border bg-white px-3 py-2.5 text-sm text-brand-navy outline-none transition-colors focus:border-brand-navy focus:ring-1 focus:ring-brand-navy"
                   />
                 </label>
 
@@ -210,7 +210,7 @@ export function FeedbackWidget() {
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
-        className="pointer-events-auto flex shrink-0 flex-col items-center gap-2 rounded-none bg-brand-gold px-2 py-3.5 text-white shadow-[0_8px_24px_rgba(92,9,49,0.35)] transition-all hover:brightness-105"
+        className="pointer-events-auto flex shrink-0 flex-col items-center gap-2 rounded-s-xl bg-brand-gold px-2 py-3.5 text-white shadow-[0_8px_24px_rgba(92,9,49,0.35)] transition-all hover:brightness-105"
       >
         <Star className="h-4 w-4 shrink-0 fill-white" aria-hidden="true" />
         <span className="text-[11px] font-semibold uppercase tracking-[0.12em] [writing-mode:vertical-rl] rotate-180">

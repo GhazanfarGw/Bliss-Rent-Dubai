@@ -435,7 +435,7 @@ export function SiteSearch({ tone = 'dark', compact = false }: { tone?: 'light' 
         aria-haspopup="dialog"
         aria-expanded={open}
         aria-label={t('nav.search.ariaLabel')}
-        className={'inline-flex items-center rounded-none transition-colors ' + triggerClass}
+        className={'inline-flex items-center rounded-full transition-colors ' + triggerClass}
       >
         <Search className={compact ? 'h-5 w-5' : 'h-4.5 w-4.5'} aria-hidden="true" />
         {!compact && <span className="text-sm font-semibold">{t('nav.search.ariaLabel')}</span>}
@@ -621,7 +621,7 @@ export function SiteSearch({ tone = 'dark', compact = false }: { tone?: 'light' 
                                     <VehiclePhoto
                                       storagePath={image?.storage_path ?? null}
                                       alt={`${vehicle.make} ${vehicle.model}`}
-                                      className="h-14 w-20 shrink-0 rounded-none object-cover"
+                                      className="h-14 w-20 shrink-0 rounded-lg object-cover"
                                     />
                                     <span className="min-w-0 flex-1">
                                       <span className="block truncate text-base font-semibold text-brand-navy">

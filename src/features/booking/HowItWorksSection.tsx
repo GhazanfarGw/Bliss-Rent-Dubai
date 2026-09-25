@@ -16,7 +16,7 @@ export function HowItWorksSection() {
   const steps = t('home.howItWorks.steps', { returnObjects: true }) as Step[]
 
   return (
-    <section id="how-it-works" className="scroll-mt-20 bg-white">
+    <section id="how-it-works" className="scroll-mt-20">
       <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
         <div className="grid gap-5 lg:grid-cols-[0.72fr_1.28fr] lg:items-end lg:gap-16">
           <div>

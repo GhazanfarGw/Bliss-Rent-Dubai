@@ -30,8 +30,18 @@ interface DialogProps {
    * accessible name still comes from `title` (kept for screen readers
    * via the same `aria-labelledby`, just visually hidden), so callers
    * don't lose that requirement, they just don't see it rendered.
+   *
+   * 'sheet' (added for the homepage search bar's phone dropdowns, after the
+   * Qatar Airways mobile booking box): a white bottom sheet with rounded top
+   * corners that slides up, a title + ✕ row, a scrolling body, an optional
+   * pinned `footer`, and page scroll locked underneath. `fullScreen` makes
+   * it cover the whole screen instead (used for the calendar).
    */
-  variant?: 'default' | 'lightbox'
+  variant?: 'default' | 'lightbox' | 'sheet'
+  /** 'sheet' only: cover the whole screen instead of sizing to content. */
+  fullScreen?: boolean
+  /** 'sheet' only: content pinned under the scrolling body (e.g. Clear / Done). */
+  footer?: ReactNode
 }
 
 /**
@@ -51,6 +61,8 @@ export function Dialog({
   maxWidthClassName = 'max-w-lg',
   mobileSheet = false,
   variant = 'default',
+  fullScreen = false,
+  footer,
 }: DialogProps) {
   const titleId = useId()
   const panelRef = useRef<HTMLDivElement>(null)
@@ -105,7 +117,58 @@ export function Dialog({
     }
   }, [open, onClose])
 
+  // A sheet covers most of the phone screen: stop the page behind it from
+  // scrolling along with the sheet's own list.
+  useEffect(() => {
+    if (!open || variant !== 'sheet') return
+    const previous = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.body.style.overflow = previous
+    }
+  }, [open, variant])
+
   if (!open) return null
+
+  if (variant === 'sheet') {
+    return createPortal(
+      <div className="fixed inset-0 z-50 flex items-end justify-center">
+        <div className="absolute inset-0 bg-brand-navy-dark/50" onClick={onClose} aria-hidden="true" />
+        <div
+          ref={panelRef}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby={titleId}
+          tabIndex={-1}
+          className={
+            'relative z-10 flex w-full flex-col bg-white shadow-[0_-12px_40px_rgba(7,10,26,0.18)] outline-none motion-safe:animate-[sheet-up_260ms_cubic-bezier(0.2,0.8,0.2,1)] ' +
+            (fullScreen ? 'h-dvh' : 'max-h-[92dvh] rounded-t-2xl') +
+            ' ' +
+            maxWidthClassName
+          }
+        >
+          <div className="flex shrink-0 items-center justify-between gap-3 px-5 pb-3 pt-5">
+            <h2 id={titleId} className="min-w-0 break-words text-lg font-medium text-brand-navy">
+              {title}
+            </h2>
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label={closeLabel}
+              className="-me-2 inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-brand-navy transition-colors hover:bg-brand-lavender focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-navy"
+            >
+              <X className="h-5 w-5" aria-hidden="true" />
+            </button>
+          </div>
+          <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 pb-5">{children}</div>
+          {footer && (
+            <div className="shrink-0 border-t border-[#efece7] px-5 pt-4 pb-[max(1rem,env(safe-area-inset-bottom))]">{footer}</div>
+          )}
+        </div>
+      </div>,
+      document.body,
+    )
+  }
 
   const isLightbox = variant === 'lightbox'
 
@@ -125,7 +188,7 @@ export function Dialog({
         className={
           isLightbox
             ? `relative z-10 max-h-[92vh] w-full max-w-[92vw] outline-none ${maxWidthClassName}`
-            : `relative z-10 max-h-[90vh] w-full overflow-y-auto rounded-none bg-surface p-6 shadow-md outline-none ${mobileSheet ? 'sm:rounded-none' : ''} ${maxWidthClassName}`
+            : `relative z-10 max-h-[90vh] w-full overflow-y-auto rounded-2xl bg-surface p-6 shadow-md outline-none ${maxWidthClassName}`
         }
       >
         {isLightbox ? (
@@ -153,7 +216,7 @@ export function Dialog({
                 type="button"
                 onClick={onClose}
                 aria-label={closeLabel}
-                className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-none p-1 text-text-muted transition-colors hover:bg-surface-muted hover:text-brand-navy focus:outline-none focus:ring-2 focus:ring-brand-gold"
+                className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-full p-1 text-text-muted transition-colors hover:bg-surface-muted hover:text-brand-navy focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold"
               >
                 <X className="h-5 w-5" aria-hidden="true" />
               </button>

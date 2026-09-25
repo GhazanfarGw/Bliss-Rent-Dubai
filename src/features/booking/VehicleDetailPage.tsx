@@ -255,13 +255,13 @@ export function VehicleDetailPage() {
         {/* The booking panel is deliberately short: what the car is, its price, one
             button. The full specifications live below the photos, and the trip (dates
             and places) is chosen in a popup rather than in three separate editors. */}
-        <section className="rounded-none border border-brand-navy/10 bg-white p-5 shadow-sm sm:p-6 lg:sticky lg:top-24 lg:col-start-2 lg:row-span-2 lg:row-start-1">
+        <section className="rounded-2xl border border-brand-navy/10 bg-white p-5 shadow-sm sm:p-6 lg:sticky lg:top-24 lg:col-start-2 lg:row-span-2 lg:row-start-1">
           <div className="flex flex-wrap items-center gap-3">
             <h1 className="text-2xl font-semibold text-brand-navy">
               {vehicle.make} {vehicle.model}
             </h1>
             {vehicle.vehicle_categories && (
-              <span className="rounded-none bg-brand-lavender px-3 py-1 text-xs font-medium text-brand-navy">
+              <span className="rounded-full bg-brand-lavender px-3 py-1 text-xs font-medium text-brand-navy">
                 {categoryLabel(t, vehicle.vehicle_categories.name)}
               </span>
             )}
@@ -338,7 +338,7 @@ export function VehicleDetailPage() {
               disabled={checking}
               onClick={handleBookNow}
               aria-haspopup={readyToBook ? undefined : 'dialog'}
-              className="mt-5 w-full rounded-none bg-brand-gold px-4 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-brand-gold-dark focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:bg-surface-muted disabled:text-text-muted"
+              className="mt-5 w-full rounded-full bg-brand-gold px-4 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-brand-gold-dark focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:bg-surface-muted disabled:text-text-muted"
             >
               {bookLabel}
             </button>

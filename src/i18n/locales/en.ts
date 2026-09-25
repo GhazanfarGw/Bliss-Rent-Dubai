@@ -476,6 +476,7 @@ const en = {
       selectReturnDate: 'Select return date',
       selectDates: 'Select dates',
       done: 'Done',
+      clear: 'Clear',
       days_one: '{{count}} day',
       days_other: '{{count}} days',
       previousMonth: 'Previous month',

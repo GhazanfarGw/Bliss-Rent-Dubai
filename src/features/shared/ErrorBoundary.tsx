@@ -47,7 +47,7 @@ function ErrorFallback() {
   const { t } = useTranslation()
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-brand-lavender/40 px-4 py-16 text-center">
-      <div className="flex h-14 w-14 items-center justify-center rounded-none bg-error-bg">
+      <div className="flex h-14 w-14 items-center justify-center rounded-full bg-error-bg">
         <AlertTriangle className="h-7 w-7 text-error" aria-hidden="true" />
       </div>
       <h1 className="mt-6 text-2xl font-semibold text-brand-navy sm:text-3xl">{t('errorBoundary.title')}</h1>

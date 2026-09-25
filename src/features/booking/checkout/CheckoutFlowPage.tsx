@@ -329,7 +329,7 @@ export function CheckoutFlowPage() {
               </fieldset>
 
               {draft.driver.isSameAsCustomer ? (
-                <div className="rounded-none bg-brand-lavender/40 px-3 py-2.5 text-sm text-brand-navy">
+                <div className="rounded-xl bg-brand-lavender/40 px-3 py-2.5 text-sm text-brand-navy">
                   <p className="font-semibold">{t('checkout.driver.sameAsCustomerTitle')}</p>
                   <p className="mt-1 break-words text-text-muted">
                     {draft.customer.firstName || draft.customer.lastName
@@ -617,7 +617,7 @@ function CompletedStepCard({
 }
 
 /**
- * The outer button follows the site's rounded-none redesign; the small
+ * The outer button follows the site's rounded-card theme; the small
  * indicator inside it deliberately stays circular — it's a genuine
  * radio-button affordance (pick exactly one of two options), and that
  * shape is a near-universal convention users rely on to recognize
@@ -631,7 +631,7 @@ function DriverToggleOption({ selected, onSelect, label }: { selected: boolean; 
       aria-pressed={selected}
       onClick={onSelect}
       className={
-        'flex min-h-12 items-center gap-2 rounded-none border px-3 py-2.5 text-start text-xs font-semibold transition-colors sm:gap-3 sm:text-sm ' +
+        'flex min-h-12 items-center gap-2 rounded-xl border px-3 py-2.5 text-start text-xs font-semibold transition-colors sm:gap-3 sm:text-sm ' +
         (selected
           ? 'border-brand-navy bg-brand-navy text-white'
           : 'border-border bg-white text-brand-navy hover:border-brand-navy/40')

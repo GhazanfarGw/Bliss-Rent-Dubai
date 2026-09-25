@@ -25,7 +25,7 @@ export function ResultCard({
   children: ReactNode
 }) {
   return (
-    <section className={'min-w-0 rounded-none bg-white p-5 sm:p-6 ' + (emphasis ? 'border border-brand-gold border-t-4 shadow-sm' : 'border border-brand-navy/10 shadow-sm')}>
+    <section className={'min-w-0 rounded-2xl bg-white p-5 sm:p-6 ' + (emphasis ? 'border border-brand-gold border-t-4 shadow-sm' : 'border border-brand-navy/10 shadow-sm')}>
       {title && (
         <div className="mb-5 flex items-center gap-3 border-b border-brand-navy/10 pb-4">
           <span className="grid h-9 w-9 shrink-0 place-items-center bg-brand-navy text-white">

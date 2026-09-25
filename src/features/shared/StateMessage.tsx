@@ -25,7 +25,7 @@ const TONE_CLASSES: Record<NonNullable<StateMessageProps['tone']>, { box: string
 export function StateMessage({ title, body, action, tone = 'neutral' }: StateMessageProps) {
   const classes = TONE_CLASSES[tone]
   return (
-    <div className={'mx-auto flex max-w-md flex-col items-center rounded-none border px-6 py-12 text-center ' + classes.box}>
+    <div className={'mx-auto flex max-w-md flex-col items-center rounded-2xl border px-6 py-12 text-center ' + classes.box}>
       <h3 className={'text-base font-semibold ' + classes.title}>{title}</h3>
       {body && <p className={'mt-2 text-sm ' + classes.body}>{body}</p>}
       {action && <div className="mt-5">{action}</div>}

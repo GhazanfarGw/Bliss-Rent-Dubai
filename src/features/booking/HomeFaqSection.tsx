@@ -13,7 +13,7 @@ export function HomeFaqSection() {
   const [open, setOpen] = useState<number | null>(null)
 
   return (
-    <section className="bg-white">
+    <section>
       <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8 lg:py-14">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
@@ -23,7 +23,7 @@ export function HomeFaqSection() {
           </div>
           <Link to="/faqs" className="text-sm font-semibold text-brand-navy underline-offset-4 hover:underline">{t('home.faq.viewAll')}</Link>
         </div>
-        <div className="mt-6 sm:mt-8 divide-y divide-brand-navy/10 rounded-none border border-[#e7dcc7] bg-white">
+        <div className="mt-6 sm:mt-8 divide-y divide-border overflow-hidden rounded-2xl bg-white shadow-(--shadow-card)">
           {items.map((item, index) => {
             const expanded = open === index
             return (

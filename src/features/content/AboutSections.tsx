@@ -92,7 +92,7 @@ export function ValuesSection() {
   const values = t('pages.about.values.items', { returnObjects: true }) as CopyItem[]
 
   return (
-    <section className="bg-white">
+    <section>
       <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
         <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-end">
           <div>
@@ -187,7 +187,7 @@ export function CompanyProfile({ coverage, fleet }: { coverage: CoverageSummary 
   )
 
   return (
-    <section className="bg-white">
+    <section>
       <div className="mx-auto grid max-w-7xl gap-12 px-4 py-20 sm:px-6 lg:grid-cols-[0.72fr_1.28fr] lg:gap-16 lg:px-8 lg:py-28">
         <div>
           <SectionKicker>{t('pages.about.profile.eyebrow')}</SectionKicker>
@@ -218,7 +218,7 @@ export function HowWeWork() {
   const documentGroups = t('home.documents.groups', { returnObjects: true }) as DocumentGroup[]
 
   return (
-    <section className="bg-white">
+    <section>
       <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
         <div className="max-w-3xl">
           <SectionKicker>{t('pages.about.operations.eyebrow')}</SectionKicker>
@@ -356,7 +356,7 @@ export function CoverageDetails({ coverage }: { coverage: CoverageSummary }) {
   ].filter((stat) => stat.value > 0)
 
   return (
-    <section className="bg-white">
+    <section>
       <div className="mx-auto max-w-7xl px-4 pb-20 sm:px-6 lg:px-8 lg:pb-28">
         <div className="max-w-3xl">
           <SectionKicker>{t('pages.about.coverageDetails.eyebrow')}</SectionKicker>

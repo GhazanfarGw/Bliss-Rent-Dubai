@@ -68,14 +68,14 @@ export function CookieConsentBanner() {
           <button
             type="button"
             onClick={() => choose('declined')}
-            className="flex-1 border border-border px-4 py-2.5 text-sm font-semibold text-brand-navy transition-colors hover:bg-surface-muted sm:flex-none"
+            className="flex-1 rounded-full border border-border px-4 py-2.5 text-sm font-semibold text-brand-navy transition-colors hover:bg-surface-muted sm:flex-none"
           >
             {t('cookieConsent.decline')}
           </button>
           <button
             type="button"
             onClick={() => choose('accepted')}
-            className="flex-1 border border-brand-gold bg-brand-gold px-4 py-2.5 text-sm font-semibold text-white transition-all hover:brightness-105 sm:flex-none"
+            className="flex-1 rounded-full border border-brand-gold bg-brand-gold px-4 py-2.5 text-sm font-semibold text-white transition-all hover:brightness-105 sm:flex-none"
           >
             {t('cookieConsent.accept')}
           </button>

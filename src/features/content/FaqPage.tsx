@@ -72,7 +72,7 @@ function FaqPageContent() {
           onChange={(e) => setQuery(e.target.value)}
           placeholder={t('pages.faqs.searchPlaceholder')}
           aria-label={t('pages.faqs.searchPlaceholder')}
-          className="w-full rounded-none border border-brand-navy/15 bg-white py-3 ps-10 pe-4 text-sm text-brand-navy outline-none transition focus:border-brand-gold focus:ring-2 focus:ring-brand-gold/25"
+          className="w-full rounded-full border border-brand-navy/15 bg-white py-3 ps-10 pe-4 text-sm text-brand-navy outline-none transition focus:border-brand-gold focus:ring-2 focus:ring-brand-gold/25"
         />
       </div>
 
@@ -85,7 +85,7 @@ function FaqPageContent() {
           {filteredCategories.map((category) => (
             <section key={category.heading}>
               <h2 className="text-base font-semibold text-brand-navy">{category.heading}</h2>
-              <div className="mt-3 divide-y divide-brand-navy/10 rounded-none border border-brand-navy/10 bg-white">
+              <div className="mt-3 divide-y divide-brand-navy/10 overflow-hidden rounded-2xl border border-brand-navy/10 bg-white">
                 {category.items.map((item) => {
                   const key = `${category.heading}__${item.question}`
                   const isOpen = openKey === key
@@ -117,7 +117,7 @@ function FaqPageContent() {
         <p className="text-sm text-text-muted">{t('pages.faqs.stillHaveQuestions')}</p>
         <Link
           to="/contact"
-          className="mt-3 inline-flex min-h-11 items-center justify-center rounded-none bg-brand-gold px-6 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-brand-gold-light"
+          className="mt-3 inline-flex min-h-11 items-center justify-center rounded-full bg-brand-gold px-6 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-brand-gold-light"
         >
           {t('pages.faqs.contactCta')}
         </Link>

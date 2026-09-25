@@ -80,28 +80,28 @@ export function VehicleCard({ vehicle, days, detailHref, isAvailable, quantity, 
   return (
     <div
       className={
-        'group relative flex flex-col overflow-hidden border bg-white shadow-[0_10px_30px_rgba(7,10,26,0.06)] transition-[border-color,box-shadow] duration-300 hover:border-brand-gold/50 hover:shadow-[0_22px_50px_rgba(7,10,26,0.12)] ' +
-        (reserved ? 'border-warning/40' : 'border-brand-navy/10')
+        'group relative flex flex-col overflow-hidden rounded-2xl border bg-white shadow-(--shadow-card) transition-[border-color,box-shadow] duration-300 hover:shadow-(--shadow-card-hover) ' +
+        (reserved ? 'border-warning/40' : 'border-brand-navy/5')
       }
     >
-      <div className="relative aspect-16/10 overflow-hidden bg-[#eeeae3]">
+      <div className="relative aspect-16/10 overflow-hidden bg-brand-lavender">
         <VehiclePhoto
           storagePath={image?.storage_path ?? null}
           alt={`${vehicle.make} ${vehicle.model}`}
           className={'h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]' + (reserved ? ' opacity-70 grayscale' : '')}
         />
         {reserved ? (
-          <span className="absolute start-3 top-3 bg-warning-bg px-2 py-1.5 text-[10px] font-medium uppercase leading-none tracking-[0.1em] text-warning shadow-sm">
+          <span className="absolute start-3 top-3 rounded-full bg-warning-bg px-2.5 py-1.5 text-[10px] font-medium uppercase leading-none tracking-[0.1em] text-warning shadow-sm">
             {t('vehicleCard.reserved')}
           </span>
         ) : (
-          <span className="absolute start-3 top-3 inline-flex items-center gap-1.5 bg-white/95 px-2 py-1.5 text-[10px] font-medium uppercase leading-none tracking-[0.1em] text-brand-navy shadow-sm backdrop-blur-sm">
+          <span className="absolute start-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-white/95 px-2.5 py-1.5 text-[10px] font-medium uppercase leading-none tracking-[0.1em] text-brand-navy shadow-sm backdrop-blur-sm">
             <span className="h-1.5 w-1.5 rounded-full bg-success" aria-hidden="true" />
             {t('vehicleCard.available')}
           </span>
         )}
         {quantity != null && quantity > 1 && (
-          <span className="absolute bottom-3 start-3 bg-white/95 px-2 py-1.5 text-[11px] font-medium leading-none text-brand-navy shadow-sm backdrop-blur-sm">
+          <span className="absolute bottom-3 start-3 rounded-full bg-white/95 px-2.5 py-1.5 text-[11px] font-medium leading-none text-brand-navy shadow-sm backdrop-blur-sm">
             {t('vehicleCard.quantityAvailable', { count: quantity })}
           </span>
         )}
@@ -112,7 +112,7 @@ export function VehicleCard({ vehicle, days, detailHref, isAvailable, quantity, 
           tabIndex={tabIndex}
           aria-label={t('vehicleCard.whatsapp')}
           title={t('vehicleCard.whatsapp')}
-          className="absolute bottom-3 end-3 z-10 inline-flex h-10 w-10 items-center justify-center bg-success text-white shadow-md transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white"
+          className="absolute bottom-3 end-3 z-10 inline-flex h-10 w-10 items-center justify-center rounded-full bg-success text-white shadow-md transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white"
         >
           <MessageCircle className="h-4 w-4" aria-hidden="true" />
         </a>
@@ -122,7 +122,7 @@ export function VehicleCard({ vehicle, days, detailHref, isAvailable, quantity, 
         <div className="flex items-center justify-between gap-2">
           <p className="min-w-0 truncate text-[11px] font-bold uppercase tracking-[0.18em] text-brand-gold-dark">{vehicle.make}</p>
           {vehicle.vehicle_categories && (
-            <span className="shrink-0 bg-brand-gold/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.1em] text-brand-navy">
+            <span className="shrink-0 rounded-full bg-brand-gold/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.1em] text-brand-navy">
               {categoryLabel(t, vehicle.vehicle_categories.name)}
             </span>
           )}
@@ -170,7 +170,7 @@ export function VehicleCard({ vehicle, days, detailHref, isAvailable, quantity, 
         </dl>
 
         <div className="mt-auto pt-4">
-          <div className="flex items-end justify-between gap-3 border-t border-brand-navy/10 pt-4">
+          <div className="flex items-end justify-between gap-3 border-t border-border pt-4">
             <div className="min-w-0">
               {reserved ? (
                 <p className="text-xs font-medium text-warning">{t('vehicleCard.reservedForDates')}</p>
@@ -206,7 +206,7 @@ export function VehicleCard({ vehicle, days, detailHref, isAvailable, quantity, 
               to={detailHref}
               tabIndex={tabIndex}
               className={
-                'inline-flex min-h-11 shrink-0 items-center justify-center gap-1.5 px-3.5 text-xs font-semibold transition-colors after:absolute after:inset-0 after:content-[""] focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold focus-visible:ring-offset-2 ' +
+                'inline-flex min-h-11 shrink-0 items-center justify-center gap-1.5 rounded-full px-4 text-xs font-semibold transition-colors after:absolute after:inset-0 after:content-[""] focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold focus-visible:ring-offset-2 ' +
                 (reserved
                   ? 'border border-brand-navy/15 bg-white text-brand-navy hover:bg-brand-gold/10'
                   : 'bg-brand-gold text-white hover:bg-brand-gold-dark')

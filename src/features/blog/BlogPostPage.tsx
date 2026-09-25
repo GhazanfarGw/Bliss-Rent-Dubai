@@ -96,7 +96,7 @@ function PostView({ post }: { post: BlogPost }) {
   })
 
   return (
-    <div className="bg-white text-brand-navy">
+    <div className="text-brand-navy">
       <article>
         <header className="mx-auto max-w-3xl px-4 pb-6 pt-8 sm:px-6 lg:px-8 lg:pt-10">
           <nav aria-label={t('pages.blog.breadcrumbLabel')} className="mb-6 flex flex-wrap items-center gap-1.5 text-xs text-text-muted">

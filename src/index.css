@@ -76,32 +76,37 @@
   --color-info-bg: #eef0f4; /* tint of brand-lavender/platinum (was a mismatched literal before Phase 10) */
 
   --color-surface: #ffffff;
-  --color-surface-muted: #faf9f6;
-  --color-border: #e5e1d8;
+  --color-surface-muted: #f7f8fa;
+  --color-border: #e2e4e9;
   --color-text: #1f1d2e;
   --color-text-muted: #5c5a6b;
 
   /*
-   * The site's main theme is WHITE: every page and section background is
-   * plain `bg-white`, with the navy hero/CTA bands as the only deliberate
-   * dark breaks. These two warm off-whites are NOT section backgrounds —
-   * -warm (#f7f4ef) is the footer's colour and the tint for small inset
-   * panels/chips (search-widget rows, spec tiles, hover states); -warm-alt
-   * is its slightly deeper sibling for the few inset elements that need
-   * one. Do not put either behind a whole section or page unless the owner
-   * asks for it on that specific section.
+   * Theme (owner's request, 2026-09-25 — modelled on qatarairways.com):
+   * the PAGE is a very pale cool grey (`bg-page`, #f4f5f7) and content
+   * sits on it in WHITE cards with rounded corners (rounded-2xl) and a
+   * soft shadow (--shadow-card), no heavy borders. Sections themselves are
+   * transparent — never paint a whole section white or beige. Buttons are
+   * pills (rounded-full). The owner's rule: only SHAPES changed — keep every
+   * existing colour, including the solid maroon panels (Qatar uses maroon
+   * too) and all button background colours.
+   *
+   * The two warm off-whites below are NOT section backgrounds: -warm
+   * (#f7f4ef) is the footer's colour; -warm-alt is its deeper sibling.
    */
+  --color-page: #f4f5f7;
   --color-surface-warm: #f7f4ef;
   --color-surface-warm-alt: #f1eee9;
 
   /*
    * Two standard elevations for card-like content (rest / hover), so
    * every section references one variable instead of inventing its own
-   * bespoke rgba shadow. Radius is deliberately NOT tokenized here —
-   * the redesign's rule is `rounded-none` everywhere, no exceptions.
+   * bespoke rgba shadow. Radius (Qatar-style theme): cards and panels
+   * `rounded-2xl`, inputs/fields `rounded-lg`, buttons and chips
+   * `rounded-full`. (This replaced the earlier `rounded-none` rule.)
    */
-  --shadow-card: 0 18px 36px rgba(16, 20, 29, 0.06);
-  --shadow-card-hover: 0 26px 50px rgba(16, 20, 29, 0.1);
+  --shadow-card: 0 1px 2px rgba(11, 19, 43, 0.04), 0 8px 24px rgba(11, 19, 43, 0.06);
+  --shadow-card-hover: 0 2px 4px rgba(11, 19, 43, 0.05), 0 16px 36px rgba(11, 19, 43, 0.1);
 }
 
 /*
@@ -221,19 +226,18 @@ body {
   display: inline-block;
 }
 
-/* White "box" surface for content that used to sit on solid navy: a plain
-   white fill, a hairline berry (#5C0931) border and a soft neutral shadow.
-   NO gradient or colour tint — the owner explicitly asked for that to be
-   removed, so don't add one back (or a coloured shadow). In the components
-   layer so a plain utility (e.g. `border-t-4`) can still override it.
-   Don't put a `bg-*` utility on the same element. */
+/* The standard white card of the Qatar-style theme: white fill, rounded
+   corners, an almost invisible hairline and the soft card shadow — on the
+   pale grey page that's all the separation it needs. NO gradient or colour
+   tint (the owner asked for those to go), no coloured shadow. In the
+   components layer so a plain utility can still override it. Don't put a
+   `bg-*` utility on the same element. */
 @layer components {
   .white-box {
     background-color: #fff;
-    border: 1px solid rgb(92 9 49 / 0.16);
-    box-shadow:
-      0 18px 40px rgb(16 20 29 / 0.08),
-      0 2px 6px rgb(16 20 29 / 0.04);
+    border: 1px solid rgb(11 19 43 / 0.06);
+    border-radius: 1rem;
+    box-shadow: var(--shadow-card);
   }
 }
 
@@ -310,6 +314,16 @@ body {
   }
   to {
     transform: translateX(0);
+  }
+}
+
+/* Phone bottom sheets (Dialog variant="sheet") rising from the screen edge. */
+@keyframes sheet-up {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
   }
 }
 

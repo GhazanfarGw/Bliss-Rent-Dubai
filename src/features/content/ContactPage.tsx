@@ -42,8 +42,8 @@ export function ContactPage() {
   const faqItems = t('pages.contact.faqShortcut.items', { returnObjects: true }) as FaqItem[]
 
   return (
-    <div className="bg-white text-brand-navy">
-      <section className="relative isolate -mt-[var(--header-h)] overflow-hidden bg-white">
+    <div className="text-brand-navy">
+      <section className="relative isolate -mt-[var(--header-h)] overflow-hidden">
         <div className="pointer-events-none absolute -end-24 top-10 h-72 w-72 rounded-full border border-brand-champagne/35" aria-hidden="true" />
         <div className="pointer-events-none absolute -end-2 top-32 h-44 w-44 rounded-full border border-brand-gold/15" aria-hidden="true" />
         <div className="pointer-events-none absolute -start-16 bottom-[-7rem] h-56 w-56 rounded-full bg-brand-gold/5" aria-hidden="true" />
@@ -71,7 +71,7 @@ export function ContactPage() {
                 href={WHATSAPP_URL}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex min-h-12 items-center justify-center gap-2 bg-brand-gold px-6 text-sm font-semibold text-white transition-all hover:brightness-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-gold"
+                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-brand-gold px-6 text-sm font-semibold text-white transition-all hover:brightness-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-gold"
               >
                 <MessageCircle className="h-4 w-4" aria-hidden="true" />
                 {t('pages.contact.methods.whatsapp.label')}
@@ -79,7 +79,7 @@ export function ContactPage() {
               </a>
               <a
                 href={SUPPORT_EMAIL_HREF}
-                className="inline-flex min-h-12 items-center justify-center gap-2 border border-brand-gold/35 bg-white px-6 text-sm font-semibold text-brand-navy transition-colors hover:border-brand-gold hover:text-brand-gold-dark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-gold"
+                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-brand-gold bg-white px-6 text-sm font-semibold text-brand-navy transition-colors hover:border-brand-gold hover:text-brand-gold-dark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-gold"
               >
                 <Mail className="h-4 w-4 text-brand-gold" aria-hidden="true" />
                 {t('pages.contact.methods.email.label')}
@@ -172,7 +172,7 @@ export function ContactPage() {
         </div>
       </section>
 
-      <section className="bg-white">
+      <section>
         <div className="mx-auto grid max-w-6xl gap-8 px-4 py-12 sm:px-6 sm:py-16 lg:grid-cols-[minmax(17rem,0.72fr)_minmax(0,1.28fr)] lg:gap-14 lg:px-8 lg:py-20">
           <div>
             <p className="text-[10px] font-bold uppercase tracking-[0.32em] text-brand-gold-dark">
@@ -217,7 +217,7 @@ export function ContactPage() {
         </div>
       </section>
 
-      <section className="bg-white">
+      <section>
         <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
           <div className="grid overflow-hidden border border-[#ddd2c5] bg-white lg:grid-cols-[minmax(18rem,0.78fr)_minmax(0,1.22fr)]">
             <div className="flex flex-col justify-between p-6 sm:p-8 lg:p-10">
@@ -235,7 +235,7 @@ export function ContactPage() {
                 href={OFFICE_MAPS_URL}
                 target="_blank"
                 rel="noreferrer"
-                className="mt-8 inline-flex min-h-12 w-full items-center justify-center gap-2 bg-brand-gold px-5 text-sm font-semibold text-white transition-all hover:brightness-105 sm:w-fit"
+                className="mt-8 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-brand-gold px-6 text-sm font-semibold text-white transition-all hover:brightness-105 sm:w-fit"
               >
                 {t('pages.contact.getDirections')}
                 <ArrowUpRight className="h-4 w-4" aria-hidden="true" />

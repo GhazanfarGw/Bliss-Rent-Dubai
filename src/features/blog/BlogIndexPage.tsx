@@ -67,7 +67,7 @@ function BlogIndexView({ category }: { category?: BlogCategory }) {
   })
 
   return (
-    <div className="bg-white text-brand-navy">
+    <div className="text-brand-navy">
       <section className="mx-auto max-w-6xl px-4 pb-8 pt-8 sm:px-6 lg:px-8 lg:pt-10">
         <nav aria-label={t('pages.blog.breadcrumbLabel')} className="mb-6 flex flex-wrap items-center gap-1.5 text-xs text-text-muted">
           <Link to="/" className="hover:text-brand-gold-dark">
@@ -132,7 +132,7 @@ function BlogIndexView({ category }: { category?: BlogCategory }) {
         )}
       </section>
 
-      <div className="bg-white">
+      <div>
         <CityLinks heading={t('pages.blog.exploreCitiesHeading')} body={t('pages.blog.exploreCitiesBody')} />
       </div>
 

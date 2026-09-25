@@ -197,7 +197,7 @@ function PaymentStepBody({ vehicleId, vehicle, criteria, pickup, dropoff, draft,
     return (
       <>
         <Card>
-          <div className="rounded-none border border-error/25 bg-error-bg px-4 py-3 text-sm text-error" role="alert">
+          <div className="rounded-xl border border-error/25 bg-error-bg px-4 py-3 text-sm text-error" role="alert">
             {initError ?? t('checkout.payment.genericError')}
           </div>
         </Card>

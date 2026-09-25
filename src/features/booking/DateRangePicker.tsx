@@ -4,6 +4,9 @@ import { validateDateRange, rentalDays } from '@/lib/dateRange'
 import { isRtl } from '@/i18n'
 import { Dialog } from '@/features/shared/ui/Dialog'
 import { Button } from '@/features/shared/ui/Button'
+import { FieldPopover } from '@/features/shared/ui/FieldPopover'
+import { BAR_BORDER, BAR_LABEL, barTriggerClass, barValueClass } from '@/features/booking/searchBarStyles'
+import { useMediaQuery } from '@/lib/useMediaQuery'
 import {
   addMonths,
   buildMonthGrid,
@@ -45,9 +48,25 @@ interface DateRangePickerProps {
    * "Done" confirmation (default false).
    */
   closeOnComplete?: boolean
+  /**
+   * Homepage search-bar segment (Qatar-style): a two-part Pickup / Return
+   * trigger and a dropdown calendar panel under it — square day cells,
+   * Clear / Done pills — instead of the modal sheet. Same date logic.
+   */
+  bar?: boolean
+  /** `bar` only: segment wrapper classes (width, dividers) from the bar layout. */
+  className?: string
 }
 
 type Phase = 'start' | 'end' | 'complete'
+
+/**
+ * The phone calendar sheet lists months from this one onwards: a few at
+ * first, more appended as the visitor scrolls near the end, up to a year.
+ */
+const MOBILE_MONTHS_MAX = 12
+const MOBILE_MONTHS_INITIAL = 4
+const MOBILE_MONTHS_STEP = 3
 
 /**
  * One combined pickup+return date control: a single trigger that opens a
@@ -71,9 +90,12 @@ export function DateRangePicker({
   open: controlledOpen,
   onOpenChange,
   closeOnComplete = false,
+  bar = false,
+  className = '',
 }: DateRangePickerProps) {
   const { t, i18n } = useTranslation()
   const rtl = isRtl(i18n.language)
+  const anchorRef = useRef<HTMLDivElement>(null)
   const [internalOpen, setInternalOpen] = useState(false)
   const isControlled = controlledOpen !== undefined
   const open = isControlled ? controlledOpen : internalOpen
@@ -86,6 +108,11 @@ export function DateRangePicker({
   const [viewYear, setViewYear] = useState(today.year)
   const [viewMonth0, setViewMonth0] = useState(today.month0)
   const dayRefs = useRef(new Map<string, HTMLButtonElement>())
+  // `bar` only: phones get a full-screen sheet of stacked months (see below).
+  const desktop = useMediaQuery('(min-width: 1024px)')
+  const monthRefs = useRef(new Map<string, HTMLDivElement>())
+  const [mobileMonthCount, setMobileMonthCount] = useState(MOBILE_MONTHS_INITIAL)
+  const moreMonthsRef = useRef<HTMLDivElement>(null)
 
   const phase: Phase = !startDate ? 'start' : !endDate ? 'end' : 'complete'
   const validation = validateDateRange(startDate, endDate, new Date(todayIso + 'T00:00:00'))
@@ -99,8 +126,38 @@ export function DateRangePicker({
     const anchor = parseIso(startDate || todayIso)
     setViewYear(anchor.year)
     setViewMonth0(anchor.month0)
+    // Phone sheet: list enough months to reach the pickup month (+1 after it).
+    const monthsAhead = (anchor.year - today.year) * 12 + (anchor.month0 - today.month0)
+    setMobileMonthCount(Math.min(MOBILE_MONTHS_MAX, Math.max(MOBILE_MONTHS_INITIAL, monthsAhead + 2)))
     // eslint-disable-next-line react-hooks/exhaustive-deps -- only meant to run when the sheet opens, not on every keystroke of startDate/todayIso
   }, [open])
+
+  // Phone sheet: open on the pickup month when one is already chosen.
+  useEffect(() => {
+    if (!bar || !open || desktop || !startDate) return
+    const { year, month0 } = parseIso(startDate)
+    const month = monthRefs.current.get(`${year}-${month0}`)
+    // jsdom (unit tests) doesn't implement scrollIntoView.
+    if (typeof month?.scrollIntoView === 'function') month.scrollIntoView({ block: 'start' })
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- only when the sheet opens
+  }, [open])
+
+  // Phone sheet: append more months as the end of the list scrolls into view.
+  useEffect(() => {
+    if (!bar || !open || desktop || mobileMonthCount >= MOBILE_MONTHS_MAX) return
+    const sentinel = moreMonthsRef.current
+    if (!sentinel || typeof IntersectionObserver === 'undefined') return
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          setMobileMonthCount((count) => Math.min(MOBILE_MONTHS_MAX, count + MOBILE_MONTHS_STEP))
+        }
+      },
+      { rootMargin: '400px' },
+    )
+    observer.observe(sentinel)
+    return () => observer.disconnect()
+  }, [bar, open, desktop, mobileMonthCount])
 
   function handleDayClick(iso: string) {
     if (phase === 'end') {
@@ -154,6 +211,17 @@ export function DateRangePicker({
     const roundEnd = !rightCell || !isHighlighted(rightCell.iso)
 
     const wrapperClasses = ['h-11 sm:h-10 flex items-center justify-center']
+
+    if (bar) {
+      // Square cells: pickup/return filled in brand berry, the days between
+      // on a light berry band (no rounding, so the band reads as one strip).
+      if (highlighted && !isSingle) wrapperClasses.push('bg-brand-gold/10')
+      let circleClass = 'text-brand-navy hover:bg-brand-lavender'
+      if (disabled) circleClass = 'text-text-muted/50 cursor-not-allowed'
+      else if (isStart || isEnd || isSingle) circleClass = 'bg-brand-gold text-white hover:bg-brand-gold'
+      return { wrapperClass: wrapperClasses.join(' '), circleClass }
+    }
+
     if (highlighted) {
       if (!isSingle) wrapperClasses.push('bg-brand-lavender/60')
       if (roundStart) wrapperClasses.push('rounded-s-full')
@@ -195,7 +263,12 @@ export function DateRangePicker({
         <p className="mb-3 text-center text-sm font-semibold text-brand-navy">
           {formatMonthLabel(year, month0, i18n.language)}
         </p>
-        <div className="grid grid-cols-7 text-center text-[11px] font-semibold uppercase tracking-wide text-text-muted">
+        <div
+          className={
+            'grid grid-cols-7 text-center text-text-muted ' +
+            (bar ? 'border-b border-[#efece7] pb-2 text-xs' : 'text-[11px] font-semibold uppercase tracking-wide')
+          }
+        >
           {weekdays.map((w, i) => (
             <span key={i}>{w}</span>
           ))}
@@ -230,7 +303,8 @@ export function DateRangePicker({
                       onFocus={() => phase === 'end' && setHoverIso(cell.iso)}
                       onKeyDown={(e) => handleDayKeyDown(e, cell.iso)}
                       className={
-                        'relative flex h-11 w-11 items-center justify-center rounded-full text-sm font-medium outline-none transition-colors focus-visible:ring-2 focus-visible:ring-brand-navy focus-visible:ring-offset-2 disabled:cursor-not-allowed sm:h-10 sm:w-10 ' +
+                        'relative flex items-center justify-center text-sm font-medium outline-none transition-colors focus-visible:ring-2 focus-visible:ring-brand-navy focus-visible:ring-offset-2 disabled:cursor-not-allowed ' +
+                        (bar ? 'h-11 w-full rounded-md sm:h-10 ' : 'h-11 w-11 rounded-full sm:h-10 sm:w-10 ') +
                         circleClass
                       }
                     >
@@ -251,6 +325,151 @@ export function DateRangePicker({
 
   const placeholder = t('searchWidget.calendar.selectDates')
   const daysLabel = days !== null ? t('searchWidget.calendar.days', { count: days }) : null
+
+  if (bar) {
+    const summary =
+      phase === 'start'
+        ? placeholder
+        : phase === 'end'
+          ? `${formatLongDate(startDate, i18n.language)} → ${t('searchWidget.calendar.selectReturnDate')}`
+          : `${formatLongDate(startDate, i18n.language)} – ${formatLongDate(endDate, i18n.language)} · ${daysLabel}`
+    const pill = 'inline-flex min-h-11 flex-1 items-center justify-center rounded-full px-6 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-40 lg:flex-none '
+    const clearButton = (
+      <button
+        type="button"
+        onClick={() => onChange({ startDate: '', endDate: '' })}
+        disabled={!startDate}
+        className={pill + 'border border-brand-gold text-brand-gold hover:bg-brand-gold/5'}
+      >
+        {t('searchWidget.calendar.clear')}
+      </button>
+    )
+    const doneButton = (
+      <button
+        type="button"
+        onClick={() => setOpen(false)}
+        disabled={!validation.valid}
+        className={pill + 'bg-brand-gold text-white hover:bg-brand-gold-dark'}
+      >
+        {t('searchWidget.calendar.done')}
+      </button>
+    )
+
+    return (
+      <div ref={anchorRef} className={'relative ' + className}>
+        <button
+          type="button"
+          aria-haspopup="dialog"
+          aria-expanded={open}
+          onClick={() => setOpen(true)}
+          className={barTriggerClass(open) + ' grid! grid-cols-2 gap-0!'}
+        >
+          <span className="min-w-0 pe-3">
+            <span className={BAR_LABEL}>{t('searchWidget.calendar.pickup')}</span>
+            <span className={barValueClass(!startDate)}>
+              <span className="ltr-nums">{startDate ? formatLongDate(startDate, i18n.language) : placeholder}</span>
+            </span>
+          </span>
+          <span className="min-w-0 border-s border-[#e6e3de] ps-3">
+            <span className={BAR_LABEL}>{t('searchWidget.calendar.return')}</span>
+            <span className={barValueClass(!endDate)}>
+              <span className="ltr-nums">{endDate ? formatLongDate(endDate, i18n.language) : placeholder}</span>
+            </span>
+          </span>
+        </button>
+
+        <FieldPopover
+          open={open}
+          onClose={() => setOpen(false)}
+          title={t('searchWidget.calendar.title')}
+          closeLabel={t('common.close')}
+          anchorRef={anchorRef}
+          align="end"
+          widthClassName="w-[46rem]"
+          sheetMaxWidthClassName="max-w-2xl"
+          mobileFullScreen
+          mobileFooter={
+            desktop ? undefined : (
+              <div>
+                <p className="ltr-nums mb-3 text-sm text-text-muted">{summary}</p>
+                <div className="flex gap-3">{clearButton}{doneButton}</div>
+              </div>
+            )
+          }
+        >
+          {desktop ? (
+          <div className="p-6">
+            <div className="relative px-10">
+              <button
+                type="button"
+                aria-label={t('searchWidget.calendar.previousMonth')}
+                disabled={atFloorMonth}
+                onClick={() => goToMonth(-1)}
+                className="absolute start-0 top-0 rounded-full p-2 text-brand-navy hover:bg-brand-lavender disabled:cursor-not-allowed disabled:opacity-30"
+              >
+                <ChevronIcon className="h-4 w-4 rtl:rotate-180" />
+              </button>
+              <button
+                type="button"
+                aria-label={t('searchWidget.calendar.nextMonth')}
+                onClick={() => goToMonth(1)}
+                className="absolute end-0 top-0 rounded-full p-2 text-brand-navy hover:bg-brand-lavender"
+              >
+                <ChevronIcon className="h-4 w-4 rotate-180 rtl:rotate-0" />
+              </button>
+              <div className="grid grid-cols-1 gap-8 sm:grid-cols-2">
+                {renderMonth(viewYear, viewMonth0, false)}
+                {renderMonth(rightMonth.year, rightMonth.month0, true)}
+              </div>
+            </div>
+
+            <div className="mt-5 flex items-center justify-between gap-3 border-t border-[#efece7] pt-4">
+              <p className="ltr-nums text-sm text-text-muted">{summary}</p>
+              <div className="flex gap-3">{clearButton}{doneButton}</div>
+            </div>
+          </div>
+          ) : (
+            // Phones: Qatar's full-screen "Travel Dates" sheet — the Pickup /
+            // Return boxes pinned on top (the one being picked outlined), then
+            // a year of months stacked to scroll through, no arrows.
+            <div>
+              <div className="sticky top-0 z-10 -mx-5 grid grid-cols-2 gap-3 border-b border-[#efece7] bg-white px-5 pb-3">
+                {[
+                  { label: t('searchWidget.calendar.pickup'), iso: startDate, active: phase === 'start' },
+                  { label: t('searchWidget.calendar.return'), iso: endDate, active: phase === 'end' },
+                ].map((box) => (
+                  <div
+                    key={box.label}
+                    className={'rounded-lg border px-3 py-2 ' + (box.active ? 'border-brand-navy ring-1 ring-brand-navy' : BAR_BORDER)}
+                  >
+                    <span className={BAR_LABEL}>{box.label}</span>
+                    <span className={barValueClass(!box.iso)}>
+                      <span className="ltr-nums">{box.iso ? formatLongDate(box.iso, i18n.language) : '—'}</span>
+                    </span>
+                  </div>
+                ))}
+              </div>
+              <div className="space-y-8 pt-5">
+                {Array.from({ length: mobileMonthCount }, (_, i) => addMonths(today.year, today.month0, i)).map(({ year, month0 }) => (
+                  <div
+                    key={`${year}-${month0}`}
+                    className="scroll-mt-24"
+                    ref={(el) => {
+                      if (el) monthRefs.current.set(`${year}-${month0}`, el)
+                      else monthRefs.current.delete(`${year}-${month0}`)
+                    }}
+                  >
+                    {renderMonth(year, month0, false)}
+                  </div>
+                ))}
+                <div ref={moreMonthsRef} aria-hidden="true" />
+              </div>
+            </div>
+          )}
+        </FieldPopover>
+      </div>
+    )
+  }
 
   return (
     <div>

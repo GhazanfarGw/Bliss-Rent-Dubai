@@ -88,7 +88,7 @@ function CarTypesPageContent() {
       {vehicles === null && (
         <div className="mt-8 grid gap-6 sm:grid-cols-2" aria-hidden="true">
           {[1, 2, 3, 4].map((item) => (
-            <div key={item} className="h-80 animate-pulse rounded-none bg-brand-lavender/40" />
+            <div key={item} className="h-80 animate-pulse rounded-2xl bg-brand-lavender/40" />
           ))}
         </div>
       )}
@@ -105,7 +105,7 @@ function CarTypesPageContent() {
             <Link
               key={cat.id}
               to={`/search?category=${cat.id}`}
-              className="group overflow-hidden rounded-none border border-brand-navy/10 bg-white shadow-(--shadow-card) transition-all duration-300 hover:-translate-y-1 hover:border-brand-gold hover:shadow-(--shadow-card-hover)"
+              className="group overflow-hidden rounded-2xl border border-brand-navy/10 bg-white shadow-(--shadow-card) transition-all duration-300 hover:-translate-y-1 hover:border-brand-gold hover:shadow-(--shadow-card-hover)"
             >
               <div className="aspect-[16/9] overflow-hidden bg-brand-lavender/60">
                 <VehiclePhoto
@@ -116,7 +116,7 @@ function CarTypesPageContent() {
               </div>
               <div className="p-6">
                 {cat.blurb && (
-                  <span className="inline-block rounded-none bg-brand-lavender px-3 py-1 text-xs font-semibold text-brand-navy">
+                  <span className="inline-block rounded-full bg-brand-lavender px-3 py-1 text-xs font-semibold text-brand-navy">
                     {cat.blurb.tagline}
                   </span>
                 )}
@@ -143,7 +143,7 @@ function CarTypesPageContent() {
       <div className="mt-8 flex justify-center">
         <Link
           to="/search"
-          className="rounded-none bg-brand-gold px-6 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-brand-gold-light"
+          className="rounded-full bg-brand-gold px-6 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-brand-gold-light"
         >
           {t('pages.carTypes.cta')}
         </Link>

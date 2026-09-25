@@ -23,7 +23,7 @@ export function Layout() {
   }, [location])
 
   return (
-    <div className="flex min-h-screen flex-col bg-white text-brand-navy">
+    <div className="flex min-h-screen flex-col bg-page text-brand-navy">
       <NavBar />
       {/* NavBar is `fixed`, so it's out of document flow — every page's
           content must clear its height itself. `pt-[var(--header-h)]` here

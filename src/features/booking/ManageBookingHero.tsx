@@ -38,7 +38,7 @@ export function ManageBookingHero(props: ManageBookingLookupCardProps) {
         <TrustItem icon={Lock} label={t('manageBooking.hero.trust3')} />
       </ul>
 
-      <div className="white-box mt-8 rounded-none p-6 sm:p-8">
+      <div className="white-box mt-8 p-6 sm:p-8">
         <h2 className="font-hero-serif text-xl font-semibold tracking-[-0.02em] text-brand-navy sm:text-2xl">{t('manageBooking.formHeading')}</h2>
         <div className="mt-5 sm:mt-6">
           <ManageBookingLookupCard {...props} />

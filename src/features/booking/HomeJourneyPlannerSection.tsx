@@ -39,7 +39,7 @@ export function HomeJourneyPlannerSection() {
   const confidence = t('home.journeyPlanner.confidence', { returnObjects: true }) as ConfidenceItem[]
 
   return (
-    <section className="bg-white py-8 sm:py-12 lg:py-14">
+    <section className="py-8 sm:py-12 lg:py-14">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mb-6 grid gap-3 sm:mb-8 sm:gap-5 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:items-end">
           <div>
@@ -53,7 +53,7 @@ export function HomeJourneyPlannerSection() {
           </p>
         </div>
 
-        <div className="grid overflow-hidden border border-[#e2d8cc] bg-white shadow-[0_24px_70px_rgba(73,42,31,0.09)] lg:grid-cols-[1.1fr_0.9fr]">
+        <div className="grid overflow-hidden rounded-2xl bg-white shadow-(--shadow-card) lg:grid-cols-[1.1fr_0.9fr]">
           <div className="relative min-h-[22rem] overflow-hidden sm:min-h-[30rem] lg:min-h-[44rem]">
             <img
               src={openRoadImage}
@@ -65,16 +65,16 @@ export function HomeJourneyPlannerSection() {
 
           <div className="flex flex-col p-5 sm:p-8 lg:p-10">
             <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-brand-gold-dark">{t('home.journeyPlanner.chooseLabel')}</p>
-            <div className="mt-4 border-t border-brand-navy/10">
+            <div className="mt-4 border-t border-border">
               {journeys.map((journey, index) => {
                 const Icon = JOURNEY_ICONS[index] ?? Route
                 return (
                   <Link
                     key={journey.title}
                     to={JOURNEY_LINKS[index] ?? '/search'}
-                    className="group grid grid-cols-[auto_1fr_auto] items-start gap-4 border-b border-brand-navy/10 py-6"
+                    className="group grid grid-cols-[auto_1fr_auto] items-start gap-4 border-b border-border py-6"
                   >
-                    <span className="flex h-11 w-11 items-center justify-center border border-brand-gold/25 bg-white text-brand-gold transition-colors group-hover:bg-brand-gold group-hover:text-white">
+                    <span className="flex h-11 w-11 items-center justify-center rounded-full border border-brand-gold/25 bg-white text-brand-gold transition-colors group-hover:bg-brand-gold group-hover:text-white">
                       <Icon className="h-5 w-5" aria-hidden="true" />
                     </span>
                     <span>
@@ -95,14 +95,14 @@ export function HomeJourneyPlannerSection() {
               <button
                 type="button"
                 onClick={() => document.getElementById('booking-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
-                className="group inline-flex min-h-12 items-center gap-2 bg-brand-gold px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-gold-dark"
+                className="group inline-flex min-h-12 items-center gap-2 rounded-full bg-brand-gold px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-gold-dark"
               >
                 {t('home.journeyPlanner.primaryCta')}
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1 rtl:rotate-180 rtl:group-hover:-translate-x-1" aria-hidden="true" />
               </button>
               <Link
                 to="/locations"
-                className="inline-flex min-h-12 items-center border border-brand-gold/35 bg-white px-5 py-3 text-sm font-semibold text-brand-navy transition-colors hover:border-brand-gold"
+                className="inline-flex min-h-12 items-center rounded-full border border-brand-gold/35 bg-white px-6 py-3 text-sm font-semibold text-brand-navy transition-colors hover:border-brand-gold"
               >
                 {t('home.journeyPlanner.secondaryCta')}
               </Link>
@@ -110,11 +110,11 @@ export function HomeJourneyPlannerSection() {
           </div>
         </div>
 
-        <div className="grid border-x border-b border-[#e2d8cc] bg-white sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-4 grid overflow-hidden rounded-2xl bg-white shadow-(--shadow-card) sm:grid-cols-2 lg:grid-cols-4">
           {confidence.map((item, index) => {
             const Icon = CONFIDENCE_ICONS[index] ?? BadgeCheck
             return (
-              <article key={item.title} className="grid grid-cols-[auto_1fr] gap-3 border-b border-[#e2d8cc] p-5 last:border-b-0 sm:border-e lg:border-b-0 lg:p-6">
+              <article key={item.title} className="grid grid-cols-[auto_1fr] gap-3 border-b border-border p-5 last:border-b-0 sm:border-border lg:border-b-0 lg:p-6">
                 <Icon className="mt-0.5 h-5 w-5 text-brand-gold" aria-hidden="true" />
                 <div>
                   <h3 className="text-sm font-semibold text-brand-navy">{item.title}</h3>

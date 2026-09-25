@@ -24,7 +24,9 @@ export function Footer() {
   const isArabic = i18n.language === 'ar'
 
   return (
-    <footer className="border-t border-[#ece7df] bg-surface-warm text-[#1f2430]">
+    // White panel with large rounded top corners on the grey page, like the
+    // Qatar Airways footer. The maroon pattern strip on top stays.
+    <footer className="overflow-hidden rounded-t-[2rem] bg-white text-[#1f2430]">
       <img className='w-full mx-auto justify-center' src='/footerbaner.jpg' alt="Footer Logo" />
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-5">
@@ -42,7 +44,7 @@ export function Footer() {
                     key={name}
                     href={href}
                     aria-label={name}
-                    className="flex h-8 w-8 items-center justify-center rounded-none border border-[#e5dfd6] bg-white text-[#1f2430] transition-colors hover:border-brand-gold/40 hover:bg-brand-gold/10 hover:text-brand-navy"
+                    className="flex h-8 w-8 items-center justify-center rounded-full border border-[#e5dfd6] bg-white text-[#1f2430] transition-colors hover:border-brand-gold/40 hover:bg-brand-gold/10 hover:text-brand-navy"
                   >
                     <Icon className="h-4 w-4" />
                   </a>
@@ -161,7 +163,7 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-10 flex flex-col gap-4 border-t border-[#e5dfd6] pt-6 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-10 flex flex-col gap-4 border-t border-border pt-6 sm:flex-row sm:items-center sm:justify-between">
           <div className="text-xs text-text-muted">
             © {new Date().getFullYear()} {t('footer.copyright')}
           </div>
@@ -171,7 +173,7 @@ export function Footer() {
               {PAYMENT_LOGOS.map((logo) => (
                 <span
                   key={logo.name}
-                  className="flex h-9 w-13 items-center justify-center rounded-none border border-[#e5dfd6] bg-white"
+                  className="flex h-9 w-13 items-center justify-center rounded-md border border-[#e5dfd6] bg-white"
                 >
                   <svg viewBox="0 0 24 24" role="img" aria-label={logo.name} className="h-5.5 w-5.5">
                     <path d={logo.path} fill={`#${logo.hex}`} />

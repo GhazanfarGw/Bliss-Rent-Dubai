@@ -85,7 +85,7 @@ export function BrandsMarquee() {
 
 function BrandCard({ name }: { name: string }) {
   return (
-    <div className="group flex h-full w-[100px] shrink-0 flex-col items-center justify-between rounded-none border border-transparent py-2 shadow-none transition-all duration-300 hover:-translate-y-1]">
+    <div className="group flex h-full w-[100px] shrink-0 flex-col items-center justify-between rounded-xl border border-transparent py-2 shadow-none transition-all duration-300 hover:-translate-y-1]">
       {/* Monochrome at rest, real brand color on hover — "silver" logo
           strip per the redesign brief. grayscale/opacity apply to
           whichever mark renders (the real simple-icons SVG, or the

@@ -31,7 +31,7 @@ export function TripCard({ trip }: { trip: TripView }) {
   return (
     <section
       aria-label={t('searchResults.yourTrip')}
-      className="shrink-0 border border-t-2 border-brand-navy/10 border-t-brand-gold bg-white shadow-[0_18px_45px_rgba(7,10,26,0.06)]"
+      className="shrink-0 overflow-hidden rounded-2xl border border-t-2 border-brand-navy/10 border-t-brand-gold bg-white shadow-(--shadow-card)"
     >
       <div className="flex items-center justify-between gap-3 border-b border-brand-navy/10 px-5 py-4">
         <h2 className="flex items-center gap-2 text-sm font-semibold text-brand-navy">
@@ -71,7 +71,7 @@ export function TripCard({ trip }: { trip: TripView }) {
               type="button"
               onClick={onEdit}
               aria-haspopup="dialog"
-              className="mt-4 inline-flex min-h-11 w-full items-center justify-center gap-2 bg-brand-gold px-4 text-sm font-semibold text-white transition-all hover:brightness-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold focus-visible:ring-offset-2"
+              className="mt-4 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-full bg-brand-gold px-4 text-sm font-semibold text-white transition-all hover:brightness-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold focus-visible:ring-offset-2"
             >
               <CalendarDays className="h-4 w-4" aria-hidden="true" />
               {t('searchResults.addDates')}
@@ -114,9 +114,9 @@ export function TripPill({ trip }: { trip: TripView }) {
       type="button"
       onClick={trip.onEdit}
       aria-haspopup="dialog"
-      className="flex w-full items-center gap-3 border border-brand-navy/12 bg-white px-3 py-2 text-start transition-colors hover:border-brand-gold focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold"
+      className="flex w-full items-center gap-3 rounded-xl border border-brand-navy/12 bg-white px-3 py-2 text-start transition-colors hover:border-brand-gold focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold"
     >
-      <span className="grid h-8 w-8 shrink-0 place-items-center bg-brand-gold/10 text-brand-gold">
+      <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-brand-gold/10 text-brand-gold">
         <CalendarDays className="h-4 w-4" aria-hidden="true" />
       </span>
       <span className="min-w-0 flex-1">

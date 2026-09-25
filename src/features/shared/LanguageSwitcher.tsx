@@ -38,7 +38,7 @@ export function LanguageSwitcher({ className = '', tone = 'dark' }: LanguageSwit
     <button
       type="button"
       onClick={toggle}
-      className={'flex items-center gap-1.5 rounded-none border px-3 py-1.5 text-sm font-semibold transition-colors ' + toneClass + (className ? ' ' + className : '')}
+      className={'flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm font-semibold transition-colors ' + toneClass + (className ? ' ' + className : '')}
       aria-label={t('nav.switchLanguage')}
     >
       {offeringArabic ? <UaeFlag className="h-3.5 w-auto shrink-0" /> : <UkFlag className="h-3.5 w-auto shrink-0" />}

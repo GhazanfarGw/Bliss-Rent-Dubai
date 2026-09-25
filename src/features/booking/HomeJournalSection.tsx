@@ -27,7 +27,7 @@ export function HomeJournalSection() {
   const { t, i18n } = useTranslation()
 
   return (
-    <section className="bg-white py-8 sm:py-12 lg:py-14">
+    <section className="py-8 sm:py-12 lg:py-14">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid gap-5 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:items-end">
           <div>
@@ -89,12 +89,12 @@ function StoryCard({
   return (
     <article
       className={
-        'group min-w-[82vw] snap-start overflow-hidden border border-[#e4dbd0] bg-white shadow-[0_18px_45px_rgba(72,54,43,0.08)] sm:min-w-[60vw] lg:min-w-0 ' +
+        'group min-w-[82vw] snap-start overflow-hidden rounded-2xl bg-white shadow-(--shadow-card) transition-shadow duration-300 hover:shadow-(--shadow-card-hover) sm:min-w-[60vw] lg:min-w-0 ' +
         (featured ? 'lg:row-span-2' : '')
       }
     >
       <Link to={postPath(post.slug)} className="flex h-full flex-col focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-gold">
-        <div className={'relative overflow-hidden bg-[#eee6dc] ' + (featured ? 'h-52 sm:h-72 lg:h-[29rem]' : 'h-52 lg:h-48')}>
+        <div className={'relative overflow-hidden bg-brand-lavender ' + (featured ? 'h-52 sm:h-72 lg:h-[29rem]' : 'h-52 lg:h-48')}>
           <img
             src={image}
             alt={imageAlt}
@@ -102,7 +102,7 @@ function StoryCard({
             fetchPriority={featured ? 'low' : undefined}
             className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.025]"
           />
-          <span className="absolute end-4 top-4 bg-white/92 px-3 py-1.5 text-[9px] font-bold uppercase tracking-[0.18em] text-brand-gold-dark backdrop-blur-sm">
+          <span className="absolute end-4 top-4 rounded-full bg-white/92 px-3 py-1.5 text-[9px] font-bold uppercase tracking-[0.18em] text-brand-gold-dark backdrop-blur-sm">
             {t('home.journal.latestLabel')}
           </span>
         </div>

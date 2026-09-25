@@ -229,7 +229,7 @@ export function SearchResultsPage() {
   const hasCars = loaded && state.vehicles.length > 0
 
   return (
-    <div className="min-h-screen bg-[#f5f3ef] pb-12 sm:pb-16">
+    <div className="min-h-screen pb-12 sm:pb-16">
       <div className={CONTAINER + ' pt-6 sm:pt-8 lg:pt-10'}>
         <header className="flex flex-col gap-4 pb-5 sm:flex-row sm:items-end sm:justify-between sm:pb-6">
           <div>
@@ -292,7 +292,7 @@ export function SearchResultsPage() {
                     <button
                       type="button"
                       onClick={() => setFilters(EMPTY_FILTERS)}
-                      className="min-h-11 bg-brand-gold px-5 text-sm font-semibold text-white transition-all hover:brightness-105"
+                      className="min-h-11 rounded-full bg-brand-gold px-6 text-sm font-semibold text-white transition-all hover:brightness-105"
                     >
                       {t('searchResults.filters.clear')}
                     </button>
@@ -334,7 +334,7 @@ function FleetSkeleton() {
   return (
     <div aria-label="Loading fleet" className={'animate-pulse ' + GRID}>
       {Array.from({ length: 6 }, (_, index) => (
-        <div key={index} className="overflow-hidden border border-brand-navy/8 bg-white">
+        <div key={index} className="overflow-hidden rounded-2xl bg-white shadow-(--shadow-card)">
           <div className="aspect-16/10 bg-brand-navy/8" />
           <div className="space-y-3 p-4">
             <div className="h-3 w-24 bg-brand-navy/8" />
