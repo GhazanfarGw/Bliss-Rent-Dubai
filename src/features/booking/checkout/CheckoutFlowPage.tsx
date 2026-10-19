@@ -16,6 +16,7 @@ import { createBooking, CheckoutApiError } from '@/features/booking/checkout/che
 import { saveBookingResult, saveActiveBooking, readActiveBooking, type ActiveBookingPointer } from '@/features/booking/checkout/checkoutStorage'
 import { criteriaToSearchParams } from '@/features/booking/searchParams'
 import { rentalDays } from '@/lib/dateRange'
+import { attachBookingAttribution, trackBookingCreated } from '@/lib/tracking'
 import { quoteForDays, TERM_LABELS } from '@/lib/pricing'
 import { Button, Card, DateField, StatusBadge, TextField } from '@/features/shared/ui'
 import { CurrencySymbol } from '@/features/shared/ui/CurrencySymbol'
@@ -187,6 +188,14 @@ export function CheckoutFlowPage() {
         },
       })
       saveBookingResult(result)
+      // Marketing attribution + conversion events — fire-and-forget, never blocks checkout.
+      void attachBookingAttribution(result.bookingId)
+      trackBookingCreated({
+        bookingId: result.bookingId,
+        value: result.totalPrice,
+        currency: result.currency,
+        vehicle: `${vehicle!.make} ${vehicle!.model}`,
+      })
       saveActiveBooking({
         vehicleId: vehicleId!,
         vehicleMake: vehicle!.make,

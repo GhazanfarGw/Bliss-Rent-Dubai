@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { prefersReducedMotion } from '@/lib/motion'
 import { Spinner } from '@/features/shared/StateMessage'
+import { trackPageView } from '@/lib/tracking'
 
 const ROUTE_LOADER_DURATION_MS = 450
 
@@ -23,6 +24,10 @@ export function RouteNavigationShell({ children }: RouteNavigationShellProps) {
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'auto' })
   }, [location.pathname, location.hash])
+
+  useEffect(() => {
+    trackPageView(location.pathname + location.search)
+  }, [location.pathname, location.search])
 
   useEffect(() => {
     const pathChanged = previousPathRef.current !== location.pathname

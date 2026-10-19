@@ -964,6 +964,20 @@ export interface Database {
        * "estimated new total" preview — never the full admin settings rows.
        * See supabase/migrations/20260918000000_extension_price_preview_and_email_breakdown.sql.
        */
+      /** 2026-10-19 — write-once UTM attribution for a just-created booking (src/lib/tracking.ts). */
+      set_booking_attribution: {
+        Args: {
+          p_booking_id: string
+          p_utm_source?: string | null
+          p_utm_medium?: string | null
+          p_utm_campaign?: string | null
+          p_utm_content?: string | null
+          p_utm_term?: string | null
+          p_referrer?: string | null
+          p_landing_page?: string | null
+        }
+        Returns: boolean
+      }
       get_extension_estimate_config: {
         Args: Record<string, never>
         Returns: {

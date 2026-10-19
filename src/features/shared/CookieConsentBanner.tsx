@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { readCookieConsent, storeCookieConsent, type CookieConsent } from '@/lib/cookieConsent'
 import { prefersReducedMotion } from '@/lib/motion'
+import { loadTrackersIfConsented } from '@/lib/tracking'
 
 /**
  * A first-visit cookie notice — Accept / Decline, plus a link to the real
@@ -40,6 +41,7 @@ export function CookieConsentBanner() {
 
   function choose(next: CookieConsent) {
     storeCookieConsent(next)
+    if (next === 'accepted') loadTrackersIfConsented()
     setVisible(false)
     setConsent(next)
   }

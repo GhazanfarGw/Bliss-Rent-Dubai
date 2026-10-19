@@ -2229,7 +2229,7 @@ const en = {
     },
     cookiePolicy: {
       title: 'Cookie Policy',
-      updated: 'Last updated: 27 August 2026',
+      updated: 'Last updated: 19 October 2026',
       draftNotice:
         'DRAFT — pending legal review. This page is a standard, plain-language starting point and is not legal advice. Please have a qualified lawyer review and finalize this policy before the site goes live.',
       sections: [
@@ -2241,7 +2241,7 @@ const en = {
           heading: '2. Cookies we use',
           list: [
             'Essential cookies — required for the website to work, such as remembering your language preference (English/Arabic) and keeping your booking session active while you check out.',
-            'We do not currently use advertising or third-party tracking cookies.',
+            'Analytics and advertising cookies (only if you click "Accept" on our cookie banner) — Google Analytics, Google Tag Manager, Google Ads and the Meta Pixel help us understand how visitors use the site and measure our advertising. If you click "Decline", none of these are loaded.',
           ],
         },
         {

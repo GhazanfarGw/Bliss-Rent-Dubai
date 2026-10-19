@@ -4,6 +4,11 @@ import './index.css'
 import './i18n'
 import App from './App.tsx'
 import { ErrorBoundary } from '@/features/shared/ErrorBoundary'
+import { captureAttribution, installContactClickTracking, loadTrackersIfConsented } from '@/lib/tracking'
+
+captureAttribution()
+installContactClickTracking()
+loadTrackersIfConsented()
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
