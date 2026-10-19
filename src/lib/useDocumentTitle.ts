@@ -15,7 +15,7 @@ export const SITE_URL = 'https://bliss.rent'
 // real description, so a page that omits one never inherits a stale
 // description left behind by whichever page the visitor was on before.
 const DEFAULT_DESCRIPTION =
-  'Book premium and economy car rentals in Dubai with fast airport delivery, flexible pickup and return points across the UAE, and no hidden fees. Reserve online in minutes — no account needed.'
+  'Rent a car in Dubai from AED 72/day. Pickup at DXB Terminal 1 & 3 or hotel delivery. Economy, SUVs, luxury cars and supercars — daily, weekly and monthly. Book online or on WhatsApp.'
 
 /**
  * Sets the browser tab/history title for the current page. Before this,
@@ -31,7 +31,7 @@ const DEFAULT_DESCRIPTION =
  */
 export function useDocumentTitle(title: string | null | undefined) {
   useEffect(() => {
-    document.title = title ? `${title} — ${SITE_NAME}` : `${SITE_NAME} — Dubai Airport Car Rental`
+    document.title = title ? `${title} — ${SITE_NAME}` : 'Car Rental Dubai from AED 72/day | DXB Airport Pickup — Bliss Rent'
   }, [title])
 }
 

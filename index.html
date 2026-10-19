@@ -12,10 +12,10 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <meta name="theme-color" content="#0b132b" />
-    <title>Bliss Rent — Dubai Airport Car Rental</title>
+    <title>Car Rental Dubai from AED 72/day | DXB Airport Pickup — Bliss Rent</title>
     <meta
       name="description"
-      content="Book premium and economy car rentals in Dubai with fast airport delivery, flexible pickup and return points across the UAE, and no hidden fees. Reserve online in minutes — no account needed."
+      content="Rent a car in Dubai from AED 72/day. Pickup at DXB Terminal 1 &amp; 3 or hotel delivery. Economy, SUVs, luxury cars and supercars — daily, weekly and monthly. Book online or on WhatsApp."
     />
     <!-- Static baseline for the "/" route. Every other route overrides
          this at runtime via useMetaDescription (src/lib/useDocumentTitle.ts),
@@ -23,26 +23,26 @@
          in scripts/generate-sitemap.mjs together if the domain changes. -->
     <link rel="canonical" href="https://bliss.rent/" />
 
-    <!-- Open Graph / Twitter card. og:image is left out deliberately —
-         the only images in this repo are the hero photography (.webp,
-         not universally supported by link-preview crawlers) and small
-         favicon/app icons, no real 1200x630 social-share asset exists
-         yet. Add og:image (and its matching twitter:card upgrade to
-         summary_large_image) once one is designed, rather than pointing
-         it at an unsuitable placeholder. -->
+    <!-- Open Graph / Twitter card. og-image.jpg (1200x630) is the shared social preview. -->
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Bliss Rent" />
-    <meta property="og:title" content="Bliss Rent — Dubai Airport Car Rental" />
+    <meta property="og:title" content="Car Rental Dubai from AED 72/day | DXB Airport Pickup — Bliss Rent" />
     <meta
       property="og:description"
-      content="Premium and economy car rentals in Dubai, with fast airport delivery and flexible pickup and return points across the UAE."
+      content="Rent a car in Dubai from AED 72/day. Pickup at DXB Terminal 1 &amp; 3 or hotel delivery. Economy, SUVs, luxury cars and supercars — daily, weekly and monthly. Book online or on WhatsApp."
     />
     <meta property="og:url" content="https://bliss.rent/" />
-    <meta name="twitter:card" content="summary" />
-    <meta name="twitter:title" content="Bliss Rent — Dubai Airport Car Rental" />
+    <meta property="og:image" content="https://bliss.rent/og-image.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Bliss Rent — car rental in Dubai from AED 72/day" />
+    <meta property="og:locale" content="en_AE" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content="https://bliss.rent/og-image.jpg" />
+    <meta name="twitter:title" content="Car Rental Dubai from AED 72/day | DXB Airport Pickup — Bliss Rent" />
     <meta
       name="twitter:description"
-      content="Premium and economy car rentals in Dubai, with fast airport delivery and flexible pickup and return points across the UAE."
+      content="Rent a car in Dubai from AED 72/day. Pickup at DXB Terminal 1 &amp; 3 or hotel delivery. Economy, SUVs, luxury cars and supercars — daily, weekly and monthly. Book online or on WhatsApp."
     />
 
     <!-- Cairo covers both Latin and Arabic script cleanly in one family,
@@ -61,23 +61,40 @@
       rel="stylesheet"
     />
 
-    <!-- Structured data: only facts already established elsewhere in the
-         app (name, real service area). No phone/address/social profile —
-         those are still bracketed placeholders on the Contact page
-         (pages.contact.methods.* in en.ts/ar.ts) and NavBar's social
-         links are placeholder URLs, so none of it is real yet; add them
-         here once real ones exist rather than publishing fabricated
-         contact details as structured data. -->
+    <!-- Structured data: contact details match src/features/booking/contactLinks.ts. -->
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
         "@type": "AutoRental",
+        "@id": "https://bliss.rent/#business",
         "name": "Bliss Rent",
-        "description": "Book premium and economy car rentals in Dubai with fast airport delivery, flexible pickup and return points across the UAE, and no hidden fees.",
-        "areaServed": {
-          "@type": "City",
-          "name": "Dubai"
-        }
+        "alternateName": "Bliss Car Rental",
+        "url": "https://bliss.rent/",
+        "logo": "https://bliss.rent/icon-512.png",
+        "image": "https://bliss.rent/og-image.jpg",
+        "description": "Car rental in Dubai from AED 72/day with pickup at Dubai International Airport (DXB) Terminal 1 and 3, Al Maktoum (DWC) and hotel delivery. Economy, SUV, luxury and supercar rentals — daily, weekly and monthly.",
+        "telephone": "+971547820057",
+        "email": "support@bliss.rent",
+        "priceRange": "AED 72 - AED 7,550 per day",
+        "currenciesAccepted": "AED",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "Apt 121B, Block B, Sajaya 7 Building, Manama Street, Nad Al Sheba 3",
+          "addressLocality": "Dubai",
+          "addressCountry": "AE"
+        },
+        "geo": { "@type": "GeoCoordinates", "latitude": 25.163296, "longitude": 55.382061 },
+        "areaServed": [
+          { "@type": "City", "name": "Dubai" },
+          { "@type": "City", "name": "Sharjah" },
+          { "@type": "City", "name": "Abu Dhabi" },
+          { "@type": "Airport", "name": "Dubai International Airport", "iataCode": "DXB" },
+          { "@type": "Airport", "name": "Al Maktoum International Airport", "iataCode": "DWC" }
+        ],
+        "sameAs": [
+          "https://www.facebook.com/blisscarrental",
+          "https://www.instagram.com/blisscarrentalofficial"
+        ]
       }
     </script>
   </head>

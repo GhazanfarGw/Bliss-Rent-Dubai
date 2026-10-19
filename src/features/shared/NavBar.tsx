@@ -386,7 +386,7 @@ export function NavBar() {
               <p className="mb-2 text-center text-xs font-semibold uppercase tracking-[0.18em] text-brand-gold">{t('nav.connect')}</p>
               <div className="flex items-center justify-center gap-3">
               <a
-                href="https://instagram.com"
+                href="https://www.instagram.com/blisscarrentalofficial"
                 target="_blank"
                 rel="noreferrer"
                 aria-label="Instagram"
@@ -399,7 +399,7 @@ export function NavBar() {
                 </svg>
               </a>
               <a
-                href="https://facebook.com"
+                href="https://www.facebook.com/blisscarrental"
                 target="_blank"
                 rel="noreferrer"
                 aria-label="Facebook"
