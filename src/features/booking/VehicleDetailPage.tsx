@@ -351,6 +351,14 @@ export function VehicleDetailPage() {
             </button>
             <p className="mt-2 text-center text-xs text-text-muted">{t('vehicleDetail.paymentNote')}</p>
 
+            <QuoteRequestForm
+              className="mt-4"
+              vehicleId={vehicle.id}
+              carInterest={`${vehicle.make} ${vehicle.model} ${vehicle.model_year}`}
+              startDate={hasDates ? criteria.startDate : undefined}
+              endDate={hasDates ? criteria.endDate : undefined}
+            />
+
             {/* Real, already-established site-wide policies — the same claims
                 WhyChooseSection/DubaiOnlyBadge already make elsewhere, as quiet lines
                 rather than three outlined badges. */}
@@ -375,14 +383,6 @@ export function VehicleDetailPage() {
           <VehicleSpecs vehicle={vehicle} />
         </div>
       </div>
-
-      <QuoteRequestForm
-        className="mt-12 sm:mt-14"
-        vehicleId={vehicle.id}
-        carInterest={`${vehicle.make} ${vehicle.model} ${vehicle.model_year}`}
-        startDate={hasDates ? criteria.startDate : undefined}
-        endDate={hasDates ? criteria.endDate : undefined}
-      />
 
       {similarVehicles && similarVehicles.length > 0 && (
         <section className="mt-12 border-t border-brand-navy/10 pt-8 sm:mt-14 sm:pt-10">

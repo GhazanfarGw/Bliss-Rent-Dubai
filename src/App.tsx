@@ -43,6 +43,7 @@ import { ExtensionsListPage } from '@/features/admin/extensions/ExtensionsListPa
 import { ComplaintsListPage } from '@/features/admin/complaints/ComplaintsListPage'
 import { ComplaintDetailPage } from '@/features/admin/complaints/ComplaintDetailPage'
 import { FeedbackListPage } from '@/features/admin/feedback/FeedbackListPage'
+import { LeadsListPage } from '@/features/admin/leads/LeadsListPage'
 import { PricingManagementPage } from '@/features/admin/pricing/PricingManagementPage'
 import { EmailManagementPage } from '@/features/admin/emails/EmailManagementPage'
 import { AuditLogPage } from '@/features/admin/auditlog/AuditLogPage'
@@ -207,6 +208,7 @@ function App() {
               <Route path="fleet/new" element={<VehicleFormPage />} />
               <Route path="fleet/:id" element={<VehicleFormPage />} />
               <Route path="availability" element={<AvailabilityCalendarPage />} />
+              <Route path="leads" element={<LeadsListPage />} />
               <Route path="customers" element={<CustomersListPage />} />
               <Route path="customers/:id" element={<CustomerDetailPage />} />
               <Route path="payments" element={<PaymentsListPage />} />

@@ -15,6 +15,7 @@ const NAV_ITEMS = [
   { to: '/admin/bookings', key: 'bookings', end: false },
   { to: '/admin/fleet', key: 'fleet', end: false },
   { to: '/admin/availability', key: 'availability', end: false },
+  { to: '/admin/leads', key: 'leads', end: false },
   { to: '/admin/customers', key: 'customers', end: false },
   { to: '/admin/payments', key: 'payments', end: false },
   { to: '/admin/extensions', key: 'extensions', end: false },

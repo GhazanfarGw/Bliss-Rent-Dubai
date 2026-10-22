@@ -1,13 +1,11 @@
 import { useId, useState, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
-import { CheckCircle2, MessageCircle } from 'lucide-react'
+import { CheckCircle2, ChevronDown, MessageCircle } from 'lucide-react'
 import { supabase } from '@/lib/supabaseClient'
 import { readAttribution, trackQuoteSubmitted } from '@/lib/tracking'
-import { Eyebrow } from '@/features/shared/ui/Eyebrow'
 import { DIAL_CODES, toInternational } from '@/lib/dialCodes'
 
 interface QuoteRequestFormProps {
-  /** Prefilled on a vehicle page. */
   vehicleId?: string
   carInterest?: string
   startDate?: string
@@ -15,34 +13,28 @@ interface QuoteRequestFormProps {
   className?: string
 }
 
-type FieldErrors = Partial<Record<'fullName' | 'phone' | 'email' | 'startDate' | 'endDate', string>>
+type FieldErrors = Partial<Record<'fullName' | 'phone', string>>
 
 /**
- * "Get a quote" lead form → submit-quote-request Edge Function → `leads`
- * (source_code QUOTE) + urgent admin email. Spam protection: a hidden
- * honeypot input (`website`) plus server-side rate limits in
- * submit_quote_request_public(). UTM attribution is read from the
- * first-party store captureAttribution() fills at boot.
+ * Compact "price on WhatsApp" box inside the vehicle page's booking card —
+ * for visitors who are not ready to book yet. Collapsed to one line until
+ * opened; asks only name + international phone (car and dates come from
+ * the page). Submits to the submit-quote-request Edge Function → `leads`
+ * (source_code QUOTE) + urgent admin email; shown in /admin/leads.
+ * Spam protection: hidden honeypot + server-side rate limits.
  */
 export function QuoteRequestForm({ vehicleId, carInterest, startDate, endDate, className = '' }: QuoteRequestFormProps) {
   const { t } = useTranslation()
   const uid = useId()
-  const [form, setForm] = useState({
-    fullName: '',
-    phone: '',
-    carInterest: carInterest ?? '',
-    startDate: startDate ?? '',
-    endDate: endDate ?? '',
-    notes: '',
-    website: '',
-  })
+  const [open, setOpen] = useState(false)
+  const [fullName, setFullName] = useState('')
+  const [phone, setPhone] = useState('')
+  const [website, setWebsite] = useState('')
   const [dialIso, setDialIso] = useState('AE')
   const dialCode = DIAL_CODES.find((c) => c.iso === dialIso)?.code ?? '971'
   const [status, setStatus] = useState<'idle' | 'sending' | 'sent'>('idle')
   const [error, setError] = useState('')
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
-
-  const set = (key: keyof typeof form) => (e: { target: { value: string } }) => setForm((f) => ({ ...f, [key]: e.target.value }))
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
@@ -53,24 +45,27 @@ export function QuoteRequestForm({ vehicleId, carInterest, startDate, endDate, c
     try {
       const { data, error: invokeError } = await supabase.functions.invoke('submit-quote-request', {
         body: {
-          ...form,
-          phone: form.phone.trim().startsWith('+') ? form.phone : toInternational(dialCode, form.phone),
+          fullName,
+          phone: phone.trim().startsWith('+') ? phone : toInternational(dialCode, phone),
+          carInterest,
           vehicleId,
+          startDate,
+          endDate,
+          website,
           utmSource: attribution?.utm_source,
           utmMedium: attribution?.utm_medium,
           utmCampaign: attribution?.utm_campaign,
         },
       })
       if (invokeError) {
-        // FunctionsHttpError carries the Response; surface the server's guest-safe message.
         const ctx = (invokeError as { context?: Response }).context
         const payload = ctx && typeof ctx.json === 'function' ? await ctx.json().catch(() => null) : null
         if (payload?.fieldErrors) setFieldErrors(payload.fieldErrors as FieldErrors)
-        setError(payload?.message ?? t('quoteForm.errorGeneric'))
+        setError(payload?.fieldErrors ? '' : (payload?.message ?? t('quoteForm.errorGeneric')))
         setStatus('idle')
         return
       }
-      if (data?.leadId) trackQuoteSubmitted({ leadId: data.leadId, vehicle: form.carInterest || null })
+      if (data?.leadId) trackQuoteSubmitted({ leadId: data.leadId, vehicle: carInterest ?? null })
       setStatus('sent')
     } catch {
       setError(t('quoteForm.errorGeneric'))
@@ -79,102 +74,73 @@ export function QuoteRequestForm({ vehicleId, carInterest, startDate, endDate, c
   }
 
   const input =
-    'mt-1 block w-full rounded-xl border border-brand-navy/15 bg-white px-3.5 py-2.5 text-sm text-brand-navy placeholder:text-brand-navy/40 focus:border-brand-gold focus:outline-none focus:ring-2 focus:ring-brand-gold/30'
-  const label = 'block text-xs font-semibold text-brand-navy/80'
-  const fieldError = (key: keyof FieldErrors) =>
-    fieldErrors[key] ? (
-      <p id={`${uid}-${key}-err`} className="mt-1 text-xs text-error">
-        {fieldErrors[key]}
-      </p>
-    ) : null
+    'block w-full rounded-lg border border-brand-navy/15 bg-white px-3 py-2 text-sm text-brand-navy placeholder:text-brand-navy/40 focus:border-brand-gold focus:outline-none focus:ring-2 focus:ring-brand-gold/30'
+
+  if (status === 'sent') {
+    return (
+      <div className={'flex items-start gap-2 rounded-xl bg-success-bg p-3 text-xs text-brand-navy ' + className} role="status">
+        <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-success" aria-hidden="true" />
+        <p>
+          <span className="font-semibold">{t('quoteForm.successTitle')}</span> {t('quoteForm.successBody')}
+        </p>
+      </div>
+    )
+  }
 
   return (
-    <section id="get-a-quote" className={'rounded-2xl border border-brand-navy/10 bg-white p-5 shadow-sm sm:p-8 ' + className}>
-      {status === 'sent' ? (
-        <div className="flex flex-col items-center py-6 text-center" role="status">
-          <CheckCircle2 className="h-10 w-10 text-success" aria-hidden="true" />
-          <h2 className="mt-3 text-xl font-semibold text-brand-navy">{t('quoteForm.successTitle')}</h2>
-          <p className="mt-2 max-w-md text-sm text-text-muted">{t('quoteForm.successBody')}</p>
-        </div>
-      ) : (
-        <>
-          <Eyebrow className="mb-3">{t('quoteForm.eyebrow')}</Eyebrow>
-          <h2 className="text-2xl font-semibold text-brand-navy sm:text-3xl">{t('quoteForm.title')}</h2>
-          <p className="mt-2 max-w-2xl text-sm text-text-muted">{t('quoteForm.subtitle')}</p>
+    <div className={'rounded-xl border border-brand-navy/10 ' + className}>
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        aria-expanded={open}
+        aria-controls={`${uid}-panel`}
+        className="flex w-full items-center justify-between gap-2 px-3 py-2.5 text-start text-xs font-semibold text-brand-navy"
+      >
+        <span className="flex items-center gap-2">
+          <MessageCircle className="h-4 w-4 shrink-0 text-success" aria-hidden="true" />
+          {t('quoteForm.toggle')}
+        </span>
+        <ChevronDown className={'h-4 w-4 shrink-0 transition-transform ' + (open ? 'rotate-180' : '')} aria-hidden="true" />
+      </button>
 
-          <form onSubmit={handleSubmit} noValidate className="mt-6 grid gap-4 sm:grid-cols-2">
-            {/* Honeypot — invisible to people, filled by bots. */}
-            <div aria-hidden="true" className="absolute -left-[9999px] h-px w-px overflow-hidden">
-              <label htmlFor={`${uid}-website`}>Website</label>
-              <input id={`${uid}-website`} name="website" tabIndex={-1} autoComplete="off" value={form.website} onChange={set('website')} />
+      {open && (
+        <form id={`${uid}-panel`} onSubmit={handleSubmit} noValidate className="relative space-y-2.5 px-3 pb-3">
+          <p className="text-xs text-text-muted">{t('quoteForm.subtitle')}</p>
+          {/* Honeypot — invisible to people, filled by bots. */}
+          <div aria-hidden="true" className="absolute -left-[9999px] h-px w-px overflow-hidden">
+            <input name="website" tabIndex={-1} autoComplete="off" value={website} onChange={(e) => setWebsite(e.target.value)} />
+          </div>
+          <div>
+            <label htmlFor={`${uid}-name`} className="sr-only">{t('quoteForm.name')}</label>
+            <input id={`${uid}-name`} autoComplete="name" placeholder={t('quoteForm.name')} value={fullName} onChange={(e) => setFullName(e.target.value)}
+              className={input} aria-invalid={!!fieldErrors.fullName} />
+            {fieldErrors.fullName && <p className="mt-1 text-xs text-error">{fieldErrors.fullName}</p>}
+          </div>
+          <div>
+            <label htmlFor={`${uid}-phone`} className="sr-only">{t('quoteForm.phone')}</label>
+            <div className="flex gap-2" dir="ltr">
+              <select aria-label={t('quoteForm.countryCode')} value={dialIso} onChange={(e) => setDialIso(e.target.value)} className={input.replace('block w-full', 'w-24 shrink-0').replace('px-3', 'px-2')}>
+                {DIAL_CODES.map((c) => (
+                  <option key={c.iso} value={c.iso}>
+                    {c.flag} +{c.code}
+                  </option>
+                ))}
+              </select>
+              <input id={`${uid}-phone`} type="tel" inputMode="tel" autoComplete="tel-national" placeholder={t('quoteForm.phonePlaceholder')}
+                value={phone} onChange={(e) => setPhone(e.target.value)} className={input.replace('block w-full', 'block min-w-0 flex-1')} aria-invalid={!!fieldErrors.phone} />
             </div>
-
-            <div>
-              <label htmlFor={`${uid}-name`} className={label}>{t('quoteForm.name')}</label>
-              <input id={`${uid}-name`} required autoComplete="name" value={form.fullName} onChange={set('fullName')} className={input}
-                aria-invalid={!!fieldErrors.fullName} aria-describedby={fieldErrors.fullName ? `${uid}-fullName-err` : undefined} />
-              {fieldError('fullName')}
-            </div>
-            <div>
-              <label htmlFor={`${uid}-phone`} className={label}>{t('quoteForm.phone')}</label>
-              <div className="mt-1 flex gap-2" dir="ltr">
-                <select
-                  aria-label={t('quoteForm.countryCode')}
-                  value={dialIso}
-                  onChange={(e) => setDialIso(e.target.value)}
-                  className={input.replace('mt-1 block w-full', 'w-28 shrink-0')}
-                >
-                  {DIAL_CODES.map((c) => (
-                    <option key={c.iso} value={c.iso}>
-                      {c.flag} +{c.code}
-                    </option>
-                  ))}
-                </select>
-                <input id={`${uid}-phone`} required type="tel" inputMode="tel" autoComplete="tel-national" placeholder={t('quoteForm.phonePlaceholder')}
-                  value={form.phone} onChange={set('phone')} className={input.replace('mt-1 block', 'block min-w-0 flex-1')}
-                  aria-invalid={!!fieldErrors.phone} aria-describedby={fieldErrors.phone ? `${uid}-phone-err` : undefined} />
-              </div>
-              {fieldError('phone')}
-            </div>
-            <div className="sm:col-span-2">
-              <label htmlFor={`${uid}-car`} className={label}>{t('quoteForm.car')}</label>
-              <input id={`${uid}-car`} placeholder={t('quoteForm.carPlaceholder')} value={form.carInterest} onChange={set('carInterest')} className={input} />
-            </div>
-            <div>
-              <label htmlFor={`${uid}-start`} className={label}>{t('quoteForm.startDate')}</label>
-              <input id={`${uid}-start`} type="date" value={form.startDate} onChange={set('startDate')} className={input} />
-              {fieldError('startDate')}
-            </div>
-            <div>
-              <label htmlFor={`${uid}-end`} className={label}>{t('quoteForm.endDate')}</label>
-              <input id={`${uid}-end`} type="date" min={form.startDate || undefined} value={form.endDate} onChange={set('endDate')} className={input} />
-              {fieldError('endDate')}
-            </div>
-            <div className="sm:col-span-2">
-              <label htmlFor={`${uid}-notes`} className={label}>{t('quoteForm.notes')}</label>
-              <textarea id={`${uid}-notes`} rows={2} maxLength={1000} value={form.notes} onChange={set('notes')} className={input} />
-            </div>
-
-            {error && (
-              <p role="alert" className="text-sm text-error sm:col-span-2">
-                {error}
-              </p>
-            )}
-
-            <div className="flex flex-col gap-2 sm:col-span-2 sm:flex-row sm:items-center sm:justify-between">
-              <p className="text-xs text-text-muted">{t('quoteForm.privacy')}</p>
-              <button
-                type="submit"
-                disabled={status === 'sending'}
-                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-brand-gold px-6 text-sm font-semibold text-white transition-colors hover:bg-brand-gold-dark disabled:opacity-60 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold focus-visible:ring-offset-2"
-              >
-                <MessageCircle className="h-4 w-4" aria-hidden="true" />
-                {status === 'sending' ? t('quoteForm.sending') : t('quoteForm.submit')}
-              </button>
-            </div>
-          </form>
-        </>
+            {fieldErrors.phone && <p className="mt-1 text-xs text-error">{fieldErrors.phone}</p>}
+          </div>
+          {error && <p role="alert" className="text-xs text-error">{error}</p>}
+          <button
+            type="submit"
+            disabled={status === 'sending'}
+            className="w-full rounded-full bg-success px-4 py-2.5 text-xs font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-60 focus:outline-none focus-visible:ring-2 focus-visible:ring-success focus-visible:ring-offset-2"
+          >
+            {status === 'sending' ? t('quoteForm.sending') : t('quoteForm.submit')}
+          </button>
+        </form>
       )}
-    </section>
+    </div>
   )
 }
