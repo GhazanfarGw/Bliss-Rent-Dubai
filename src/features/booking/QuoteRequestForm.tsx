@@ -4,6 +4,7 @@ import { CheckCircle2, MessageCircle } from 'lucide-react'
 import { supabase } from '@/lib/supabaseClient'
 import { readAttribution, trackQuoteSubmitted } from '@/lib/tracking'
 import { Eyebrow } from '@/features/shared/ui/Eyebrow'
+import { DIAL_CODES, toInternational } from '@/lib/dialCodes'
 
 interface QuoteRequestFormProps {
   /** Prefilled on a vehicle page. */
@@ -35,6 +36,8 @@ export function QuoteRequestForm({ vehicleId, carInterest, startDate, endDate, c
     notes: '',
     website: '',
   })
+  const [dialIso, setDialIso] = useState('AE')
+  const dialCode = DIAL_CODES.find((c) => c.iso === dialIso)?.code ?? '971'
   const [status, setStatus] = useState<'idle' | 'sending' | 'sent'>('idle')
   const [error, setError] = useState('')
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
@@ -51,6 +54,7 @@ export function QuoteRequestForm({ vehicleId, carInterest, startDate, endDate, c
       const { data, error: invokeError } = await supabase.functions.invoke('submit-quote-request', {
         body: {
           ...form,
+          phone: form.phone.trim().startsWith('+') ? form.phone : toInternational(dialCode, form.phone),
           vehicleId,
           utmSource: attribution?.utm_source,
           utmMedium: attribution?.utm_medium,
@@ -113,9 +117,23 @@ export function QuoteRequestForm({ vehicleId, carInterest, startDate, endDate, c
             </div>
             <div>
               <label htmlFor={`${uid}-phone`} className={label}>{t('quoteForm.phone')}</label>
-              <input id={`${uid}-phone`} required type="tel" inputMode="tel" autoComplete="tel" dir="ltr" placeholder={t('quoteForm.phonePlaceholder')}
-                value={form.phone} onChange={set('phone')} className={input}
-                aria-invalid={!!fieldErrors.phone} aria-describedby={fieldErrors.phone ? `${uid}-phone-err` : undefined} />
+              <div className="mt-1 flex gap-2" dir="ltr">
+                <select
+                  aria-label={t('quoteForm.countryCode')}
+                  value={dialIso}
+                  onChange={(e) => setDialIso(e.target.value)}
+                  className={input.replace('mt-1 block w-full', 'w-28 shrink-0')}
+                >
+                  {DIAL_CODES.map((c) => (
+                    <option key={c.iso} value={c.iso}>
+                      {c.flag} +{c.code}
+                    </option>
+                  ))}
+                </select>
+                <input id={`${uid}-phone`} required type="tel" inputMode="tel" autoComplete="tel-national" placeholder={t('quoteForm.phonePlaceholder')}
+                  value={form.phone} onChange={set('phone')} className={input.replace('mt-1 block', 'block min-w-0 flex-1')}
+                  aria-invalid={!!fieldErrors.phone} aria-describedby={fieldErrors.phone ? `${uid}-phone-err` : undefined} />
+              </div>
               {fieldError('phone')}
             </div>
             <div className="sm:col-span-2">
