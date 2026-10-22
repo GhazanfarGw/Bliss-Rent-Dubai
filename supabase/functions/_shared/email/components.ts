@@ -189,10 +189,8 @@ export function renderFooter(language: EmailLanguage): string {
   const rtl = isRtl(language)
   const strings = EMAIL_STRINGS[language]
   const year = new Date().getFullYear()
-  // Placeholder contact block: intentionally labeled "(placeholder)" so
-  // no one mistakes these bracketed values for real business info while
-  // they render in a preview or a stray test send. Remove the label the
-  // moment PHASE9_BUSINESS_DECISIONS item 2 is resolved with real values.
+  // Real business contact block (resolved Oct 2026 — see PLACEHOLDER_CONTACT in brand.ts;
+  // the constant keeps its historical name to avoid churn across imports).
   return `
 <tr>
   <td style="padding:28px 24px 8px;">
@@ -204,10 +202,10 @@ export function renderFooter(language: EmailLanguage): string {
       </tr>
       <tr>
         <td dir="${rtl ? 'rtl' : 'ltr'}" align="${rtl ? 'right' : 'left'}" style="font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:20px;color:${BRAND_COLORS.textMuted};">
-          ${escapeHtml(strings.whatsappLabel)}: ${wrapLtr(PLACEHOLDER_CONTACT.whatsapp)} <span style="color:${BRAND_COLORS.accentText};">(placeholder)</span><br />
-          ${escapeHtml(strings.emailLabel)}: ${wrapLtr(PLACEHOLDER_CONTACT.email)} <span style="color:${BRAND_COLORS.accentText};">(placeholder)</span><br />
-          ${escapeHtml(strings.officeLabel)}: ${escapeHtml(PLACEHOLDER_CONTACT.address)} <span style="color:${BRAND_COLORS.accentText};">(placeholder)</span><br />
-          ${escapeHtml(strings.hoursLabel)}: ${escapeHtml(PLACEHOLDER_CONTACT.hours)} <span style="color:${BRAND_COLORS.accentText};">(placeholder)</span>
+          ${escapeHtml(strings.whatsappLabel)}: ${wrapLtr(PLACEHOLDER_CONTACT.whatsapp)}<br />
+          ${escapeHtml(strings.emailLabel)}: ${wrapLtr(PLACEHOLDER_CONTACT.email)}<br />
+          ${escapeHtml(strings.officeLabel)}: ${escapeHtml(PLACEHOLDER_CONTACT.address)}<br />
+          ${escapeHtml(strings.hoursLabel)}: ${escapeHtml(PLACEHOLDER_CONTACT.hours)}
         </td>
       </tr>
     </table>

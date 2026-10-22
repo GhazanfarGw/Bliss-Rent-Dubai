@@ -24,6 +24,8 @@ import { rentalDays, validateDateRange } from '@/lib/dateRange'
 import { isCompleteCriteria, searchParamsToCriteria } from '@/features/booking/searchParams'
 import { useDocumentTitle, useMetaDescription } from '@/lib/useDocumentTitle'
 import { metaSpecSummary } from '@/lib/vehicleSpecs'
+import { trackViewItem } from '@/lib/tracking'
+import { QuoteRequestForm } from '@/features/booking/QuoteRequestForm'
 import type { Location, SearchCriteria, VehicleWithDetails } from '@/types/domain'
 
 type LoadState =
@@ -144,6 +146,11 @@ export function VehicleDetailPage() {
       cancelled = true
     }
   }, [loadedCategoryId, loadedVehicleId])
+
+  // Fleet engagement: one view_item / ViewContent per vehicle opened.
+  useEffect(() => {
+    if (state.status === 'loaded') trackViewItem(state.vehicle)
+  }, [state])
 
   useDocumentTitle(state.status === 'loaded' ? `${state.vehicle.make} ${state.vehicle.model}` : null)
   useMetaDescription(state.status === 'loaded' ? buildVehicleMetaDescription(state.vehicle) : null)
@@ -368,6 +375,14 @@ export function VehicleDetailPage() {
           <VehicleSpecs vehicle={vehicle} />
         </div>
       </div>
+
+      <QuoteRequestForm
+        className="mt-12 sm:mt-14"
+        vehicleId={vehicle.id}
+        carInterest={`${vehicle.make} ${vehicle.model} ${vehicle.model_year}`}
+        startDate={hasDates ? criteria.startDate : undefined}
+        endDate={hasDates ? criteria.endDate : undefined}
+      />
 
       {similarVehicles && similarVehicles.length > 0 && (
         <section className="mt-12 border-t border-brand-navy/10 pt-8 sm:mt-14 sm:pt-10">

@@ -1,4 +1,3 @@
-import { supabase } from '@/lib/supabaseClient'
 import { readCookieConsent } from '@/lib/cookieConsent'
 
 /**
@@ -86,6 +85,7 @@ export async function attachBookingAttribution(bookingId: string): Promise<void>
   const a = readAttribution()
   if (!a) return
   try {
+    const { supabase } = await import('@/lib/supabaseClient')
     await supabase.rpc('set_booking_attribution', {
       p_booking_id: bookingId,
       p_utm_source: a.utm_source ?? null,
@@ -180,6 +180,81 @@ export function trackBookingCreated(p: { bookingId: string; value: number; curre
   window.gtag?.('event', 'booking_created', { transaction_id: p.bookingId, value: p.value, currency: p.currency, vehicle: p.vehicle })
   window.fbq?.('track', 'Lead', { value: p.value, currency: p.currency, content_name: p.vehicle }, { eventID: p.bookingId })
   adsConversion(GADS_LABEL_BOOKING, { value: p.value, currency: p.currency, transaction_id: p.bookingId })
+}
+
+/** Minimal vehicle shape the fleet events need (VehicleWithDetails satisfies it). */
+export interface TrackableVehicle {
+  id: string
+  make: string
+  model: string
+  model_year?: number | null
+  vehicle_categories?: { name: string } | null
+  pricing: { term: string; client_price: number; currency?: string | null }[]
+}
+
+const TERM_DAYS: Record<string, number> = { daily: 1, weekly: 7, monthly: 30, '3_month': 90 }
+/** AED/day at or above which a car is reported as "luxury" (ad audiences + bidding). */
+export const LUXURY_DAILY_THRESHOLD = 400
+
+/** GA4 ecommerce item for a vehicle: per-day price, category name, and a luxury/economy tier. */
+export function vehicleEcommerceItem(v: TrackableVehicle) {
+  const perDay = v.pricing
+    .map((p) => p.client_price / (TERM_DAYS[p.term] ?? 1))
+    .filter((n) => Number.isFinite(n) && n > 0)
+    .sort((a, b) => a - b)[0]
+  const price = perDay != null ? Math.round(perDay) : undefined
+  const categoryName = v.vehicle_categories?.name ?? ''
+  const tier =
+    (price != null && price >= LUXURY_DAILY_THRESHOLD) || /luxury|sport|super|exotic|premium/i.test(categoryName) ? 'luxury' : 'economy'
+  return {
+    item_id: v.id,
+    item_name: `${v.make} ${v.model}${v.model_year ? ` ${v.model_year}` : ''}`,
+    item_brand: v.make,
+    item_category: tier,
+    item_category2: categoryName || undefined,
+    price,
+    quantity: 1,
+  }
+}
+
+function pushFleetEvent(event: 'view_item' | 'select_item', v: TrackableVehicle, listName?: string): void {
+  if (!trackersLoaded) return
+  const item = vehicleEcommerceItem(v)
+  const ecommerce = { currency: 'AED', value: item.price, item_list_name: listName, items: [item] }
+  window.dataLayer?.push({ ecommerce: null })
+  window.dataLayer?.push({
+    event: event === 'view_item' ? 'view_item' : 'select_vehicle',
+    vehicle_tier: item.item_category,
+    vehicle_name: item.item_name,
+    ecommerce,
+  })
+  window.gtag?.('event', event, ecommerce)
+  window.fbq?.('track', 'ViewContent', {
+    content_ids: [v.id],
+    content_type: 'vehicle',
+    content_name: item.item_name,
+    content_category: item.item_category,
+    value: item.price,
+    currency: 'AED',
+  })
+}
+
+/** Vehicle detail page opened. */
+export function trackViewItem(v: TrackableVehicle): void {
+  pushFleetEvent('view_item', v)
+}
+
+/** A fleet card was clicked (fleet page, homepage rows, similar vehicles). */
+export function trackVehicleSelect(v: TrackableVehicle, listName: string): void {
+  pushFleetEvent('select_item', v, listName)
+}
+
+/** "Get a quote" form submitted successfully. */
+export function trackQuoteSubmitted(p: { leadId: string; vehicle?: string | null; value?: number | null }): void {
+  if (!trackersLoaded) return
+  window.dataLayer?.push({ event: 'quote_submitted', lead_id: p.leadId, vehicle_name: p.vehicle ?? undefined })
+  window.gtag?.('event', 'generate_lead', { method: 'quote_form', value: p.value ?? undefined, currency: 'AED' })
+  window.fbq?.('track', 'Lead', { content_name: p.vehicle ?? 'quote', value: p.value ?? undefined, currency: 'AED' }, { eventID: p.leadId })
 }
 
 /** One delegated listener for every wa.me / tel: link in the app. */

@@ -13,6 +13,7 @@ import { SportsCollectionSection } from '@/features/booking/SportsCollectionSect
 import { LocationsPreviewSection } from '@/features/booking/LocationsPreviewSection'
 import { fetchAllAvailableVehicles } from '@/features/booking/api'
 import { criteriaToSearchParams } from '@/features/booking/searchParams'
+import { QuoteRequestForm } from '@/features/booking/QuoteRequestForm'
 import { ClosingCta } from '@/features/shared/ui/ClosingCta'
 import type { SearchCriteria, VehicleWithDetails } from '@/types/domain'
 
@@ -59,6 +60,9 @@ export function HomePage() {
 
       <main>
         <FeaturedVehicles vehicles={vehicles} failed={fleetFailed} />
+        <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+          <QuoteRequestForm />
+        </div>
         <HomeJournalSection />
         <SportsCollectionSection vehicles={vehicles} failed={fleetFailed} />
         <HomeJourneyPlannerSection />

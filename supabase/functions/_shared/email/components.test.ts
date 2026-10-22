@@ -144,10 +144,12 @@ describe('renderCtaButton', () => {
 })
 
 describe('renderFooter', () => {
-  it('marks placeholder contact info as a placeholder rather than presenting it as real', () => {
+  it('shows the real contact details with no placeholder markers', () => {
     const html = renderFooter('en')
     expect(html).toContain(PLACEHOLDER_CONTACT.email)
-    expect(html).toContain('(placeholder)')
+    expect(html).toContain('+971 54 782 0057')
+    expect(html).not.toContain('(placeholder)')
+    expect(html).not.toContain('[')
   })
 
   it('includes the automated-message notice', () => {

@@ -132,10 +132,10 @@ export const BRAND_NAME = 'Bliss Rent'
  * PHASE9_BUSINESS_DECISIONS item 2.
  */
 export const PLACEHOLDER_CONTACT = {
-  whatsapp: '[+971 5X XXX XXXX]',
-  email: '[support@bliss.rent]',
-  address: '[Office address, Dubai, UAE]',
-  hours: '[e.g. 24/7, or specific hours]',
+  whatsapp: '+971 54 782 0057',
+  email: 'support@bliss.rent',
+  address: 'Apt 121B, Block B, Sajaya 7 Building, Manama Street, Nad Al Sheba 3, Dubai, UAE',
+  hours: 'Open 24/7',
 } as const
 
 export const CURRENCY = 'AED'

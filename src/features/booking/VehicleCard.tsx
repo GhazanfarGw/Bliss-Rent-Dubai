@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { ArrowRight, Calendar, Cog, Gauge, MessageCircle, Users } from 'lucide-react'
 import type { VehicleWithDetails } from '@/types/domain'
@@ -10,6 +10,7 @@ import { engineLabel } from '@/lib/vehicleSpecs'
 import { VehiclePhoto } from '@/features/booking/VehiclePhoto'
 import { whatsappUrlForVehicle } from '@/features/booking/contactLinks'
 import { CurrencySymbol } from '@/features/shared/ui/CurrencySymbol'
+import { trackVehicleSelect } from '@/lib/tracking'
 
 interface VehicleCardProps {
   vehicle: VehicleWithDetails
@@ -67,6 +68,7 @@ export const TERM_I18N_KEY: Record<PricingTerm, string> = {
  */
 export function VehicleCard({ vehicle, days, detailHref, isAvailable, quantity, focusable = true }: VehicleCardProps) {
   const { t } = useTranslation()
+  const { pathname } = useLocation()
   const tabIndex = focusable ? undefined : -1
   const image = primaryImage(vehicle)
   const engine = engineLabel(vehicle)
@@ -205,6 +207,7 @@ export function VehicleCard({ vehicle, days, detailHref, isAvailable, quantity, 
             <Link
               to={detailHref}
               tabIndex={tabIndex}
+              onClick={() => trackVehicleSelect(vehicle, pathname === '/' ? 'home' : pathname)}
               className={
                 'inline-flex min-h-11 shrink-0 items-center justify-center gap-1.5 rounded-full px-4 text-xs font-semibold transition-colors after:absolute after:inset-0 after:content-[""] focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold focus-visible:ring-offset-2 ' +
                 (reserved
