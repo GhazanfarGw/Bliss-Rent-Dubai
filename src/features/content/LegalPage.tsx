@@ -18,7 +18,7 @@ interface LegalPageProps {
 /**
  * Shared renderer for the three legal pages (Privacy Policy, Cookie
  * Policy, Booking Terms & Conditions). Published 23 Oct 2026 with the
- * company's real rules (age, deposit, fuel, mileage, cancellation, fines);
+ * company's real rules (age, documents, fuel, cancellation, fines);
  * the previous DRAFT banner and "[__]" placeholders were removed.
  */
 function slugify(heading: string): string {

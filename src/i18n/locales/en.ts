@@ -2064,8 +2064,8 @@ const en = {
                 'No — Bliss Rent is self-drive only. You or someone you choose does the driving; we do not arrange a driver for you.',
             },
             {
-              question: 'Is there a mileage limit or fuel policy?',
-              answer: 'Economy cars and SUVs include 250 km per day; luxury, sports and supercars include 200 km per day; monthly rentals include 4,500 km per 30 days. Return the car with the same fuel level you received it with.',
+              question: 'What is the fuel policy?',
+              answer: 'Return the car with the same fuel level you received it with. Any shortfall is charged at the current fuel price plus a AED 50 refuelling service charge.',
             },
           ],
         },
@@ -2155,8 +2155,8 @@ const en = {
             answer: 'Pickup is at the airport in the city you choose, and you can drop off anywhere across that city. See our Locations page for current pickup and drop-off points.',
           },
           {
-            question: 'Is there a mileage limit or fuel policy?',
-            answer: 'Economy cars and SUVs include 250 km per day; luxury, sports and supercars include 200 km per day; monthly rentals include 4,500 km per 30 days. Return the car with the same fuel level you received it with.',
+            question: 'What is the fuel policy?',
+            answer: 'Return the car with the same fuel level you received it with. Any shortfall is charged at the current fuel price plus a AED 50 refuelling service charge.',
           },
         ],
       },
@@ -2202,7 +2202,7 @@ const en = {
           list: [
             "To create, confirm and manage your booking, and to deliver and collect the vehicle.",
             "To contact you about your booking or price request by email, phone or WhatsApp.",
-            "To take payment, process refunds and handle security deposits, traffic fines and Salik tolls.",
+            "To take payment, process refunds and handle traffic fines and Salik tolls.",
             "To meet our legal, insurance and record-keeping obligations.",
             "To understand how the website is used and measure our advertising (only with your consent).",
           ],
@@ -2337,33 +2337,20 @@ const en = {
           ],
         },
         {
-          heading: "4. Security deposit",
-          paragraphs: [
-            "A refundable security deposit is taken or pre-authorised on a credit card in the main driver's name at handover: AED 1,000 for economy cars, AED 2,500 for SUVs and premium cars, AED 5,000 for luxury cars and AED 10,000 for sports and supercars. The amount for your vehicle is confirmed before pickup.",
-            "The deposit is released within 21 days after the vehicle is returned, less any unpaid traffic fines, Salik tolls, fuel, extra kilometres, late-return charges or damage costs. The waiting period allows fines and tolls issued during your rental to be reported.",
-          ],
-        },
-        {
-          heading: "5. Fuel",
+          heading: "4. Fuel",
           paragraphs: [
             "The vehicle is provided with a fuel level recorded at handover and must be returned with the same level. Any shortfall is charged at the current UAE fuel price plus a AED 50 refuelling service charge.",
           ],
         },
         {
-          heading: "6. Mileage",
-          paragraphs: [
-            "Daily allowance: 250 km per day for economy cars and SUVs, and 200 km per day for luxury, sports and supercars. Monthly and 3-month rentals include 4,500 km per 30 days. Extra kilometres are charged at AED 1 per km for economy cars and SUVs and AED 5 per km for luxury, sports and supercars.",
-          ],
-        },
-        {
-          heading: "7. Late return, extensions and early return",
+          heading: "5. Late return, extensions and early return",
           paragraphs: [
             "Please return the vehicle at the agreed date and time. A 60-minute grace period applies; after that, each started 24-hour period is charged at the vehicle's current daily rate. To keep the car longer, request an extension through Manage Booking or WhatsApp before your return time; extensions are subject to availability.",
             "If you return the vehicle early, unused days are not refunded unless agreed in writing in advance.",
           ],
         },
         {
-          heading: "8. Cancellations and changes",
+          heading: "6. Cancellations and changes",
           list: [
             "Cancelled more than 48 hours before pickup: full refund.",
             "Cancelled within 48 hours of pickup, or no-show: one day's rental is charged and the rest is refunded.",
@@ -2372,14 +2359,14 @@ const en = {
           ],
         },
         {
-          heading: "9. Insurance, accidents and damage",
+          heading: "7. Insurance, accidents and damage",
           paragraphs: [
             "All vehicles carry the insurance required by UAE law. In case of an accident or any damage, you must report it to the police (Dubai Police app or 999) and inform us immediately; a police report is required by law for any repair.",
-            "With a police report, your liability is limited to the insurance excess for your vehicle category, which is no more than the security deposit amount. Without a police report, or if damage results from a breach of these terms (for example driving under the influence, an unauthorised driver, racing or off-road use), you are liable for the full repair cost and loss of use.",
+            "With a police report, your liability is limited to the insurance excess for your vehicle category. Without a police report, or if damage results from a breach of these terms (for example driving under the influence, an unauthorised driver, racing or off-road use), you are liable for the full repair cost and loss of use.",
           ],
         },
         {
-          heading: "10. Prohibited use",
+          heading: "8. Prohibited use",
           list: [
             "Using the vehicle for any illegal purpose, racing, towing or off-road driving.",
             "Driving under the influence of alcohol or drugs.",
@@ -2389,25 +2376,25 @@ const en = {
           ],
         },
         {
-          heading: "11. Traffic fines, Salik and parking",
+          heading: "9. Traffic fines, Salik and parking",
           paragraphs: [
             "Traffic fines, Salik tolls and parking fines incurred during the rental are the renter's responsibility. Salik tolls are charged at cost. Each traffic or parking fine is charged at its value plus a AED 30 administration fee, and black points are transferred to the driver as required by the RTA.",
           ],
         },
         {
-          heading: "12. Delivery and collection",
+          heading: "10. Delivery and collection",
           paragraphs: [
             "We deliver and collect vehicles at Dubai International Airport (DXB) and across Dubai. Any delivery or collection charge is shown before payment or agreed with you in writing in advance.",
           ],
         },
         {
-          heading: "13. Governing law",
+          heading: "11. Governing law",
           paragraphs: [
             "These terms are governed by the laws of the United Arab Emirates as applied in the Emirate of Dubai, and the courts of Dubai have jurisdiction.",
           ],
         },
         {
-          heading: "14. Contact",
+          heading: "12. Contact",
           paragraphs: [
             "Bliss Rent, Apt 121B, Block B, Sajaya 7 Building, Manama Street, Nad Al Sheba 3, Dubai, UAE. WhatsApp or call +971 54 782 0057 (24/7) or email support@bliss.rent.",
           ],

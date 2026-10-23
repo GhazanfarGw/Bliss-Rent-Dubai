@@ -577,7 +577,7 @@ export const RENTAL_GUIDE_POSTS: BlogPost[] = [
         {
           heading: 'Check before a long rental',
           paragraphs: [
-            'Mileage, fuel and late-return rules are set out in the [Booking Terms](/booking-terms). If your dates change, [Manage Booking](/manage-booking) lets you request an extension where one is available for your booking.',
+            'Fuel and late-return rules are set out in the [Booking Terms](/booking-terms). If your dates change, [Manage Booking](/manage-booking) lets you request an extension where one is available for your booking.',
           ],
         },
       ],
@@ -616,7 +616,7 @@ export const RENTAL_GUIDE_POSTS: BlogPost[] = [
         {
           heading: 'تحقق قبل الإيجار الطويل',
           paragraphs: [
-            'قواعد المسافة والوقود والتأخير مذكورة في [شروط وأحكام الحجز](/booking-terms). وإذا تغيرت تواريخك تتيح لك [إدارة الحجز](/manage-booking) طلب تمديد عندما يكون متاحًا لحجزك.',
+            'قواعد الوقود والتأخير مذكورة في [شروط وأحكام الحجز](/booking-terms). وإذا تغيرت تواريخك تتيح لك [إدارة الحجز](/manage-booking) طلب تمديد عندما يكون متاحًا لحجزك.',
           ],
         },
       ],
