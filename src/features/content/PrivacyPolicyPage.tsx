@@ -15,7 +15,6 @@ export function PrivacyPolicyPage() {
     <LegalPage
       title={t('pages.privacyPolicy.title')}
       updated={t('pages.privacyPolicy.updated')}
-      draftNotice={t('pages.privacyPolicy.draftNotice')}
       sections={sections}
     />
   )

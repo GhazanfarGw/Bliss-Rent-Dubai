@@ -113,7 +113,7 @@ describe('ContactPage', () => {
     expect(screen.queryByText(/booking terms & conditions/i)).not.toBeInTheDocument()
 
     await user.click(question)
-    expect(screen.getByText(/booking terms & conditions/i)).toBeInTheDocument()
+    expect(screen.getByText(/more than 48 hours before pickup/i)).toBeInTheDocument()
     expect(question).toHaveAttribute('aria-expanded', 'true')
   })
 

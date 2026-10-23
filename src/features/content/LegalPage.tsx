@@ -11,19 +11,15 @@ interface LegalSection {
 interface LegalPageProps {
   title: string
   updated: string
-  draftNotice: string
   intro?: string
   sections: LegalSection[]
 }
 
 /**
- * Shared renderer for the three draft legal pages (Privacy Policy, Cookie
- * Policy, Booking Terms & Conditions). All three are standard,
- * plain-language starting points — not legal advice — and carry bracketed
- * placeholders (e.g. "[__]") for business-specific numbers the owner still
- * needs to supply. The amber "DRAFT" banner is intentionally the same
- * component on all three so none of them can quietly lose it during a
- * future edit.
+ * Shared renderer for the three legal pages (Privacy Policy, Cookie
+ * Policy, Booking Terms & Conditions). Published 23 Oct 2026 with the
+ * company's real rules (age, deposit, fuel, mileage, cancellation, fines);
+ * the previous DRAFT banner and "[__]" placeholders were removed.
  */
 function slugify(heading: string): string {
   return heading
@@ -32,7 +28,7 @@ function slugify(heading: string): string {
     .replace(/^-+|-+$/g, '')
 }
 
-export function LegalPage({ title, updated, draftNotice, intro, sections }: LegalPageProps) {
+export function LegalPage({ title, updated, intro, sections }: LegalPageProps) {
   const { t } = useTranslation()
   useDocumentTitle(title)
   useMetaDescription(intro)
@@ -44,11 +40,6 @@ export function LegalPage({ title, updated, draftNotice, intro, sections }: Lega
   return (
     <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6">
       <SectionHeader title={title} description={updated} emphasis="marketing" />
-
-      <div className="mt-6 rounded-xl border border-warning/30 bg-warning-bg px-5 py-4 text-sm text-warning">
-        <p className="font-semibold">{t('pages.draftBannerTitle')}</p>
-        <p className="mt-1">{draftNotice}</p>
-      </div>
 
       {intro && <p className="mt-6 text-sm leading-relaxed text-brand-navy/80">{intro}</p>}
 

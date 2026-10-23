@@ -242,7 +242,7 @@ const en = {
       items: [
         {
           title: 'Age',
-          body: 'The driver must be at least 25 years old at the start of the rental.',
+          body: 'The driver must be at least 21 years old (25 for luxury, sports and supercars) at the start of the rental.',
         },
         {
           title: 'Driving license',
@@ -1664,7 +1664,7 @@ const en = {
   },
   cookieConsent: {
     ariaLabel: 'Cookie notice',
-    message: 'We use essential cookies to keep the site working — remembering your language and your booking session. We don’t use tracking or advertising cookies.',
+    message: 'We use essential cookies to run this site. With your permission, we also use analytics and advertising cookies (Google and Meta) to improve the site and measure our ads.',
     learnMore: 'Cookie Policy',
     decline: 'Decline',
     accept: 'Accept',
@@ -2042,7 +2042,7 @@ const en = {
             },
             {
               question: 'Can I cancel or change my booking?',
-              answer: 'Our cancellation and refund rules are set out in the Booking Terms & Conditions — please check there before booking.',
+              answer: 'Yes. Cancel more than 48 hours before pickup for a full refund; within 48 hours (or no-show) one day’s rental is charged and the rest refunded. Date or car changes depend on availability. Full details are in our Booking Terms.',
             },
           ],
         },
@@ -2051,7 +2051,7 @@ const en = {
           items: [
             {
               question: 'How old do I need to be to rent a car?',
-              answer: 'The driver must be at least 18 years old at the start of the rental.',
+              answer: 'At least 21 years old for economy cars and SUVs, and 25 for luxury, sports and supercars, with a licence held for at least 1 year (2 years for luxury and sports cars).',
             },
             {
               question: 'What documents does the driver need?',
@@ -2065,7 +2065,7 @@ const en = {
             },
             {
               question: 'Is there a mileage limit or fuel policy?',
-              answer: 'Yes — mileage allowance and fuel policy are set out in the Booking Terms & Conditions.',
+              answer: 'Economy cars and SUVs include 250 km per day; luxury, sports and supercars include 200 km per day; monthly rentals include 4,500 km per 30 days. Return the car with the same fuel level you received it with.',
             },
           ],
         },
@@ -2143,7 +2143,7 @@ const en = {
         items: [
           {
             question: 'Can I cancel or change my booking?',
-            answer: 'Our cancellation and refund rules are set out in the Booking Terms & Conditions — please check there before booking.',
+            answer: 'Yes. Cancel more than 48 hours before pickup for a full refund; within 48 hours (or no-show) one day’s rental is charged and the rest refunded. Date or car changes depend on availability. Full details are in our Booking Terms.',
           },
           {
             question: 'What documents does the driver need?',
@@ -2156,7 +2156,7 @@ const en = {
           },
           {
             question: 'Is there a mileage limit or fuel policy?',
-            answer: 'Yes — mileage allowance and fuel policy are set out in the Booking Terms & Conditions.',
+            answer: 'Economy cars and SUVs include 250 km per day; luxury, sports and supercars include 200 km per day; monthly rentals include 4,500 km per 30 days. Return the car with the same fuel level you received it with.',
           },
         ],
       },
@@ -2181,182 +2181,236 @@ const en = {
       supportNote: 'Bliss Rent bookings are made only on this website. WhatsApp and this contact form are for support, not for booking a car.',
     },
     privacyPolicy: {
-      title: 'Privacy Policy',
-      updated: 'Last updated: 27 August 2026',
-      draftNotice:
-        "DRAFT — pending legal review. This page is a standard, plain-language starting point and is not legal advice. Please have a qualified lawyer review and finalize this policy — including applicable UAE data protection rules — before the site goes live.",
+      title: "Privacy Policy",
+      updated: "Last updated: 23 October 2026",
       sections: [
         {
-          heading: '1. Introduction',
+          heading: "1. Introduction",
           paragraphs: [
-            "This Privacy Policy explains what information Bliss Rent ('we', 'us', 'our') collects when you use our website to search for and book a rental car, and how we use, store, and protect that information.",
+            "This Privacy Policy explains what information Bliss Rent ('we', 'us', 'our') collects when you use bliss.rent to search for and book a rental car, and how we use, share, store and protect it. We handle personal data in line with applicable UAE data protection law, including Federal Decree-Law No. 45 of 2021 on the Protection of Personal Data.",
           ],
         },
         {
-          heading: '2. Information we collect',
+          heading: "2. Information we collect",
           paragraphs: [
-            "When you make a booking, we collect the contact and driver information needed to complete it, including: your full name, email address, and phone number; and the driver's full name, date of birth, driving license number and expiry date, and issuing country.",
-            'We also automatically collect basic technical information (such as browser type and general usage of the site) to help the site work correctly.',
+            "When you book or request a price, we collect the details needed to provide the rental: your name, email address and phone/WhatsApp number; the driver's name, date of birth, driving licence details and issuing country; and your booking details (vehicle, dates, pickup and drop-off locations).",
+            "With your consent (see our Cookie Policy), we also collect basic usage and device information through analytics and advertising tools, and where you arrived from (for example an ad or a search engine).",
           ],
         },
         {
-          heading: '3. How we use your information',
+          heading: "3. How we use your information",
           list: [
-            'To create and manage your booking.',
-            'To contact you about your booking (confirmations, updates, and support).',
-            'To meet our legal and record-keeping obligations.',
-            'To improve our website and services.',
+            "To create, confirm and manage your booking, and to deliver and collect the vehicle.",
+            "To contact you about your booking or price request by email, phone or WhatsApp.",
+            "To take payment, process refunds and handle security deposits, traffic fines and Salik tolls.",
+            "To meet our legal, insurance and record-keeping obligations.",
+            "To understand how the website is used and measure our advertising (only with your consent).",
           ],
         },
         {
-          heading: '4. How we store and protect your information',
+          heading: "4. Who we share information with",
           paragraphs: [
-            "Your information is stored using access controls that restrict it to authorized Bliss Rent staff only. Driver's license and ID information, once document upload is available, is stored in a private, non-public storage area.",
-            'Payment card details are handled by our payment provider directly and are not stored on our own servers.',
+            "We do not sell your personal information. We share it only where needed to provide the service:",
+          ],
+          list: [
+            "The licensed rental company that supplies your vehicle, so it can prepare, hand over and insure the car.",
+            "Stripe, which processes card payments — card details go directly to Stripe and are never stored on our servers.",
+            "Our hosting, database and email providers, which process data on our behalf under contract.",
+            "Google and Meta analytics and advertising tools, only if you accept cookies.",
+            "Authorities such as the police or the RTA where required by law, for example for traffic fines or accidents.",
           ],
         },
         {
-          heading: '5. Who we share information with',
+          heading: "5. How we store and protect your information",
           paragraphs: [
-            'We do not sell your personal information. We only share it where necessary — for example, with a payment provider to process payment, or where required by law.',
+            "Your information is stored with access controls that restrict it to authorised Bliss Rent staff. Connections to our website are encrypted (HTTPS).",
           ],
         },
         {
-          heading: '6. Cookies',
-          paragraphs: ['Our website uses a small number of cookies, described in full in our Cookie Policy.'],
-        },
-        {
-          heading: '7. Your rights',
+          heading: "6. Cookies",
           paragraphs: [
-            'You may request access to, correction of, or deletion of your personal information by contacting us at [privacy contact email]. We will respond within a reasonable timeframe.',
+            "We use essential cookies to run the website and, only if you accept, analytics and advertising cookies. Full details are in our Cookie Policy.",
           ],
         },
         {
-          heading: '8. Data retention',
+          heading: "7. Your rights",
           paragraphs: [
-            'We retain booking and driver information for as long as needed to fulfill the booking and meet our legal and accounting obligations, after which it is deleted or anonymized.',
+            "You can ask to access, correct or delete your personal information, or withdraw your marketing or cookie consent at any time, by emailing support@bliss.rent. We will respond within 30 days. Some records (for example invoices and traffic-fine records) must be kept by law even after a deletion request.",
+          ],
+        },
+        {
+          heading: "8. Data retention",
+          paragraphs: [
+            "We keep booking and driver information for as long as needed to complete the rental and settle any fines, tolls or claims, and then for the period required by UAE accounting and legal rules, after which it is deleted or anonymised. Price requests that do not become bookings are deleted after 12 months.",
           ],
         },
         {
           heading: "9. Children's privacy",
           paragraphs: [
-            "Bliss Rent's services are intended for adults only. Renting a vehicle requires the driver to meet [minimum driver age] and hold a valid driving license.",
+            "Our services are for adults only. Drivers must be at least 21 years old (25 for luxury, sports and supercars) and hold a valid driving licence.",
           ],
         },
         {
-          heading: '10. Changes to this policy',
-          paragraphs: ["We may update this policy from time to time. The 'last updated' date above will reflect the most recent version."],
+          heading: "10. Changes to this policy",
+          paragraphs: [
+            "We may update this policy from time to time. The 'last updated' date above shows the latest version.",
+          ],
         },
         {
-          heading: '11. Contact us',
-          paragraphs: ['For any question about this policy or your information, contact us at [privacy contact email] or through our Contact Us page.'],
+          heading: "11. Contact us",
+          paragraphs: [
+            "Bliss Rent, Apt 121B, Block B, Sajaya 7 Building, Manama Street, Nad Al Sheba 3, Dubai, UAE. Email support@bliss.rent or WhatsApp +971 54 782 0057.",
+          ],
         },
       ],
     },
     cookiePolicy: {
-      title: 'Cookie Policy',
-      updated: 'Last updated: 19 October 2026',
-      draftNotice:
-        'DRAFT — pending legal review. This page is a standard, plain-language starting point and is not legal advice. Please have a qualified lawyer review and finalize this policy before the site goes live.',
+      title: "Cookie Policy",
+      updated: "Last updated: 23 October 2026",
       sections: [
         {
-          heading: '1. What are cookies',
-          paragraphs: ['Cookies are small text files stored on your device that help a website function and remember your preferences.'],
-        },
-        {
-          heading: '2. Cookies we use',
-          list: [
-            'Essential cookies — required for the website to work, such as remembering your language preference (English/Arabic) and keeping your booking session active while you check out.',
-            'Analytics and advertising cookies (only if you click "Accept" on our cookie banner) — Google Analytics, Google Tag Manager, Google Ads and the Meta Pixel help us understand how visitors use the site and measure our advertising. If you click "Decline", none of these are loaded.',
-          ],
-        },
-        {
-          heading: '3. Managing cookies',
+          heading: "1. What are cookies",
           paragraphs: [
-            'Most browsers let you control or delete cookies in their settings. Blocking essential cookies may prevent parts of the booking process (like checkout) from working correctly.',
+            "Cookies are small text files stored on your device that help a website work and remember your preferences. We use the word \"cookies\" here to also cover similar technologies such as local storage and tracking pixels.",
           ],
         },
         {
-          heading: '4. Changes to this policy',
-          paragraphs: ['If the cookies we use change — for example, if analytics cookies are added in future — this page will be updated and the date above will change.'],
+          heading: "2. Cookies we use",
+          list: [
+            "Essential (always on) — remember your language (English/Arabic), your cookie choice and your booking session during checkout. The site cannot work without these.",
+            "Analytics (only if you click \"Accept\") — Google Analytics and Google Tag Manager show us how visitors use the site, for example which pages and cars are viewed.",
+            "Advertising (only if you click \"Accept\") — Google Ads and the Meta (Facebook/Instagram) Pixel measure which ads lead to enquiries and bookings, and let us show relevant ads to people who visited our site.",
+          ],
         },
         {
-          heading: '5. Contact us',
-          paragraphs: ['Questions about cookies can be sent to [privacy contact email] or through our Contact Us page.'],
+          heading: "3. Your choice",
+          paragraphs: [
+            "When you first visit, our banner lets you Accept or Decline. If you decline, no analytics or advertising cookies are loaded. To change your choice later, clear this site's cookies and storage in your browser and the banner will appear again.",
+          ],
+        },
+        {
+          heading: "4. Managing cookies in your browser",
+          paragraphs: [
+            "Most browsers let you block or delete cookies in their settings. Blocking essential cookies may stop parts of the booking process, such as checkout, from working.",
+          ],
+        },
+        {
+          heading: "5. Changes to this policy",
+          paragraphs: [
+            "If the cookies we use change, we will update this page and the date above.",
+          ],
+        },
+        {
+          heading: "6. Contact us",
+          paragraphs: [
+            "Questions about cookies can be sent to support@bliss.rent or through our Contact Us page.",
+          ],
         },
       ],
     },
     bookingTerms: {
-      title: 'Booking Terms & Conditions',
-      updated: 'Last updated: 27 August 2026',
-      draftNotice:
-        'DRAFT — pending legal review. This page is a standard, plain-language starting point and is not legal advice. The bracketed fields below need your actual business rules before this is final — please have a qualified lawyer review the complete terms before the site goes live.',
-      intro: 'These terms apply to every booking made through the Bliss Rent website. By completing a booking, you agree to the terms below.',
+      title: "Booking Terms & Conditions",
+      updated: "Last updated: 23 October 2026",
+      intro: "These terms apply to every booking made with Bliss Rent through bliss.rent, by WhatsApp or by phone. By completing a booking you agree to them. The rental agreement signed at vehicle handover forms part of these terms.",
       sections: [
         {
-          heading: '1. Self-drive rental — no driver provided',
+          heading: "1. Self-drive rental and vehicle supply",
           paragraphs: [
-            "Bliss Rent provides self-drive vehicle rental only. We do not provide a driver. The person named as 'driver' at booking is solely responsible for operating the vehicle safely and legally for the full rental period.",
+            "Bliss Rent provides self-drive car rental only — no driver is provided. Vehicles may be supplied by our licensed partner rental companies; Bliss Rent remains your point of contact throughout. If the exact vehicle booked becomes unavailable for reasons outside our control, we will provide the same model or a vehicle of the same or a higher class at no extra cost, or a full refund if you prefer.",
           ],
         },
         {
-          heading: '2. Driver eligibility',
+          heading: "2. Driver eligibility and documents",
           list: [
-            'Minimum driver age: [__]',
-            'Minimum license holding period: [__]',
-            'A valid driving license (and International Driving Permit if applicable) is required, valid through the end of the rental period.',
+            "Minimum age: 21 years for economy cars and SUVs; 25 years for luxury, sports and supercars.",
+            "Minimum licence holding period: 1 year (2 years for luxury, sports and supercars).",
+            "UAE residents: a valid UAE driving licence and Emirates ID.",
+            "Visitors: passport with UAE entry stamp or visa, and a valid driving licence from your home country; an International Driving Permit is also required if your licence is not on the RTA list of licences accepted without one.",
+            "Only drivers named on the rental agreement may drive the vehicle. All documents must be presented in original at handover; we may refuse handover, with a full refund, if they are missing or invalid.",
           ],
         },
         {
-          heading: '3. Booking & payment',
+          heading: "3. Prices and payment",
           paragraphs: [
-            'A booking is confirmed once payment is completed on our website. Prices shown at checkout are the final price for the dates and vehicle selected, unless changed by the customer.',
-            'Security deposit: [__]',
+            "Prices are shown in UAE dirhams (AED). The total shown at checkout is the rental price for the selected vehicle and dates. Longer rentals use our weekly, monthly and 3-month rates.",
+            "A booking is confirmed once payment is completed. Card payments are processed securely by Stripe.",
           ],
         },
         {
-          heading: '4. Fuel policy',
-          paragraphs: ['Fuel policy: [__ — e.g. the vehicle is provided with a full tank and must be returned with a full tank].'],
-        },
-        {
-          heading: '5. Mileage',
-          paragraphs: ['Daily/rental-period mileage allowance: [__]. Additional mileage beyond this allowance is charged at [__ per km].'],
-        },
-        {
-          heading: '6. Late return',
-          paragraphs: ['Vehicles must be returned by the agreed date and time. A late return fee of [__] applies per [hour/day] beyond the agreed return time, unless an extension has been agreed in advance.'],
-        },
-        {
-          heading: '7. Cancellations & refunds',
-          paragraphs: ['Cancellation window: [__]. Refund policy: [__ — e.g. full refund if cancelled more than X hours before pickup, partial/no refund thereafter].'],
-        },
-        {
-          heading: '8. Vehicle condition & damage',
+          heading: "4. Security deposit",
           paragraphs: [
-            "The vehicle must be returned in the same condition as at handover, normal wear and tear excepted. Any damage beyond normal wear and tear during the rental period is the renter's responsibility, up to [__ / the security deposit amount / actual repair cost].",
+            "A refundable security deposit is taken or pre-authorised on a credit card in the main driver's name at handover: AED 1,000 for economy cars, AED 2,500 for SUVs and premium cars, AED 5,000 for luxury cars and AED 10,000 for sports and supercars. The amount for your vehicle is confirmed before pickup.",
+            "The deposit is released within 21 days after the vehicle is returned, less any unpaid traffic fines, Salik tolls, fuel, extra kilometres, late-return charges or damage costs. The waiting period allows fines and tolls issued during your rental to be reported.",
           ],
         },
         {
-          heading: '9. Prohibited use',
+          heading: "5. Fuel",
+          paragraphs: [
+            "The vehicle is provided with a fuel level recorded at handover and must be returned with the same level. Any shortfall is charged at the current UAE fuel price plus a AED 50 refuelling service charge.",
+          ],
+        },
+        {
+          heading: "6. Mileage",
+          paragraphs: [
+            "Daily allowance: 250 km per day for economy cars and SUVs, and 200 km per day for luxury, sports and supercars. Monthly and 3-month rentals include 4,500 km per 30 days. Extra kilometres are charged at AED 1 per km for economy cars and SUVs and AED 5 per km for luxury, sports and supercars.",
+          ],
+        },
+        {
+          heading: "7. Late return, extensions and early return",
+          paragraphs: [
+            "Please return the vehicle at the agreed date and time. A 60-minute grace period applies; after that, each started 24-hour period is charged at the vehicle's current daily rate. To keep the car longer, request an extension through Manage Booking or WhatsApp before your return time; extensions are subject to availability.",
+            "If you return the vehicle early, unused days are not refunded unless agreed in writing in advance.",
+          ],
+        },
+        {
+          heading: "8. Cancellations and changes",
           list: [
-            'Using the vehicle for any illegal purpose.',
-            'Sub-renting or lending the vehicle to a driver not named on the booking.',
-            'Using the vehicle outside the coverage area agreed at booking (the pickup/drop-off city agreed at booking, unless otherwise agreed).',
+            "Cancelled more than 48 hours before pickup: full refund.",
+            "Cancelled within 48 hours of pickup, or no-show: one day's rental is charged and the rest is refunded.",
+            "Refunds are made to the original payment card, usually within 5–10 business days depending on your bank.",
+            "Changes to dates or vehicle are subject to availability and any price difference.",
           ],
         },
         {
-          heading: '10. Traffic fines & tolls',
+          heading: "9. Insurance, accidents and damage",
           paragraphs: [
-            "Any traffic fines, Salik (toll) charges, or parking fines incurred during the rental period are the renter's responsibility and may be charged to the payment method on file, plus an administration fee of [__].",
+            "All vehicles carry the insurance required by UAE law. In case of an accident or any damage, you must report it to the police (Dubai Police app or 999) and inform us immediately; a police report is required by law for any repair.",
+            "With a police report, your liability is limited to the insurance excess for your vehicle category, which is no more than the security deposit amount. Without a police report, or if damage results from a breach of these terms (for example driving under the influence, an unauthorised driver, racing or off-road use), you are liable for the full repair cost and loss of use.",
           ],
         },
         {
-          heading: '11. Governing law',
-          paragraphs: ['These terms are governed by the laws of the United Arab Emirates and the Emirate of Dubai.'],
+          heading: "10. Prohibited use",
+          list: [
+            "Using the vehicle for any illegal purpose, racing, towing or off-road driving.",
+            "Driving under the influence of alcohol or drugs.",
+            "Sub-renting the vehicle or letting a driver not named on the agreement drive it.",
+            "Smoking in the vehicle — specialist cleaning is charged at cost.",
+            "Taking the vehicle outside the UAE (including Oman) without our prior written approval and the required additional insurance.",
+          ],
         },
         {
-          heading: '12. Contact',
-          paragraphs: ['Questions about these terms can be sent through our Contact Us page.'],
+          heading: "11. Traffic fines, Salik and parking",
+          paragraphs: [
+            "Traffic fines, Salik tolls and parking fines incurred during the rental are the renter's responsibility. Salik tolls are charged at cost. Each traffic or parking fine is charged at its value plus a AED 30 administration fee, and black points are transferred to the driver as required by the RTA.",
+          ],
+        },
+        {
+          heading: "12. Delivery and collection",
+          paragraphs: [
+            "We deliver and collect vehicles at Dubai International Airport (DXB) and across Dubai. Any delivery or collection charge is shown before payment or agreed with you in writing in advance.",
+          ],
+        },
+        {
+          heading: "13. Governing law",
+          paragraphs: [
+            "These terms are governed by the laws of the United Arab Emirates as applied in the Emirate of Dubai, and the courts of Dubai have jurisdiction.",
+          ],
+        },
+        {
+          heading: "14. Contact",
+          paragraphs: [
+            "Bliss Rent, Apt 121B, Block B, Sajaya 7 Building, Manama Street, Nad Al Sheba 3, Dubai, UAE. WhatsApp or call +971 54 782 0057 (24/7) or email support@bliss.rent.",
+          ],
         },
       ],
     },
