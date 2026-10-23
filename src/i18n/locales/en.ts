@@ -2345,7 +2345,7 @@ const en = {
         {
           heading: "5. Late return, extensions and early return",
           paragraphs: [
-            "Please return the vehicle at the agreed date and time. A 60-minute grace period applies; after that, each started 24-hour period is charged at the vehicle's current daily rate. To keep the car longer, request an extension through Manage Booking or WhatsApp before your return time; extensions are subject to availability.",
+            "Please return the vehicle at the agreed date and time. If it is returned late, even by an hour or two, one full extra day is charged at the vehicle's current daily rate for each started 24-hour period after the agreed return time. There is no other late-return fee. To keep the car longer, request an extension through Manage Booking or WhatsApp before your return time; extensions are subject to availability.",
             "If you return the vehicle early, unused days are not refunded unless agreed in writing in advance.",
           ],
         },
