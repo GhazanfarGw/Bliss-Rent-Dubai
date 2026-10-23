@@ -97,7 +97,7 @@ export function CheckoutSummaryCard({ vehicle, startDate, endDate, pickup, dropo
             total.detail && <p className="mt-3 text-xs leading-4 text-text-muted">{total.detail}</p>
           ) : quote ? (
             <p className="mt-3 text-xs leading-4 text-text-muted">
-              <CurrencySymbol currency={quote.currency} /> {quote.unitPrice.toLocaleString()} {TERM_LABELS[quote.term]} × {quote.units} · {t('checkout.summaryCard.estimated')}
+              <CurrencySymbol currency={quote.currency} /> {quote.unitPrice.toLocaleString()} {TERM_LABELS[quote.term]} × {quote.units.toLocaleString(undefined, { maximumFractionDigits: 2 })} · {t('checkout.summaryCard.estimated')}
             </p>
           ) : null}
 

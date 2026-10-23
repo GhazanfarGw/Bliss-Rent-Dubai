@@ -40,39 +40,43 @@ export interface RentalQuote {
 }
 
 /**
- * Picks the best-matching priced term for the requested rental length and
- * computes a total. Falls back to any other term that IS priced (rather
- * than showing nothing) if the ideal one is missing pricing data — real
- * fleets won't always have every tier filled in for every vehicle.
- * Returns null only if the vehicle has no pricing rows at all.
+ * Prices a rental of `days` days. Each priced term is billed pro rata at its
+ * own per-day rate (a 10-day rental on a weekly rate pays 10/7 of the
+ * weekly price, not two full weeks), with a minimum of one full unit of
+ * that term — so a slightly shorter rental can still take a longer, cheaper
+ * package (29 days on the monthly rate when that is cheaper than 29 days
+ * on the weekly rate). The cheapest option wins, so the price never jumps
+ * when a customer adds a day. Returns null only if there are no pricing
+ * rows at all. Mirrored byte-for-byte in the create-booking Edge Function
+ * (which imports this file), so the checkout total and the charged total
+ * always agree.
  */
 export function quoteForDays(pricing: PricingRow[], days: number): RentalQuote | null {
   if (pricing.length === 0) return null
 
-  const idealTerm = resolveTermForDays(days)
-  const preferredOrder: PricingTerm[] = [
-    idealTerm,
-    'daily',
-    'weekly',
-    'monthly',
-    '3_month',
-  ]
+  const rentalDays = Math.max(1, days)
+  const idealTerm = resolveTermForDays(rentalDays)
+  const idealIsPriced = pricing.some((p) => p.term === idealTerm)
+  let best: RentalQuote | null = null
 
-  for (const term of preferredOrder) {
-    const row = pricing.find((p) => p.term === term)
-    if (!row) continue
-    const units = Math.max(1, Math.ceil(days / UNIT_LENGTH[term]))
-    return {
-      term,
-      units,
-      unitPrice: row.client_price,
-      totalPrice: Math.round(row.client_price * units * 100) / 100,
-      currency: row.currency,
-      isFallback: term !== idealTerm,
+  for (const row of pricing) {
+    const unitLength = UNIT_LENGTH[row.term as PricingTerm]
+    if (!unitLength) continue
+    const units = Math.max(1, rentalDays / unitLength)
+    const totalPrice = Math.round(row.client_price * units * 100) / 100
+    if (!best || totalPrice < best.totalPrice) {
+      best = {
+        term: row.term as PricingTerm,
+        units: Math.round(units * 100) / 100,
+        unitPrice: row.client_price,
+        totalPrice,
+        currency: row.currency,
+        isFallback: !idealIsPriced,
+      }
     }
   }
 
-  return null
+  return best
 }
 
 /** The cheapest per-day-equivalent priced term, for a simple "From AED X" display with no dates selected yet. */

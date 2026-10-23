@@ -54,13 +54,34 @@ describe('quoteForDays', () => {
     })
   })
 
-  it('computes a weekly total rounding up partial weeks', () => {
+  it('prorates a partial week at the weekly per-day rate instead of charging two weeks', () => {
     const pricing = [row({ term: 'weekly', client_price: 3623 })]
-    // 10 days -> ceil(10/7) = 2 weeks
+    // 10 days -> 10/7 of a week
     const quote = quoteForDays(pricing, 10)
     expect(quote?.term).toBe('weekly')
-    expect(quote?.units).toBe(2)
-    expect(quote?.totalPrice).toBe(7246)
+    expect(quote?.units).toBe(1.43)
+    expect(quote?.totalPrice).toBe(5175.71)
+  })
+
+  it('picks the cheapest term so the price never jumps when a day is added (live MG 3 rates)', () => {
+    const pricing = [
+      row({ term: 'daily', client_price: 72 }),
+      row({ term: 'weekly', client_price: 453.6 }),
+      row({ term: 'monthly', client_price: 1382.4 }),
+      row({ term: '3_month', client_price: 3032.64 }),
+    ]
+    expect(quoteForDays(pricing, 3)).toMatchObject({ term: 'daily', totalPrice: 216 })
+    expect(quoteForDays(pricing, 8)).toMatchObject({ term: 'weekly', totalPrice: 518.4 })
+    expect(quoteForDays(pricing, 31)).toMatchObject({ term: 'monthly', totalPrice: 1428.48 })
+    expect(quoteForDays(pricing, 90)).toMatchObject({ term: '3_month', totalPrice: 3032.64 })
+    // 29 days on the weekly rate (1879.2) is dearer than one month (1382.4)
+    expect(quoteForDays(pricing, 29)).toMatchObject({ term: 'monthly', totalPrice: 1382.4 })
+    let previous = 0
+    for (let d = 1; d <= 120; d++) {
+      const total = quoteForDays(pricing, d)!.totalPrice
+      expect(total).toBeGreaterThanOrEqual(previous)
+      previous = total
+    }
   })
 
   it('falls back to another priced term when the ideal one is missing', () => {
